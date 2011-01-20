@@ -1,0 +1,77 @@
+<html>
+    <head>
+    <script type="text/javascript" src="js/jquery-1.4.4.min.js"></script>
+           <script type="text/javascript" src="js/jquery.json-2.2.min.js"></script>
+    <script>
+        $(document).ready(function(){
+            var messages = [
+               ["id-1-import-pbrowser","import", "contrib.pbrowser"],
+               ["id-2-import-selenium","import","contrib.selenium2"],
+               ["id-3-make-Browser","make","instance","Browser"],
+               ["id-4-get-port", "call", "instance", "getPort"],
+               ["id-5-get-port", "call", "instance", "getPortErr"],
+               ["id-6-go-localhost", "call", "instance", "go", "http://localhost:3141/"],
+               ["id-999-shut_down", "call", "instance", "shut_down"]
+            ];
+            
+            $(messages).each(function(i,val){
+                var id = val[0];
+                var command = '';
+                $(val).each(function(i, val){ if (i>0) command = command + ' ' + val; });
+                var result = '<img src="img/loader.gif">';
+                $('#main').append('<tr id="'+id+'"><td class="id">'+id+'</td><td class="command">'+command+'</td><td class="result">'+result+'</td></tr>');
+            });
+
+            var index = 0;
+    
+            var webSocket = new WebSocket('ws://localhost:8000/');
+ 
+            webSocket.onopen = function(event) {
+               //alert('send: ' + $.toJSON([messages[index]]));
+               webSocket.send($.toJSON([messages[index]]));
+            };
+ 
+            webSocket.onmessage = function(event) {
+                //alert('onmessage, ' + event.data);
+                var data = '';
+                try {
+                   data = $.evalJSON(event.data);
+                } catch (ex) {
+                   var id = messages[index][0];
+                   var result = ex;
+                   $('table#main tr#'+id+' td.result').html('<img src="img/error.gif">'+result);;
+                   webSocket.close();
+                   return;
+                }
+                if ( messages[index][0] == data[0][0]) {
+                    var id = messages[index][0];
+                    var result = data[0][1];
+                    if ( result.toLowerCase().indexOf('exception') >= 0 ) {
+                        $('table#main tr#'+id+' td.result').html('<img src="img/error.gif">'+result);
+                    } else {
+                        $('table#main tr#'+id+' td.result').html('<img src="img/ok.gif">'+result);
+                    }
+                    index += 1;
+                    if ( messages.length > index ) {
+                        //alert('send: '+$.toJSON([messages[index]]));
+                        webSocket.send($.toJSON([messages[index]]));
+                     } else { 
+                        webSocket.close();
+                     }
+                } else {
+                    webSocket.close();
+                }
+            };
+ 
+            webSocket.onclose = function(event) {
+                //alert('onclose');
+            };
+        });
+        </script>
+    </head>
+    <body>
+        <table id="main">
+            <tr><th>id</th><th>command</th><th>result</th></tr>
+        </table>
+    </body>
+</html>
