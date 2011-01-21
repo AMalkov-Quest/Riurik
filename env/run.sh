@@ -9,4 +9,4 @@ SRCDIR="$SERVERDIR/src"
 # activating virtual environment
 "$ENVDIR/linux/bin/activate"
 # running server
-"$ENVDIR/linux/bin/python" "$SRCDIR/manage.py" runserver localhost:8000 --multithreaded
+"$ENVDIR/linux/bin/python" "$SRCDIR/manage.py" runserver 0.0.0.0:8000 --multithreaded

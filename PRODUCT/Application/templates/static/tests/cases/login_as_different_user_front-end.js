@@ -1,6 +1,6 @@
 login_as_different_user_frontend = function(url) {
 	this.testname = 'login_as_different_user_front-end';
-	this.url = url || 'http://atimiskov-w2k3:3141/';
+	this.url = url || /http:\/\/.*?\//.exec(window.location.href || document.url)[0];
 	this.run = function() { 
 		this.check(_$('#loginas-menu').css('display'), 'none');
 		_$('#loginas-img').click();

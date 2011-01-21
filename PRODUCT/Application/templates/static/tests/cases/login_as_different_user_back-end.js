@@ -1,6 +1,6 @@
 login_as_different_user_backend = function(url) {
 	this.testname = 'login_as_different_user_back-end';
-	this.url = url || 'http://atimiskov-w2k3:3141/';
+	this.url = url || /http:\/\/.*?\//.exec(window.location.href || document.url)[0];
 	this.run = function() { 
 		this.check(true, true);
 	};

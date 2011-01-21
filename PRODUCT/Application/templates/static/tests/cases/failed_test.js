@@ -1,6 +1,6 @@
 failed = function(url) {
 	this.testname = 'SAMPLE Test';
-	this.url = url || 'http://atimiskov-w2k3:3141/';
+	this.url = url || /http:\/\/.*?\//.exec(window.location.href || document.url)[0];
 	this.run = function() { 
         Test = this;
 		next(function(){
@@ -21,7 +21,7 @@ failed = function(url) {
             return Test.make('instance', 'Browser');
         }).
         next(function(){
-            return Test.call('instance', 'go', 'http://atimiskov-w2k3:3141/');
+            return Test.call('instance', 'go', Test.url);
         }).
         next(function(){
             return Test.call('instance', 'shut_down');

@@ -67,7 +67,7 @@
 
 	win.BaseTest = function(){
 		this.testname = 'NoName test';
-		this.url = null;
+		this.url = /http:\/\/.*?\//.exec(window.location.href || document.url)[0];
 		this.result = null;
 		this.gotErrors = false;
 		this.firstError = null;
@@ -123,7 +123,8 @@
             this._wsd = deferred;
             if ( typeof this._ws == 'undefined' ) {
                 console.log('creating websocket')
-                this._ws = new WebSocket('ws://localhost:8000/');
+                var host = /http:\/\/(.*?)\//.exec(window.location.href || document.url)[1];
+                this._ws = new WebSocket('ws://'+host+'/');
                 console.log('websocket created')
                 this._ws.onopen = function(event) {
                     _this._ws.send($.toJSON([args]));
