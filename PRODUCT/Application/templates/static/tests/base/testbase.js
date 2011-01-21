@@ -124,6 +124,10 @@
             if ( typeof this._ws == 'undefined' ) {
                 console.log('creating websocket')
                 var host = /http:\/\/(.*?)\//.exec(window.location.href || document.url)[1];
+                if ( /:/.test(host) ) {
+                    host = /(.*?):.*/.exec(host)[1] + ':8000';
+                }
+                console.log('Websocket connecting to '+host)
                 this._ws = new WebSocket('ws://'+host+'/');
                 console.log('websocket created')
                 this._ws.onopen = function(event) {
