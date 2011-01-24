@@ -2,15 +2,7 @@ failed = function(url) {
 	this.testname = 'SAMPLE Test';
 	this.url = url || /http:\/\/.*?\//.exec(window.location.href || document.url)[0];
 	this.run = function() { 
-        Test = this;
-		next(function(){
-            alert('start');
-        }).
-        next(function(){
-            var d = Test.new();
-            setTimeout(function(){ alert('timeouted'); d.ok(); }, 10);
-            return d;
-        }).
+        /*Test = this;
         next(function(){
             return Test.import('contrib.pbrowser');
         }).
@@ -25,11 +17,8 @@ failed = function(url) {
         }).
         next(function(){
             return Test.call('instance', 'shut_down');
-        }).
-		next(function(){
-            alert('ok');
         });
-
+        */
 	};
 }
 failed.prototype = new BaseTest();

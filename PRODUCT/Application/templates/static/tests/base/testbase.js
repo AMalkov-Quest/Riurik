@@ -23,9 +23,9 @@
 		var k = i.lastTest;
 		if ( i.tests.length <= k ) { 
 			TestRunner.log('All tests completed');
-			$('iframe').unbind();
-			$('iframe').attr('src','');
-			$('iframe').remove();
+		    //$('iframe').unbind();
+			//$('iframe').attr('src','');
+			//$('iframe').remove();
 			return; 
 		}
 		(function(TestRunner){
@@ -194,6 +194,18 @@
         this.call = function(){
             var d = Deferred();
             return this.websocket(d, 'call',arguments);
+        };
+        this.go = function(url){
+            var d = Deferred();
+            $('iframe').unbind();
+			$('iframe').attr('src',url);
+			$('iframe').load(function(){
+				window._$ = window.frames[0].window.jQuery;
+				_$(document).ready(function(){ 
+                    d.call();
+				});
+			});
+            return d;
         };
 
 	};
