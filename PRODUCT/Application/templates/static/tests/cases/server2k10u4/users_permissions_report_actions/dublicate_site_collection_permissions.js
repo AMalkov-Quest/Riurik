@@ -78,21 +78,53 @@ dublicate_site_collection_permissions = function(url) {
             var d = new Deferred();
             var f = function(){
                 if ( _$('#updatingPanel').length === 0 ) {
+                    TestRunner.log('element hidden');
                     d.call();
                 } else {
-                    TestRunner.log('waiting for element hiding');
-                    setTimeout(f,100);
+                    //TestRunner.log('waiting for element hiding');
+                    setTimeout(f,500);
                 }
             }
-            setTimeout(f,100);
+            setTimeout(f,500);
             return d;
         }).
         next(function(){
             _$('#btnDuplicate-button').trigger('click');
         }).
         next(function(){
-            _$('#id_user_dupl_to').val('UTAH\jassange');
-            _$('#dlgDuplicateOKButton-button').trigger('click');
+            _$('#id_user_dupl_to').val('UTAH\\jassange');
+        }).
+        next(function(){
+            var d = new Deferred();
+            setTimeout(function(){ d.call(); }, 3000);
+            return d;
+        }).
+        next(function(){
+             _$('#dlgDuplicateOKButton-button').trigger('click');
+        }).
+        next(function(){
+           var d = new Deferred();
+            var f = function(){
+                if ( _$('#dialogOperationResult').is(':visible') ) {
+                    setTimeout(f, 500);
+                } else {
+                    TestRunner.log('Element is not visible');
+                    d.call();
+                }
+            };
+            setTimeout(f, 500);
+           return d;
+        }).
+        next(function(){
+            var d = new Deferred();
+            setTimeout(function(){
+                if ( _$('#trendErrors').length === 0 ) {
+                    d.call();
+                } else {
+                    d.error('#trendErrors is present');
+                }
+            }, 100);
+            return d;
         }).
         error(function(error){
             alert(error);
