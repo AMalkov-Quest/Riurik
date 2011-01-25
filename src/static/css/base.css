@@ -4,21 +4,15 @@
 	width: 100%;
 }
 
-.menu {
-	float:left;	
+.menu li {
+	display: inline;
+	font-family: Calibri, cursive; font-size:10pt;	
 }
 
 body {
 	color: #666;
 	font-family: Tahoma, Arial, Helvetica, Tahoma, serif;
 	font-size: 12px;
-}
-
-a {
-	color: #058CB6;
-	font-family: Tahoma, Arial, Helvetica, serif;
-	font-size: 12px;
-	text-decoration: none;
 }
 
 a.logo {
@@ -53,6 +47,13 @@ a.logo {
 .column {
 	float: left;
 	width: 24%;
+}
+
+.column a {
+	color: #058CB6;
+	font-family: Tahoma, Arial, Helvetica, serif;
+	font-size: 12px;
+	text-decoration: none;
 }
 
 li img {
