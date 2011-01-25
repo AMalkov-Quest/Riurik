@@ -52,12 +52,12 @@ USE_I18N = True
 
 # Absolute path to the directory that holds media.
 # Example: "/home/media/media.lawrence.com/"
-MEDIA_ROOT = ''
+MEDIA_ROOT = os.path.dirname( __file__ ) + '/static'
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash if there is a path component (optional in other cases).
 # Examples: "http://media.lawrence.com", "http://example.com/media/"
-MEDIA_URL = ''
+MEDIA_URL = '/static/'
 
 # URL prefix for admin media -- CSS, JavaScript and images. Make sure to use a
 # trailing slash.
@@ -84,7 +84,7 @@ import os
 
 TEMPLATE_DIRS = (
 
-    #os.path.dirname( __file__ ) + '/templates',
+    os.path.dirname( __file__ ) + '/templates',
 
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
@@ -93,4 +93,12 @@ TEMPLATE_DIRS = (
 
 INSTALLED_APPS = (
 	'django_websocket',
+	'django.contrib.staticfiles',
+	'src',
 )
+
+#STATIC_ROOT = os.path.dirname( __file__ ) + '/static'
+#STATIC_URL = '/static/'
+
+# Path to a folder where tests are located
+STATIC_TESTS_ROOT = 'C:/saip/SharePoint Information Portal/Application/tests'
