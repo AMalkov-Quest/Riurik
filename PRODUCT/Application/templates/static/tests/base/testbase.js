@@ -41,6 +41,7 @@
 				_$(document).ready(function(){ 
 					try {
 						TestRunner.log('Runing test "'+test.testname+'"');
+                        _$(document).unbind();
 						test.run();	
 						test.markSuccess();
 					} catch (ex) {
@@ -202,7 +203,11 @@
 			$('iframe').load(function(){
 				window._$ = window.frames[0].window.jQuery;
 				_$(document).ready(function(){ 
-                    d.call();
+                    _$(document).unbind();
+                    if ( typeof d._called == 'undefined' ) {
+                        d._called = true;
+                        d.call();
+                    }
 				});
 			});
             return d;
