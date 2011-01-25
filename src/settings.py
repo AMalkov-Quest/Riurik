@@ -93,7 +93,6 @@ TEMPLATE_DIRS = (
 
 INSTALLED_APPS = (
 	'django_websocket',
-	'django.contrib.staticfiles',
 	'src',
 )
 

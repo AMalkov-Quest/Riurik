@@ -1,0 +1,66 @@
+.header {
+	background: url(/static/img/head_bg.png);
+	height: 100px;
+	width: 100%;
+}
+
+.menu {
+	float:left;	
+}
+
+body {
+	color: #666;
+	font-family: Tahoma, Arial, Helvetica, Tahoma, serif;
+	font-size: 12px;
+}
+
+a {
+	color: #058CB6;
+	font-family: Tahoma, Arial, Helvetica, serif;
+	font-size: 12px;
+	text-decoration: none;
+}
+
+a.logo {
+	background-image: url(/static/img/logo.jpg);
+	display: block;
+	float: left;
+	margin-left: 48px;
+	outline: none;
+	width: 70px;
+	height: 74px;
+}
+
+.tittle-riurik {
+	color: white;
+	cursor: default;
+	float: left;
+	font-family: arial, serif;
+	font-size: 16px;
+	padding: 29px 0px 0px 121px;
+}
+
+.content {
+	margin: 30px 63px 0px;
+}
+
+.line {
+	background: url(/static/img/border-dotted.gif) repeat-x 50% 0%;
+	margin: 0px;
+	padding: 1px;
+}
+
+.column {
+	float: left;
+	width: 24%;
+}
+
+li img {
+	margin-bottom: -5px;
+	padding-right: 7px;
+}
+
+.content li {
+	list-style: none;
+	margin-bottom: 5px;
+}

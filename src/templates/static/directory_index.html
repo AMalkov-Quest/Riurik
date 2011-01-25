@@ -1,6 +1,8 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
+    <link rel="stylesheet" href="/static/css/base.css" type="text/css">
+    
     <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
     <meta http-equiv="Content-Language" content="en-us" />
     <meta name="robots" content="NONE,NOARCHIVE" />
@@ -10,9 +12,30 @@
 {% load img_by_fstype %}
 
 <body>
-    <h1>{{ directory }}</h1>
-    {% for f in file_list %}
-    <img src="/static/img/{{ directory|img_by_fstype:f }}" height="24" width="24" title="{{ f }}"></img> <a href="{{ f }}">{{ f }}</a><br>
-    {% endfor %}
+	<div class="header">
+		<a href="" title="Riurik Web Based Acceptance Testing Framework"></a>
+		<div class="tittle-riurik">Riurik Web Based Acceptance Testing Framework</div>
+	</div>
+	<div class="content">
+		<h4 class="menu" style="float:left;">{{ directory }}</h4>
+		<div class="menu" style="display:inline;" align="right"><li><ul>Create folder</ul></li></div>
+		<div style="clear:both;"></div>
+		
+		<div class="line">
+			<div class="column" style="width:500px;">
+				<div class="column" style="width:500px;">
+	        		<ul>
+	        		<li></li>
+	        		{% for f in file_list %}
+	    			<li>
+	    				<img src="/static/img/{{ directory|img_by_fstype:f }}" height="24" width="24" title="{{ f }}" alt>
+	    				<a href="{{ f }}">{{ f }}</a>
+	    			</li>
+	    			{% endfor %}
+	    			</ul>
+	    		</div>
+    		</div>
+    	</div>
+    </div>
 </body>
 </html>
