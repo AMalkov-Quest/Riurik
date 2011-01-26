@@ -9,15 +9,17 @@ def mkdir(path):
 	
 	return resources.ok
 
-def mksuite(path):
+def mksuite(path, name):
 	try:
-		os.mkdir(settings.STATIC_TESTS_ROOT + '/' + path.strip('/'))
-		f = open(settings.STATIC_TESTS_ROOT + '/' + path.strip('/') + '/' + settings.TEST_CONTEXT_FILE_NAME, 'w')
+		fullpath = os.path.join(settings.STATIC_TESTS_ROOT, path.strip('/'), name)
+		os.mkdir(fullpath)
+		filename = os.path.join(fullpath, settings.TEST_CONTEXT_FILE_NAME)
+		f = open(filename, 'w')
 		f.close()
 	except Exception, e:
-		return str(e)
+		return (False, str(e))
 	
-	return resources.ok
+	return (True, os.path.join(name, settings.TEST_CONTEXT_FILE_NAME))
 
 def mktest(path, name):
 	try:
