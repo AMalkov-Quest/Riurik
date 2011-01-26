@@ -84,3 +84,9 @@ li img {
 {
 	display: none;
 }
+
+h4 a {
+    text-decoration: none;
+    color: navy;
+    font-weight: normal;
+}
