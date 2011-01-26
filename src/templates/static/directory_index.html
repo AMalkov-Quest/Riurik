@@ -13,6 +13,12 @@
     <meta http-equiv="Content-Language" content="en-us" />
     <meta name="robots" content="NONE,NOARCHIVE" />
     <title>Index of {{ directory }}</title>
+    {% block head %}
+        {% block styles %}
+	{% endblock styles %}
+	{% block javascripts %}
+	{% endblock javascripts %}
+    {% endblock head %}
 </head>
 
 {% include "tools.html" %}
@@ -20,22 +26,26 @@
 {% load prev_dir %}
 
 <body>
+	{% block body %}
 	<div class="header">
 		<a href="" title="Riurik Web Based Acceptance Testing Framework"></a>
 		<div class="tittle-riurik">Riurik Web Based Acceptance Testing Framework</div>
 	</div>
 	<div class="content">
 		<div style="float:right;">
+			{% block controls %}
 			<ul class="horizontal-menu">
 				<li><a href="javascript:createFolder('{{ directory }}')">Create Folder</a></li>
 				<li><a href="javascript:createSuite('{{ directory }}')">Create Suite</a></li>
 				<li><a href="javascript:createTest('{{ directory }}')">Create Test</a></li>
 			</ul>
+			{% endblock controls %}
 		</div>
 		<h4>{{ directory }} {% ifnotequal directory '/' %}<a style="text-decoration: none;" href="/site_media/{{ directory|prev_dir }}">...</a>{% endifnotequal %}</h4>
 		<div style="clear:both;"></div>
 		
 		<div class="line">
+			{% block content %}
 			<div class="column" style="width:500px;">
 				<div class="column" style="width:500px;">
 	        		<ul>
@@ -48,8 +58,10 @@
 	    			{% endfor %}
 	    			</ul>
 	    		</div>
+			{% endblock %}
     		</div>
+		
     	</div>
-    </div>
+    {% endblock body %}
 </body>
 </html>

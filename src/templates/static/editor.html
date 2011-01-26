@@ -1,0 +1,45 @@
+{% extends 'static/directory_index.html' %}
+
+{% block styles %}
+	{{ block.super }}
+	<link rel="stylesheet" type="text/css" href="/static/css/editor.css" />	
+{% endblock styles %}
+
+{% block javascripts %}
+	{{ block.super }}
+	<script type="text/javascript" src="/static/codemirroreditor/js/codemirror.js"></script>
+	<!--<script type="text/javascript" src="/static/codemirroreditor/js/mirrorframe.js"></script>-->
+        <script type="text/javascript">
+	  $(document).ready(function() {
+		  var textarea = document.getElementById('code');
+  		  var editor = CodeMirror.fromTextArea("code", {
+		    height: "600px",
+		    content: textarea.value,
+		    parserfile: ["tokenizejavascript.js", "parsejavascript.js"],
+		    stylesheet: "/static/codemirroreditor/css/jscolors.css",
+		    path: "/static/codemirroreditor/js/",
+		    autoMatchParens: true
+		  });
+	  });
+	</script>
+{% endblock %}
+
+{% block body %}
+	<form action='/actions/test/save/' method='POST'>
+		<input type="hidden" name="name" value="{{ relative_file_path }}" />
+		{{ block.super }}
+	</form>
+{% endblock body %}
+
+{% block controls %}
+	<ul class="horizontal-menu">
+		<li><a href="javascript:void(0);" onclick="$('form').submit();">Save</a></li>
+		<li><a href="javascript:void(0);" onclick="document.location=document.location;">Discard</a></li>
+
+	</ul>
+{% endblock controls %}
+
+{% block content %}
+	<textarea id='code'i name='content'>{{ content|default:"" }}</textarea>
+	
+{% endblock content %}
