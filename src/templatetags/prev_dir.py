@@ -17,7 +17,7 @@ def prev_dir(path):
 
 @register.filter
 def breadcrumbs(path):
-    html = ''
+    html = '/&nbsp;<a href="/%s">%s</a>' % (settings.STATIC_TESTS_URL,settings.STATIC_TESTS_URL.replace('/',''))
     lastpath = '/' + settings.STATIC_TESTS_URL
     i = 0
     path = path.split('/')
