@@ -32,15 +32,18 @@
 	</form>
 {% endblock body %}
 
+{% load prev_dir %}
+
 {% block controls %}
 	<ul class="horizontal-menu">
 		<li><a href="javascript:void(0);" onclick="$('form').submit();">Save</a></li>
-		<li><a href="javascript:void(0);" onclick="document.location=document.location;">Discard</a></li>
-
+		<li><a href="javascript: void(0);" onclick="document.location=document.location;">Discard</a></li>
+		<li><a href="javascript: void(0);" onclick="document.location='{{ request.path|prev_dir }}';">Close</a></li>
 	</ul>
 {% endblock controls %}
 
+{% block title %}<h4>{{ request.path|breadcrumbs_file }}</h4>{% endblock title %}
+
 {% block content %}
 	<textarea id='code'i name='content'>{{ content|default:"" }}</textarea>
-	
 {% endblock content %}

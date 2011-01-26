@@ -111,3 +111,12 @@ STATIC_TESTS_ROOT = 'C:/saip/SharePoint Information Portal/Application/tests'
 
 TEST_CONTEXT_FILE_NAME = 'context.ini'
 TEST_FILE_EXT = '.js'
+
+STATIC_TESTS_URL = 'site_media/'
+
+APPEND_SLASH = False
+CODEMIRROR_CALL_EDITOR_FOR = '^.*\.(?:js|ini)$' # .js and .ini files
+
+try:
+	from local_settings import *
+except: pass
