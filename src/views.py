@@ -62,11 +62,9 @@ if hasattr(settings, 'CODEMIRROR_CALL_EDITOR_FOR'):
 
 def static_wrapper(func):
     def new(*args,**kwargs):
-        request = args[0]
-        #kwargs['context_instance'] = RequestContext(request)
         r = func(*args, **kwargs)
         try:
-            path, content = kwargs['path'], r.content
+            request, path, content = args[0], kwargs['path'], r.content
             if re.match(CODEMIRROR_CALL_EDITOR_FOR, path.lower()):
                 return _render_to_response(
                     'static/types/javascript.html', 

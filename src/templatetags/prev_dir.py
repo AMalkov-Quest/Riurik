@@ -1,4 +1,4 @@
-import os
+import os, re
 from django import template
 from django.utils.safestring import mark_safe
 import settings
@@ -7,6 +7,12 @@ register = template.Library()
 
 @register.filter
 def prev_dir(path):
+    m = re.match('^(.*/).*?/$', path)
+    if m:
+        return m.group(1)
+    m = re.match('^(.*/).*?$', path)
+    if m:
+        return m.group(1)
 	return path
 
 @register.filter
