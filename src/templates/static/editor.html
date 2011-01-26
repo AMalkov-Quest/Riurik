@@ -27,6 +27,7 @@
 {% block body %}
 	<form action='/actions/test/save/' method='POST'>
 		<input type="hidden" name="name" value="{{ relative_file_path }}" />
+		<input type="hidden" name="url" value="{{ request.path }}" />
 		{{ block.super }}
 	</form>
 {% endblock body %}

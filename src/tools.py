@@ -31,7 +31,7 @@ def mktest(path):
 def savetest(content, path):
 	try:
 		f = open(settings.STATIC_TESTS_ROOT + '/' + path.strip('/'), 'w')
-		f.write(content)
+		f.write(content.replace('\r', ''))
 		f.close()
 	except Exception, e:
 		return str(e)

@@ -1,6 +1,7 @@
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response as _render_to_response
 from django_websocket.decorators import require_websocket, accept_websocket
+from django.template import RequestContext
 import protocol
 import traceback, sys, logging, os
 import tools
@@ -103,4 +104,4 @@ def saveTest(request):
 	response = HttpResponse(mimetype='text/plain')
 	response.write(result)
 	
-	return HttpResponseRedirect("/")
+	return HttpResponseRedirect(request.POST["url"])
