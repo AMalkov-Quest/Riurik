@@ -3,6 +3,7 @@ from django.shortcuts import render_to_response as _render_to_response
 from django_websocket.decorators import require_websocket, accept_websocket
 import protocol
 import traceback, sys, logging, os
+import tools
 
 LOG_FILENAME = os.path.join(os.path.dirname(os.path.abspath(__file__)),'waferslim-websocket-server.log')
 logging.basicConfig(filename=LOG_FILENAME,level=logging.DEBUG, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
@@ -54,12 +55,29 @@ def handle_message(data, isolate_imports=False, executioncontext=_executionconte
     return protocol.pack(results)
 
 def createFolder(request):
-	name = request.POST["name"]
-	print name
-	
-	import time
-	time.sleep(5)
+	result = tools.mkdir(request.POST["name"])
 	response = HttpResponse(mimetype='text/plain')
-	response.write('OK')
+	response.write(result)
 	
 	return response
+
+def createSuite(request):
+	result = tools.mksuite(request.POST["name"])
+	response = HttpResponse(mimetype='text/plain')
+	response.write(result)
+	
+	return response
+
+def createTest(request):
+	result = tools.mktest(request.POST["name"])
+	response = HttpResponse(mimetype='text/plain')
+	response.write(result)
+	
+	return response
+
+def saveTest(request):
+	result = tools.savetest(request.POST["content"], request.POST["name"])
+	response = HttpResponse(mimetype='text/plain')
+	response.write(result)
+	
+	return HttpResponseRedirect("/")

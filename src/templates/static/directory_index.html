@@ -32,7 +32,7 @@
 				<li><a href="javascript:createTest('{{ directory }}')">Create Test</a></li>
 			</ul>
 		</div>
-		<h4>{{ directory }} <a href="/site_media/{{ directory|prev_dir }}">...</a></h4>
+		<h4>{{ directory }} {% ifnotequal directory '/' %}<a style="text-decoration: none;" href="/site_media/{{ directory|prev_dir }}">...</a>{% endifnotequal %}</h4>
 		<div style="clear:both;"></div>
 		
 		<div class="line">
