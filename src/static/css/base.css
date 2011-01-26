@@ -4,9 +4,23 @@
 	width: 100%;
 }
 
-.menu li {
+.horizontal-menu li {
 	display: inline;
-	font-family: Calibri, cursive; font-size:10pt;	
+	padding: 0 10px 0 5px;
+	border-right: solid 1px #000;	
+}
+
+.horizontal-menu a {
+	font-family: Calibri, cursive; font-size:10pt;
+	text-decoration: none;	
+}
+
+.horizontal-menu li a:hover {
+  color: #33CC00;
+}
+
+.horizontal-menu li:last-child {
+  border: none;
 }
 
 body {
@@ -64,4 +78,9 @@ li img {
 .content li {
 	list-style: none;
 	margin-bottom: 5px;
+}
+
+.invisible
+{
+	display: none;
 }

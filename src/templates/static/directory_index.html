@@ -2,6 +2,12 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
     <link rel="stylesheet" href="/static/css/base.css" type="text/css">
+    <script type="text/javascript" src="/static/js/tools.js"></script>
+    
+    <link rel="stylesheet" type="text/css" href="/static/jquery-ui/css/start/jquery-ui-1.8.9.custom.css" />
+	<script type="text/javascript" src="/static/jquery-ui/js/jquery-1.4.4.min.js"></script>
+	<script type="text/javascript" src="/static/jquery-ui/js/jquery-ui-1.8.9.custom.min.js"></script>
+    
     
     <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
     <meta http-equiv="Content-Language" content="en-us" />
@@ -9,6 +15,7 @@
     <title>Index of {{ directory }}</title>
 </head>
 
+{% include "tools.html" %}
 {% load img_by_fstype %}
 
 <body>
@@ -18,10 +25,10 @@
 	</div>
 	<div class="content">
 		<div style="float:right;">
-			<ul class="menu">
-				<li><a>Create Folder</a></li> |
-				<li><a>Create Suite</a></li> |
-				<li><a>Create Test</a></li>
+			<ul class="horizontal-menu">
+				<li><a href="javascript:createFolder('{{ directory }}')">Create Folder</a></li>
+				<li><a href="javascript:createSuite('{{ directory }}')">Create Suite</a></li>
+				<li><a href="javascript:createTest('{{ directory }}')">Create Test</a></li>
 			</ul>
 		</div>
 		<h4>{{ directory }}</h4>
