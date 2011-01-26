@@ -40,7 +40,9 @@
 	</ul>
 {% endblock controls %}
 
+{% load prev_dir %}
+{% block title %}<h4>{{ request.path|breadcrumbs_file }}</h4>{% endblock title %}
+
 {% block content %}
 	<textarea id='code'i name='content'>{{ content|default:"" }}</textarea>
-	
 {% endblock content %}

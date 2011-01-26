@@ -3,8 +3,9 @@ from django.shortcuts import render_to_response as _render_to_response
 from django_websocket.decorators import require_websocket, accept_websocket
 from django.template import RequestContext
 import protocol
-import traceback, sys, logging, os
+import traceback, sys, logging, os, re
 import tools
+from django.conf import settings
 
 LOG_FILENAME = os.path.join(os.path.dirname(os.path.abspath(__file__)),'waferslim-websocket-server.log')
 logging.basicConfig(filename=LOG_FILENAME,level=logging.DEBUG, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
@@ -55,53 +56,56 @@ def handle_message(data, isolate_imports=False, executioncontext=_executionconte
     results = result.collection()
     return protocol.pack(results)
 
+CODEMIRROR_CALL_EDITOR_FOR = '^.*\.(?:js|ini)$'
+if hasattr(settings, 'CODEMIRROR_CALL_EDITOR_FOR'):
+    CODEMIRROR_CALL_EDITOR_FOR = getattr(settings, 'CODEMIRROR_CALL_EDITOR_FOR')
+
 def static_wrapper(func):
-	def new(*args,**kwargs):
-		r = func(*args, **kwargs)
-		#print dir(r), r._headers
-		if r.has_header('content-type'):
-			try:
-				contenttype = r._headers['content-type']
-				if 'javascript' in str(contenttype).lower():
-					request, path, content = args[0], kwargs['path'], r.content
-					return _render_to_response(
-						'static/types/javascript.html', 
-						{ 
-							'content': content,
-							'relative_file_path': path
-						}, 
-						context_instance=RequestContext(request)
-					)
-			except Exception, ex: logging.error(str(ex))
-		return r
-	return new
+    def new(*args,**kwargs):
+        request = args[0]
+        #kwargs['context_instance'] = RequestContext(request)
+        r = func(*args, **kwargs)
+        try:
+            path, content = kwargs['path'], r.content
+            if re.match(CODEMIRROR_CALL_EDITOR_FOR, path.lower()):
+                return _render_to_response(
+                    'static/types/javascript.html', 
+                    { 
+                        'content': content,
+                        'relative_file_path': path,
+                    }, 
+                    context_instance=RequestContext(request)
+                )
+        except Exception, ex: logging.error(str(ex))
+        return r
+    return new
 import django.views.static
 serve = static_wrapper(django.views.static.serve)
 
 def createFolder(request):
-	result = tools.mkdir(request.POST["name"])
-	response = HttpResponse(mimetype='text/plain')
-	response.write(result)
-	
-	return response
+    result = tools.mkdir(request.POST["name"])
+    response = HttpResponse(mimetype='text/plain')
+    response.write(result)
+    
+    return response
 
 def createSuite(request):
-	result = tools.mksuite(request.POST["name"])
-	response = HttpResponse(mimetype='text/plain')
-	response.write(result)
-	
-	return response
+    result = tools.mksuite(request.POST["name"])
+    response = HttpResponse(mimetype='text/plain')
+    response.write(result)
+    
+    return response
 
 def createTest(request):
-	result = tools.mktest(request.POST["name"])
-	response = HttpResponse(mimetype='text/plain')
-	response.write(result)
-	
-	return response
+    result = tools.mktest(request.POST["name"])
+    response = HttpResponse(mimetype='text/plain')
+    response.write(result)
+    
+    return response
 
 def saveTest(request):
-	result = tools.savetest(request.POST["content"], request.POST["name"])
-	response = HttpResponse(mimetype='text/plain')
-	response.write(result)
-	
-	return HttpResponseRedirect(request.POST["url"])
+    result = tools.savetest(request.POST["content"], request.POST["name"])
+    response = HttpResponse(mimetype='text/plain')
+    response.write(result)
+    
+    return HttpResponseRedirect(request.POST["url"])

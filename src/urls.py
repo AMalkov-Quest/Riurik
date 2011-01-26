@@ -22,7 +22,7 @@ urlpatterns = patterns('',
 	(r'^actions/suite/create/$', 'views.createSuite'),
 	(r'^actions/test/create/$', 'views.createTest'),
 	(r'^actions/test/save/$', 'views.saveTest'),
-	(r'^site_media/(?P<path>.*)$', 'views.serve',
+	(r'^'+settings.STATIC_TESTS_URL+'(?P<path>.*)$', 'views.serve',
 		{
 			'document_root': settings.STATIC_TESTS_ROOT,
 			'show_indexes': True
