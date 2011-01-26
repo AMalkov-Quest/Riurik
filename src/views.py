@@ -5,6 +5,7 @@ from django.template import RequestContext
 import protocol
 import traceback, sys, logging, os
 import tools
+import simplejson
 
 LOG_FILENAME = os.path.join(os.path.dirname(os.path.abspath(__file__)),'waferslim-websocket-server.log')
 logging.basicConfig(filename=LOG_FILENAME,level=logging.DEBUG, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
@@ -93,9 +94,11 @@ def createSuite(request):
 	return response
 
 def createTest(request):
-	result = tools.mktest(request.POST["name"])
-	response = HttpResponse(mimetype='text/plain')
-	response.write(result)
+	result = {}
+	result['success'], result['result'] = tools.mktest(request.POST["full-path"], request.POST["object-name"])
+	print result
+	response = HttpResponse(mimetype='text/json')
+	response.write(simplejson.dumps(result))
 	
 	return response
 

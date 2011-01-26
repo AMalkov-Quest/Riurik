@@ -12,21 +12,23 @@ def mkdir(path):
 def mksuite(path):
 	try:
 		os.mkdir(settings.STATIC_TESTS_ROOT + '/' + path.strip('/'))
-		f = open(settings.STATIC_TESTS_ROOT + '/' + path.strip('/') + '/' + 'context.txt', 'w')
+		f = open(settings.STATIC_TESTS_ROOT + '/' + path.strip('/') + '/' + settings.TEST_CONTEXT_FILE_NAME, 'w')
 		f.close()
 	except Exception, e:
 		return str(e)
 	
 	return resources.ok
 
-def mktest(path):
+def mktest(path, name):
 	try:
-		f = open(settings.STATIC_TESTS_ROOT + '/' + path.strip('/') + '.js', 'w')
+		filename = os.path.join(name + settings.TEST_FILE_EXT)
+		fullpath = os.path.join(settings.STATIC_TESTS_ROOT, path.strip('/'), filename)
+		f = open(fullpath, 'w')
 		f.close()
 	except Exception, e:
-		return str(e)
+		return (False, str(e))
 	
-	return resources.ok
+	return (True, filename)
 
 def savetest(content, path):
 	try:

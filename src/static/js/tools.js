@@ -43,7 +43,24 @@ function createSuite(path) {
 }
 
 function createTest(path) {
-	createObject(path, "/actions/test/create/");
+	$("#createFSObjectDialog").dialog({
+		resizable: false,
+		buttons: {
+			"create": function() {
+				$(this).dialog("close");
+				$.post(
+					"/actions/test/create/", 
+					$("#create-fsobject").serialize(), 
+					function(data) {
+						document.location = data['result'];
+					},
+					"json")
+			},
+			"cancel": function() {
+				$(this).dialog("close");
+			}
+		}
+	});
 }
 
 function createObject(path, url) {

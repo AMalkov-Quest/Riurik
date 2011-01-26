@@ -12,5 +12,7 @@ def img_by_fstype(path, fsobject):
 		fullpath = os.path.join(settings.STATIC_TESTS_ROOT, path, fsobject)
 	
 	if os.path.isdir(fullpath):
+		if os.path.exists( os.path.join(fullpath, settings.TEST_CONTEXT_FILE_NAME) ):
+			return 'fssuite'
 		return 'fsfolder'
 	return 'fstest'
