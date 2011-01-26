@@ -17,7 +17,7 @@ def prev_dir(path):
 
 @register.filter
 def breadcrumbs(path):
-    html = '/&nbsp;<a href="/%s">%s</a>' % (settings.STATIC_TESTS_URL,settings.STATIC_TESTS_URL.replace('/',''))
+    html = '<a href="/">/</a>&nbsp;'
     lastpath = '/' + settings.STATIC_TESTS_URL
     i = 0
     path = path.split('/')
@@ -26,12 +26,12 @@ def breadcrumbs(path):
         if p:
             lastpath += p 
             lastpath += '/'
-            html += '&nbsp;/&nbsp;<a href="%s">%s</a>' % ( lastpath, p )
+            html += '<a href="%s">%s</a>&nbsp;/&nbsp;' % ( lastpath, p )
     return mark_safe(html)
 
 @register.filter
 def breadcrumbs_file(path):
-    html = ''
+    html = '<a href="/">/</a>&nbsp;'
     lastpath = '/'
     i = 0
     path = path.split('/')
@@ -39,7 +39,10 @@ def breadcrumbs_file(path):
         i += 1
         if p:
             lastpath += p 
-            if i < len(path): lastpath += '/'
-            html += '&nbsp;/&nbsp;<a href="%s">%s</a>' % ( lastpath, p )
+            if i < len(path): 
+                lastpath += '/'
+                html += '<a href="%s">%s</a>&nbsp;/&nbsp;' % ( lastpath, p )
+            else:
+                html += '<a href="%s">%s</a>' % ( lastpath, p )
     return mark_safe(html)
 
