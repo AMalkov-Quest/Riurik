@@ -129,7 +129,7 @@
                     host = /(.*?):.*/.exec(host)[1] + ':8000';
                 }
                 console.log('Websocket connecting to '+host)
-                this._ws = new WebSocket('ws://'+host+'/');
+                this._ws = new WebSocket('ws://'+host+'/websocket');
                 console.log('websocket created')
                 this._ws.onopen = function(event) {
                     _this._ws.send($.toJSON([args]));
