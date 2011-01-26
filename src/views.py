@@ -53,6 +53,29 @@ def handle_message(data, isolate_imports=False, executioncontext=_executionconte
     results = result.collection()
     return protocol.pack(results)
 
+def static_wrapper(func):
+	def new(*args,**kwargs):
+		r = func(*args, **kwargs)
+		#print dir(r), r._headers
+		if r.has_header('content-type'):
+			try:
+				contenttype = r._headers['content-type']
+				if 'javascript' in str(contenttype).lower():
+					request, path, content = args[0], kwargs['path'], r.content
+					return _render_to_response(
+						'static/types/javascript.html', 
+						{ 
+							'content': content,
+							'relative_file_path': path
+						}, 
+						context_instance=RequestContext(request)
+					)
+			except Exception, ex: logging.error(str(ex))
+		return r
+	return new
+import django.views.static
+serve = static_wrapper(django.views.static.serve)
+
 def createFolder(request):
 	name = request.POST["name"]
 	print name

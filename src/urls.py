@@ -19,7 +19,7 @@ import settings
 urlpatterns = patterns('',
 	('^$', 'views.handler' ),
 	(r'^actions/folder/create/$', 'views.createFolder'),
-	(r'^site_media/(?P<path>.*)$', 'django.views.static.serve', 
+	(r'^site_media/(?P<path>.*)$', 'views.serve', 
 		{
 			'document_root': settings.STATIC_TESTS_ROOT,
 			'show_indexes': True
