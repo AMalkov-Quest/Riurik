@@ -1,16 +1,3 @@
-# coding: utf-8
-#######################################################################################
-#Copyright (C) 2010 Quest Software, Inc.
-#File:        views.py
-#Version:       1.0.0.0
-
-#######################################################################################
-#
-#       THIS CODE AND INFORMATION IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND,
-#       EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED
-#       WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A PARTICULAR PURPOSE.
-#
-########################################################################################
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response as _render_to_response
 from django_websocket.decorators import require_websocket, accept_websocket
@@ -66,3 +53,13 @@ def handle_message(data, isolate_imports=False, executioncontext=_executionconte
     results = result.collection()
     return protocol.pack(results)
 
+def createFolder(request):
+	name = request.POST["name"]
+	print name
+	
+	import time
+	time.sleep(5)
+	response = HttpResponse(mimetype='text/plain')
+	response.write('OK')
+	
+	return response

@@ -18,6 +18,7 @@ import settings
 
 urlpatterns = patterns('',
 	('^$', 'views.handler' ),
+	(r'^actions/folder/create/$', 'views.createFolder'),
 	(r'^site_media/(?P<path>.*)$', 'django.views.static.serve', 
 		{
 			'document_root': settings.STATIC_TESTS_ROOT,

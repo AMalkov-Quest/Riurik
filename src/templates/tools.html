@@ -2,7 +2,12 @@
 	<span>Specify a folder name here</span>
 	<br>
 	<br>
-	<form id="folder">
-		<input style="width: 100%;" id="name" align="bottom">		
+	<form id="create-folder">
+		<input type="hidden" id="full-path" value="{{ directory }}">
+		<input style="width: 100%;" id="folder-name" align="bottom">
 	</form>
+</div>
+
+<div style=" text-align: center; margin-top: 20px;" class="dialog invisible" id="operationInProgress" title="Progress">
+	In progress...
 </div>

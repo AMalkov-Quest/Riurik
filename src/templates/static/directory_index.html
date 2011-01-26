@@ -17,6 +17,7 @@
 
 {% include "tools.html" %}
 {% load img_by_fstype %}
+{% load prev_dir %}
 
 <body>
 	<div class="header">
@@ -31,7 +32,7 @@
 				<li><a href="javascript:createTest('{{ directory }}')">Create Test</a></li>
 			</ul>
 		</div>
-		<h4>{{ directory }}</h4>
+		<h4>{{ directory }} <a href="/site_media/{{ directory|prev_dir }}">...</a></h4>
 		<div style="clear:both;"></div>
 		
 		<div class="line">
@@ -41,7 +42,7 @@
 	        		<li></li>
 	        		{% for f in file_list %}
 	    			<li>
-	    				<img src="/static/img/{{ directory|img_by_fstype:f }}" height="24" width="24" title="{{ f }}" alt>
+	    				<img src="/static/img/{{ directory|img_by_fstype:f }}.gif" height="24" width="24" title="{{ f }}" alt>
 	    				<a href="{{ f }}">{{ f }}</a>
 	    			</li>
 	    			{% endfor %}
