@@ -12,17 +12,6 @@ try:
 except ImportError: 
     _USE_MESSAGES = False
 
-def _get_variables(path):
-    """ Get variables list for test, parses test-suites in upper folders.
-        Suite config is in '.config.ini'
-        path - absolute path for current test-file. 
-        Returns an array of tuples (name, value) """
-    # DUMMY method
-    # TODO: write this functional
-    return [
-            ('var1', 'val1',), ('var2','val2',),
-        ]
-
 @never_cache
 def index(request):
     tests = []
@@ -42,19 +31,16 @@ def index(request):
         if not os.path.exists(tests_dir):
             continue
         test_cases_dir = os.path.join(tests_dir, path)
-        
         if os.path.exists(test_cases_dir):
             if os.path.isdir(test_cases_dir):
                 for root, dirs, files in os.walk(test_cases_dir):
                     for in_file in files:
                         abs_file_path = os.path.join(root, in_file)
-                        export_vars = _get_variables(abs_file_path)
                         tests += [ 
-                            (abs_file_path.replace(abs_path_tpl_dir,'').replace(abs_path_tpl_dir,'').replace('\\','/'), export_vars,) 
+                            abs_file_path.replace(abs_path_tpl_dir,'').replace(abs_path_tpl_dir,'').replace('\\','/'), 
                         ]
             else:
-                export_vars = _get_variables(test_cases_dir)
-                tests += [ (test_cases_dir.replace(abs_path_tpl_dir,'').replace(abs_path_tpl_dir,'').replace('\\','/'), export_vars,) ]
+                tests += [ test_cases_dir.replace(abs_path_tpl_dir,'').replace(abs_path_tpl_dir,'').replace('\\','/'), ]
             break
         else:
             if _USE_MESSAGES:
