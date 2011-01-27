@@ -38,18 +38,10 @@
                 }
             });
             $('#discard').click(function(){ if ( ConfirmDiscardchanges() ) document.location=document.location;});
-            $('#close').click(function(){ if ( ConfirmDiscardchanges() ) document.location='{{ request.path|prev_dir }}';});
+            $('#close').click(function(){ if ( ConfirmDiscardchanges() ) document.location='{{ request.path|above }}';});
 	  });
 	</script>
 {% endblock %}
-
-{% block body %}
-	<form action='/actions/test/save/' method='POST'>
-		<input type="hidden" name="name" value="{{ relative_file_path }}" />
-		<input type="hidden" name="url" value="{{ request.path }}" />
-		{{ block.super }}
-	</form>
-{% endblock body %}
 
 {% block controls %}
 	<ul class="horizontal-menu">
@@ -63,5 +55,9 @@
 {% block title %}<h4>{{ request.path|breadcrumbs_file }}</h4>{% endblock title %}
 
 {% block content %}
-	<textarea id='code'i name='content'>{{ content|default:"" }}</textarea>
+	<form action='/actions/test/save/' method='POST'>
+		<input type="hidden" name="name" value="{{ relative_file_path }}" />
+		<input type="hidden" name="url" value="{{ request.path }}" />
+		<textarea id='code' name='content'>{{ content|default:"" }}</textarea>
+	</form>
 {% endblock content %}

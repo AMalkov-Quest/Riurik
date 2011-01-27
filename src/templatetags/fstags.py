@@ -6,6 +6,19 @@ import settings
 register = template.Library()
 
 @register.filter
+def img_by_fstype(path, fsobject):
+	if path == '/':
+		fullpath = os.path.join(settings.STATIC_TESTS_ROOT, fsobject)
+	else:
+		fullpath = os.path.join(settings.STATIC_TESTS_ROOT, path, fsobject)
+	
+	if os.path.isdir(fullpath):
+		if os.path.exists( os.path.join(fullpath, settings.TEST_CONTEXT_FILE_NAME) ):
+			return 'fssuite'
+		return 'fsfolder'
+	return 'fstest'
+
+@register.filter
 def above(path):
 	'''
 	parses given path and returns a path that is a parent folder to the given one
@@ -24,16 +37,6 @@ def current(path):
 	if path.rstrip('/').find('/') == -1:
 		return path.rstrip('/')
 	return path.rstrip('/').rsplit('/', 1)[1]
-
-@register.filter
-def prev_dir(path):
-    m = re.match('^(.*/).*?/$', path)
-    if m:
-        return m.group(1)
-    m = re.match('^(.*/).*?$', path)
-    if m:
-        return m.group(1)
-	return path
 
 @register.filter
 def breadcrumbs(path):
