@@ -4,13 +4,13 @@ function createFolder(path) {
 		buttons: {
 			"create": function() {
 				$(this).dialog("close");
-				var name = $("#full-path").val() + $("#object-name").val();
 				$("#operationInProgress").load(
 						"/actions/folder/create/", 
-						{"name" : name},
+						{"full-path" : $("#full-path").val(), "object-name": $("#object-name").val()},
 						function() {
 							$("#operationInProgress").parent().find("button:contains('ok')").attr('disabled',false).removeClass('ui-state-disabled');
-						});
+						},
+						"json");
 				operationInProgress();
 			},
 			"cancel": function() {
@@ -20,63 +20,27 @@ function createFolder(path) {
 	});
 }
 
-function createSuite(path) {
-	$("#createFSObjectDialog").dialog({
-		resizable: false,
-		buttons: {
-			"create": function() {
-				$(this).dialog("close");
-				var name = $("#full-path").val() + $("#object-name").val();
-				$("#operationInProgress").load(
-						"/actions/suite/create/", 
-						{"name" : name},
-						function() {
-							$("#operationInProgress").parent().find("button:contains('ok')").attr('disabled',false).removeClass('ui-state-disabled');
-						});
-				operationInProgress();
-			},
-			"cancel": function() {
-				$(this).dialog("close");
-			}
-		}
-	});
+function createSuite() {
+	createAndEdit("/actions/suite/create/");
 }
 
-function createTest(path) {
+function createTest() {
+	createAndEdit("/actions/test/create/");
+}
+
+function createAndEdit(url) {
 	$("#createFSObjectDialog").dialog({
 		resizable: false,
 		buttons: {
 			"create": function() {
 				$(this).dialog("close");
 				$.post(
-					"/actions/test/create/", 
+					url, 
 					$("#create-fsobject").serialize(), 
 					function(data) {
 						document.location = data['result'];
 					},
-					"json")
-			},
-			"cancel": function() {
-				$(this).dialog("close");
-			}
-		}
-	});
-}
-
-function createObject(path, url) {
-	$("#createFSObjectDialog").dialog({
-		resizable: false,
-		buttons: {
-			"create": function() {
-				$(this).dialog("close");
-				var name = $("#full-path").val() + $("#object-name").val();
-				$("#operationInProgress").load(
-						url, 
-						{"name" : name},
-						function() {
-							$("#operationInProgress").parent().find("button:contains('ok')").attr('disabled',false).removeClass('ui-state-disabled');
-						});
-				operationInProgress();
+					"json");
 			},
 			"cancel": function() {
 				$(this).dialog("close");

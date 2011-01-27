@@ -38,21 +38,14 @@
                 }
             });
             $('#discard').click(function(){ if ( ConfirmDiscardchanges() ) document.location=document.location;});
-            $('#close').click(function(){ if ( ConfirmDiscardchanges() ) document.location='{{ request.path|prev_dir }}';});
+            $('#close').click(function(){ if ( ConfirmDiscardchanges() ) document.location='{{ request.path|above }}';});
 	  });
 	</script>
 {% endblock %}
 
-{% block body %}
-	<form action='/actions/test/save/' method='POST'>
-		<input type="hidden" name="name" value="{{ relative_file_path }}" />
-		<input type="hidden" name="url" value="{{ request.path }}" />
-		{{ block.super }}
-	</form>
-{% endblock body %}
-
 {% block controls %}
 	<ul class="horizontal-menu">
+		<li><a href="http://sp-2k10-u4:3141/tests/{{ relative_file_path }}">Run</a></li>
 		<li><a id="save" href="javascript:void(0);" onclick="$('form').submit();">Save</a></li>
 		<li><a id="discard" href="javascript: void(0);">Discard</a></li>
 		<li><a id="close" href="javascript: void(0);">Close</a></li>
@@ -62,5 +55,9 @@
 {% block title %}<h4>{{ request.path|breadcrumbs_file }}</h4>{% endblock title %}
 
 {% block content %}
-	<textarea id='code'i name='content'>{{ content|default:"" }}</textarea>
+	<form action='/actions/test/save/' method='POST'>
+		<input type="hidden" name="name" value="{{ relative_file_path }}" />
+		<input type="hidden" name="url" value="{{ request.path }}" />
+		<textarea id='code' name='content'>{{ content|default:"" }}</textarea>
+	</form>
 {% endblock content %}
