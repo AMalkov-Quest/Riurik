@@ -24,7 +24,4 @@ failed = function(url) {
 failed.prototype = new BaseTest();
 failed.prototype.constructor = failed;
 failed.superClass = BaseTest.prototype;
-var failed_test = new failed();
-
-TestRunner.addTest(failed_test);
-
+var test = new failed();
