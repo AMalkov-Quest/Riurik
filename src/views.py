@@ -132,13 +132,13 @@ def runTest(request):
 	# TODO: call data = _patch_with_context(data, items) to add context variables to test file content behind
 	data['name'] = request.POST["name"]
 	
+	result = tools.remotesavetest('http://sp-2k10-u4:8000/actions/remote/save/', data)
+	
 	import context
 	ctx = context.context(request.POST["name"])
-	ctx.get('test')
+	url = ctx.get('url')
 	
-	#result = tools.remotesavetest('http://sp-2k10-u4:8000/actions/remote/save/', data)
-	
-	return HttpResponseRedirect(request.POST["url"])
+	return HttpResponseRedirect(url + '?path=' + request.POST["url"])
 
 def remoteSaveTest(request):
 	result = tools.savetest(request.POST["content"], request.POST["name"])

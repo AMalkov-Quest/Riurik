@@ -107,7 +107,7 @@ INSTALLED_APPS = (
 #STATIC_URL = '/static/'
 
 # Path to a folder where tests are located
-STATIC_TESTS_ROOT = 'C:/saip/SharePoint Information Portal/tests'
+STATIC_TESTS_ROOT = 'C:/saip/SharePoint Information Portal/Application/tests'
 STATIC_TESTS_URL = ''
 
 TEST_CONTEXT_FILE_NAME = '.context.ini'
