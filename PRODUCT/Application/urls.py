@@ -73,5 +73,5 @@ urlpatterns = patterns('',
 	(r'^report_export$', 'Application.views.report_export'),
 	(r'^Lists$', 'Application.views.get_lists'),
 	(r'^MultipleLists$', 'Application.views.get_mlists'),
-	(r'^tests/', include('Application.jstests.urls')),
+	(r'^tests/', include('Application.tests.urls')),
 )

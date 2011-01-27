@@ -23,11 +23,11 @@ def index(request):
             messages.add_message(request, messages.INFO, _('No tests loaded. Please, check path parameter'))
         else:
             vars = {'error': _('No tests loaded. Please, check path parameter')}
-        return render_to_response('static/tests/testLoader.html', vars)
+        return render_to_response('testLoader.html', vars)
         
     for tpl_dir in settings.TEMPLATE_DIRS:
         abs_path_tpl_dir = os.path.abspath(tpl_dir)
-        tests_dir = os.path.join(abs_path_tpl_dir, 'static/tests')
+        tests_dir = abs_path_tpl_dir
         if not os.path.exists(tests_dir):
             continue
         test_cases_dir = os.path.join(tests_dir, path)
@@ -40,13 +40,13 @@ def index(request):
                             abs_file_path.replace(abs_path_tpl_dir,'').replace(abs_path_tpl_dir,'').replace('\\','/'), 
                         ]
             else:
-                tests += [ test_cases_dir.replace(abs_path_tpl_dir,'').replace(abs_path_tpl_dir,'').replace('\\','/'), ]
+				tests += [ '/testsrc/' + test_cases_dir.replace(abs_path_tpl_dir,'').replace(abs_path_tpl_dir,'').replace('\\','/').lstrip('/'), ]
             break
-        else:
-            if _USE_MESSAGES:
-                messages.add_message(request, messages.ERROR, _('No tests loaded. "%s" does not exists').__unicode__() % (test_cases_dir))
-            else:
-                vars =  {'error': _('No tests loaded. "%s" does not exists').__unicode__() % (test_cases_dir)}
-            return render_to_response('static/tests/testLoader.html', vars)
+        #else:
+        #    if _USE_MESSAGES:
+        #        messages.add_message(request, messages.ERROR, _('No tests loaded. "%s" does not exists') % (test_cases_dir))
+        #    else:
+        #        vars =  {'error': _('No tests loaded. "%s" does not exists') % (test_cases_dir)}
+        #    return render_to_response('testLoader.html', vars)
     vars = { 'js': tests }
-    return render_to_response('static/tests/testLoader.html', vars)
+    return render_to_response('testLoader.html', vars)

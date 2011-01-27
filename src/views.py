@@ -138,7 +138,7 @@ def runTest(request):
 	ctx = context.context(request.POST["name"])
 	url = ctx.get('url')
 	
-	return HttpResponseRedirect(url + '?path=' + request.POST["url"])
+	return HttpResponseRedirect(url + '?path=' + request.POST["url"].lstrip('/'))
 
 def remoteSaveTest(request):
 	result = tools.savetest(request.POST["content"], request.POST["name"])

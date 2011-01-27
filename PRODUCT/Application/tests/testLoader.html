@@ -18,13 +18,17 @@
         <style>
             iframe { width: 99%; height:99%; }
         </style>
-        <script type="text/javascript" src="/static/tests/base/jquery-1.4.4.min.js"></script>
-        <script type="text/javascript" src="/static/tests/base/jquery.json-2.2.min.js"></script>
-        <script type="text/javascript" src="/static/tests/base/jsdeferred.js"></script>
-        <script type="text/javascript" src="/static/tests/base/testbase.js"></script>
+        <script type="text/javascript" src="/testsrc/base/jquery-1.4.4.min.js"></script>
+        <script type="text/javascript" src="/testsrc/base/jquery.json-2.2.min.js"></script>
+        <script type="text/javascript" src="/testsrc/base/jsdeferred.js"></script>
+        <script type="text/javascript" src="/testsrc/base/testbase.js"></script>
+		
+		<link rel="stylesheet" type="text/css" href="/static/jquery/qunit/qunit.css" media="screen" />
+		<script type="text/javascript" src="/static/jquery/qunit/qunit.js"></script>
+		
         {% for jsfile in js %}
             <script type="text/javascript" src="{{ jsfile }}"></script>
-            <script type="text/javascript">
+            <!--<script type="text/javascript">
                 if ( typeof test != 'undefined' ) {
                     if ( typeof context != 'undefined' ) {
                         for (n in context) {
@@ -36,11 +40,19 @@
                     delete context;
                     delete test;
                 } else console.log('test is undefined')
-            </script>
+            </script>-->
         {% endfor %}
     </head>
-    {% if error %}<div id="error">{{error|default:""}}</div>{% endif %}
-    <div id="results"></div>
-    <iframe id="frame" name="frame">
-    </iframe>
+	<body>
+		<h1 id="qunit-header">QUnit example</h1>
+		<h2 id="qunit-banner"></h2>
+		<div id="qunit-testrunner-toolbar"></div>
+		<h2 id="qunit-userAgent"></h2>
+		<ol id="qunit-tests"></ol>
+		<div id="qunit-fixture">test markup, will be hidden</div>
+
+		{% if error %}<div id="error">{{error|default:""}}</div>{% endif %}
+		<div id="results"></div>
+		<iframe id="frame" name="frame">
+		</iframe>
 </html>
