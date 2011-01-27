@@ -110,14 +110,20 @@ def createTest(request):
 
 def saveTest(request):
 	result = tools.savetest(request.POST["content"], request.POST["name"])
-	response = HttpResponse(mimetype='text/plain')
-	response.write(result)
-	
 	return HttpResponseRedirect(request.POST["url"])
 
 def runTest(request):
+	data = {}
+	data['content'] = request.POST["content"]
+	data['name'] = request.POST["name"]
+	result = tools.remotesavetest('http://sp-2k10-u4:8000/actions/remote/save/', data)
+	
+	return HttpResponseRedirect(request.POST["url"])
+
+def remoteSaveTest(request):
 	result = tools.savetest(request.POST["content"], request.POST["name"])
+	
 	response = HttpResponse(mimetype='text/plain')
 	response.write(result)
 	
-	return HttpResponseRedirect(request.POST["url"])
+	return response

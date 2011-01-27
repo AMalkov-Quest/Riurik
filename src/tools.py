@@ -34,9 +34,18 @@ def mktest(path, name):
 	
 	return (True, filename)
 
+def remotesavetest(url, data):
+	import urllib, urllib2
+	post = urllib.urlencode(data)
+	return urllib2.urlopen(url, post).read()
+
 def savetest(content, path):
 	try:
-		f = open(settings.STATIC_TESTS_ROOT + '/' + path.strip('/'), 'w')
+		fullpath = os.path.normpath(os.path.join(settings.STATIC_TESTS_ROOT, path.strip('/')))
+		if not os.path.exists(os.path.dirname(fullpath)):
+			os.makedirs(os.path.dirname(fullpath))
+			
+		f = open(fullpath, 'w')
 		f.write(content.replace('\r', ''))
 		f.close()
 	except Exception, e:
