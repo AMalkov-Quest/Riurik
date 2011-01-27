@@ -1,7 +1,8 @@
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response as _render_to_response
+from django.template.loader import render_to_string
 from django_websocket.decorators import require_websocket, accept_websocket
-from django.template import RequestContext
+from django.template import RequestContext, Context, Template
 import protocol
 import traceback, sys, logging, os, re
 import tools
@@ -112,9 +113,23 @@ def saveTest(request):
 	result = tools.savetest(request.POST["content"], request.POST["name"])
 	return HttpResponseRedirect(request.POST["url"])
 
+def _patch_with_context(data, vars):
+    t = Template("""
+        var context = {
+            {% for option in options %}
+                {{ option.0 }}: '{{ option.1 }}'{% if not forloop.last %},{% endif %}
+            {% endfor %}
+        };
+    """)
+    c = Context();
+    for name,value in vars:
+        c[name] = value
+    return t.render(c) + data
+
 def runTest(request):
 	data = {}
 	data['content'] = request.POST["content"]
+	# TODO: call data = _patch_with_context(data, items) to add context variables to test file content behind
 	data['name'] = request.POST["name"]
 	result = tools.remotesavetest('http://sp-2k10-u4:8000/actions/remote/save/', data)
 	
