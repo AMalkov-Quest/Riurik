@@ -5,41 +5,42 @@
     testbase.js: TestRunner and BaseTest classes
     
     Incoming variables:
-        js - it is an array of tuples with setups for loading tests
-             Each array item is a tuple of ( <test file name to load>, < global variables for test >, ).
-             Each variable is a tuple to with format ( < name > , < value >, ).
+        js - it is an array of loading tests
              Example:
                 js = [
-                    ( 'cases/simpleTest.js', [ ('variable1','value1',), ('variavle2','value2',), ... ], ),
-                    ( 'cases/complexTest.js', [ ('complex1','value1',), ... ], ),
+                    'cases/simpleTest.js',
+                    'cases/complexTest.js',
                     ...
                 ]
-{% endcomment %}
-<html>
-	<head>
-		<link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/2.8.2r1/build/reset/reset-min.css">
-		<style>
-			iframe { width: 99%; height:99%; }
-		</style>
-		<script type="text/javascript" src="/static/tests/base/jquery-1.4.4.min.js"></script>
-		<script type="text/javascript" src="/static/tests/base/jquery.json-2.2.min.js"></script>
-		<script type="text/javascript" src="/static/tests/base/jsdeferred.js"></script>
-		<script type="text/javascript" src="/static/tests/base/testbase.js"></script>
-		{% for jsfile in js %}
-		    <script type="text/javascript" src="{{ jsfile.0 }}"></script>
-		    <script type="text/javascript">
-		        if ( typeof test != 'undefined' ) {
-    		        {% for option in jsfile.1 %}
-    		            test.{{ option.0 }} = '{{ option.1|default:"" }}';
-    		        {% endfor %}
-    		        console.log(test);
-    		        TestRunner.addTest(test);
-    		    }
-		    </script>
-		{% endfor %}
-	</head>
-	<div id="error">{{error|default:""}}</div>
-	<div id="results"></div>
-	<iframe id="frame" name="frame">
-	</iframe>
+{% endcomment %}<html>
+    <head>
+        <link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/2.8.2r1/build/reset/reset-min.css">
+        <style>
+            iframe { width: 99%; height:99%; }
+        </style>
+        <script type="text/javascript" src="/static/tests/base/jquery-1.4.4.min.js"></script>
+        <script type="text/javascript" src="/static/tests/base/jquery.json-2.2.min.js"></script>
+        <script type="text/javascript" src="/static/tests/base/jsdeferred.js"></script>
+        <script type="text/javascript" src="/static/tests/base/testbase.js"></script>
+        {% for jsfile in js %}
+            <script type="text/javascript" src="{{ jsfile }}"></script>
+            <script type="text/javascript">
+                if ( typeof test != 'undefined' ) {
+                    if ( typeof context != 'undefined' ) {
+                        for (n in context) {
+                            test[n] = context[n];
+                        }
+                    } else console.log('context is undefined')
+                    console.log(test);
+                    TestRunner.addTest(test);
+                    delete context;
+                    delete test;
+                } else console.log('test is undefined')
+            </script>
+        {% endfor %}
+    </head>
+    {% if error %}<div id="error">{{error|default:""}}</div>{% endif %}
+    <div id="results"></div>
+    <iframe id="frame" name="frame">
+    </iframe>
 </html>
