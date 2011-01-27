@@ -107,14 +107,14 @@ INSTALLED_APPS = (
 #STATIC_URL = '/static/'
 
 # Path to a folder where tests are located
-STATIC_TESTS_ROOT = 'C:/saip/SharePoint Information Portal/Application/tests'
+STATIC_TESTS_ROOT = 'C:/saip/SharePoint Information Portal/tests'
 STATIC_TESTS_URL = ''
 
 TEST_CONTEXT_FILE_NAME = '.context.ini'
 TEST_FILE_EXT = '.js'
 
 APPEND_SLASH = False
-CODEMIRROR_CALL_EDITOR_FOR = '^.*\.(?:js|ini)$' # .js and .ini files
+CODEMIRROR_CALL_EDITOR_FOR = '^.*\.(?:js|ini|html)$' # .js and .ini files
 
 try:
 	from local_settings import *

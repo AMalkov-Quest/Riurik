@@ -1,9 +1,11 @@
 import os
 import settings, resources
 
-def mkdir(path):
+def mkdir(path, name):
 	try:
-		os.mkdir(settings.STATIC_TESTS_ROOT + '/' + path.strip('/'))
+		fullpath = os.path.join(settings.STATIC_TESTS_ROOT, path.strip('/'), name)
+		print fullpath
+		os.mkdir(fullpath)
 	except Exception, e:
 		return str(e)
 	

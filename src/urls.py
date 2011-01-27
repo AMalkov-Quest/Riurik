@@ -22,6 +22,7 @@ urlpatterns = patterns('',
 	(r'^actions/suite/create/$', 'views.createSuite'),
 	(r'^actions/test/create/$', 'views.createTest'),
 	(r'^actions/test/save/$', 'views.saveTest'),
+	(r'^actions/test/run/$', 'views.saveTest'),
 )
 
 urlpatterns += patterns('',

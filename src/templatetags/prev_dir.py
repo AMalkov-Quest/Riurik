@@ -6,6 +6,26 @@ import settings
 register = template.Library()
 
 @register.filter
+def above(path):
+	'''
+	parses given path and returns a path that is a parent folder to the given one
+	given: dir1/dir2/dir3/
+	returns:  dir1/dir2/
+	given: dir1/
+	returns:  empty string
+	'''
+	if path.rstrip('/').find('/') == -1:
+		return ''
+
+	return path.rstrip('/').rsplit('/', 1)[0] + '/'
+
+@register.filter
+def current(path):
+	if path.rstrip('/').find('/') == -1:
+		return path.rstrip('/')
+	return path.rstrip('/').rsplit('/', 1)[1]
+
+@register.filter
 def prev_dir(path):
     m = re.match('^(.*/).*?/$', path)
     if m:

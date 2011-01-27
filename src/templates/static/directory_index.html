@@ -1,5 +1,9 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+
+{% load img_by_fstype %}
+{% load prev_dir %}
+
 <head>
     <link rel="stylesheet" href="/static/css/base.css" type="text/css">
     <script type="text/javascript" src="/static/js/tools.js"></script>
@@ -12,7 +16,7 @@
     <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
     <meta http-equiv="Content-Language" content="en-us" />
     <meta name="robots" content="NONE,NOARCHIVE" />
-    <title>Index of {{ directory }}</title>
+    <title>{{ directory|current }}</title>
     {% block head %}
         {% block styles %}
 	{% endblock styles %}
@@ -22,8 +26,6 @@
 </head>
 
 {% include "tools.html" %}
-{% load img_by_fstype %}
-{% load prev_dir %}
 
 <body>
 	{% block body %}
@@ -41,7 +43,7 @@
 			</ul>
 			{% endblock controls %}
 		</div>
-		{% block title %}<h4>{{ directory|breadcrumbs }}</h4>{% endblock title %}
+		{% block title %}<h4>{{ directory|breadcrumbs }}{% ifnotequal directory '/' %}<a style="text-decoration: none;" href="/{{ directory|above }}">...</a>{% endifnotequal %}</h4>{% endblock title %}
 		<div style="clear:both;"></div>
 		
 		<div class="line">

@@ -4,13 +4,13 @@ function createFolder(path) {
 		buttons: {
 			"create": function() {
 				$(this).dialog("close");
-				var name = $("#full-path").val() + $("#object-name").val();
 				$("#operationInProgress").load(
 						"/actions/folder/create/", 
-						{"name" : name},
+						{"full-path" : $("#full-path").val(), "object-name": $("#object-name").val()},
 						function() {
 							$("#operationInProgress").parent().find("button:contains('ok')").attr('disabled',false).removeClass('ui-state-disabled');
-						});
+						},
+						"json");
 				operationInProgress();
 			},
 			"cancel": function() {
@@ -40,7 +40,7 @@ function createAndEdit(url) {
 					function(data) {
 						document.location = data['result'];
 					},
-					"json")
+					"json");
 			},
 			"cancel": function() {
 				$(this).dialog("close");

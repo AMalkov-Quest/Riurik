@@ -82,7 +82,9 @@ import django.views.static
 serve = static_wrapper(django.views.static.serve)
 
 def createFolder(request):
-	result = tools.mkdir(request.POST["name"])
+	print request.POST["full-path"]
+	result = tools.mkdir(request.POST["full-path"], request.POST["object-name"])
+	
 	response = HttpResponse(mimetype='text/plain')
 	response.write(result)
 	
@@ -91,7 +93,7 @@ def createFolder(request):
 def createSuite(request):
 	result = {}
 	result['success'], result['result'] = tools.mksuite(request.POST["full-path"], request.POST["object-name"])
-	print result
+	
 	response = HttpResponse(mimetype='text/json')
 	response.write(simplejson.dumps(result))
 	
@@ -107,6 +109,13 @@ def createTest(request):
 	return response
 
 def saveTest(request):
+	result = tools.savetest(request.POST["content"], request.POST["name"])
+	response = HttpResponse(mimetype='text/plain')
+	response.write(result)
+	
+	return HttpResponseRedirect(request.POST["url"])
+
+def runTest(request):
 	result = tools.savetest(request.POST["content"], request.POST["name"])
 	response = HttpResponse(mimetype='text/plain')
 	response.write(result)

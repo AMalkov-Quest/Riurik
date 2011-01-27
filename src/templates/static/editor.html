@@ -36,6 +36,7 @@
 
 {% block controls %}
 	<ul class="horizontal-menu">
+		<li><a href="http://sp-2k10-u4:3141/tests/{{ relative_file_path }}">Run</a></li>
 		<li><a href="javascript:void(0);" onclick="$('form').submit();">Save</a></li>
 		<li><a href="javascript: void(0);" onclick="document.location=document.location;">Discard</a></li>
 		<li><a href="javascript: void(0);" onclick="document.location='{{ request.path|prev_dir }}';">Close</a></li>
