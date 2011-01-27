@@ -116,7 +116,12 @@ def runTest(request):
 	data = {}
 	data['content'] = request.POST["content"]
 	data['name'] = request.POST["name"]
-	result = tools.remotesavetest('http://sp-2k10-u4:8000/actions/remote/save/', data)
+	
+	import context
+	ctx = context.context(request.POST["name"])
+	ctx.get('test')
+	
+	#result = tools.remotesavetest('http://sp-2k10-u4:8000/actions/remote/save/', data)
 	
 	return HttpResponseRedirect(request.POST["url"])
 
