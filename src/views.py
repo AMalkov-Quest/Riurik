@@ -129,6 +129,7 @@ def _patch_with_context(data, vars):
 def submitTest(request):
 	content = request.POST["content"]
 	testname = request.POST["name"]
+	url = request.POST["url"]
 
 	return _render_to_response( "runtest.html", locals() )
 	
@@ -139,7 +140,7 @@ def runTest(request):
 	# TODO: call data = _patch_with_context(data, items) to add context variables to test file content behind
 	data['name'] = request.POST["name"]
 	print 'remotesavetest start'
-	result = tools.remotesavetest('http://sp-2k10-u4:8000/actions/remote/save/', data)
+	result = tools.remotesavetest('sp-2k10-u4', data)
 	print 'remotesavetest completed'
 	import context
 	ctx = context.context(request.POST["name"])

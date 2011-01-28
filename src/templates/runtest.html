@@ -13,11 +13,14 @@
 <body>
 	<script type="text/javascript">
 		$(document).ready(function(){
-			$('#run-test').submit();
+			setTimeout(function(){
+				$('#run-test').submit();
+			}, 100);
 		});	
 	</script>
 	<form id='run-test' action="/actions/test/run/" method='POST'>
 		<input type="hidden" name="name" value="{{ testname }}" />
+		<input type="hidden" name="url" value="{{ url }}" />
 		<textarea style="display:none" id='code' name='content'>{{ content }}</textarea>
 	</form>
 	

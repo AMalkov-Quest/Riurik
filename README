@@ -17,3 +17,9 @@ urlpatterns += patterns('',
 [infoportal_security_levels.py]
 UnSecurePages += ["/tests/"]
 
+[tests]
+copy to the Application folder
+
+[Quest.InfoPortal.WebAccess]
+restart service
+

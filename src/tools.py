@@ -1,5 +1,6 @@
 import os
 import settings, resources
+from django.core.cache import cache
 
 def mkdir(path, name):
 	try:
@@ -34,9 +35,15 @@ def mktest(path, name):
 	
 	return (True, filename)
 
-def remotesavetest(url, data):
+def resolveRemoteAddr(host):
+	import socket
+	return cache.get(host, socket.gethostbyname(host))
+
+def remotesavetest(host, data):
 	import urllib, urllib2
 	post = urllib.urlencode(data)
+	url = "http://%s:8000/actions/remote/save/" % resolveRemoteAddr(host)
+	print url
 	return urllib2.urlopen(url, post).read()
 
 def savetest(content, path):
