@@ -6,6 +6,10 @@ import settings
 register = template.Library()
 
 @register.filter
+def strip(s, chars):
+	return s.strip(chars)
+
+@register.filter
 def img_by_fstype(path, fsobject):
 	if path == '/':
 		fullpath = os.path.join(settings.STATIC_TESTS_ROOT, fsobject)

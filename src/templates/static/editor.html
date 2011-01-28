@@ -39,7 +39,7 @@
             });
             $('#discard').click(function(){ if ( ConfirmDiscardchanges() ) document.location=document.location;});
             $('#close').click(function(){ if ( ConfirmDiscardchanges() ) document.location='{{ request.path|above }}';});
-            $('#run').click(function(){ $('#apply-test').attr('action', '/actions/test/run/');$('#apply-test').submit(); });
+            $('#run').click(function(){ $('#apply-test').attr('action', '/actions/test/submit/').attr('target', '_blank');$('#apply-test').submit(); });
             $('#save').click(function(){ $('#apply-test').attr('action', '/actions/test/save/');$('#apply-test').submit(); });
 	  });
 	</script>

@@ -53,8 +53,8 @@
 	        		<li></li>
 	        		{% for f in file_list %}
 	    			<li>
-	    				<img src="/static/img/{{ directory|img_by_fstype:f }}.gif" height="24" width="24" title="{{ f }}" alt>
-	    				<a href="{{ f }}">{{ f }}</a>
+	    				<img src="/static/img/{{ directory|img_by_fstype:f }}.gif" height="24" width="24" title="{{ f|strip:'/' }}" alt>
+	    				<a href="{{ f }}">{{ f|strip:'/' }}</a>
 	    			</li>
 	    			{% endfor %}
 	    			</ul>
