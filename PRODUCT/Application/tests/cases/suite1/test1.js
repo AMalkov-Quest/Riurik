@@ -1,34 +1,37 @@
-$(document).ready(function() {
 
-function go(url){
-  var d = new Deferred();
-  $('iframe').unbind();
-  $('iframe').attr('src',url);
-  $('iframe').load(function(){
-    window._$ = window.frames[0].window.jQuery;
-    _$(document).ready(function(){ 
-      _$(document).unbind();
-      if ( typeof d._called == 'undefined' ) {
-        d._called = true;
-        d.call();
-      }
-    });
-  });
-  return d;
-};
-go('http://sp-2k10-u4:3141/user_permission_report?user=&url=SharePoint_Config@sp-2k10-u4&title=http://sp-2k10-u4:1855&search_limit=20&filter=farms&permScope=farms').
-  
-next(function(){    
-  module("There is no data");
-  
-  test("toolbar is invisible", function() {
-    equals( _$('#btnDelete-button').is(":visible"), false, 'Revoke button is invisible');
-    equals( _$('#btnGrant-button').is(":visible"), false, 'Grant button is invisible');
-    equals( _$('#btnDuplicate-button').is(":visible"), false, 'Duplicate button is invisible');
-    equals( _$('#btnReassign-button').is(":visible"), false, 'Reassign button is invisible');
-  });
-  
-  come_on();
-});
+        var context = {
+            
+                url: 'http://atimiskov-w2k3:3141/tests/',
+            
+                host: 'atimiskov-w2k3'
+            
+        };
+    bus = function(url) {
+  this.testname = 'Dublicate Site Collection Permissions';
+  this.url = url || /http:\/\/.*?\//.exec(window.location.href || document.url)[0];
+  this.run = function() {
+    go('http://'+this.host+':3141/user_permission_report?user=&url=SharePoint_Config@'+this.host+'&title=http:/'+this.host+':1855&search_limit=20&filter=farms&permScope=farms').
+    do(function(d){
+        setTimeout(function(){
+          d.call();
+        }, 500);
+      }).
+    next(function(){
+      console.log(window._$);
+      alert(2)
+      QUnit.module("There is no data");
+      QUnit.test("toolbar is invisible", function() {
+        QUnit.equals( $('#btnDelete-button').is(":visible"), false, 'Revoke button is invisible');
+        QUnit.equals( $('#btnGrant-button').is(":visible"), false, 'Grant button is invisible');
+        QUnit.equals( $('#btnDuplicate-button').is(":visible"), false, 'Duplicate button is invisible');
+        QUnit.equals( $('#btnReassign-button').is(":visible"), false, 'Reassign button is invisible');
+      });
+      come_on();
+   });
 
-});
+  };
+}
+bus.prototype = new BaseTest();
+bus.prototype.constructor = bus;
+bus.superClass = BaseTest.prototype;
+var test = new  bus();
