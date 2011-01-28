@@ -8,8 +8,7 @@
 {% block javascripts %}
 	{{ block.super }}
 	<script type="text/javascript" src="/static/codemirroreditor/js/codemirror.js"></script>
-	<!--<script type="text/javascript" src="/static/codemirroreditor/js/mirrorframe.js"></script>-->
-        <script type="text/javascript">
+	<script type="text/javascript">
 	  $(document).ready(function() {
           var source_value = $('#code').val();
   		  var editor = CodeMirror.fromTextArea("code", {
