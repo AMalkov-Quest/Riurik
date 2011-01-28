@@ -1,0 +1,19 @@
+[httpd.conf]
+Alias /testsrc/ "C:\SAIP\SharePoint Information Portal\Application\tests\\"
+<Location '/testsrc/'>
+  DirectoryIndex Content.htm
+</Location>
+
+[settings.py]
+TEMPLATE_DIRS = (
+	os.path.join(os.path.dirname( __file__ ), 'tests'),
+}
+
+[url.py]
+urlpatterns += patterns('',
+	(r'^tests/', include('Application.tests.urls')),
+)
+
+[infoportal_security_levels.py]
+UnSecurePages += ["/tests/"]
+
