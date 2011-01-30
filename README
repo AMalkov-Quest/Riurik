@@ -5,7 +5,7 @@ Alias /testsrc/ "C:\SAIP\SharePoint Information Portal\Application\tests\\"
 </Location>
 
 [settings.py]
-TEMPLATE_DIRS = (
+TEMPLATE_DIRS += (
 	os.path.join(os.path.dirname( __file__ ), 'tests'),
 }
 

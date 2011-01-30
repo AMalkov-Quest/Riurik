@@ -122,8 +122,9 @@ def _patch_with_context(data, vars):
         };
     """)
     c = Context();
+    c['options'] = []
     for name,value in vars:
-        c[name] = value
+        c['options'] += [ (name,value,), ]
     return t.render(c) + data
 
 def submitTest(request):
@@ -145,6 +146,8 @@ def runTest(request):
 	ctx = context.context(request.POST["name"])
 	url = ctx.get('url')
 	host = ctx.get('host')
+	items = ctx.items();
+	data['content'] = _patch_with_context(data['content'], items)
 	
 	result = tools.remotesavetest(host, data)
 	

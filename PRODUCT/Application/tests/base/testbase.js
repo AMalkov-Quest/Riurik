@@ -34,22 +34,22 @@
 				TestRunner.error(test+' is not a valid test');
 				continue;
 			}
-			$('iframe').unbind();
-			$('iframe').attr('src',test.url);
-			$('iframe').load(function(){
-				window._$ = window.frames[0].window.jQuery;
-				_$(document).ready(function(){ 
-					try {
+			//$('iframe').unbind();
+			//$('iframe').attr('src',test.url);
+			//$('iframe').load(function(){
+			//	window._$ = window.frames[0].window.jQuery;
+			//	_$(document).ready(function(){ 
+			//		try {
 						TestRunner.log('Runing test "'+test.testname+'"');
-                        _$(document).unbind();
+            //            _$(document).unbind();
 						test.run();	
-						test.markSuccess();
-					} catch (ex) {
-						test.markFail(ex);
-					}
-					TestRunner.run();
-				});
-			});
+			//			test.markSuccess();
+			//		} catch (ex) {
+			//			test.markFail(ex);
+			//		}
+			//		TestRunner.run();
+			//	});
+			//});
 		}(TestRunner));
 	};
 	TestRunner.error = function(ex){
@@ -137,8 +137,10 @@
                 }
                 this._ws.onclose = function(event) {
                     console.log('websocket closed')
-                    _this._ws.close();
-                    _this._ws = null;
+                    try {
+                        _this._ws.close();
+                        _this._ws = null;
+                    } catch (ex) {}
                 }
                 this._ws.onmessage = function(event) {
                     console.log('websocket received '+ event.data)
@@ -198,23 +200,50 @@
         };
         this.go = function(url){
             var d = Deferred();
-            $('iframe').unbind();
-			$('iframe').attr('src',url);
-			$('iframe').load(function(){
+            $('#frame').unbind();
+			$('#frame').attr('src',url);
+			$('#frame').load(function(){
 				window._$ = window.frames[0].window.jQuery;
+				console.log('_$ assigned', _$)
 				_$(document).ready(function(){ 
                     _$(document).unbind();
                     if ( typeof d._called == 'undefined' ) {
                         d._called = true;
+                        console.log('_$ is also assigned', _$)
                         d.call();
                     }
 				});
 			});
             return d;
         };
-
 	};
     Deferred.define();
+    Deferred.prototype.do = function(func){
+            var d = new Deferred();
+            var args = new Array();
+            args.push(d);
+            $(arguments).each(function(i, el){ args.push(el); });
+            func.apply(this, args)
+            return d;
+    }
+    Deferred.prototype.go = function(url){
+            var d = Deferred();
+            $('#frame').unbind();
+			$('#frame').attr('src',url);
+			$('#frame').load(function(){
+				window._$ = window.frames[0].window.jQuery;
+				console.log('_$ assigned', _$)
+				_$(document).ready(function(){ 
+                    _$(document).unbind();
+                    if ( typeof d._called == 'undefined' ) {
+                        d._called = true;
+                        console.log('_$ is also assigned', _$)
+                        d.call();
+                    }
+				});
+			});
+            return d;
+    };
 }(window));
 new TestRunner();
 

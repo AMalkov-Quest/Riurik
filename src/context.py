@@ -21,6 +21,14 @@ def get(file, section, option):
 		logging.info(e)
 		return None
 
+def items(file, section):
+	try:
+		config = read(file)
+		return config.items(section)
+	except Exception, e:
+		logging.info(e)
+		return None
+
 def set(file, section, option, value):
 	try:
 		config = read(file)
@@ -37,3 +45,6 @@ class context():
 		
 	def get(self, option, section='default'):
 		return get(self.inifile, section, option)
+
+	def items(self, section='default'):
+		return items(self.inifile, section)

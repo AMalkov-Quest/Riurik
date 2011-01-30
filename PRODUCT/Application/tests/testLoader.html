@@ -28,7 +28,7 @@
 		
         {% for jsfile in js %}
             <script type="text/javascript" src="{{ jsfile }}"></script>
-            <!--<script type="text/javascript">
+            <script type="text/javascript">
                 if ( typeof test != 'undefined' ) {
                     if ( typeof context != 'undefined' ) {
                         for (n in context) {
@@ -40,7 +40,7 @@
                     delete context;
                     delete test;
                 } else console.log('test is undefined')
-            </script>-->
+            </script>
         {% endfor %}
     </head>
 	<body>
