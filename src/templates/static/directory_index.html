@@ -4,13 +4,18 @@
 {% load fstags %}
 
 <head>
-    <link rel="stylesheet" href="/static/css/base.css" type="text/css">
-    <script type="text/javascript" src="/static/js/tools.js"></script>
-    
     <link rel="stylesheet" type="text/css" href="/static/jquery-ui/css/start/jquery-ui-1.8.9.custom.css" />
 	<script type="text/javascript" src="/static/jquery-ui/js/jquery-1.4.4.min.js"></script>
 	<script type="text/javascript" src="/static/jquery-ui/js/jquery-ui-1.8.9.custom.min.js"></script>
     
+    <link rel="stylesheet" href="/static/css/base.css" type="text/css">
+    <script type="text/javascript" src="/static/js/tools.js"></script>
+    
+    <link rel="stylesheet" href="/static/css/dir-index-menu.css" type="text/css">
+    <script type="text/javascript" src="/static/js/dir-index.js"></script>
+    
+    <link rel="stylesheet" href="/static/css/jquery.contextMenu.css" type="text/css">
+    <script type="text/javascript" src="/static/js/jquery.contextMenu.js"></script>
     
     <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
     <meta http-equiv="Content-Language" content="en-us" />
@@ -25,6 +30,7 @@
 </head>
 
 {% include "tools.html" %}
+{% include "dir-index-menu.html" %}
 
 <body>
 	{% block body %}
@@ -47,9 +53,8 @@
 		
 		<div class="line">
 			{% block content %}
-			<div class="column" style="width:500px;">
-				<div class="column" style="width:500px;">
-	        		<ul>
+			<div id="dir-index-id" class="dir-index" style="width:500px;">
+	        	<ul>
 	        		<li></li>
 	        		{% for f in file_list %}
 	    			<li>
@@ -57,12 +62,12 @@
 	    				<a href="{{ f }}">{{ f|strip:'/' }}</a>
 	    			</li>
 	    			{% endfor %}
-	    			</ul>
-	    		</div>
+	    		</ul>
+	    	</div>
 			{% endblock %}
-    		</div>
 		
     	</div>
+    </div>
     {% endblock body %}
 </body>
 </html>

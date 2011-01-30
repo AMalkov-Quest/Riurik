@@ -11,7 +11,8 @@
 }
 
 .horizontal-menu a {
-	font-family: Calibri, cursive; font-size:10pt;
+	font-family: Calibri, cursive;
+	font-size:10pt;
 	text-decoration: none;	
 }
 
@@ -58,12 +59,12 @@ a.logo {
 	padding: 1px;
 }
 
-.column {
+.dir-index {
 	float: left;
 	width: 24%;
 }
 
-.column a {
+.dir-index a {
 	color: #058CB6;
 	font-family: Tahoma, Arial, Helvetica, serif;
 	font-size: 12px;
