@@ -5,9 +5,22 @@ from django.core.cache import cache
 def mkdir(path, name):
 	try:
 		fullpath = os.path.join(settings.STATIC_TESTS_ROOT, path.strip('/'), name)
-		print fullpath
 		os.mkdir(fullpath)
 	except Exception, e:
+		return str(e)
+	
+	return resources.ok
+
+def remove(path):
+	try:
+		fullpath = os.path.join(settings.STATIC_TESTS_ROOT, path.strip('/'))
+		if os.path.isdir(fullpath):
+			import shutil
+			shutil.rmtree(fullpath)
+		else:
+			os.remove(fullpath)
+	except Exception, e:
+		print e
 		return str(e)
 	
 	return resources.ok

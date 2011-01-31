@@ -1,11 +1,17 @@
 <ul id="dir-index-menu" class="contextMenu" style="display:none;">
 	<li class="edit"><a href="#edit">Edit</a></li>
-	<li class="delete"><a href="#delete">Delete</a></li>
-	<li class="versions"><a href="#versions">Versions</a></li>
+	<li class="delete"><a href="#remove">Delete</a></li>
+	<li class="move"><a href="#move">Move</a></li>
 	<li class="run separator"><a href="#run">Run</a></li>
 </ul>
 
+<form id='context-action' method='POST'>
+	<input type="hidden" name="name" value="" />
+	<input type="hidden" name="path" value="" />
+	<input type="hidden" name="url" value="{{ directory }}" />
+</form>
+
 <form id='run-test' action='/actions/test/submit/' target='_blank' method='POST'>
-	<input type="hidden" name="name" value="test132" />
+	<input type="hidden" name="name" value="" />
 	<input type="hidden" name="url" value="{{ directory }}" />
 </form>

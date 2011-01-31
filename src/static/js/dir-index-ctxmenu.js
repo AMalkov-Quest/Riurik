@@ -1,6 +1,6 @@
 $(document).ready(function(){
 	
-	$('#dir-index-menu').disableContextMenuItems('delete,versions');
+	$('#dir-index-menu').disableContextMenuItems('move');
 	
 	$("#dir-index-id UL LI").contextMenu({
         menu: 'dir-index-menu'
@@ -13,23 +13,28 @@ $(document).ready(function(){
 	function edit(target, context) {
 		if (context == 'suite') {
 			var currentDir = $('#run-test > input[name=url]').val();
-			//alert("/actions/suite/edit/?path=" + currentDir + target);
 			window.location = "/actions/suite/edit/?path=" + currentDir + target;
 		}else{
 			window.location = target;
 		}
 	}
 	
-	function run(target, context) {
-		var currentDir = $('#run-test > input[name=url]').val();
+	function remove(target, context) {
+		var currentDir = $('#context-action > input[name=url]').val();
 		var fullPath = currentDir + target;
 		
-		if (context == 'suite') {
-			fullPath = currentDir + ".context.ini";
-		}
+		$('#context-action').attr('action', '/actions/remove/');
+		$('#context-action > input[name=path]').val(fullPath);
+		$('#context-action').submit();
+	}
+	
+	function run(target, context) {
+		var currentDir = $('#context-action > input[name=url]').val();
+		var fullPath = currentDir + target;
 		
-		$('#run-test > input[name=name]').val(fullPath);
-		$('#run-test > input[name=url]').val(fullPath);
-		$('#run-test').submit();
+		$('#context-action > input[name=name]').val(fullPath);
+		$('#context-action > input[name=url]').val(fullPath);
+		$('#context-action').attr('action', '/actions/test/submit/').attr('target', '_blank');
+		$('#context-action').submit();
 	}
 });

@@ -80,13 +80,16 @@ import django.views.static
 serve = static_wrapper(django.views.static.serve)
 
 def createFolder(request):
-	print request.POST["full-path"]
 	result = tools.mkdir(request.POST["full-path"], request.POST["object-name"])
 	
 	response = HttpResponse(mimetype='text/plain')
 	response.write(result)
 	
 	return response
+
+def removeObject(request):
+	result = tools.remove(request.POST["path"])
+	return HttpResponseRedirect('/' + request.POST["url"].strip('/'))
 
 def createSuite(request):
 	result = {}

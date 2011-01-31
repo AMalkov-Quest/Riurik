@@ -56,5 +56,5 @@
 
 .contextMenu LI.edit A { background-image: url(/static/img/dir_index_edit.png); }
 .contextMenu LI.delete A { background-image: url(/static/img/dir_index_delete.png); }
-.contextMenu LI.versions A { background-image: url(/static/img/dir_index_versions.png); }
+.contextMenu LI.move A { background-image: url(/static/img/dir_index_move.png); }
 .contextMenu LI.run A { background-image: url(/static/img/dir_index_execute.gif); }

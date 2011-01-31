@@ -24,6 +24,11 @@
   border: none;
 }
 
+.horizontal-menu li.disabled a {
+	color: #AAA;
+	cursor: default;
+}
+
 body {
 	color: #666;
 	font-family: Tahoma, Arial, Helvetica, Tahoma, serif;
@@ -81,8 +86,7 @@ li img {
 	margin-bottom: 5px;
 }
 
-.invisible
-{
+.invisible {
 	display: none;
 }
 
