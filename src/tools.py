@@ -59,3 +59,14 @@ def savetest(content, path):
 		return str(e)
 	
 	return resources.ok
+
+def gettest(path):
+	try:
+		fullpath = os.path.normpath(os.path.join(settings.STATIC_TESTS_ROOT, path.strip('/')))
+		f = open(fullpath, 'r')
+		content = f.read()
+		f.close()
+	except Exception, e:
+		return str(e)
+	
+	return content

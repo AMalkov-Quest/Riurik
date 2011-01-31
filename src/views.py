@@ -128,10 +128,10 @@ def _patch_with_context(data, vars):
     return t.render(c) + data
 
 def submitTest(request):
-	content = request.POST["content"]
 	testname = request.POST["name"]
 	url = request.POST["url"]
-
+	content = request.POST.get("content", tools.gettest(testname))
+	
 	return _render_to_response( "runtest.html", locals() )
 	
 def runTest(request):
