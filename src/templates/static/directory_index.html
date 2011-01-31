@@ -11,17 +11,9 @@
     <link rel="stylesheet" href="/static/css/base.css" type="text/css">
     <script type="text/javascript" src="/static/js/tools.js"></script>
     
-    <link rel="stylesheet" href="/static/css/dir-index-menu.css" type="text/css">
-    <script type="text/javascript" src="/static/js/dir-index.js"></script>
-    
     <link rel="stylesheet" href="/static/css/jquery.contextMenu.css" type="text/css">
     <script type="text/javascript" src="/static/js/jquery.contextMenu.js"></script>
-    
-    <script type="text/javascript" >
-	    function getCurrentDir() {
-	    	return '{{ directory }}'
-	    }
-    </script>
+    <script type="text/javascript" src="/static/js/dir-index-ctxmenu.js"></script>
     
     <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
     <meta http-equiv="Content-Language" content="en-us" />
@@ -63,8 +55,7 @@
 	        	<ul>
 	        		<li></li>
 	        		{% for f in file_list %}
-	    			<li>
-	    				<img src="/static/img/{{ directory|img_by_fstype:f }}.gif" height="24" width="24" title="{{ f|strip:'/' }}" alt>
+	    			<li class="{{ directory|dir_index_type:f }}" title="{{ f|strip:'/' }}">
 	    				<a href="{{ f }}">{{ f|strip:'/' }}</a>
 	    			</li>
 	    			{% endfor %}

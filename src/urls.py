@@ -20,11 +20,13 @@ urlpatterns = patterns('',
 	('^websocket$', 'views.handler' ),
 	(r'^actions/folder/create/$', 'views.createFolder'),
 	(r'^actions/suite/create/$', 'views.createSuite'),
+	(r'^actions/suite/edit/$', 'views.editSuite'),
 	(r'^actions/test/create/$', 'views.createTest'),
 	(r'^actions/test/save/$', 'views.saveTest'),
 	(r'^actions/test/run/$', 'views.runTest'),
 	(r'^actions/test/submit/$', 'views.submitTest'),
 	(r'^actions/remote/save/$', 'views.remoteSaveTest'),
+	(r'^logger/records/recv/$', 'views.recvLogRecords'),
 )
 
 urlpatterns += patterns('',

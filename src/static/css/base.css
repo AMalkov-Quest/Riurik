@@ -91,3 +91,12 @@ h4 a {
     color: navy;
     font-weight: normal;
 }
+
+.dir-index li {
+	height: 16px;
+	padding-left: 24px;	
+}
+
+.dir-index .folder { background: url(/static/img/dir-index-folder.gif) no-repeat scroll top left; }
+.dir-index .suite { background: url(/static/img/dir-index-suite.gif) no-repeat scroll top left; }
+.dir-index .test { background: url(/static/img/dir-index-test.gif) no-repeat scroll top left; }

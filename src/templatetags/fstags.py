@@ -10,7 +10,7 @@ def strip(s, chars):
 	return s.strip(chars)
 
 @register.filter
-def img_by_fstype(path, fsobject):
+def dir_index_type(path, fsobject):
 	if path == '/':
 		fullpath = os.path.join(settings.STATIC_TESTS_ROOT, fsobject)
 	else:
@@ -18,9 +18,9 @@ def img_by_fstype(path, fsobject):
 	
 	if os.path.isdir(fullpath):
 		if os.path.exists( os.path.join(fullpath, settings.TEST_CONTEXT_FILE_NAME) ):
-			return 'fssuite'
-		return 'fsfolder'
-	return 'fstest'
+			return 'suite'
+		return 'folder'
+	return 'test'
 
 @register.filter
 def above(path):

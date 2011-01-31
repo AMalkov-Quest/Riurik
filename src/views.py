@@ -4,14 +4,11 @@ from django.template.loader import render_to_string
 from django_websocket.decorators import require_websocket, accept_websocket
 from django.template import RequestContext, Context, Template
 import protocol
-import traceback, sys, logging, os, re
+import traceback, sys, os, re
 import tools
 import simplejson
 from django.conf import settings
-
-LOG_FILENAME = os.path.join(os.path.dirname(os.path.abspath(__file__)),'waferslim-websocket-server.log')
-logging.basicConfig(filename=LOG_FILENAME,level=logging.DEBUG, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
-log = logging.getLogger('waferslim')
+from logger import log
 
 __all__ = ('handler',)
 _isolate_imports = False
@@ -100,6 +97,9 @@ def createSuite(request):
 	
 	return response
 
+def editSuite(request):
+	return HttpResponseRedirect('/' + request.GET["path"] + '/' + settings.TEST_CONTEXT_FILE_NAME)
+
 def createTest(request):
 	result = {}
 	result['success'], result['result'] = tools.mktest(request.POST["full-path"], request.POST["object-name"])
@@ -158,5 +158,17 @@ def remoteSaveTest(request):
 	
 	response = HttpResponse(mimetype='text/plain')
 	response.write(result)
+	
+	return response
+
+def recvLogRecords(request):
+	log.warn('This is a warning')
+	
+	from logbook.queues import ZeroMQSubscriber
+	subscriber = ZeroMQSubscriber('tcp://127.0.0.1:5000')
+	records = subscriber.recv()
+	
+	response = HttpResponse(mimetype='text/plain')
+	response.write(records)
 	
 	return response
