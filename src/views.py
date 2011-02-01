@@ -113,7 +113,7 @@ def createTest(request):
 	return response
 
 def saveTest(request):
-	result = tools.savetest(request.POST["content"], request.POST["name"])
+	result = tools.savetest(request.POST["content"], request.POST["path"])
 	return HttpResponseRedirect(request.POST["url"])
 
 def _patch_with_context(data, vars):

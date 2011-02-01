@@ -57,11 +57,11 @@
 
 {% block controls %}
 	<ul class="horizontal-menu">
-		<li><a id="run" href="javascript:void(0);">Run</a></li>
-		<li><a id="save" href="javascript:void(0);">Save</a></li>
-		<li><a id="discard" href="javascript: void(0);">Discard</a></li>
-		<li><a id="close" href="javascript: void(0);">Close</a></li>
-		<li class="disabled"><a id="history" href="javascript: void(0);">History</a></li>
+		<li><a id="run" href="javascript:void(0);">{% trans "Run" %}</a></li>
+		<li><a id="save" href="javascript:void(0);">{% trans "Save" %}</a></li>
+		<li><a id="discard" href="javascript: void(0);">{% trans "Discard" %}</a></li>
+		<li class="disabled"><a id="history" href="javascript: void(0);">{% trans "History" %}</a></li>
+		<li><a id="close" href="javascript: void(0);">{% trans "Close" %}</a></li>
 	</ul>
 {% endblock controls %}
 

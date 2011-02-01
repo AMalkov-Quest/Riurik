@@ -1,4 +1,4 @@
-function createFolder(path) {
+function createFolder_old(path) {
 	$("#createFSObjectDialog").dialog({
 		resizable: false,
 		buttons: {
@@ -20,16 +20,43 @@ function createFolder(path) {
 	});
 }
 
+function createFolder(path) {
+	$("#createFSObjectDialog").dialog({
+		resizable: false,
+		buttons: {
+			"create": function() {
+				$(this).dialog("close");
+				$.post(
+					"/actions/folder/create/", 
+					$("#create-fsobject").serialize(), 
+					function(data) {
+						if (data == 'OK') {
+							window.location = window.location;
+						}else{
+							showError(data);
+						}
+					},
+					"text"
+				);
+			},
+			"cancel": function() {
+				$(this).dialog("close");
+			}
+		}
+	});
+}
+
 function createSuite() {
-	createAndEdit("/actions/suite/create/");
+	createAndEdit("Create Suite", "/actions/suite/create/");
 }
 
 function createTest() {
-	createAndEdit("/actions/test/create/");
+	createAndEdit("Create Test", "/actions/test/create/");
 }
 
-function createAndEdit(url) {
+function createAndEdit(title, url) {
 	$("#createFSObjectDialog").dialog({
+		title: title,
 		resizable: false,
 		buttons: {
 			"create": function() {
@@ -40,7 +67,8 @@ function createAndEdit(url) {
 					function(data) {
 						document.location = data['result'];
 					},
-					"json");
+					"json"
+				);
 			},
 			"cancel": function() {
 				$(this).dialog("close");
@@ -48,6 +76,21 @@ function createAndEdit(url) {
 		}
 	});
 }
+
+function showError( msg) {
+	$("#operationResult").text(msg);
+	$("#operationResult").dialog({
+		resizable: false,
+		modal: true,
+		disabled: false,
+		buttons: {
+			"ok": function() {
+				$(this).dialog("close");
+				window.location = window.location;
+			}
+		}
+	});
+};
 
 function operationInProgress() {
 	$("#operationInProgress").dialog({
