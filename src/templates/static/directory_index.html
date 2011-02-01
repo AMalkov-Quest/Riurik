@@ -9,7 +9,7 @@
 	<script type="text/javascript" src="/static/jquery-ui/js/jquery-ui-1.8.9.custom.min.js"></script>
     
     <link rel="stylesheet" href="/static/css/base.css" type="text/css">
-    <script type="text/javascript" src="/static/js/tools.js"></script>
+    <script type="text/javascript" src="/static/js/dir-index-tools.js"></script>
     
     <link rel="stylesheet" href="/static/css/jquery.contextMenu.css" type="text/css">
     <script type="text/javascript" src="/static/js/jquery.contextMenu.js"></script>
@@ -27,7 +27,7 @@
     {% endblock head %}
 </head>
 
-{% include "tools.html" %}
+{% include "dir-index-tools.html" %}
 {% include "dir-index-menu.html" %}
 
 <body>
@@ -55,8 +55,8 @@
 	        	<ul>
 	        		<li></li>
 	        		{% for f in file_list %}
-	    			<li class="{{ directory|dir_index_type:f }}" title="{{ f|strip:'/' }}">
-	    				<a href="{{ f }}">{{ f|strip:'/' }}</a>
+	        		<li class="{{ directory|dir_index_type:f }}" title="{{ f|strip:'/' }}">
+	    				<a href="{% ifnotequal directory '/' %}/{{ directory|strip:'/' }}{% endifnotequal %}/{{ f|strip:'/' }}">{{ f|strip:'/' }}</a>
 	    			</li>
 	    			{% endfor %}
 	    		</ul>

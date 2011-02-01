@@ -5,7 +5,7 @@ from django_websocket.decorators import require_websocket, accept_websocket
 from django.template import RequestContext, Context, Template
 import protocol
 import traceback, sys, os, re
-import tools
+import dir_index_tools as tools
 import simplejson
 from django.conf import settings
 from logger import log
@@ -89,6 +89,7 @@ def createFolder(request):
 
 def removeObject(request):
 	result = tools.remove(request.POST["path"])
+	print '/' + request.POST["url"].strip('/')
 	return HttpResponseRedirect('/' + request.POST["url"].strip('/'))
 
 def createSuite(request):
