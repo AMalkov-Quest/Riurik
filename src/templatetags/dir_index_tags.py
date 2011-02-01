@@ -6,6 +6,13 @@ import settings
 register = template.Library()
 
 @register.filter
+def kind_tests(p):
+	if settings.STATIC_TESTS_ROOT == settings.STATIC_INNER_TESTS_ROOT:
+		return 'Outer'
+	else:
+		return 'Inner'
+
+@register.filter
 def strip(s, chars):
 	return s.strip(chars)
 
@@ -44,32 +51,39 @@ def current(path):
 
 @register.filter
 def breadcrumbs(path):
-    html = '<a href="/">/</a>&nbsp;'
-    lastpath = '/' + settings.STATIC_TESTS_URL
-    i = 0
-    path = path.split('/')
-    for p in path:
-        i += 1
-        if p:
-            lastpath += p 
-            lastpath += '/'
-            html += '<a href="%s">%s</a>&nbsp;/&nbsp;' % ( lastpath, p )
-    return mark_safe(html)
+	html = '<a href="/">/</a>&nbsp;'
+	if settings.STATIC_TESTS_URL:
+		root = '/' + settings.STATIC_TESTS_URL + '/'
+	else:
+		root = '/'
+	
+	lastpath = root
+	i = 0
+	crumbs = path.split('/')
+	for p in crumbs:
+		i += 1
+		if p:
+			lastpath += p 
+			lastpath += '/'
+			html += '<a href="%s">%s</a>&nbsp;/&nbsp;' % ( lastpath, p )
+			
+	if not path == '/':
+		html += '<a style="text-decoration: none;" href="%s%s">...</a>' % (root, above(path))
+	return mark_safe(html)
 
 @register.filter
 def breadcrumbs_file(path):
-    html = '<a href="/">/</a>&nbsp;'
-    lastpath = '/'
-    i = 0
-    path = path.split('/')
-    for p in path:
-        i += 1
-        if p:
-            lastpath += p 
-            if i < len(path): 
-                lastpath += '/'
-                html += '<a href="%s">%s</a>&nbsp;/&nbsp;' % ( lastpath, p )
-            else:
-                html += '<a href="%s">%s</a>' % ( lastpath, p )
-    return mark_safe(html)
-
+	html = '<a href="/">/</a>&nbsp;'
+	lastpath = '/'
+	i = 0
+	path = path.split('/')
+	for p in path:
+		i += 1
+		if p:
+			lastpath += p 
+			if i < len(path): 
+				lastpath += '/'
+				html += '<a href="%s">%s</a>&nbsp;/&nbsp;' % ( lastpath, p )
+			else:
+				html += '<a href="%s">%s</a>' % ( lastpath, p )
+	return mark_safe(html)

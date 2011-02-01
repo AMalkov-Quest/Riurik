@@ -2,9 +2,13 @@ import os
 import settings, resources
 from django.core.cache import cache
 
+def getWorkingDir():
+	print 'STATIC_TESTS_ROOT: ' + settings.STATIC_TESTS_ROOT
+	return settings.STATIC_TESTS_ROOT
+
 def mkdir(path, name):
 	try:
-		fullpath = os.path.join(settings.STATIC_TESTS_ROOT, path.strip('/'), name)
+		fullpath = os.path.join(getWorkingDir(), path.strip('/'), name)
 		os.mkdir(fullpath)
 	except Exception, e:
 		return str(e)
@@ -13,7 +17,7 @@ def mkdir(path, name):
 
 def remove(path):
 	try:
-		fullpath = os.path.join(settings.STATIC_TESTS_ROOT, path.strip('/'))
+		fullpath = os.path.join(getWorkingDir(), path.strip('/'))
 		if os.path.isdir(fullpath):
 			import shutil
 			shutil.rmtree(fullpath)
@@ -27,7 +31,7 @@ def remove(path):
 
 def mksuite(path, name):
 	try:
-		fullpath = os.path.join(settings.STATIC_TESTS_ROOT, path.strip('/'), name)
+		fullpath = os.path.join(getWorkingDir(), path.strip('/'), name)
 		os.mkdir(fullpath)
 		filename = os.path.join(fullpath, settings.TEST_CONTEXT_FILE_NAME)
 		f = open(filename, 'w')
@@ -40,7 +44,7 @@ def mksuite(path, name):
 def mktest(path, name):
 	try:
 		filename = os.path.join(name + settings.TEST_FILE_EXT)
-		fullpath = os.path.join(settings.STATIC_TESTS_ROOT, path.strip('/'), filename)
+		fullpath = os.path.join(getWorkingDir(), path.strip('/'), filename)
 		f = open(fullpath, 'w')
 		f.close()
 	except Exception, e:
@@ -61,7 +65,7 @@ def remotesavetest(host, data):
 
 def savetest(content, path):
 	try:
-		fullpath = os.path.normpath(os.path.join(settings.STATIC_TESTS_ROOT, path.strip('/')))
+		fullpath = os.path.normpath(os.path.join(getWorkingDir(), path.strip('/')))
 		if not os.path.exists(os.path.dirname(fullpath)):
 			os.makedirs(os.path.dirname(fullpath))
 			
@@ -75,7 +79,7 @@ def savetest(content, path):
 
 def gettest(path):
 	try:
-		fullpath = os.path.normpath(os.path.join(settings.STATIC_TESTS_ROOT, path.strip('/')))
+		fullpath = os.path.normpath(os.path.join(getWorkingDir(), path.strip('/')))
 		f = open(fullpath, 'r')
 		content = f.read()
 		f.close()

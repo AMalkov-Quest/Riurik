@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 
-{% load fstags %}
+{% load dir_index_tags %}
 
 <head>
     <link rel="stylesheet" type="text/css" href="/static/jquery-ui/css/start/jquery-ui-1.8.9.custom.css" />
@@ -33,7 +33,7 @@
 <body>
 	{% block body %}
 	<div class="header">
-		<a href="" title="Riurik Web Based Acceptance Testing Framework"></a>
+		<a href="#" title="Riurik Web Based Acceptance Testing Framework"></a>
 		<div class="tittle-riurik">Riurik Web Based Acceptance Testing Framework</div>
 	</div>
 	<div class="content">
@@ -43,20 +43,26 @@
 				<li><a href="javascript:createFolder('{{ directory }}')">Create Folder</a></li>
 				<li><a href="javascript:createSuite()">Create Suite</a></li>
 				<li><a href="javascript:createTest()">Create Test</a></li>
+				<li><a href="/tests/{{ ''|kind_tests }}/">{{ ''|kind_tests }} Tests</a></li>
 			</ul>
 			{% endblock controls %}
 		</div>
-		{% block title %}<h4>{{ directory|breadcrumbs }}{% ifnotequal directory '/' %}<a style="text-decoration: none;" href="/{{ directory|above }}">...</a>{% endifnotequal %}</h4>{% endblock title %}
+		{% block title %}
+		<!--<h4>{{ directory|breadcrumbs }}{% ifnotequal directory '/' %}<a style="text-decoration: none;" href="/{{ directory|above }}">...</a>{% endifnotequal %}</h4>-->
+		<h4>{{ directory|breadcrumbs }}</h4>
+		{% endblock title %}
 		<div style="clear:both;"></div>
 		
 		<div class="line">
 			{% block content %}
 			<div id="dir-index-id" class="dir-index" style="width:500px;">
+<!--				<script>alert("{{ directory }}")</script>-->
 	        	<ul>
 	        		<li></li>
 	        		{% for f in file_list %}
 	        		<li class="{{ directory|dir_index_type:f }}" title="{{ f|strip:'/' }}">
-	    				<a href="{% ifnotequal directory '/' %}/{{ directory|strip:'/' }}{% endifnotequal %}/{{ f|strip:'/' }}">{{ f|strip:'/' }}</a>
+<!--	    				<a href="{% ifnotequal directory '/' %}/{{ directory|strip:'/' }}/{% endifnotequal %}{{ f|strip:'/' }}">{{ f|strip:'/' }}</a>-->
+						<a href="{{ f }}">{{ f|strip:'/' }}</a>
 	    			</li>
 	    			{% endfor %}
 	    		</ul>

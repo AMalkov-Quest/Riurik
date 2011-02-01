@@ -38,7 +38,7 @@ DATABASE_OPTIONS = {'timeout': 30}
 # although not all choices may be available on all operating systems.
 # If running in a Windows environment this must be set to the same as your
 # system time zone.
-TIME_ZONE = 'America/Chicago'
+TIME_ZONE = 'Europe/Moscow'
 
 # Language code for this installation. All choices can be found here:
 # http://www.i18nguy.com/unicode/language-identifiers.html
@@ -80,15 +80,9 @@ MIDDLEWARE_CLASSES = (
 
 ROOT_URLCONF = 'urls'
 
-import os
-
 TEMPLATE_DIRS = (
 
-    os.path.dirname( __file__ ) + '/templates',
-
-    # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
-    # Always use forward slashes, even on Windows.
-    # Don't forget to use absolute paths, not relative paths.
+    os.path.join(os.path.dirname( __file__ ), 'templates'),
 )
 
 TEMPLATE_CONTEXT_PROCESSORS = (
@@ -107,14 +101,25 @@ INSTALLED_APPS = (
 #STATIC_URL = '/static/'
 
 # Path to a folder where tests are located
-STATIC_TESTS_ROOT = 'C:/saip/SharePoint Information Portal/Application/tests'
-STATIC_TESTS_URL = ''
+STATIC_OUTER_TESTS_ROOT = 'C:/saip/SharePoint Information Portal/Application/tests'
+STATIC_OUTER_TESTS_URL = ''
+
+STATIC_INNER_TESTS_ROOT = os.path.join(os.path.dirname( __file__ ), 'tests')
+STATIC_INNER_TESTS_URL = 'inner'
+
+STATIC_TESTS_URLs = {
+	STATIC_OUTER_TESTS_ROOT: STATIC_OUTER_TESTS_URL,
+	STATIC_INNER_TESTS_ROOT: STATIC_INNER_TESTS_URL
+}
+
+STATIC_TESTS_ROOT = STATIC_OUTER_TESTS_ROOT
+STATIC_TESTS_URL = STATIC_OUTER_TESTS_URL
 
 TEST_CONTEXT_FILE_NAME = '.context.ini'
 TEST_FILE_EXT = '.js'
 
 APPEND_SLASH = False
-CODEMIRROR_CALL_EDITOR_FOR = '^.*\.(?:js|ini|html)$' # .js and .ini files
+CODEMIRROR_CALL_EDITOR_FOR = '^.*\.(?:js|ini|html|py)$'
 
 try:
 	from local_settings import *

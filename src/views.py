@@ -7,7 +7,8 @@ import protocol
 import traceback, sys, os, re
 import dir_index_tools as tools
 import simplejson
-from django.conf import settings
+import django.conf
+import settings
 from logger import log
 
 __all__ = ('handler',)
@@ -56,11 +57,16 @@ def handle_message(data, isolate_imports=False, executioncontext=_executionconte
 	return protocol.pack(results)
 
 CODEMIRROR_CALL_EDITOR_FOR = '^.*\.(?:js|ini)$'
-if hasattr(settings, 'CODEMIRROR_CALL_EDITOR_FOR'):
-	CODEMIRROR_CALL_EDITOR_FOR = getattr(settings, 'CODEMIRROR_CALL_EDITOR_FOR')
+if hasattr(django.conf, 'CODEMIRROR_CALL_EDITOR_FOR'):
+	CODEMIRROR_CALL_EDITOR_FOR = getattr(django.conf, 'CODEMIRROR_CALL_EDITOR_FOR')
+	
+def setTestsRoot(document_root):
+	settings.STATIC_TESTS_ROOT = document_root
+	settings.STATIC_TESTS_URL = settings.STATIC_TESTS_URLs[document_root]
 
 def static_wrapper(func):
 	def new(*args,**kwargs):
+		setTestsRoot(kwargs['document_root'])
 		r = func(*args, **kwargs)
 		try:
 			request, path, content = args[0], kwargs['path'], r.content
@@ -73,11 +79,20 @@ def static_wrapper(func):
 					}, 
 					context_instance=RequestContext(request)
 				)
-		except Exception, ex: logging.error(str(ex))
+		except Exception, ex:
+			log.error(str(ex))
 		return r
 	return new
+
 import django.views.static
 serve = static_wrapper(django.views.static.serve)
+innerserve = static_wrapper(django.views.static.serve)
+
+def innerTests(request):
+	return HttpResponseRedirect('/inner/')
+
+def outerTests(request):
+	return HttpResponseRedirect('/')
 
 def createFolder(request):
 	result = tools.mkdir(request.POST["full-path"], request.POST["object-name"])
@@ -89,8 +104,7 @@ def createFolder(request):
 
 def removeObject(request):
 	result = tools.remove(request.POST["path"])
-	print '/' + request.POST["url"].strip('/')
-	return HttpResponseRedirect('/' + request.POST["url"].strip('/'))
+	return HttpResponseRedirect('/' + settings.STATIC_TESTS_URL + '/' + request.POST["url"].strip('/'))
 
 def createSuite(request):
 	result = {}
