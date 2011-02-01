@@ -131,7 +131,7 @@ def _patch_with_context(data, vars):
     return t.render(c) + data
 
 def submitTest(request):
-	testname = request.POST["name"]
+	testname = request.POST["path"]
 	url = request.POST["url"]
 	content = request.POST.get("content", tools.gettest(testname))
 	

@@ -7,7 +7,7 @@ Alias /testsrc/ "C:\SAIP\SharePoint Information Portal\Application\tests\\"
 [settings.py]
 TEMPLATE_DIRS += (
 	os.path.join(os.path.dirname( __file__ ), 'tests'),
-}
+)
 
 [url.py]
 urlpatterns += patterns('',

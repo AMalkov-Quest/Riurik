@@ -69,7 +69,7 @@
 
 {% block content %}
 	<form id='apply-test' method='POST'>
-		<input type="hidden" name="name" value="{{ relative_file_path }}" />
+		<input type="hidden" name="path" value="{{ relative_file_path }}" />
 		<input type="hidden" name="url" value="{{ request.path }}" />
 		<textarea id='code' name='content'>{{ content|default:"" }}</textarea>
 	</form>

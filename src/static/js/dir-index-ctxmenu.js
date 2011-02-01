@@ -32,7 +32,7 @@ $(document).ready(function(){
 		var currentDir = $('#context-action > input[name=url]').val();
 		var fullPath = currentDir + target;
 		
-		$('#context-action > input[name=name]').val(fullPath);
+		$('#context-action > input[name=path]').val(fullPath);
 		$('#context-action > input[name=url]').val(fullPath);
 		$('#context-action').attr('action', '/actions/test/submit/').attr('target', '_blank');
 		$('#context-action').submit();
