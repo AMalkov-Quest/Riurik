@@ -40,9 +40,9 @@
 		<div style="float:right;">
 			{% block controls %}
 			<ul class="horizontal-menu">
-				<li><a href="javascript:createFolder('{{ directory }}')">Create Folder</a></li>
-				<li><a href="javascript:createSuite()">Create Suite</a></li>
-				<li><a href="javascript:createTest()">Create Test</a></li>
+				<li><a id="new-folder" href="#" onClick="javascript:createFolder('{{ directory }}')">Create Folder</a></li>
+				<li><a id="new-suite" href="javascript:createSuite()">Create Suite</a></li>
+				<li><a id="new-test" href="javascript:createTest()">Create Test</a></li>
 				<li><a href="/tests/{{ ''|kind_tests }}/">{{ ''|kind_tests }} Tests</a></li>
 			</ul>
 			{% endblock controls %}
@@ -56,13 +56,11 @@
 		<div class="line">
 			{% block content %}
 			<div id="dir-index-id" class="dir-index" style="width:500px;">
-<!--				<script>alert("{{ directory }}")</script>-->
 	        	<ul>
 	        		<li></li>
 	        		{% for f in file_list %}
 	        		<li class="{{ directory|dir_index_type:f }}" title="{{ f|strip:'/' }}">
-<!--	    				<a href="{% ifnotequal directory '/' %}/{{ directory|strip:'/' }}/{% endifnotequal %}{{ f|strip:'/' }}">{{ f|strip:'/' }}</a>-->
-						<a href="{{ f }}">{{ f|strip:'/' }}</a>
+						<a id="{{ f|strip:'/' }}" href="{{ f }}">{{ f|strip:'/' }}</a>
 	    			</li>
 	    			{% endfor %}
 	    		</ul>

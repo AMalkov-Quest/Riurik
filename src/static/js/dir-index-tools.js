@@ -1,27 +1,6 @@
-function createFolder_old(path) {
-	$("#createFSObjectDialog").dialog({
-		resizable: false,
-		buttons: {
-			"create": function() {
-				$(this).dialog("close");
-				$("#operationInProgress").load(
-						"/actions/folder/create/", 
-						{"full-path" : $("#full-path").val(), "object-name": $("#object-name").val()},
-						function() {
-							$("#operationInProgress").parent().find("button:contains('ok')").attr('disabled',false).removeClass('ui-state-disabled');
-						},
-						"json");
-				operationInProgress();
-			},
-			"cancel": function() {
-				$(this).dialog("close");
-			}
-		}
-	});
-}
-
-function createFolder(path) {
-	$("#createFSObjectDialog").dialog({
+function __createFolder(path) {
+	$("#create-dir-index-dialog").dialog({
+		title: $('#new-folder').text(),
 		resizable: false,
 		buttons: {
 			"create": function() {
@@ -46,17 +25,54 @@ function createFolder(path) {
 	});
 }
 
+function createFolderClick() {
+	$(this).dialog("close");
+	$.post(
+		"/actions/folder/create/", 
+		$("#create-fsobject").serialize(), 
+		function(data) {
+			if (data == 'OK') {
+				window.location = window.location;
+			}else{
+				showError(data);
+			}
+		},
+		"text"
+	);
+}
+
+function createFolder(path) {
+	$("#create-dir-index-dialog").dialog({
+		title: $('#new-folder').text(),
+		resizable: false,
+		buttons: [
+			{
+				id: "create-folder-btn",
+				text: "create", 
+				click: createFolderClick
+			},
+		    {
+				id: "cancel-folder-btn",
+		    	text: "cancel", 
+		    	click: function() {
+					$(this).dialog("close");
+				}
+		    }
+	   ]
+	});
+}
+
 function createSuite() {
-	createAndEdit("Create Suite", "/actions/suite/create/");
+	createAndEdit($('#new-suite'), "/actions/suite/create/");
 }
 
 function createTest() {
-	createAndEdit("Create Test", "/actions/test/create/");
+	createAndEdit($('#new-test'), "/actions/test/create/");
 }
 
-function createAndEdit(title, url) {
-	$("#createFSObjectDialog").dialog({
-		title: title,
+function createAndEdit(srcObject, url) {
+	$("#create-dir-index-dialog").dialog({
+		title: srcObject.text(),
 		resizable: false,
 		buttons: {
 			"create": function() {

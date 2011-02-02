@@ -64,10 +64,12 @@ if hasattr(django.conf, 'CODEMIRROR_CALL_EDITOR_FOR'):
 def setTestsRoot(document_root):
 	settings.STATIC_TESTS_ROOT = document_root
 	settings.STATIC_TESTS_URL = settings.STATIC_TESTS_URLs[document_root]
+	log.debug('Set tests root: %s' % document_root)
 
 def static_wrapper(func):
 	def new(*args,**kwargs):
 		setTestsRoot(kwargs['document_root'])
+		print kwargs
 		r = func(*args, **kwargs)
 		try:
 			request, path, content = args[0], kwargs['path'], r.content
@@ -166,8 +168,6 @@ def runTest(request):
 
 def runInnerTest(name, url):
 	jsfile = "/%s/%s" % (settings.TESTS_URL, name)
-	
-	#return HttpResponseRedirect(url)
 	return _render_to_response('testLoader.html', locals())
 
 def runRemoteTest(name, content, testpath, context):
