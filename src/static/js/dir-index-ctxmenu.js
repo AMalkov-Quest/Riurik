@@ -12,7 +12,7 @@ $(document).ready(function(){
 	
 	function edit(target, context) {
 		if (context == 'suite') {
-			var currentDir = $('#run-test > input[name=url]').val();
+			var currentDir = $('#context-action > input[name=url]').val();
 			window.location = "/actions/suite/edit/?path=" + currentDir + target;
 		}else{
 			window.location = target;

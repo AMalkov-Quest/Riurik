@@ -115,6 +115,9 @@ STATIC_TESTS_URLs = {
 STATIC_TESTS_ROOT = STATIC_OUTER_TESTS_ROOT
 STATIC_TESTS_URL = STATIC_OUTER_TESTS_URL
 
+TESTS_ROOT = os.path.join(os.path.dirname( __file__ ), 'tests')
+TESTS_URL = 'testsrc'
+
 TEST_CONTEXT_FILE_NAME = '.context.ini'
 TEST_FILE_EXT = '.js'
 

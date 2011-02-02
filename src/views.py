@@ -10,6 +10,7 @@ import simplejson
 import django.conf
 import settings
 from logger import log
+import context
 
 __all__ = ('handler',)
 _isolate_imports = False
@@ -116,7 +117,7 @@ def createSuite(request):
 	return response
 
 def editSuite(request):
-	return HttpResponseRedirect('/' + request.GET["path"] + '/' + settings.TEST_CONTEXT_FILE_NAME)
+	return HttpResponseRedirect('/' + settings.STATIC_TESTS_URL + request.GET["path"] + '/' + settings.TEST_CONTEXT_FILE_NAME)
 
 def createTest(request):
 	result = {}
@@ -154,22 +155,33 @@ def submitTest(request):
 	
 def runTest(request):
 	result = tools.savetest(request.POST["content"], request.POST["name"])
+	
+	ctx = context.get(request.POST["name"])
+	host = ctx.get('host')
+	
+	if host == 'localhost':
+		return runInnerTest(request.POST["name"], request.POST["url"])
+	else:
+		return runRemoteTest(request.POST["name"], request.POST["content"], request.POST["url"], ctx)
+
+def runInnerTest(name, url):
+	jsfile = "/%s/%s" % (settings.TESTS_URL, name)
+	
+	#return HttpResponseRedirect(url)
+	return _render_to_response('testLoader.html', locals())
+
+def runRemoteTest(name, content, testpath, context):
 	data = {}
-	data['content'] = request.POST["content"]
-	data['name'] = request.POST["name"]
+	data['content'] = content
+	data['name'] = name
 	
 	# TODO: call data = _patch_with_context(data, items) to add context variables to test file content behind
 	
-	import context
-	ctx = context.context(request.POST["name"])
-	url = ctx.get('url')
-	host = ctx.get('host')
-	items = ctx.items();
-	data['content'] = _patch_with_context(data['content'], items)
+	data['content'] = _patch_with_context(data['content'], context.items())
+	result = tools.remotesavetest(context.get('host'), data)
+	url = context.get('url')
 	
-	result = tools.remotesavetest(host, data)
-	
-	return HttpResponseRedirect(url + '?path=' + request.POST["url"].lstrip('/'))
+	return HttpResponseRedirect(url + '?path=' + testpath.lstrip('/'))
 
 def remoteSaveTest(request):
 	result = tools.savetest(request.POST["content"], request.POST["name"])

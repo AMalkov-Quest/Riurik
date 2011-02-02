@@ -3,7 +3,6 @@ import settings, resources
 from django.core.cache import cache
 
 def getWorkingDir():
-	print 'STATIC_TESTS_ROOT: ' + settings.STATIC_TESTS_ROOT
 	return settings.STATIC_TESTS_ROOT
 
 def mkdir(path, name):

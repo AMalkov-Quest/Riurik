@@ -31,12 +31,19 @@ urlpatterns = patterns('',
 	(r'^actions/remove/$', 'views.removeObject'),
 	(r'^tests/Inner/$', 'views.innerTests'),
 	(r'^tests/Outer/$', 'views.outerTests'),
+	(r'^tests$', 'views.runInnerTests'),
 )
 
 urlpatterns += patterns('',
     (r'^static/(?P<path>.*)$', 'django.views.static.serve',
 		  {
 		'document_root': settings.MEDIA_ROOT,
+		'show_indexes': True
+		}
+	),
+	(r'^' + settings.TESTS_URL + '/(?P<path>.*)$', 'django.views.static.serve',
+		  {
+		'document_root': settings.TESTS_ROOT,
 		'show_indexes': True
 		}
 	),

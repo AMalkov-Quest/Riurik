@@ -1,50 +1,21 @@
-import os, logging, ConfigParser
-import settings
-	
-def read(file):
-	config = ConfigParser.RawConfigParser()
-	config.read(file)
-	return config
-
-def write(path, func):
-	try:
-		file = open(path, 'w')
-		func(file)
-	finally:
-		if file: file.close()
-
-def get(file, section, option):
-	try:
-		config = read(file)
-		return config.get(section, option)
-	except Exception, e:
-		logging.info(e)
-		return None
-
-def items(file, section):
-	try:
-		config = read(file)
-		return config.items(section)
-	except Exception, e:
-		logging.info(e)
-		return None
-
-def set(file, section, option, value):
-	try:
-		config = read(file)
-		config.set(section, option, value)
-		write(file, config.write)
-	except Exception, e:
-		logging.info(e)
+import os
+from logger import log
+import settings, config
+		
+def get(name):
+	return context(name)
 
 class context():
 	
 	def __init__(self, test):
 		test = os.path.join(settings.STATIC_TESTS_ROOT, test)
 		self.inifile = os.path.join(os.path.dirname(test), settings.TEST_CONTEXT_FILE_NAME)
+		log.debug('context: %s' % self.inifile)
 		
 	def get(self, option, section='default'):
-		return get(self.inifile, section, option)
+		value = config.get(self.inifile, section, option)
+		log.debug('context: %s=%s' % (option, value))
+		return value
 
 	def items(self, section='default'):
-		return items(self.inifile, section)
+		return config.items(self.inifile, section)
