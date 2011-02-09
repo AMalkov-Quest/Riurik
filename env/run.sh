@@ -7,6 +7,7 @@ ENVDIR="$(pwd)"
 SERVERDIR="$(dirname $ENVDIR)"
 SRCDIR="$SERVERDIR/src"
 # activating virtual environment
-"$ENVDIR/linux/bin/activate"
+#"$ENVDIR/linux/bin/activate"
 # running server
-"$ENVDIR/linux/bin/python" "$SRCDIR/manage.py" runserver 0.0.0.0:8000 --multithreaded
+python "$SRCDIR/manage.py" runserver 0.0.0.0:8000 --multithreaded
+#"$ENVDIR/linux/bin/python" "$SRCDIR/manage.py" runserver 0.0.0.0:8000 --multithreaded
