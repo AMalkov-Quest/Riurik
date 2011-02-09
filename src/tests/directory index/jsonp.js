@@ -8,5 +8,5 @@ function NewSPSite(url, name) {
 
 $(document).ready(function () {
   ps.server = 'sp-2k10-u4';
-  ps.eval(NewSPSite, 'http://sp-2k10-u4:1703', 'new-site-5');
+  ps.eval(NewSPSite, 'http://sp-2k10-u4:1703', 'new-site-4');
 });
