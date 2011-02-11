@@ -81,9 +81,7 @@ def patch_fullpaths(fullpath,newpath=''):
         if m:
             fullpath = settings.VIRTUAL_URLS[key] + m.group(1)
             return fullpath
-    return ''
-
-patch_virtual_paths = patch_fullpaths
+    return fullpath
 
 def get_fullpath(path):
     return patch_fullpaths('', path)
@@ -104,6 +102,7 @@ def serve(request, path, document_root=None, show_indexes=False):
     """
 
     # Clean up given path to only allow serving files below document_root.
+    log.debug((request.GET, path,document_root,show_indexes))
     path = posixpath.normpath(urllib.unquote(path))
     path = path.lstrip('/')
     newpath = ''
@@ -118,11 +117,12 @@ def serve(request, path, document_root=None, show_indexes=False):
             continue
         newpath = os.path.join(newpath, part).replace('\\', '/')
     if newpath and path != newpath:
+        log.debug('before redirect to newpath')
         return HttpResponseRedirect(newpath)
     fullpath = os.path.join(document_root, newpath).replace('/', '\\')
-    
-    fullpath = patch_virtual_paths(fullpath, newpath)
-    
+    log.debug(('before patching fullpath',fullpath, newpath))
+    fullpath = patch_fullpaths(fullpath, newpath)
+    log.debug(('after patching fullpath',fullpath, newpath))
     log.debug(fullpath)
     log.debug(os.path.isdir(fullpath))
     if os.path.isdir(fullpath):
