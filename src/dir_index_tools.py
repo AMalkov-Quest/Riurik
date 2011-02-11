@@ -63,9 +63,9 @@ def remotesavetest(host, data):
 	print url
 	return urllib2.urlopen(url, post).read()
 
-def savetmptest(content, path):
+def savetmptest(content, fullpath):
 	try:
-		fullpath = os.path.normpath(os.path.join(getWorkingDir(), path.strip('/')))
+		#fullpath = os.path.normpath(os.path.join(getWorkingDir(), path.strip('/')))
 		if not os.path.exists(os.path.dirname(fullpath)):
 			os.makedirs(os.path.dirname(fullpath))
 
@@ -102,19 +102,19 @@ def savetmptest(content, path):
 		#return str(e)
 	return False
 	
-def savetest(content, path):
+def savetest(content, fullpath):
 	try:
-		swpname = savetmptest(content, path)
-		fullpath = os.path.normpath(os.path.join(getWorkingDir(), path.strip('/')))
+		swpname = savetmptest(content, fullpath)
 		if swpname:
-			log.debug(swpname)
-			log.debug(fullpath)
-			shutil.move(swpname, fullpath)
+			with open(swpname,'rb') as source:
+				with open(fullpath, 'wb') as dest:
+					dest.write(source.read())
+					dest.close();
+				source.close()
 		else:
 			raise Exception('Can\'t presave')
 	except Exception, e:
-		log.debug(e)
-		return str(e)
+		log.error(e)
 	
 	return resources.ok
 

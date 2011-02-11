@@ -17,7 +17,7 @@
 		});	
 	</script>
 	<form id='run-test' action="/actions/test/run/" method='POST'>
-		<input type="hidden" name="name" value="{{ testname }}" />
+		<input type="hidden" name="path" value="{{ testname }}" />
 		<input type="hidden" name="url" value="{{ url }}" />
 		<textarea style="display:none" id='code' name='content'>{{ content }}</textarea>
 	</form>

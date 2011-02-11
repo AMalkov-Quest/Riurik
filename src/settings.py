@@ -115,6 +115,13 @@ STATIC_TESTS_URLs = {
 STATIC_TESTS_ROOT = STATIC_OUTER_TESTS_ROOT
 STATIC_TESTS_URL = STATIC_OUTER_TESTS_URL
 
+
+VIRTUAL_URLS = {
+    'in': os.path.join(os.path.dirname( __file__ ), 'tests'),
+    'out': 'C:/saip/SharePoint Information Portal/Application/tests',
+    'c': 'C:/saip',
+}
+
 TESTS_ROOT = os.path.join(os.path.dirname( __file__ ), 'tests')
 TESTS_URL = 'testsrc'
 

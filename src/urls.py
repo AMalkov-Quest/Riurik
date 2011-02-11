@@ -1,13 +1,13 @@
 #######################################################################################
 #Copyright (C) 2008 Quest Software, Inc.
 #File:		urls.py
-#Version:       1.0.0.0
+#Version:	   1.0.0.0
 
 #######################################################################################
 #
-#       THIS CODE AND INFORMATION IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND,
-#       EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED
-#       WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A PARTICULAR PURPOSE.
+#	   THIS CODE AND INFORMATION IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND,
+#	   EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED
+#	   WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A PARTICULAR PURPOSE.
 #
 ########################################################################################
 from django.conf.urls.defaults import *
@@ -30,18 +30,10 @@ urlpatterns = patterns('',
 	(r'^actions/remote/save/$', 'views.remoteSaveTest'),
 	(r'^logger/records/recv/$', 'views.recvLogRecords'),
 	(r'^actions/remove/$', 'views.removeObject'),
-	(r'^tests/Inner/$', 'views.innerTests'),
-	(r'^tests/Outer/$', 'views.outerTests'),
-	(r'^tests$', 'views.runInnerTests'),
+	(r'^tests/$', 'views.showTests'),
 )
 
-urlpatterns += patterns('',
-    (r'^static/(?P<path>.*)$', 'django.views.static.serve',
-		  {
-		'document_root': settings.MEDIA_ROOT,
-		'show_indexes': True
-		}
-	),
+"""
 	(r'^' + settings.TESTS_URL + '/(?P<path>.*)$', 'django.views.static.serve',
 		  {
 		'document_root': settings.TESTS_ROOT,
@@ -54,7 +46,16 @@ urlpatterns += patterns('',
 		'show_indexes': True
 		}
 	),
-    (r'^' + settings.STATIC_OUTER_TESTS_URL + '(?P<path>.*)$', 'views.serve',
+"""
+
+urlpatterns += patterns('',
+	(r'^static/(?P<path>.*)$', 'django.views.static.serve',
+		{
+		'document_root': settings.MEDIA_ROOT,
+		'show_indexes': True
+		}
+	),
+	(r'^' + settings.STATIC_OUTER_TESTS_URL + '(?P<path>.*)$', 'views.serve',
 		{
 			'document_root': settings.STATIC_OUTER_TESTS_ROOT,
 			'show_indexes': True
