@@ -1,8 +1,10 @@
-from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response as _render_to_response
 from django.template.loader import render_to_string
 from django_websocket.decorators import require_websocket, accept_websocket
-from django.template import RequestContext, Context, Template
+from django.template import loader, RequestContext, Context, Template, TemplateDoesNotExist
+from django.http import Http404, HttpResponse, HttpResponseRedirect, HttpResponseNotModified, HttpRequest
+from django.utils.http import http_date
+import django.views.static
 import protocol
 import traceback, sys, os, re
 import dir_index_tools as tools
@@ -11,8 +13,15 @@ import django.conf
 import settings
 from logger import log
 import context
+import mimetypes
+import os
+import posixpath
+import re
+import stat
+import urllib
+from email.Utils import parsedate_tz, mktime_tz
 
-__all__ = ('handler',)
+__all__ = ('handler','serve',)
 _isolate_imports = False
 _executioncontext=protocol.ExecutionContext(isolate_imports=_isolate_imports)
 
@@ -66,76 +75,164 @@ def setTestsRoot(document_root):
     settings.STATIC_TESTS_URL = settings.STATIC_TESTS_URLs[document_root]
     log.debug('Set tests root: %s' % document_root)
 
-def static_wrapper(func):
-    def new(*args,**kwargs):
-        setTestsRoot(kwargs['document_root'])
-        print kwargs
-        r = func(*args, **kwargs)
-        try:
-            request, path, content = args[0], kwargs['path'], r.content
-            if re.match(CODEMIRROR_CALL_EDITOR_FOR, path.lower()):
-                return _render_to_response(
-                    'static/types/javascript.html', 
-                    { 
-                        'content': content,
-                        'relative_file_path': path,
-                    }, 
-                    context_instance=RequestContext(request)
-                )
-        except Exception, ex:
-            log.error(str(ex))
-        return r
-    return new
+def patch_fullpaths(fullpath,newpath=''):
+    for key in settings.VIRTUAL_URLS:
+        m = re.search('^%s(/.*)$' % key, newpath)
+        if m:
+            fullpath = settings.VIRTUAL_URLS[key] + m.group(1)
+            return fullpath
+    return ''
 
-import django.views.static
-serve = static_wrapper(django.views.static.serve)
-innerserve = static_wrapper(django.views.static.serve)
+patch_virtual_paths = patch_fullpaths
 
-def innerTests(request):
-    return HttpResponseRedirect('/inner/')
+def get_fullpath(path):
+    return patch_fullpaths('', path)
 
-def outerTests(request):
-    return HttpResponseRedirect('/')
+def serve(request, path, document_root=None, show_indexes=False):
+    """
+    Serve static files below a given point in the directory structure.
 
-def createFolder(request):
-    result = tools.mkdir(request.POST["full-path"], request.POST["object-name"])
+    To use, put a URL pattern such as::
+
+        (r'^(?P<path>.*)$', 'django.views.static.serve', {'document_root' : '/path/to/my/files/'})
+
+    in your URLconf. You must provide the ``document_root`` param. You may
+    also set ``show_indexes`` to ``True`` if you'd like to serve a basic index
+    of the directory.  This index view will use the template hardcoded below,
+    but if you'd like to override it, you can create a template called
+    ``static/directory_index.html``.
+    """
+
+    # Clean up given path to only allow serving files below document_root.
+    path = posixpath.normpath(urllib.unquote(path))
+    path = path.lstrip('/')
+    newpath = ''
+    for part in path.split('/'):
+        if not part:
+            # Strip empty path components.
+            continue
+        drive, part = os.path.splitdrive(part)
+        head, part = os.path.split(part) 
+        if part in (os.curdir, os.pardir):
+            # Strip '.' and '..' in path.
+            continue
+        newpath = os.path.join(newpath, part).replace('\\', '/')
+    if newpath and path != newpath:
+        return HttpResponseRedirect(newpath)
+    fullpath = os.path.join(document_root, newpath).replace('/', '\\')
+    
+    fullpath = patch_virtual_paths(fullpath, newpath)
+    
+    log.debug(fullpath)
+    log.debug(os.path.isdir(fullpath))
+    if os.path.isdir(fullpath):
+        if show_indexes:
+            try:
+                t = loader.select_template(['static/directory_index.html',
+                        'static/directory_index'])
+            except TemplateDoesNotExist:
+                t = Template(django.views.static.DEFAULT_DIRECTORY_INDEX_TEMPLATE, name='Default directory index template')
+            files = []
+            for f in os.listdir(fullpath):
+                if not f.startswith('.'):
+                    if os.path.isdir(os.path.join(fullpath, f)):
+                        f += '/'
+                    files.append(f)
+            if newpath == '/' or newpath == '': 
+                for key in settings.VIRTUAL_URLS:
+                    files =  [ key + '/', ] + files
+            c = Context({
+                'directory' : newpath + '/',
+                'file_list' : files,
+            })
+            return HttpResponse(t.render(c))
+        raise Http404("Directory indexes are not allowed here.")
+    if not os.path.exists(fullpath):
+        raise Http404('"%s" does not exist' % fullpath)
+    # Respect the If-Modified-Since header.
+    statobj = os.stat(fullpath)
+    mimetype, encoding = mimetypes.guess_type(fullpath)
+    mimetype = mimetype or 'application/octet-stream'
+    if not django.views.static.was_modified_since(request.META.get('HTTP_IF_MODIFIED_SINCE'),
+                              statobj[stat.ST_MTIME], statobj[stat.ST_SIZE]):
+        return HttpResponseNotModified(mimetype=mimetype)
+    contents = open(fullpath, 'rb').read()
+    response = HttpResponse(contents, mimetype=mimetype)
+    response["Last-Modified"] = http_date(statobj[stat.ST_MTIME])
+    response["Content-Length"] = len(contents)
+    if encoding:
+        response["Content-Encoding"] = encoding
+        
+    try:
+        content = contents
+        if re.match(CODEMIRROR_CALL_EDITOR_FOR, path.lower()):
+            return _render_to_response(
+                'static/types/javascript.html', 
+                { 
+                    'content': content,
+                    'relative_file_path': path,
+                }, 
+                context_instance=RequestContext(request)
+            )
+    except Exception, ex:
+        log.error(str(ex))
+        
+    return response
+
+def add_fullpath(fn):
+    def patch(request):
+        if request.POST and 'path' in request.POST:
+            log.debug('add_fullpath: func (%s) arguments patched. path: %s , fullpath: %s' % (fn, request.POST['path'], get_fullpath(request.POST['path'])))
+            return fn(request, get_fullpath(request.POST['path']))
+        return fn(request)
+    return patch
+
+@add_fullpath
+def createFolder(request, fullpath):
+    result = tools.mkdir(fullpath, request.POST["object-name"])
     
     response = HttpResponse(mimetype='text/plain')
     response.write(result)
     
     return response
 
+@add_fullpath
 def removeObject(request):
-    result = tools.remove(request.POST["path"])
+    result = tools.remove(fullpath)
     return HttpResponseRedirect('/' + settings.STATIC_TESTS_URL + '/' + request.POST["url"].strip('/'))
 
-def createSuite(request):
+@add_fullpath
+def createSuite(request, fullpath):
     result = {}
-    result['success'], result['result'] = tools.mksuite(request.POST["full-path"], request.POST["object-name"])
+    result['success'], result['result'] = tools.mksuite(fullpath, request.POST["object-name"])
     
     response = HttpResponse(mimetype='text/json')
     response.write(simplejson.dumps(result))
     
     return response
-
-def editSuite(request):
-    return HttpResponseRedirect('/' + settings.STATIC_TESTS_URL + request.GET["path"] + '/' + settings.TEST_CONTEXT_FILE_NAME)
-
-def createTest(request):
+    
+@add_fullpath
+def editSuite(request, fullpath):
+    return HttpResponseRedirect(fullpath + '/' + settings.TEST_CONTEXT_FILE_NAME)
+    
+@add_fullpath
+def createTest(request, fullpath):
     result = {}
-    result['success'], result['result'] = tools.mktest(request.POST["full-path"], request.POST["object-name"])
+    result['success'], result['result'] = tools.mktest(fullpath, request.POST["object-name"])
     
     response = HttpResponse(mimetype='text/json')
     response.write(simplejson.dumps(result))
     
     return response
-
-def saveTest(request):
-    result = tools.savetest(request.POST["content"], request.POST["path"])
+    
+@add_fullpath
+def saveTest(request, fullpath):
+    result = tools.savetest(request.POST["content"], fullpath)
     return HttpResponseRedirect(request.POST["url"])
-    
-def saveDraftTest(request):
-    result = tools.savetmptest(request.POST["content"], request.POST["path"])
+
+@add_fullpath    
+def saveDraftTest(request, fullpath):
+    result = tools.savetmptest(request.POST["content"], fullpath)
     if result:
         result = { 'success': result }
     else:
@@ -163,16 +260,18 @@ def submitTest(request):
     
     return _render_to_response( "runtest.html", locals() )
     
-def runTest(request):
-    result = tools.savetest(request.POST["content"], request.POST["name"])
+@add_fullpath    
+def runTest(request, fullpath=''):
+    log.debug(request.POST)
+    result = tools.savetest(request.POST["content"], fullpath)
     
-    ctx = context.get(request.POST["name"])
+    ctx = context.get(request.POST["path"])
     host = ctx.get('host')
     
     if host == 'localhost':
-        return runInnerTest(request.POST["name"], request.POST["url"])
+        return runInnerTest(request.POST["path"], request.POST["url"])
     else:
-        return runRemoteTest(request.POST["name"], request.POST["content"], request.POST["url"], ctx)
+        return runRemoteTest(request.POST["path"], request.POST["content"], request.POST["url"], ctx)
 
 def runInnerTest(name, url):
     jsfile = "/%s/%s" % (settings.TESTS_URL, name)

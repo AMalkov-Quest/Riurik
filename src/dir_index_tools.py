@@ -1,4 +1,4 @@
-import os, logging
+import os, shutil
 import settings, resources
 from django.core.cache import cache
 from logger import log
@@ -63,9 +63,9 @@ def remotesavetest(host, data):
     print url
     return urllib2.urlopen(url, post).read()
 
-def savetmptest(content, path):
+def savetmptest(content, fullpath):
     try:
-        fullpath = os.path.normpath(os.path.join(getWorkingDir(), path.strip('/')))
+        #fullpath = os.path.normpath(os.path.join(getWorkingDir(), path.strip('/')))
         if not os.path.exists(os.path.dirname(fullpath)):
             os.makedirs(os.path.dirname(fullpath))
 
@@ -96,21 +96,25 @@ def savetmptest(content, path):
         f.write(content.encode('utf-8'))
         f.close()
         log.debug('swp saved to %s' % swpname)
-        return fullpath
+        return swpname
     except Exception, e:
         log.debug(str(e))
         #return str(e)
     return False
     
-def savetest(content, path):
+def savetest(content, fullpath):
     try:
-        ret = savetmptest(content, path)
-        if ret:
-            shutil.move(swpname, fullpath)
+        swpname = savetmptest(content, fullpath)
+        if swpname:
+            with open(swpname,'rb') as source:
+                with open(fullpath, 'wb') as dest:
+                    dest.write(source.read())
+                    dest.close();
+                source.close()
         else:
             raise Exception('Can\'t presave')
     except Exception, e:
-        return str(e)
+        log.error(e)
     
     return resources.ok
 

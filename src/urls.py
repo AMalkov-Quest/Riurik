@@ -30,18 +30,15 @@ urlpatterns = patterns('',
 	(r'^actions/remote/save/$', 'views.remoteSaveTest'),
 	(r'^logger/records/recv/$', 'views.recvLogRecords'),
 	(r'^actions/remove/$', 'views.removeObject'),
-	(r'^tests/Inner/$', 'views.innerTests'),
-	(r'^tests/Outer/$', 'views.outerTests'),
-	(r'^tests$', 'views.runInnerTests'),
+	(r'^tests/$', 'views.showTests'),
+	#(r'^tests/Inner/$', 'views.innerTests'),
+	#(r'^tests/Outer/$', 'views.outerTests'),
+	#(r'^tests$', 'views.runInnerTests'),
+    
+	
 )
 
-urlpatterns += patterns('',
-    (r'^static/(?P<path>.*)$', 'django.views.static.serve',
-		  {
-		'document_root': settings.MEDIA_ROOT,
-		'show_indexes': True
-		}
-	),
+"""
 	(r'^' + settings.TESTS_URL + '/(?P<path>.*)$', 'django.views.static.serve',
 		  {
 		'document_root': settings.TESTS_ROOT,
@@ -51,6 +48,15 @@ urlpatterns += patterns('',
 	(r'^' + settings.STATIC_INNER_TESTS_URL + '/(?P<path>.*)$', 'views.innerserve',
 		  {
 		'document_root': os.path.join(os.path.dirname( __file__ ), settings.STATIC_INNER_TESTS_ROOT),
+		'show_indexes': True
+		}
+	),
+"""
+
+urlpatterns += patterns('',
+    (r'^static/(?P<path>.*)$', 'django.views.static.serve',
+		  {
+		'document_root': settings.MEDIA_ROOT,
 		'show_indexes': True
 		}
 	),
