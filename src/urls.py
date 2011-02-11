@@ -32,25 +32,16 @@ urlpatterns = patterns('',
 	(r'^actions/remove/$', 'views.removeObject'),
 )
 
-"""
-	(r'^' + settings.TESTS_URL + '/(?P<path>.*)$', 'django.views.static.serve',
-		  {
-		'document_root': settings.TESTS_ROOT,
-		'show_indexes': True
-		}
-	),
-	(r'^' + settings.STATIC_INNER_TESTS_URL + '/(?P<path>.*)$', 'views.innerserve',
-		  {
-		'document_root': os.path.join(os.path.dirname( __file__ ), settings.STATIC_INNER_TESTS_ROOT),
-		'show_indexes': True
-		}
-	),
-"""
-
 urlpatterns += patterns('',
 	(r'^static/(?P<path>.*)$', 'django.views.static.serve',
 		{
 		'document_root': settings.MEDIA_ROOT,
+		'show_indexes': True
+		}
+	),
+	(r'^' + settings.TESTS_URL + '/(?P<path>.*)$', 'django.views.static.serve',
+		{
+		'document_root': settings.VIRTUAL_URLS[settings.INNER_TESTS_ROOT],
 		'show_indexes': True
 		}
 	),

@@ -168,11 +168,20 @@ def serve(request, path, document_root=None, show_indexes=False):
 		
 	return response
 
+def get_path(request):
+	if request.POST and 'path' in request.POST:
+		return request.POST['path']
+	elif request.GET and 'path' in request.GET:
+		return request.GET['path']
+	else:
+		return None
+
 def add_fullpath(fn):
 	def patch(request):
-		if request.POST and 'path' in request.POST:
-			#log.debug('add_fullpath: func (%s) arguments patched. path: %s , fullpath: %s' % (fn, request.POST['path'], get_fullpath(request.POST['path'])))
-			return fn(request, get_fullpath(request.POST['path']))
+		path = get_path(request)
+		if path:
+			log.debug('add_fullpath: func (%s) arguments patched. path: %s , fullpath: %s' % (fn, path, get_fullpath(path)))
+			return fn(request, get_fullpath(path))
 		return fn(request)
 	return patch
 
@@ -200,9 +209,8 @@ def createSuite(request, fullpath):
 	
 	return response
 	
-@add_fullpath
-def editSuite(request, fullpath):
-	return HttpResponseRedirect(fullpath + '/' + settings.TEST_CONTEXT_FILE_NAME)
+def editSuite(request):
+	return HttpResponseRedirect('/' + request.GET['path'] + '/' + settings.TEST_CONTEXT_FILE_NAME)
 	
 @add_fullpath
 def createTest(request, fullpath):
@@ -262,7 +270,7 @@ def runTest(request, fullpath):
 		return runRemoteTest(request.POST["path"], request.POST["content"], request.POST["url"], ctx)
 
 def runInnerTest(name, url):
-	jsfile = "/%s" % name
+	jsfile = '/' + name.replace(settings.INNER_TESTS_ROOT, settings.TESTS_URL)
 	return _render_to_response('testLoader.html', locals())
 
 def runRemoteTest(name, content, testpath, context):

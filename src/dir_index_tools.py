@@ -65,11 +65,12 @@ def remotesavetest(host, data):
 
 def savetmptest(content, fullpath):
 	try:
-		#fullpath = os.path.normpath(os.path.join(getWorkingDir(), path.strip('/')))
 		if not os.path.exists(os.path.dirname(fullpath)):
 			os.makedirs(os.path.dirname(fullpath))
 
-		swpname = "%s.swp" % fullpath 
+		dir, file_name = os.path.split(fullpath)
+		swp_file_name = settings.TEST_SWAP_FILE_NAME % file_name 
+		swpname = os.path.join(dir, swp_file_name) 
 
 		f = open(swpname, 'w')
 		

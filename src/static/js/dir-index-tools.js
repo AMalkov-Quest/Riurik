@@ -1,30 +1,3 @@
-function __createFolder(path) {
-	$("#create-dir-index-dialog").dialog({
-		title: $('#new-folder').text(),
-		resizable: false,
-		buttons: {
-			"create": function() {
-				$(this).dialog("close");
-				$.post(
-					"/actions/folder/create/", 
-					$("#create-fsobject").serialize(), 
-					function(data) {
-						if (data == 'OK') {
-							window.location = window.location;
-						}else{
-							showError(data);
-						}
-					},
-					"text"
-				);
-			},
-			"cancel": function() {
-				$(this).dialog("close");
-			}
-		}
-	});
-}
-
 function createFolderClick() {
 	$(this).dialog("close");
 	$.post(

@@ -97,24 +97,22 @@ INSTALLED_APPS = (
 	'src',
 )
 
-#STATIC_ROOT = os.path.dirname( __file__ ) + '/static'
-#STATIC_URL = '/static/'
-
 # Path to a folder where tests are located
 STATIC_TESTS_ROOT = 'C:/saip/SharePoint Information Portal/Application/tests/cases'#STATIC_OUTER_TESTS_ROOT
 STATIC_TESTS_URL = ''#STATIC_OUTER_TESTS_URL
 
 INNER_TESTS_ROOT = 'tests'
+TESTS_URL = 'src' + INNER_TESTS_ROOT
+
 VIRTUAL_URLS = {
-    'tests': os.path.join(os.path.dirname( __file__ ), INNER_TESTS_ROOT),
+    INNER_TESTS_ROOT: os.path.join(os.path.dirname( __file__ ), INNER_TESTS_ROOT),
     #'out': 'C:/saip/SharePoint Information Portal/Application/tests',
 }
 
-TESTS_ROOT = os.path.join(os.path.dirname( __file__ ), 'tests')
-TESTS_URL = 'testsrc'
 
 TEST_CONTEXT_FILE_NAME = '.context.ini'
 TEST_FILE_EXT = '.js'
+TEST_SWAP_FILE_NAME = '.%s.swp'
 
 APPEND_SLASH = False
 CODEMIRROR_CALL_EDITOR_FOR = '^.*\.(?:js|ini|html|py)$'
