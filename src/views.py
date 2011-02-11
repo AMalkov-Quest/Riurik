@@ -107,7 +107,9 @@ def createFolder(request):
 
 def removeObject(request):
     result = tools.remove(request.POST["path"])
-    return HttpResponseRedirect('/' + settings.STATIC_TESTS_URL + '/' + request.POST["url"].strip('/'))
+    redirect_url = '/' + settings.STATIC_TESTS_URL + '/' + request.POST["url"].strip('/')
+    log.debug(redirect_url)
+    return HttpResponseRedirect(redirect_url)
 
 def createSuite(request):
     result = {}
