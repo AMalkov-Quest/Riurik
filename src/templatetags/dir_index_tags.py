@@ -2,15 +2,10 @@ import os, re
 from django import template
 from django.utils.safestring import mark_safe
 import settings
+import contrib
+from logger import log
 
 register = template.Library()
-
-@register.filter
-def kind_tests(p):
-	if settings.STATIC_TESTS_ROOT == settings.STATIC_INNER_TESTS_ROOT:
-		return 'Outer'
-	else:
-		return 'Inner'
 
 @register.filter
 def strip(s, chars):
@@ -18,11 +13,9 @@ def strip(s, chars):
 
 @register.filter
 def dir_index_type(path, fsobject):
-	if path == '/':
-		fullpath = os.path.join(settings.STATIC_TESTS_ROOT, fsobject)
-	else:
-		fullpath = os.path.join(settings.STATIC_TESTS_ROOT, path, fsobject)
-	
+	log.debug(path + fsobject)
+	fullpath = contrib.get_fullpath(path + fsobject)
+	log.debug(fullpath)
 	if os.path.isdir(fullpath):
 		if os.path.exists( os.path.join(fullpath, settings.TEST_CONTEXT_FILE_NAME) ):
 			return 'suite'

@@ -101,25 +101,13 @@ INSTALLED_APPS = (
 #STATIC_URL = '/static/'
 
 # Path to a folder where tests are located
-STATIC_OUTER_TESTS_ROOT = 'C:/saip/SharePoint Information Portal/Application/tests'
-STATIC_OUTER_TESTS_URL = ''
+STATIC_TESTS_ROOT = 'C:/saip/SharePoint Information Portal/Application/tests/cases'#STATIC_OUTER_TESTS_ROOT
+STATIC_TESTS_URL = ''#STATIC_OUTER_TESTS_URL
 
-STATIC_INNER_TESTS_ROOT = os.path.join(os.path.dirname( __file__ ), 'tests')
-STATIC_INNER_TESTS_URL = 'inner'
-
-STATIC_TESTS_URLs = {
-	STATIC_OUTER_TESTS_ROOT: STATIC_OUTER_TESTS_URL,
-	STATIC_INNER_TESTS_ROOT: STATIC_INNER_TESTS_URL
-}
-
-STATIC_TESTS_ROOT = STATIC_OUTER_TESTS_ROOT
-STATIC_TESTS_URL = STATIC_OUTER_TESTS_URL
-
-
+INNER_TESTS_ROOT = 'tests'
 VIRTUAL_URLS = {
-    'in': os.path.join(os.path.dirname( __file__ ), 'tests'),
-    'out': 'C:/saip/SharePoint Information Portal/Application/tests',
-    'c': 'C:/saip',
+    'tests': os.path.join(os.path.dirname( __file__ ), INNER_TESTS_ROOT),
+    #'out': 'C:/saip/SharePoint Information Portal/Application/tests',
 }
 
 TESTS_ROOT = os.path.join(os.path.dirname( __file__ ), 'tests')

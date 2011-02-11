@@ -1,4 +1,4 @@
-var url = 'http://spb0281:8001/cases';
+var url = 'http://spb0281:8001/cases'; 
 
 asyncTest('create new folder', function() {
   $.when( frame.go(url) ).then(function(_$) {

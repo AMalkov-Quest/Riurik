@@ -41,10 +41,9 @@
 		<div style="float:right;">
 			{% block controls %}
 			<ul class="horizontal-menu">
-				<li><a id="new-folder" href="#" onClick="javascript:createFolder('{{ directory }}')">Create Folder</a></li>
-				<li><a id="new-suite" href="javascript:createSuite()">Create Suite</a></li>
-				<li><a id="new-test" href="javascript:createTest()">Create Test</a></li>
-				<li><a href="/tests/{{ ''|kind_tests }}/">{{ ''|kind_tests }} Tests</a></li>
+				<li><a id="new-folder" href="javascript:void(0);" onClick="javascript:createFolder('{{ directory }}')">Create Folder</a></li>
+				<li><a id="new-suite" href="javascript:void(0);" onClick="javascript:createSuite();">Create Suite</a></li>
+				<li><a id="new-test" href="javascript:void(0);" onClick="javascript:createTest();">Create Test</a></li>
 			</ul>
 			{% endblock controls %}
 		</div>

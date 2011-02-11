@@ -30,7 +30,6 @@ urlpatterns = patterns('',
 	(r'^actions/remote/save/$', 'views.remoteSaveTest'),
 	(r'^logger/records/recv/$', 'views.recvLogRecords'),
 	(r'^actions/remove/$', 'views.removeObject'),
-	(r'^tests/$', 'views.showTests'),
 )
 
 """
@@ -55,9 +54,9 @@ urlpatterns += patterns('',
 		'show_indexes': True
 		}
 	),
-	(r'^' + settings.STATIC_OUTER_TESTS_URL + '(?P<path>.*)$', 'views.serve',
+	(r'^' + settings.STATIC_TESTS_URL + '(?P<path>.*)$', 'views.serve',
 		{
-			'document_root': settings.STATIC_OUTER_TESTS_ROOT,
+			'document_root': settings.STATIC_TESTS_ROOT,
 			'show_indexes': True
 		}
 	),

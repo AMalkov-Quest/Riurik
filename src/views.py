@@ -20,6 +20,7 @@ import re
 import stat
 import urllib
 from email.Utils import parsedate_tz, mktime_tz
+from contrib import *
 
 __all__ = ('handler','serve',)
 _isolate_imports = False
@@ -74,17 +75,6 @@ def setTestsRoot(document_root):
 	settings.STATIC_TESTS_ROOT = document_root
 	settings.STATIC_TESTS_URL = settings.STATIC_TESTS_URLs[document_root]
 	log.debug('Set tests root: %s' % document_root)
-
-def patch_fullpaths(fullpath,newpath=''):
-	for key in settings.VIRTUAL_URLS:
-		m = re.search('^%s(/.*)$' % key, newpath)
-		if m:
-			fullpath = settings.VIRTUAL_URLS[key] + m.group(1)
-			return fullpath
-	return fullpath
-
-def get_fullpath(path):
-	return patch_fullpaths('', path)
 
 def serve(request, path, document_root=None, show_indexes=False):
 	"""
@@ -181,7 +171,7 @@ def serve(request, path, document_root=None, show_indexes=False):
 def add_fullpath(fn):
 	def patch(request):
 		if request.POST and 'path' in request.POST:
-			log.debug('add_fullpath: func (%s) arguments patched. path: %s , fullpath: %s' % (fn, request.POST['path'], get_fullpath(request.POST['path'])))
+			#log.debug('add_fullpath: func (%s) arguments patched. path: %s , fullpath: %s' % (fn, request.POST['path'], get_fullpath(request.POST['path'])))
 			return fn(request, get_fullpath(request.POST['path']))
 		return fn(request)
 	return patch
@@ -198,7 +188,7 @@ def createFolder(request, fullpath):
 @add_fullpath
 def removeObject(request, fullpath):
 	result = tools.remove(fullpath)
-	return HttpResponseRedirect('/' + settings.STATIC_TESTS_URL + '/' + request.POST["url"].strip('/'))
+	return HttpResponseRedirect('/' + request.POST["url"].strip('/'))
 
 @add_fullpath
 def createSuite(request, fullpath):
@@ -260,11 +250,10 @@ def submitTest(request):
 	return _render_to_response( "runtest.html", locals() )
 	
 @add_fullpath	
-def runTest(request, fullpath=''):
-	log.debug(request.POST)
+def runTest(request, fullpath):
 	result = tools.savetest(request.POST["content"], fullpath)
 	
-	ctx = context.get(request.POST["path"])
+	ctx = context.get(fullpath)
 	host = ctx.get('host')
 	
 	if host == 'localhost':
@@ -273,7 +262,7 @@ def runTest(request, fullpath=''):
 		return runRemoteTest(request.POST["path"], request.POST["content"], request.POST["url"], ctx)
 
 def runInnerTest(name, url):
-	jsfile = "/%s/%s" % (settings.TESTS_URL, name)
+	jsfile = "/%s" % name
 	return _render_to_response('testLoader.html', locals())
 
 def runRemoteTest(name, content, testpath, context):
