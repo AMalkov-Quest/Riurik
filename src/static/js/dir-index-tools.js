@@ -54,8 +54,8 @@ function createAndEdit(srcObject, url) {
 					url, 
 					$("#create-fsobject").serialize(), 
 					function(data) {
-						if (data['success'] == 'true') {
-							document.location = data['result'];
+						if (data['success'] == true) {
+							document.location += '\\' + data['result'];
 						}else{
 							showError(data['result']);
 						}
