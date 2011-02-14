@@ -1,5 +1,6 @@
 import os, re, settings
 from logger import log
+from django.core.cache import cache
 
 def patch_fullpaths(fullpath, newpath=''):
 	for key in settings.VIRTUAL_URLS:
@@ -12,3 +13,7 @@ def patch_fullpaths(fullpath, newpath=''):
 def get_fullpath(path):
 	path = path.lstrip('/')
 	return patch_fullpaths(os.path.join(settings.STATIC_TESTS_ROOT, path), path)
+
+def resolveRemoteAddr(host):
+	import socket
+	return cache.get(host, socket.gethostbyname(host))

@@ -301,11 +301,13 @@ def runRemoteTest(path, content, testpath, context):
 	post = urllib.urlencode(data)
 	login = context.get('login')
 	password = context.get('password')
+	
+	ipaddr = resolveRemoteAddr(context.get('host'))
 	url = "%s/tests/" % context.get('url')
+	url = url.replace(context.get('host'), ipaddr)
 	
 	useLogin(url, login, password)
 	redirect = urllib2.urlopen(url, post).read()
-	log.debug(redirect)
 	
 	return HttpResponseRedirect(context.get('url') + redirect)
 

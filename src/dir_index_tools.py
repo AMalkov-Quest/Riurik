@@ -1,6 +1,5 @@
 import os, shutil
 import settings, resources
-from django.core.cache import cache
 from logger import log
 
 def getWorkingDir():
@@ -51,17 +50,6 @@ def mktest(path, name):
 		return (False, str(e))
 	
 	return (True, filename)
-
-def resolveRemoteAddr(host):
-	import socket
-	return cache.get(host, socket.gethostbyname(host))
-
-def remotesavetest(host, data):
-	import urllib, urllib2
-	post = urllib.urlencode(data)
-	url = "http://%s:8000/actions/remote/save/" % resolveRemoteAddr(host)
-	print url
-	return urllib2.urlopen(url, post).read()
 
 def savetmptest(content, fullpath):
 	try:
