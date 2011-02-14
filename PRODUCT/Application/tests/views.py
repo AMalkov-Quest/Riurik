@@ -12,8 +12,38 @@ try:
 except ImportError: 
     _USE_MESSAGES = False
 
+def saveTestContent(path, content, test_root):
+	root = os.path.dirname(__file__)
+	path = os.path.join(root, test_root, path)
+	log.Info(path)
+	
+	if not os.path.exists(os.path.dirname(path)):
+		os.makedirs(os.path.dirname(path))
+	
+	file = open(path, 'wb')
+	file.write(content)
+	file.close()
+
 @never_cache
 def index(request):
+	if request.method == "POST":
+		try:
+			saveTestContent(request.REQUEST['path'], request.REQUEST['content'], 'cases')
+		except Exception, e:
+			log.Info(e)
+		
+		#redirect example cases/tests/?path=enterprise-report/web-applications/setup.js
+		redirect = request.path + '?path=/cases/' + request.REQUEST['path']
+		response = HttpResponse(mimetype='text/plain')
+		response.write(redirect)
+		
+		return response
+	else:
+		jsfile = request.REQUEST['path']
+		return render_to_response('testLoader.html', locals())
+
+@never_cache
+def __index(request):
     tests = []
     vars = {}
     if 'path' in request.REQUEST:

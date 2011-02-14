@@ -98,8 +98,8 @@ INSTALLED_APPS = (
 )
 
 # Path to a folder where tests are located
-STATIC_TESTS_ROOT = 'C:/saip/SharePoint Information Portal/Application/tests/cases'#STATIC_OUTER_TESTS_ROOT
-STATIC_TESTS_URL = ''#STATIC_OUTER_TESTS_URL
+STATIC_TESTS_ROOT = 'C:/saip/SharePoint Information Portal/Application/tests/cases'
+STATIC_TESTS_URL = ''
 
 INNER_TESTS_ROOT = 'tests'
 TESTS_URL = 'src' + INNER_TESTS_ROOT

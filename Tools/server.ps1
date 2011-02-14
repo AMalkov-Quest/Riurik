@@ -1,4 +1,9 @@
-Add-PSSnapin Microsoft.SharePoint.PowerShell;
+#Add-PSSnapin Microsoft.SharePoint.PowerShell;
+
+$12HiveDir = "${env:CommonProgramFiles}\Microsoft Shared\web server extensions\12\"
+cd $12HiveDir
+
+[reflection.assembly]::Loadwithpartialname("Microsoft.SharePoint")
 
 $http = New-Object System.Net.HttpListener
 $http.Prefixes.Add( "http://$($env:computername):$($args[0])/" )

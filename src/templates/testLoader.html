@@ -4,13 +4,13 @@
         <style>
             iframe { width: 99%; height:99%; }
         </style>
-        <script type="text/javascript" src="/static/jquery-ui/js/jquery-1.5.js"></script>
-        <script type="text/javascript" src="/static/jquery-ui/js/jquery.json-2.2.min.js"></script>
+        <script type="text/javascript" src="/static/testLoader/jquery-1.5.js"></script>
+        <script type="text/javascript" src="/static/testLoader/jquery.json-2.2.min.js"></script>
 		
-		<link rel="stylesheet" type="text/css" href="/static/css/qunit.css" media="screen" />
-		<script type="text/javascript" src="/static/js/qunit.js"></script>
+		<link rel="stylesheet" type="text/css" href="/static/testLoader/qunit.css" media="screen" />
+		<script type="text/javascript" src="/static/testLoader/qunit.js"></script>
 		
-        <script type="text/javascript" src="/static/js/testLoader.js"></script>
+        <script type="text/javascript" src="/static/testLoader/testLoader.js"></script>
         <script type="text/javascript" src="{{ jsfile }}"></script>
         
     </head>
@@ -24,6 +24,12 @@
 
 		{% if error %}<div id="error">{{error|default:""}}</div>{% endif %}
 		<div id="results"></div>
-		<iframe id="frame" contenteditable="true" name="frame">
+		<iframe id="frame" name="frame">
+			<html>
+				<head>
+				</head>
+				<body>
+				</body>
+			</html>
 		</iframe>
 </html>

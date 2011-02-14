@@ -21,6 +21,7 @@ import stat
 import urllib
 from email.Utils import parsedate_tz, mktime_tz
 from contrib import *
+import urllib, urllib2
 
 __all__ = ('handler','serve',)
 _isolate_imports = False
@@ -273,7 +274,7 @@ def runInnerTest(name, url):
 	jsfile = '/' + name.replace(settings.INNER_TESTS_ROOT, settings.TESTS_URL)
 	return _render_to_response('testLoader.html', locals())
 
-def runRemoteTest(name, content, testpath, context):
+def __runRemoteTest(name, content, testpath, context):
 	data = {}
 	data['content'] = content
 	data['name'] = name
@@ -285,6 +286,28 @@ def runRemoteTest(name, content, testpath, context):
 	url = context.get('url')
 	
 	return HttpResponseRedirect(url + '?path=' + testpath.lstrip('/'))
+
+def useLogin(url, login, password):
+	from ntlm import HTTPNtlmAuthHandler
+	
+	passman = urllib2.HTTPPasswordMgrWithDefaultRealm()
+	passman.add_password(None, url, login, password)
+	auth_NTLM = HTTPNtlmAuthHandler.HTTPNtlmAuthHandler(passman)
+	opener = urllib2.build_opener(auth_NTLM)
+	urllib2.install_opener(opener)
+
+def runRemoteTest(path, content, testpath, context):
+	data = { 'content': content, 'path': path }
+	post = urllib.urlencode(data)
+	login = context.get('login')
+	password = context.get('password')
+	url = "%s/tests/" % context.get('url')
+	
+	useLogin(url, login, password)
+	redirect = urllib2.urlopen(url, post).read()
+	log.debug(redirect)
+	
+	return HttpResponseRedirect(context.get('url') + redirect)
 
 def remoteSaveTest(request):
 	result = tools.savetest(request.POST["content"], request.POST["name"])

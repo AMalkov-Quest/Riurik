@@ -110,7 +110,7 @@ def savetest(content, fullpath):
 			with open(swpname,'rb') as source:
 				with open(fullpath, 'wb') as dest:
 					dest.write(source.read())
-					dest.close();
+					dest.close()
 				source.close()
 		else:
 			raise Exception('Can\'t presave')

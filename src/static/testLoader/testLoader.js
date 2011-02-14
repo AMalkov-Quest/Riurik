@@ -32,9 +32,17 @@ function extractScript(fragment) {
     });
 }
 
-function out(res) {
-	//window.frames[0].document.body.appendChild(res);
-	console.log( res );
+function out(message) {
+	var regexp = new RegExp('\\n', 'gi');
+	html = message.replace(regexp, '<br>');
+	
+	var frame = window.frames[0];
+	frame.document.open();
+    frame.document.write(html);
+    frame.document.close();
+	  
+	console.log( message );
+	
 }
 
 function argumentNames(func) {
