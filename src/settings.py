@@ -119,4 +119,5 @@ CODEMIRROR_CALL_EDITOR_FOR = '^.*\.(?:js|ini|html|py)$'
 
 try:
 	from local_settings import *
-except: pass
+except Exception, ex: print ex
+#pass
