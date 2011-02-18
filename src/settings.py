@@ -73,9 +73,15 @@ TEMPLATE_LOADERS = (
     'django.template.loaders.app_directories.load_template_source',
 #     'django.template.loaders.eggs.load_template_source',
 )
+#SESSION_ENGINE = 'django.contrib.sessions.backends.file'
+SESSION_ENGINE = "django.contrib.sessions.backends.cache"
+CACHE_BACKEND = 'locmem://'
+CACHE_MIDDLEWARE_ANONYMOUS_ONLY = False
+CACHE_MIDDLEWARE_SECONDS = 600
 
 MIDDLEWARE_CLASSES = (
 	'django_websocket.middleware.WebSocketMiddleware',
+	'django.contrib.sessions.middleware.SessionMiddleware',
 )
 
 ROOT_URLCONF = 'urls'
@@ -93,6 +99,11 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 )
 
 INSTALLED_APPS = (
+	'django.contrib.auth',
+        'django.contrib.contenttypes',
+	'django.contrib.sessions',
+	'django.contrib.sites',
+	'django.contrib.messages',
 	'django_websocket',
 	'src',
 )

@@ -4,6 +4,7 @@ from django_websocket.decorators import require_websocket, accept_websocket
 from django.template import loader, RequestContext, Context, Template, TemplateDoesNotExist
 from django.http import Http404, HttpResponse, HttpResponseRedirect, HttpResponseNotModified, HttpRequest
 from django.utils.http import http_date
+from django.core.cache import cache
 import django.views.static
 import protocol
 import traceback, sys, os, re
@@ -16,7 +17,7 @@ import context
 import mimetypes
 import os
 import posixpath
-import re
+import re, datetime
 import stat
 import urllib
 from email.Utils import parsedate_tz, mktime_tz
@@ -78,6 +79,16 @@ def setTestsRoot(document_root):
 	log.debug('Set tests root: %s' % document_root)
 
 def serve(request, path, document_root=None, show_indexes=False):
+	print request.session.session_key
+	print cache.get('asfasf')
+	cache.add('asfasf', datetime.datetime.now())
+
+	if 'nnn' in request.session:
+		print 'IN SESSION OK'
+	else:
+		print 'NOT IN SESSION'
+	request.session['nnn'] = 'awgawg'
+
 	"""
 	Serve static files below a given point in the directory structure.
 
@@ -143,9 +154,9 @@ def serve(request, path, document_root=None, show_indexes=False):
 	statobj = os.stat(fullpath)
 	mimetype, encoding = mimetypes.guess_type(fullpath)
 	mimetype = mimetype or 'application/octet-stream'
-	if not django.views.static.was_modified_since(request.META.get('HTTP_IF_MODIFIED_SINCE'),
-							  statobj[stat.ST_MTIME], statobj[stat.ST_SIZE]):
-		return HttpResponseNotModified(mimetype=mimetype)
+	#if not django.views.static.was_modified_since(request.META.get('HTTP_IF_MODIFIED_SINCE'),
+	#						  statobj[stat.ST_MTIME], statobj[stat.ST_SIZE]):
+	#	return HttpResponseNotModified(mimetype=mimetype)
 	contents = open(fullpath, 'rb').read()
 	response = HttpResponse(contents, mimetype=mimetype)
 	response["Last-Modified"] = http_date(statobj[stat.ST_MTIME])
@@ -156,15 +167,20 @@ def serve(request, path, document_root=None, show_indexes=False):
 	try:
 		content = contents
 		if re.match(CODEMIRROR_CALL_EDITOR_FOR, path.lower()):
-			return _render_to_response(
+			ret = _render_to_response(
 				'static/types/javascript.html', 
 				{ 
 					'content': content,
 					'relative_file_path': path,
+					'is_stubbed': is_stubbed(path, request),
+	
 				}, 
 				context_instance=RequestContext(request)
 			)
+			stub(path, request)
+			return ret
 	except Exception, ex:
+		print ex
 		log.error(str(ex))
 		
 	return response
@@ -247,8 +263,8 @@ def _patch_with_context(data, vars):
 	""")
 	c = Context();
 	c['options'] = []
-	for name,value in vars:
-		c['options'] += [ (name,value,), ]
+	for name, value in vars:
+		c['options'] += [ (name, value,), ]
 	return t.render(c) + data
 
 def submitTest(request):
@@ -268,7 +284,7 @@ def runTest(request, fullpath):
 	if host == 'localhost':
 		return runInnerTest(request.POST["path"], request.POST["url"])
 	else:
-		return runRemoteTest(request.POST["path"], request.POST["content"], request.POST["url"], ctx)
+		return runRemoteTest(request.POST["path"], request.POST["content"], request.POST["url"], ctx, request)
 
 def runInnerTest(name, url):
 	jsfile = '/' + name.replace(settings.INNER_TESTS_ROOT, settings.TESTS_URL)
@@ -295,9 +311,24 @@ def useLogin(url, login, password):
 	auth_NTLM = HTTPNtlmAuthHandler.HTTPNtlmAuthHandler(passman)
 	opener = urllib2.build_opener(auth_NTLM)
 	urllib2.install_opener(opener)
+	
+def saveSatelliteScripts(url, scripts):
+	'''
+	saves all documents opened in the same browser(in other tabs)
+	as a test that is about to run 
+	'''
+	log.info(scripts)
+	for path in scripts:
+		fullpath = get_fullpath(path)
+		content = tools.gettest(fullpath)
+		data = { 'content': content, 'path': path }
+		post = urllib.urlencode(data)
+		result = urllib2.urlopen(url, post).read()
+		log.info("%s is saved" % result)
 
-def runRemoteTest(path, content, testpath, context):
-	data = { 'content': content, 'path': path }
+def runRemoteTest(path, content, testpath, context, request):
+	patched = _patch_with_context(content, context.items())
+	data = { 'content': patched, 'path': path }
 	post = urllib.urlencode(data)
 	login = context.get('login')
 	password = context.get('password')
@@ -307,6 +338,9 @@ def runRemoteTest(path, content, testpath, context):
 	url = url.replace(context.get('host'), ipaddr)
 	
 	useLogin(url, login, password)
+	scripts = getOpenFiles(request)
+	scripts.remove(path)
+	saveSatelliteScripts(url, scripts)
 	redirect = urllib2.urlopen(url, post).read()
 	
 	return HttpResponseRedirect(context.get('url') + redirect)
@@ -330,3 +364,43 @@ def recvLogRecords(request):
 	response.write(records)
 	
 	return response
+
+def is_stubbed(path, request):
+	session_key = request.session.get('stub_key') or None
+	print 'IS_STUBBED:', path, session_key, cache.get(path)
+	return cache.get(path) != None and cache.get(path) != session_key
+	#return False
+	
+
+def stub(path, request):
+	if 'stub_key' in request.session:
+		session_key = request.session['stub_key']
+	else:
+		request.session['stub_key'] = session_key = datetime.datetime.now()
+
+	print 'STUB:', path, session_key
+	if cache.get(path) == session_key:
+		request.session[path] = session_key
+		cache.set(path, session_key, 60)
+		return
+	if cache.add(path, session_key, 60):
+		request.session[path] = session_key
+	return
+
+def stubFile(request):
+	stub(request.GET['path'], request)
+	return HttpResponse('')
+
+def getOpenFiles(request):
+	files = []
+	if not 'stub_key' in request.session:
+		return files
+	key = str(request.session['stub_key'])
+	print 'all session', request.session.items()
+	for i,v in request.session.items():
+		if i != 'stub_key' and str(v) == key:
+			files += [ i ]
+	return files
+
+
+	

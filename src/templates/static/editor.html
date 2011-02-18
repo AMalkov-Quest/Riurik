@@ -7,8 +7,9 @@
 
 {% block javascripts %}
 	{{ block.super }}
+	{% if not is_stubbed %}
 	<script type="text/javascript" src="/static/codemirroreditor/js/codemirror.js"></script>
-    <script type="text/javascript" src="/static/codemirroreditor/js/ctrl.js"></script>
+	<script type="text/javascript" src="/static/codemirroreditor/js/ctrl.js"></script>
         <script type="text/javascript">
    	  $(document).ready(function() {
           var source_value = draft_value = $('#code').val();
@@ -91,10 +92,15 @@
             $.ctrl('S', function(){ $('#draft').trigger('click'); });
             $.ctrl('R', function(){ $('#run').trigger('click'); });
 	  });
+          setInterval(function(){
+             $.get('/actions/test/stub/', { path: '{{ relative_file_path }}' });
+          }, 30 * 1000);
 	</script>
+	{% endif %}
 {% endblock %}
 
 {% block controls %}
+	{% if not is_stubbed %}
 	<ul class="horizontal-menu">
 		<li><a id="run" href="javascript:void(0);">{% trans "Run" %}</a></li>
 		<li><a id="save" href="javascript:void(0);">{% trans "Save" %}</a></li>
@@ -102,15 +108,20 @@
 		<li class="disabled"><a id="history" href="javascript: void(0);">{% trans "History" %}</a></li>
 		<li><a id="close" href="javascript: void(0);">{% trans "Close" %}</a></li>
 	</ul>
+	{% endif %}
 {% endblock controls %}
 
 {% block title %}<h4>{{ request.path|breadcrumbs_file }}</h4>{% endblock title %}
 
 {% block content %}
-	<form id='apply-test' method='POST'>
+	{% if not is_stubbed %}
+		<form id='apply-test' method='POST'>
 		<input type="hidden" name="path" value="{{ relative_file_path }}" />
 		<input type="hidden" name="url" value="{{ request.path }}" />
 		<textarea id='code' name='content'>{{ content|default:"" }}</textarea>
 		<input id='draft' type='button' value='{% trans 'save draft' %}'>
-	</form>
+		</form>
+	{% else %}
+		<pre>{{ content }}</pre>
+	{% endif %}
 {% endblock content %}

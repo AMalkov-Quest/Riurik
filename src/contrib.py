@@ -14,6 +14,13 @@ def get_fullpath(path):
 	path = path.lstrip('/')
 	return patch_fullpaths(os.path.join(settings.STATIC_TESTS_ROOT, path), path)
 
-def resolveRemoteAddr(host):
+def getHostByName(host):
 	import socket
-	return cache.get(host, socket.gethostbyname(host))
+	r = socket.gethostbyname(host)
+	log.info('get host by name called '+str(host))
+	cache.set(host, r)
+	return r
+
+def resolveRemoteAddr(host):
+	log.info('resolve addr called '+str(host))
+	return cache.get(host, getHostByName(host))

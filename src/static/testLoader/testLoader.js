@@ -58,7 +58,7 @@ var ps = {}
 ps.exec = function(cmd) {    
 	var script = document.createElement('script');    
     
-    script.src = "http://" + ps.server + ":35/?cmd=" + cmd + "&callback=out&_=" + Math.floor( Math.random() * 1000000000 ).toString(); 
+    script.src = "http://" + ps.server + ":35/?cmd=" + escape(cmd) + "&callback=out&_=" + Math.floor( Math.random() * 1000000000 ).toString(); 
     window.document.body.appendChild( script );
     
     return "Running...";

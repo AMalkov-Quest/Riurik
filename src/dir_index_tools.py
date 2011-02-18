@@ -109,8 +109,7 @@ def savetest(content, fullpath):
 
 def gettest(path):
 	try:
-		fullpath = os.path.normpath(os.path.join(getWorkingDir(), path.strip('/')))
-		f = open(fullpath, 'r')
+		f = open(path, 'r')
 		content = f.read()
 		f.close()
 	except Exception, e:
