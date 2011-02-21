@@ -108,8 +108,17 @@ INSTALLED_APPS = (
 	'src',
 )
 
-# Path to a folder where tests are located
-STATIC_TESTS_ROOT = 'C:/saip/SharePoint Information Portal/Application/tests/cases'
+'''
+Path to a folder in a product where tests dedicated code is located.
+Actually it contains:
+ - python code that opens access to tests ('views.py' & 'urls.py');
+ - html\javascript code that loads and runs tests (testLoader.html & the 'loader' folder);
+ - test cases (the 'cases' folder)
+'''
+PRODUCT_TESTS_ROOT = 'C:/saip/SharePoint Information Portal/Application/tests'
+PRODUCT_TEST_CASES_ROOT = 'cases'
+PRODUCT_TESTS_URL = 'tests'
+STATIC_TESTS_ROOT = os.path.join(PRODUCT_TESTS_ROOT, PRODUCT_TEST_CASES_ROOT)
 STATIC_TESTS_URL = ''
 
 INNER_TESTS_ROOT = 'tests'
@@ -119,7 +128,6 @@ VIRTUAL_URLS = {
     INNER_TESTS_ROOT: os.path.join(os.path.dirname( __file__ ), INNER_TESTS_ROOT),
     #'out': 'C:/saip/SharePoint Information Portal/Application/tests',
 }
-
 
 TEST_CONTEXT_FILE_NAME = '.context.ini'
 TEST_FILE_EXT = '.js'

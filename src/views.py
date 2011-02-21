@@ -300,6 +300,13 @@ def useLogin(url, login, password):
 	opener = urllib2.build_opener(auth_NTLM)
 	urllib2.install_opener(opener)
 	
+def makeSaveContentPost(content, path):
+	return {
+		'content': content,
+		'path': path,
+		'tests_root': settings.PRODUCT_TEST_CASES_ROOT 
+	}
+	
 def saveTestSatelliteScripts(url, test, request):
 	'''
 	saves all documents opened in the same browser(in other tabs)
@@ -310,27 +317,30 @@ def saveTestSatelliteScripts(url, test, request):
 	for path in scripts:
 		fullpath = get_fullpath(path)
 		content = tools.gettest(fullpath)
-		data = { 'content': content, 'path': path }
+		data = makeSaveContentPost(content, path)
 		post = urllib.urlencode(data)
+		log.info("Save satellite script %s to %s" % (path, url))
 		result = urllib2.urlopen(url, post).read()
-		log.info("%s is saved" % result)
+		log.info("... done as %s" % result)
 
 def saveRemoteScripts(path, content, testpath, ctx, request):
 	patched = _patch_with_context(content, ctx.items())
-	data = { 'content': patched, 'path': path }
+	data = makeSaveContentPost(patched, path)
 	post = urllib.urlencode(data)
 	login = ctx.get('login')
 	password = ctx.get('password')
 	
-	url = "%s/tests/" % ctx.get('url')
+	url = "%s/%s/" % (ctx.get('url'), settings.PRODUCT_TESTS_URL)
 	url = url.replace(ctx.get('host'), context.host(ctx))
 	
 	useLogin(url, login, password)
 	saveTestSatelliteScripts(url, path, request)
+	log.info("Save test script %s to %s" % (path, url))
 	return urllib2.urlopen(url, post).read()
 
 def runRemoteTest(path, context):
 	url = "%s/%s" % (context.get('url'), path)
+	log.info("Run test %s" % url)
 	return HttpResponseRedirect(url)
 
 def recvLogRecords(request):
