@@ -333,14 +333,6 @@ def runRemoteTest(path, context):
 	url = "%s/%s" % (context.get('url'), path)
 	return HttpResponseRedirect(url)
 
-def remoteSaveTest(request):
-	result = tools.savetest(request.POST["content"], request.POST["name"])
-	
-	response = HttpResponse(mimetype='text/plain')
-	response.write(result)
-	
-	return response
-
 def recvLogRecords(request):
 	log.warn('This is a warning')
 	
