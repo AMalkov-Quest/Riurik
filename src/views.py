@@ -284,24 +284,12 @@ def runTest(request, fullpath):
 	if host == 'localhost':
 		return runInnerTest(request.POST["path"], request.POST["url"])
 	else:
-		return runRemoteTest(request.POST["path"], request.POST["content"], request.POST["url"], ctx, request)
+		path = saveRemoteScripts(request.POST["path"], request.POST["content"], request.POST["url"], ctx, request)
+		return runRemoteTest(path, ctx)
 
 def runInnerTest(name, url):
 	jsfile = '/' + name.replace(settings.INNER_TESTS_ROOT, settings.TESTS_URL)
 	return _render_to_response('testLoader.html', locals())
-
-def __runRemoteTest(name, content, testpath, context):
-	data = {}
-	data['content'] = content
-	data['name'] = name
-	
-	# TODO: call data = _patch_with_context(data, items) to add context variables to test file content behind
-	
-	data['content'] = _patch_with_context(data['content'], context.items())
-	result = tools.remotesavetest(context.get('host'), data)
-	url = context.get('url')
-	
-	return HttpResponseRedirect(url + '?path=' + testpath.lstrip('/'))
 
 def useLogin(url, login, password):
 	from ntlm import HTTPNtlmAuthHandler
@@ -312,12 +300,13 @@ def useLogin(url, login, password):
 	opener = urllib2.build_opener(auth_NTLM)
 	urllib2.install_opener(opener)
 	
-def saveSatelliteScripts(url, scripts):
+def saveTestSatelliteScripts(url, test, request):
 	'''
 	saves all documents opened in the same browser(in other tabs)
 	as a test that is about to run 
 	'''
-	log.info(scripts)
+	scripts = getOpenedFiles(request)
+	if scripts.count(test) > 0: scripts.remove(test)
 	for path in scripts:
 		fullpath = get_fullpath(path)
 		content = tools.gettest(fullpath)
@@ -326,24 +315,23 @@ def saveSatelliteScripts(url, scripts):
 		result = urllib2.urlopen(url, post).read()
 		log.info("%s is saved" % result)
 
-def runRemoteTest(path, content, testpath, context, request):
-	patched = _patch_with_context(content, context.items())
+def saveRemoteScripts(path, content, testpath, ctx, request):
+	patched = _patch_with_context(content, ctx.items())
 	data = { 'content': patched, 'path': path }
 	post = urllib.urlencode(data)
-	login = context.get('login')
-	password = context.get('password')
+	login = ctx.get('login')
+	password = ctx.get('password')
 	
-	ipaddr = resolveRemoteAddr(context.get('host'))
-	url = "%s/tests/" % context.get('url')
-	url = url.replace(context.get('host'), ipaddr)
+	url = "%s/tests/" % ctx.get('url')
+	url = url.replace(ctx.get('host'), context.host(ctx))
 	
 	useLogin(url, login, password)
-	scripts = getOpenFiles(request)
-	scripts.remove(path)
-	saveSatelliteScripts(url, scripts)
-	redirect = urllib2.urlopen(url, post).read()
-	
-	return HttpResponseRedirect(context.get('url') + redirect)
+	saveTestSatelliteScripts(url, path, request)
+	return urllib2.urlopen(url, post).read()
+
+def runRemoteTest(path, context):
+	url = "%s/%s" % (context.get('url'), path)
+	return HttpResponseRedirect(url)
 
 def remoteSaveTest(request):
 	result = tools.savetest(request.POST["content"], request.POST["name"])
@@ -391,7 +379,10 @@ def stubFile(request):
 	stub(request.GET['path'], request)
 	return HttpResponse('')
 
-def getOpenFiles(request):
+def getOpenedFiles(request):
+	'''
+	returns all scripts those are currently opened in a browser
+	'''
 	files = []
 	if not 'stub_key' in request.session:
 		return files

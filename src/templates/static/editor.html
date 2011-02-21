@@ -23,7 +23,7 @@
 		    basefiles: ["util.js", "stringstream.js", "select.js", "undo.js", "editor.js", "tokenize.js", "jquery.js", "ctrl.js"],
 		    onLoad: function(){
                 window.frames[0].$(document).ready(function(){
-                    window.frames[0].$.ctrl('S', function(){ $('#draft').trigger('click'); });
+                    window.frames[0].$.ctrl('S', function(){ $('#save').trigger('click'); });
                     window.frames[0].$.ctrl('R', function(){ $('#run').trigger('click'); });
                 });
 		    }

@@ -17,10 +17,16 @@ def get_fullpath(path):
 def getHostByName(host):
 	import socket
 	r = socket.gethostbyname(host)
-	log.info('get host by name called '+str(host))
 	cache.set(host, r)
 	return r
 
 def resolveRemoteAddr(host):
-	log.info('resolve addr called '+str(host))
-	return cache.get(host, getHostByName(host))
+	#return cache.get(host, getHostByName(host))
+	addr =  cache.get(host, None)
+	if not addr:
+		addr = getHostByName(host)
+		log.info('%s addr is resolved: %s' % (str(host), str(addr)))
+	else:
+		log.info('%s addr is got from cach: %s' % (str(host), str(addr)))
+		
+	return addr

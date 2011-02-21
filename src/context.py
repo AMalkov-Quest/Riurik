@@ -1,6 +1,12 @@
 import os
 from logger import log
-import settings, config
+import settings, config, contrib
+		
+def host(instance, resolve=True):
+	key = 'host'
+	if resolve:
+		return contrib.resolveRemoteAddr(instance.get(key))
+	return instance.get(key)
 		
 def get(name):
 	return context(name)
