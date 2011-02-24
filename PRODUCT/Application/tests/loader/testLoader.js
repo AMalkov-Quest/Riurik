@@ -20,60 +20,91 @@ var frame = {
 		  });
 		  
 		  return dfd.promise();
+	},
+	
+	println: function(message) {
+		var frame = window.frames[0];
+		var regexp = new RegExp('\\n', 'gi');
+		
+		html = message.replace(regexp, '<br>');
+		frame.document.write(html);
+		
+		console.log(message);
 	}
 };
 
-function jqextend( $ ) {
-	
-	$.fn.wait = function( lambda, timeout ){
-		var dfd = $.Deferred();
-		var timeout = timeout || 10 * 1000; // 10 sec by default
-		var time = 0;
-		(function f(){
-			if ( lambda() === true ) {
-				return dfd.resolve();
-			}
-			time += 1000;
-			if ( time < timeout ) {
-				setTimeout(f, 1000)
-			}
-		})();
-		$.extend( dfd, {
-			wait: $.wait 
-		})
-		
-		return dfd.promise(dfd);
-	};
-	
-	$.fn.areSameAs = function() {
-		this.each( function() {
-			console.log($(this).text());
-		});
-	};
-	
+var suite = {
+
+	setup: function() {},
+	teardown: function() {}
+
 }
 
-$.wait = function( lambda, timeout ){
-    var dfd = $.Deferred();
+function jqextend( $ ) {
+  var jq = $;	
+  $.wait = function( lambda, timeout ){
+    var dfd = jq.Deferred();
     var timeout = timeout || 10 * 1000; // 10 sec by default
     var time = 0;
     (function f(){
 		if ( lambda() === true ) {
+			console.log('resolve wait')
 			return dfd.resolve();
 		}
-		time += 1000;
+		time += 100;
 		if ( time < timeout ) {
-			setTimeout(f, 1000)
+			setTimeout(f, 100)
+		} else {
+			console.log('timeouted');
 		}
     })();
-    $.extend( dfd, {
-		wait: $.wait 
+    jq.extend( dfd, {
+		wait: jq.wait 
     });
 	
     return dfd.promise(dfd);
-};
-
-jQuery.fn.extend({ 
+  };
+  $.seq = function() {
+    // Execute a sequense of functions supplied by arguments and wait until them are not finished.
+    // One function executes at time;
+    //
+    var dfd = new $.Deferred();
+    var funcs = new Array();
+    $( arguments ).each(function(i,e){ funcs.push(e); });
+    var busy = false;
+    var a = null;
+    (function f(){
+        if ( funcs.length == 0 && ! busy ) {
+            console.log('all done',dfd)
+            return dfd.resolve();
+        }
+        if ( ! busy ) {
+            a = funcs.shift();
+            console.log('a', a, busy, funcs)
+            var k = function(){
+                busy = true;
+                console.log('stack busy now');
+                console.log('calling a function');
+                var ret = a();
+                if ( typeof ret != "undefined" && typeof ret.then == "function" ) {
+                    console.log( 'function returned a deffered object. waiting for resolving.' , ret)
+                    ret.then(function(){
+                        console.log( 'function resoled a deferred object')
+                        busy = false;
+                        console.log('stack is free now (deferred)')
+                    });
+                } else {
+                    busy = false;
+                    console.log('stack is free now')
+                }
+            };
+            k();
+        };
+        setTimeout(f, 100);
+    })();
+    return dfd.promise(dfd);
+  };
+  $.fn.extend({ 
     sameAs : function(checks){
        console.log('check', this, arguments)
        var options = {
@@ -86,14 +117,22 @@ jQuery.fn.extend({
          };
        });
      }
-});
+  });
 
+};
 
 jQuery.extend(QUnit, {
-  equalExt: function(actual, expected, message) {
-    QUnit.pushExt(actual, expected, message);
+  rowEqual: function(actual, expected, message) {
+    QUnit.rowPush(
+		actual.map(function(i, e) {
+			if ( typeof e == 'object' ) return jQuery(e).text();
+			return this;
+		}).splice(0, expected.length), 
+		expected, 
+		message
+	);
   },
-  pushExt: function(actual, expected, message) {
+  rowPush: function(actual, expected, message) {
     // 
     var result = true;
     messageI = QUnit.escapeHtml(message) || (result ? "okay" : "failed");
@@ -109,7 +148,7 @@ jQuery.extend(QUnit, {
     output += '</tr><tr class="test-diff"><th>Diff:</th>';
     var cols = i;
     for (i=0;i < expected.length; i++) {
-      if ( actual[i] === expected[i] ) {
+      if ( actual[i] == expected[i] ) {
         output += '<td><pre><del> ' + actual[i] + ' </del>,</pre></td>';
       } else {
         result = false;
@@ -117,7 +156,7 @@ jQuery.extend(QUnit, {
       }
     }
     for (i=i; i < actual.length; i++) {
-      if ( actual[i] === expected[i] ) {
+      if ( actual[i] == expected[i] ) {
         output += '<td><pre><del> ' + actual[i] + ' </del>,</pre></td>';
       } else {
         result = false;        
@@ -183,78 +222,89 @@ jQuery.extend(QUnit, {
   }
 });
 
-
-function extractScript(fragment) {
-	var pattert = '\\/\\*([\\S\\s]*?)\\*\\/';
-	var matchAll = new RegExp(pattert, 'img');
-	var matchOne = new RegExp(pattert, 'im');
-
-	return (fragment.toString().match(matchAll) || []).map(function(scriptTag) {
-		return (scriptTag.match(matchOne) || ['', ''])[1];
-    });
-}
-
-function out(message) {
-	var regexp = new RegExp('\\n', 'gi');
-	html = message.replace(regexp, '<br>');
+function PowerShell(server) {
 	
-	var frame = window.frames[0];
-	frame.document.open();
-    frame.document.write(html);
-    frame.document.close();
+	this.server = server;
+	
+	this.exec = function(name, args, cmd) {
+		var dfd = $.Deferred();
+		var script = document.createElement('script');
+		
+		frame.println('queue up ' + name + '( ' + args + ' )\n');
+		
+		var random = Math.floor( Math.random() * 1000000000 ).toString();
+		var callback = name + random;
+		
+		window[callback] = function(result) {
+			frame.println(name + '( ' + args + ' ) is done whis result:\n');
+			frame.println(result?result:'OK\n');
+			dfd.resolve();
+		};
+		
+		//script.src = "http://" + this.server + ":35/?cmd=" + escape(cmd) + "&callback=" + callback;
+		script.src = "http://" + this.server + ":35/?cmd=" + escape(cmd) + "&callback=" + callback + "&_=" + Math.floor( Math.random() * 1000000000 ).toString();
+		window.document.body.appendChild( script );
 	  
-	console.log( message );
+		return dfd.promise();
+	};
 	
-}
-
-function argumentNames(func) {
-	var names = func.toString().match(/^[\s\(]*function[^(]*\(([^)]*)\)/)[1]
-		.replace(/\/\/.*?[\r\n]|\/\*(?:.|[\r\n])*?\*\//g, '')
-		.replace(/\s+/g, '').split(',');
-    
-	return names.length == 1 && !names[0] ? [] : names;
-}
-
-var ps = {}
-
-ps.exec = function(cmd) {    
-	var script = document.createElement('script');    
-    
-    script.src = "http://" + ps.server + ":35/?cmd=" + escape(cmd) + "&callback=out&_=" + Math.floor( Math.random() * 1000000000 ).toString(); 
-    window.document.body.appendChild( script );
-    
-    return "Running...";
-}
-
-ps.eval = function(func) {
-	var args = {};
-  
-	names = argumentNames(func);
-	for (var i = 1; i < arguments.length; i++) {
-		args[names[i-1]] = arguments[i];
-	}
-  
-	//var re = /(?!\/\*)[^\/\*]*(?=\*\/)/m;
-	//script = re.exec(func.toString())[0];
-	script = extractScript(func);
+	this.functionName = function(func) {
+		return func.toString().match(/^[\s\(]*function\s*([^(]*?)\([^)]*?\)/)[1];
+	};
 	
-	var cmd = '';
-	for (var i = 0; i < script.length; i++) {
-		var line = script[i];
-		for (arg in args) {
-			var regexp = new RegExp('\\{' + arg + '\\}', 'gi');
-			line = line.replace(regexp, args[arg]);
+	this.argumentNames = function(func) {
+		var names = func.toString().match(/^[\s\(]*function[^(]*\(([^)]*?)\)/)[1]
+			.replace(/\/\/.*?[\r\n]|\/\*(?:.|[\r\n])*?\*\//g, '')
+			.replace(/\s+/g, '').split(',');
+		
+		return names.length == 1 && !names[0] ? [] : names;
+	};
+	
+	this.extractScript = function(fragment) {
+		var pattert = '\\/\\*([\\S\\s]*?)\\*\\/';
+		var matchAll = new RegExp(pattert, 'img');
+		var matchOne = new RegExp(pattert, 'im');
+
+		return (fragment.toString().match(matchAll) || []).map(function(scriptTag) {
+			return (scriptTag.match(matchOne) || ['', ''])[1];
+		});
+	};
+	
+	this.invoke = function(func) {
+		var args = {};
+	  
+		var fnName = this.functionName(func);
+		var names = this.argumentNames(func);
+		for (var i = 1; i < arguments.length; i++) {
+			args[names[i-1]] = arguments[i];
 		}
-		cmd += line;
-	}
-	
-	ps.exec(cmd);
+	  
+		var script = this.extractScript(func);
+		
+		var cmd = '';
+		for (var i = 0; i < script.length; i++) {
+			var line = script[i];
+			for (arg in args) {
+				var regexp = new RegExp('\\{' + arg + '\\}', 'gi');
+				line = line.replace(regexp, args[arg]);
+			}
+			cmd += line;
+		}
+		
+		return this.exec(fnName, $(arguments).splice(1), cmd);
+	};
 }
 
-function _NewSPSite(url, name) {
-	/*
-  	$spSite = Get-SPSite {url};
-  	$spWeb = $spSite.OpenWeb();
-  	$spWeb.Webs.Add("{name}");
-	*/
-}
+var sharepoint = {
+	
+	webAppUrl: function(host, port) {
+		return 'http://' + host + ':' + port;
+	},
+
+	SCUrl: function(host, port, title) {
+		var waUrl = sharepoint.webAppUrl(host, port);
+		return waUrl + '/sites/' + title;
+	}
+};
+
+jqextend($);
