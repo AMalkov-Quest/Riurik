@@ -103,7 +103,7 @@ def serve(request, path, document_root=None, show_indexes=False):
 	``static/directory_index.html``.
 	"""
 	# Clean up given path to only allow serving files below document_root.
-	log.debug((request.GET, path,document_root,show_indexes))
+	log.debug((request.GET, path,document_root,show_indexes, path))
 	path = posixpath.normpath(urllib.unquote(path))
 	path = path.lstrip('/')
 	newpath = ''
@@ -116,10 +116,7 @@ def serve(request, path, document_root=None, show_indexes=False):
 		if part in (os.curdir, os.pardir):
 			# Strip '.' and '..' in path.
 			continue
-		newpath = os.path.abspath(os.path.join(newpath, part))#.replace('\\', '/')
-	if newpath and path != newpath:
-		log.debug('before redirect to newpath')
-		return HttpResponseRedirect(newpath)
+		newpath = os.path.join(newpath, part)
 	fullpath = os.path.abspath(os.path.join(document_root, newpath))#.replace('/', '\\')
 	log.debug(('before patching fullpath',fullpath, newpath))
 	fullpath = patch_fullpaths(fullpath, newpath)
