@@ -116,11 +116,11 @@ def serve(request, path, document_root=None, show_indexes=False):
 		if part in (os.curdir, os.pardir):
 			# Strip '.' and '..' in path.
 			continue
-		newpath = os.path.join(newpath, part).replace('\\', '/')
+		newpath = os.path.abspath(os.path.join(newpath, part))#.replace('\\', '/')
 	if newpath and path != newpath:
 		log.debug('before redirect to newpath')
 		return HttpResponseRedirect(newpath)
-	fullpath = os.path.join(document_root, newpath).replace('/', '\\')
+	fullpath = os.path.abspath(os.path.join(document_root, newpath))#.replace('/', '\\')
 	log.debug(('before patching fullpath',fullpath, newpath))
 	fullpath = patch_fullpaths(fullpath, newpath)
 	log.debug(('after patching fullpath',fullpath, newpath))

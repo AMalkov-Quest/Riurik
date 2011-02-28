@@ -1,47 +1,18 @@
-{% comment %}
-    This file is used for loading test-cases.
-    Based on JQuery and Deferred.
-    
-    testbase.js: TestRunner and BaseTest classes
-    
-    Incoming variables:
-        js - it is an array of loading tests
-             Example:
-                js = [
-                    'cases/simpleTest.js',
-                    'cases/complexTest.js',
-                    ...
-                ]
-{% endcomment %}<html>
+<html>
     <head>
-        <link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/2.8.2r1/build/reset/reset-min.css">
         <style>
             iframe { width: 99%; height:99%; }
         </style>
-        <script type="text/javascript" src="/testsrc/base/jquery-1.4.4.min.js"></script>
-        <script type="text/javascript" src="/testsrc/base/jquery.json-2.2.min.js"></script>
-        <script type="text/javascript" src="/testsrc/base/jsdeferred.js"></script>
-        <script type="text/javascript" src="/testsrc/base/testbase.js"></script>
+        <script type="text/javascript" src="/testsrc/loader/jquery-1.5.js"></script>
+        <script type="text/javascript" src="/testsrc/loader/jquery.json-2.2.min.js"></script>
 		
-		<link rel="stylesheet" type="text/css" href="/static/jquery/qunit/qunit.css" media="screen" />
-		<script type="text/javascript" src="/static/jquery/qunit/qunit.js"></script>
+		<link rel="stylesheet" type="text/css" href="/testsrc/loader/qunit.css" media="screen" />
+		<script type="text/javascript" src="/testsrc/loader/qunit.js"></script>
 		
-        {% for jsfile in js %}
-            <script type="text/javascript" src="{{ jsfile }}"></script>
-            <script type="text/javascript">
-                if ( typeof test != 'undefined' ) {
-                    if ( typeof context != 'undefined' ) {
-                        for (n in context) {
-                            test[n] = context[n];
-                        }
-                    } else console.log('context is undefined')
-                    console.log(test);
-                    TestRunner.addTest(test);
-                    delete context;
-                    delete test;
-                } else console.log('test is undefined')
-            </script>
-        {% endfor %}
+        <script type="text/javascript" src="/testsrc/loader/testLoader.js"></script>
+		<script type="text/javascript" src="/testsrc/cases/libraries/sharepoint.js"></script>
+        <script type="text/javascript" src="/testsrc/{{ jsfile }}"></script>
+        
     </head>
 	<body>
 		<h1 id="qunit-header">QUnit example</h1>
@@ -54,5 +25,11 @@
 		{% if error %}<div id="error">{{error|default:""}}</div>{% endif %}
 		<div id="results"></div>
 		<iframe id="frame" name="frame">
+			<html>
+				<head>
+				</head>
+				<body>
+				</body>
+			</html>
 		</iframe>
 </html>
