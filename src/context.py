@@ -8,20 +8,25 @@ def host(instance, resolve=True):
 		return contrib.resolveRemoteAddr(instance.get(key))
 	return instance.get(key)
 		
-def get(name):
-	return context(name)
+def get(name, section='default'):
+	#if not section: section = 'default'
+	return context(name, section)
 
 class context():
 	
-	def __init__(self, test):
+	def __init__(self, test, section='default'):
 		test = os.path.join(settings.STATIC_TESTS_ROOT, test)
 		self.inifile = os.path.join(os.path.dirname(test), settings.TEST_CONTEXT_FILE_NAME)
-		log.debug('context: %s' % self.inifile)
+		self.section = section
+		log.debug('context: %s, section: %s' % (self.inifile, self.section))
 		
-	def get(self, option, section='default'):
-		value = config.get(self.inifile, section, option)
+	def get(self, option):
+		value = config.get(self.inifile, self.section, option)
 		log.debug('context: %s=%s' % (option, value))
 		return value
 
-	def items(self, section='default'):
-		return config.items(self.inifile, section)
+	def items(self):
+		return config.items(self.inifile, self.section)
+	
+	def sections(self):
+		return config.sections(self.inifile)

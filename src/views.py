@@ -167,10 +167,17 @@ def serve(request, path, document_root=None, show_indexes=False):
 	try:
 		content = contents
 		if re.match(CODEMIRROR_CALL_EDITOR_FOR, path.lower()):
+			try:
+				contexts = context.get( fullpath ).sections()
+			except Exception, e:
+				log.error(e)
+				contexts = []
+
 			ret = _render_to_response(
 				'static/types/javascript.html', 
 				{ 
 					'content': content,
+					'contexts': contexts,
 					'relative_file_path': path,
 					'is_stubbed': is_stubbed(path, request),
 	
@@ -270,6 +277,7 @@ def _patch_with_context(data, vars):
 def submitTest(request):
 	testname = request.POST["path"]
 	url = request.POST["url"]
+	context = request.POST["context"]
 	content = request.POST.get("content", tools.gettest(testname))
 	
 	return _render_to_response( "runtest.html", locals() )
@@ -277,10 +285,13 @@ def submitTest(request):
 @add_fullpath	
 def runTest(request, fullpath):
 	result = tools.savetest(request.POST["content"], fullpath)
+	log.debug(request.POST)
 	
-	ctx = context.get(fullpath)
-	host = ctx.get('host')
+	context_name = request.POST.get("context", None)
 	
+	ctx = context.get(fullpath, section=context_name)
+	host = ctx.get( option='host' )
+	#log.debug( locals() )
 	if host == 'localhost':
 		return runInnerTest(request.POST["path"], request.POST["url"])
 	else:

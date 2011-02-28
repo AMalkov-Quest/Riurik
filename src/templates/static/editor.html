@@ -47,7 +47,7 @@
             });
             $('#discard').click(function(){ if ( ConfirmDiscardchanges() ) document.location=document.location;});
             $('#close').click(function(){ if ( ConfirmDiscardchanges() ) document.location='{{ request.path|above }}';});
-            $('#run').click(function(){ $('#apply-test').attr('action', '/actions/test/submit/').attr('target', '{{ request.path|current }}');$('#apply-test').submit(); });
+            $('#run').click(function(){ $('#apply-test input[name=context]').val($('select[name=context]').val()); $('#apply-test').attr('action', '/actions/test/submit/').attr('target', '{{ request.path|current }}');$('#apply-test').submit(); });
             $('#save').click(function(){ $('#apply-test').attr('action', '/actions/test/save/').removeAttr('target');$('#apply-test').submit(); });
 
             var ticks = 0;
@@ -102,7 +102,8 @@
 {% block controls %}
 	{% if not is_stubbed %}
 	<ul class="horizontal-menu">
-		<li><a id="run" href="javascript:void(0);">{% trans "Run" %}</a></li>
+		<li><a id="run" href="javascript:void(0);">{% trans "Run" %}</a>
+		at <select name="context">{% for item in contexts %}<option value='{{item}}'{% if forloop.first %} selected="selected"{% endif %}>{{item}}</option>{% endfor %}</select></li>
 		<li><a id="save" href="javascript:void(0);">{% trans "Save" %}</a></li>
 		<li><a id="discard" href="javascript: void(0);">{% trans "Discard" %}</a></li>
 		<li class="disabled"><a id="history" href="javascript: void(0);">{% trans "History" %}</a></li>
@@ -118,6 +119,7 @@
 		<form id='apply-test' method='POST'>
 		<input type="hidden" name="path" value="{{ relative_file_path }}" />
 		<input type="hidden" name="url" value="{{ request.path }}" />
+		<input type="hidden" name="context" value="default" />
 		<textarea id='code' name='content'>{{ content|default:"" }}</textarea>
 		<input id='draft' type='button' value='{% trans 'save draft' %}'>
 		</form>
