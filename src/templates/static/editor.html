@@ -14,9 +14,9 @@
         <script type="text/javascript">
    	  $(document).ready(function() {
 	  try { var last_context = $.cookie('last_context');
-          if ( typeof last_context == 'string' ) {
+          if ( typeof last_context == 'string' ) 
           	$('select[name=context]').val(last_context);
-	  } } except (e) { console.log(e); }
+	  } catch (e) { console.log(e); }
           var source_value = draft_value = $('#code').val();
   		  var editor = CodeMirror.fromTextArea("code", {
 		    height: "600px",
@@ -54,7 +54,7 @@
             $('#close').click(function(){ if ( ConfirmDiscardchanges() ) document.location='{{ request.path|above }}';});
             $('#run').click(function(){ 
 			var context = $('select[name=context]').val();
-			try { $.cookie('last_context', context); } except (e) { console.log(e); }
+			try { $.cookie('last_context', context); } catch (e) { console.log(e); }
 			$('#apply-test input[name=context]')
 				.val(context); 
 			$('#apply-test')
