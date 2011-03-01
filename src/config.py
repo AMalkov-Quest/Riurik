@@ -36,3 +36,10 @@ def set(file, section, option, value):
 		write(file, config.write)
 	except Exception, e:
 		log.error(e)
+
+def sections(file):
+	try:
+		return read(file).sections()
+	except Exception, e:
+		log.error(e)
+		return None

@@ -30,6 +30,10 @@ var frame = {
 		frame.document.write(html);
 		
 		console.log(message);
+	},
+	
+	jQuery: function() {
+		return window.frames[0].window.jQuery;
 	}
 };
 
@@ -55,7 +59,7 @@ function jqextend( $ ) {
 		if ( time < timeout ) {
 			setTimeout(f, 100)
 		} else {
-			console.log('timeouted');
+			console.log('wait timeout');
 		}
     })();
     jq.extend( dfd, {
