@@ -62,8 +62,12 @@
 				.attr('target', '{{ request.path|current }}');
 			$('#apply-test').submit();
 	   });
-            $('#save').click(function(){ $('#apply-test').attr('action', '/actions/test/save/').removeAttr('target');$('#apply-test').submit(); });
-
+            $('#save').click(function(){ 
+		var context = $('select[name=context]').val();
+		try { $.cookie('last_context', context); } catch (e) { console.log(e); }
+        	$('#apply-test').attr('action', '/actions/test/save/').removeAttr('target');
+		$('#apply-test').submit(); 
+	    });
             var ticks = 0;
             var savingDraft = false;
             var saveDraft = function(){
