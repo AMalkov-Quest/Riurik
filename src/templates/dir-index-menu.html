@@ -2,10 +2,15 @@
 	<li class="edit"><a href="#edit">Edit</a></li>
 	<li class="delete"><a href="#remove">Delete</a></li>
 	<li class="move"><a href="#move">Move</a></li>
-	<li class="run separator"><a href="#run">Run</a></li>
+	<li class="separator disabled"><b><a href="#run#default">Run at:</a></b></li>
+	{% for item in contexts %}
+	<li class="run context"><nobr><a href="#run#{{item}}" target="{{item}}">{{item}}</a></nobr></li>
+	{% endfor %}
+	<li class="separator"></li>
 </ul>
 
 <form id='context-action' method='POST'>
 	<input type="hidden" name="path" value="" />
+	<input type="hidden" name="context" value="" />
 	<input type="hidden" name="url" value="{{ directory }}" />
 </form>

@@ -3,12 +3,17 @@ $(document).ready(function(){
 	$('#dir-index-menu').disableContextMenuItems('move');
 	
 	$("#dir-index-id UL LI").contextMenu({
-        menu: 'dir-index-menu'
-    },
-        function(action, el, pos) {
-        	var parmas = '("' + $(el).find('a').text() + '", "' + $(el).attr('class') + '")';
+	        menu: 'dir-index-menu'
+	    },  
+            function(action, el, pos) {
+                var args = action.split('#');
+                action = args.shift();
+		args = ', [' + args.map(function(i){return '"'+i+'"';}).toString() + ']';
+        	var parmas = '("' + $(el).find('a').text() + '", "' + $(el).attr('class') + '"'+ args +')';
+		console.log(arguments, action + parmas)
     		eval(action + parmas);
-    });
+            }
+	);
 	
 	function edit(target, context) {
 		if (context == 'suite') {
@@ -28,12 +33,13 @@ $(document).ready(function(){
 		$('#context-action').submit();
 	}
 	
-	function run(target, context) {
+	function run(target, context, context_names) {
 		var currentDir = $('#context-action > input[name=url]').val();
 		var fullPath = currentDir + target;
-		
+		console.log(target, context, arguments);
 		$('#context-action > input[name=path]').val(fullPath);
 		$('#context-action > input[name=url]').val(fullPath);
+		$('#context-action > input[name=context]').val(context_names.shift());
 		$('#context-action').attr('action', '/actions/test/submit/').attr('target', '_blank');
 		$('#context-action').submit();
 	}

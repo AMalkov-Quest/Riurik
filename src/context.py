@@ -16,7 +16,10 @@ class context():
 	
 	def __init__(self, test, section='default'):
 		test = os.path.join(settings.STATIC_TESTS_ROOT, test)
-		self.inifile = os.path.join(os.path.dirname(test), settings.TEST_CONTEXT_FILE_NAME)
+		if os.path.isdir(test):
+			self.inifile = os.path.join(test, settings.TEST_CONTEXT_FILE_NAME)
+		else:
+			self.inifile = os.path.join(os.path.dirname(test), settings.TEST_CONTEXT_FILE_NAME)
 		self.section = section
 		log.debug('context: %s, section: %s' % (self.inifile, self.section))
 		

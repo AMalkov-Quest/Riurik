@@ -10,8 +10,13 @@
 	{% if not is_stubbed %}
 	<script type="text/javascript" src="/static/codemirroreditor/js/codemirror.js"></script>
 	<script type="text/javascript" src="/static/codemirroreditor/js/ctrl.js"></script>
+	<script type="text/javascript" src="/static/js/jquery.cookie.js"></script>
         <script type="text/javascript">
    	  $(document).ready(function() {
+	  var last_context = $.cookie('last_context');
+          if ( typeof last_context == 'string' ) {
+          	$('select[name=context]').val(last_context);
+	  }
           var source_value = draft_value = $('#code').val();
   		  var editor = CodeMirror.fromTextArea("code", {
 		    height: "600px",
@@ -47,7 +52,16 @@
             });
             $('#discard').click(function(){ if ( ConfirmDiscardchanges() ) document.location=document.location;});
             $('#close').click(function(){ if ( ConfirmDiscardchanges() ) document.location='{{ request.path|above }}';});
-            $('#run').click(function(){ $('#apply-test input[name=context]').val($('select[name=context]').val()); $('#apply-test').attr('action', '/actions/test/submit/').attr('target', '{{ request.path|current }}');$('#apply-test').submit(); });
+            $('#run').click(function(){ 
+			var context = $('select[name=context]').val();
+			$.cookie('last_context', context);
+			$('#apply-test input[name=context]')
+				.val(context); 
+			$('#apply-test')
+				.attr('action', '/actions/test/submit/')
+				.attr('target', '{{ request.path|current }}');
+			$('#apply-test').submit();
+	   });
             $('#save').click(function(){ $('#apply-test').attr('action', '/actions/test/save/').removeAttr('target');$('#apply-test').submit(); });
 
             var ticks = 0;

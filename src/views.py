@@ -139,9 +139,16 @@ def serve(request, path, document_root=None, show_indexes=False):
 			if newpath == '/' or newpath == '': 
 				for key in settings.VIRTUAL_URLS:
 					files =  [ key + '/', ] + files
+			try:
+				contexts = context.get(fullpath).sections()
+			except Exception, e:
+				log.error(e)
+				contexts = []
+
 			c = Context({
 				'directory' : newpath + '/',
 				'file_list' : files,
+				'contexts'  : contexts,
 			})
 			return HttpResponse(t.render(c))
 		raise Http404("Directory indexes are not allowed here.")
@@ -288,12 +295,26 @@ def runTest(request, fullpath):
 	
 	ctx = context.get(fullpath, section=context_name)
 	host = ctx.get( option='host' )
-	#log.debug( locals() )
+	localhost = ctx.get( option='localhost' )
+	
 	if host == 'localhost':
 		return runInnerTest(request.POST["path"], request.POST["url"])
 	else:
-		path = saveRemoteScripts(request.POST["path"], request.POST["content"], request.POST["url"], ctx, request)
-		return runRemoteTest(path, ctx)
+		if localhost:
+			return runLocalTest(request.POST["path"], ctx)
+		else:
+			path = saveRemoteScripts(request.POST["path"], request.POST["content"], request.POST["url"], ctx, request)
+			return runRemoteTest(path, ctx)
+
+def runRemoteTest(path, context):
+	url = "%s/%s" % (context.get('url'), path)
+	log.info("Run remote test %s" % url)
+	return HttpResponseRedirect(url)
+	
+def runLocalTest(path, context):
+	jsfile = '/' + path.replace(settings.INNER_TESTS_ROOT, settings.TESTS_URL)
+	log.info("Run local test %s" % jsfile)
+	return _render_to_response('testLoader.html', locals())
 
 def runInnerTest(name, url):
 	jsfile = '/' + name.replace(settings.INNER_TESTS_ROOT, settings.TESTS_URL)
@@ -345,11 +366,6 @@ def saveRemoteScripts(path, content, testpath, ctx, request):
 	saveTestSatelliteScripts(url, path, request)
 	log.info("Save test script %s to %s" % (path, url))
 	return urllib2.urlopen(url, post).read()
-
-def runRemoteTest(path, context):
-	url = "%s/%s" % (context.get('url'), path)
-	log.info("Run test %s" % url)
-	return HttpResponseRedirect(url)
 
 def recvLogRecords(request):
 	log.warn('This is a warning')
