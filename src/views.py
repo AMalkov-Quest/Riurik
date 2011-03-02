@@ -69,10 +69,6 @@ def handle_message(data, isolate_imports=False, executioncontext=_executionconte
 	results = result.collection()
 	return protocol.pack(results)
 
-CODEMIRROR_CALL_EDITOR_FOR = '^.*\.(?:js|ini)$'
-if hasattr(django.conf, 'CODEMIRROR_CALL_EDITOR_FOR'):
-	CODEMIRROR_CALL_EDITOR_FOR = getattr(django.conf, 'CODEMIRROR_CALL_EDITOR_FOR')
-	
 def setTestsRoot(document_root):
 	settings.STATIC_TESTS_ROOT = document_root
 	settings.STATIC_TESTS_URL = settings.STATIC_TESTS_URLs[document_root]
@@ -126,16 +122,19 @@ def serve(request, path, document_root=None, show_indexes=False):
 	if os.path.isdir(fullpath):
 		if show_indexes:
 			try:
-				t = loader.select_template(['static/directory_index.html',
-						'static/directory_index'])
+				t = loader.select_template(['directory_index.html',
+						'directory_index'])
 			except TemplateDoesNotExist:
 				t = Template(django.views.static.DEFAULT_DIRECTORY_INDEX_TEMPLATE, name='Default directory index template')
 			files = []
+			dirs = []
 			for f in os.listdir(fullpath):
 				if not f.startswith('.'):
-					if os.path.isdir(os.path.join(fullpath, f)):
+					if os.path.isfile(os.path.join(fullpath, f)):
+						files.append(f)
+					else:
 						f += '/'
-					files.append(f)
+						dirs.append(f)
 			if newpath == '/' or newpath == '': 
 				for key in settings.VIRTUAL_URLS:
 					files =  [ key + '/', ] + files
@@ -148,19 +147,16 @@ def serve(request, path, document_root=None, show_indexes=False):
 			c = Context({
 				'directory' : newpath + '/',
 				'file_list' : files,
+				'dir_list'  : dirs,
 				'contexts'  : contexts,
 			})
 			return HttpResponse(t.render(c))
 		raise Http404("Directory indexes are not allowed here.")
 	if not os.path.exists(fullpath):
 		raise Http404('"%s" does not exist' % fullpath)
-	# Respect the If-Modified-Since header.
 	statobj = os.stat(fullpath)
 	mimetype, encoding = mimetypes.guess_type(fullpath)
 	mimetype = mimetype or 'application/octet-stream'
-	#if not django.views.static.was_modified_since(request.META.get('HTTP_IF_MODIFIED_SINCE'),
-	#						  statobj[stat.ST_MTIME], statobj[stat.ST_SIZE]):
-	#	return HttpResponseNotModified(mimetype=mimetype)
 	contents = open(fullpath, 'rb').read()
 	response = HttpResponse(contents, mimetype=mimetype)
 	response["Last-Modified"] = http_date(statobj[stat.ST_MTIME])
@@ -170,7 +166,7 @@ def serve(request, path, document_root=None, show_indexes=False):
 		
 	try:
 		content = contents
-		if re.match(CODEMIRROR_CALL_EDITOR_FOR, path.lower()):
+		if 'editor' in request.REQUEST:
 			try:
 				contexts = context.get( fullpath ).sections()
 			except Exception, e:
@@ -178,7 +174,7 @@ def serve(request, path, document_root=None, show_indexes=False):
 				contexts = []
 
 			ret = _render_to_response(
-				'static/types/javascript.html', 
+				'editor.html', 
 				{ 
 					'content': content,
 					'contexts': contexts,
@@ -238,7 +234,7 @@ def createSuite(request, fullpath):
 	return response
 	
 def editSuite(request):
-	return HttpResponseRedirect('/' + request.GET['path'] + '/' + settings.TEST_CONTEXT_FILE_NAME)
+	return HttpResponseRedirect('/' + request.GET['path'] + '/' + settings.TEST_CONTEXT_FILE_NAME+'?editor')
 	
 @add_fullpath
 def createTest(request, fullpath):
@@ -253,7 +249,7 @@ def createTest(request, fullpath):
 @add_fullpath
 def saveTest(request, fullpath):
 	result = tools.savetest(request.POST["content"], fullpath)
-	return HttpResponseRedirect(request.POST["url"])
+	return HttpResponseRedirect(request.POST["url"]+'?editor')
 
 @add_fullpath	
 def saveDraftTest(request, fullpath):
@@ -307,17 +303,18 @@ def runTest(request, fullpath):
 			return runRemoteTest(path, ctx)
 
 def runRemoteTest(path, context):
-	url = "%s/%s" % (context.get('url'), path)
-	log.info("Run remote test %s" % url)
+	url = "%s%s" % (context.get('url'), path)
+	log.info("Run REMOTE test %s" % url)
 	return HttpResponseRedirect(url)
 	
 def runLocalTest(path, context):
 	jsfile = '/' + path.replace(settings.INNER_TESTS_ROOT, settings.TESTS_URL)
-	log.info("Run local test %s" % jsfile)
+	log.info("Run LOCAL test %s" % jsfile)
 	return _render_to_response('testLoader.html', locals())
 
 def runInnerTest(name, url):
 	jsfile = '/' + name.replace(settings.INNER_TESTS_ROOT, settings.TESTS_URL)
+	log.info("Run INNER test %s (%s)" % (jsfile, repr((name, url))))
 	return _render_to_response('testLoader.html', locals())
 
 def useLogin(url, login, password):

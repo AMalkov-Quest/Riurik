@@ -57,9 +57,15 @@
 			<div id="dir-index-id" class="dir-index" style="width:500px;">
 	        	<ul>
 	        		<li></li>
-	        		{% for f in file_list %}
+	        		{% for f in dir_list %}
 	        		<li class="{{ directory|dir_index_type:f }}" title="{{ f|strip:'/' }}">
 						<a id="{{ f|strip:'/' }}" href="{{ f }}">{{ f|strip:'/' }}</a>
+	    			</li>
+	    			{% endfor %}
+
+	        		{% for f in file_list %}
+	        		<li class="{{ directory|dir_index_type:f }}" title="{{ f|strip:'/' }}">
+						<a id="{{ f|strip:'/' }}" href="{{ f }}?editor">{{ f|strip:'/' }}</a>
 	    			</li>
 	    			{% endfor %}
 	    		</ul>

@@ -30,7 +30,18 @@ var frame = {
 		frame.document.write(html);
 		
 		console.log(message);
+	},
+	
+	jQuery: function() {
+		return window.frames[0].window.jQuery;
+	},
+	document: function(){
+		return window.frames[0].document;
+	},
+	window: function(){
+		return window.frames[0].window;
 	}
+
 };
 
 var suite = {
@@ -55,7 +66,7 @@ function jqextend( $ ) {
 		if ( time < timeout ) {
 			setTimeout(f, 100)
 		} else {
-			console.log('timeouted');
+			console.log('wait timeout');
 		}
     })();
     jq.extend( dfd, {
@@ -85,7 +96,12 @@ function jqextend( $ ) {
                 busy = true;
                 console.log('stack busy now');
                 console.log('calling a function');
-                var ret = a();
+                var ret = null;
+                if ( typeof a == "function" ) {
+                    ret = a();
+                } else {
+                    ret = a;
+                }
                 if ( typeof ret != "undefined" && typeof ret.then == "function" ) {
                     console.log( 'function returned a deffered object. waiting for resolving.' , ret)
                     ret.then(function(){
@@ -126,7 +142,7 @@ jQuery.extend(QUnit, {
     QUnit.rowPush(
 		actual.map(function(i, e) {
 			if ( typeof e == 'object' ) return jQuery(e).text();
-			return this;
+			return i;
 		}).splice(0, expected.length), 
 		expected, 
 		message
@@ -293,6 +309,10 @@ function PowerShell(server) {
 		
 		return this.exec(fnName, $(arguments).splice(1), cmd);
 	};
+
+    this.invokeLambda = function(){
+        return this.invoke.apply(this, arguments);
+    };
 }
 
 var sharepoint = {

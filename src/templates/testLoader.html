@@ -1,17 +1,18 @@
 <html>
     <head>
-        <link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/2.8.2r1/build/reset/reset-min.css">
         <style>
             iframe { width: 99%; height:99%; }
         </style>
-        <script type="text/javascript" src="/static/testLoader/jquery-1.5.js"></script>
-        <script type="text/javascript" src="/static/testLoader/jquery.json-2.2.min.js"></script>
+        <script type="text/javascript" src="/testsrc/loader/jquery-1.5.js"></script>
+        <script type="text/javascript" src="/testsrc/loader/jquery.json-2.2.min.js"></script>
 		
-		<link rel="stylesheet" type="text/css" href="/static/testLoader/qunit.css" media="screen" />
-		<script type="text/javascript" src="/static/testLoader/qunit.js"></script>
+		<link rel="stylesheet" type="text/css" href="/testsrc/loader/qunit.css" media="screen" />
+		<script type="text/javascript" src="/testsrc/loader/qunit.js"></script>
 		
-        <script type="text/javascript" src="/static/testLoader/testLoader.js"></script>
-        <script type="text/javascript" src="{{ jsfile }}"></script>
+        <script type="text/javascript" src="/testsrc/loader/testLoader.js"></script>
+		<script type="text/javascript" src="/testsrc/cases/libraries/sharepoint.js"></script>
+		<script type="text/javascript" src="/testsrc/{{ jspath }}/library.js"></script>
+        <script type="text/javascript" src="/testsrc/{{ jsfile }}"></script>
         
     </head>
 	<body>
