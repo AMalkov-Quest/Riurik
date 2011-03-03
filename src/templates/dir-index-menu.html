@@ -1,4 +1,4 @@
-<ul id="dir-index-menu" class="contextMenu" style="display:none;">
+{% load dir_index_tags %}<ul id="dir-index-menu" class="contextMenu" style="display:none;">
 	<li class="edit"><a href="#edit">Edit</a></li>
 	<li class="delete"><a href="#remove">Delete</a></li>
 	<li class="move"><a href="#move">Move</a></li>
@@ -12,5 +12,5 @@
 <form id='context-action' method='POST'>
 	<input type="hidden" name="path" value="" />
 	<input type="hidden" name="context" value="" />
-	<input type="hidden" name="url" value="{{ directory }}" />
+	<input type="hidden" name="url" value="{{ directory|make_url }}" />
 </form>

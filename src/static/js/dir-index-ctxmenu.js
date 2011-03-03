@@ -27,10 +27,11 @@ $(document).ready(function(){
 	function remove(target, context) {
 		var currentDir = $('#context-action > input[name=url]').val();
 		var fullPath = currentDir + target;
-		
-		$('#context-action').attr('action', '/actions/remove/');
-		$('#context-action > input[name=path]').val(fullPath);
-		$('#context-action').submit();
+		if ( confirm('Do you realy want to delete "'+ target  +'"?') ) {
+			$('#context-action').attr('action', '/actions/remove/');
+			$('#context-action > input[name=path]').val(fullPath);
+			$('#context-action').submit();
+		};
 	}
 	
 	function run(target, context, context_names) {

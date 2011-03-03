@@ -23,6 +23,10 @@ def dir_index_type(path, fsobject):
 	return 'test'
 
 @register.filter
+def make_url(val):
+	return '/'.join(val.split('\\'))
+
+@register.filter
 def above(path):
 	'''
 	parses given path and returns a path that is a parent folder to the given one

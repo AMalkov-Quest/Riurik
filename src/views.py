@@ -221,13 +221,13 @@ def createFolder(request, fullpath):
 @add_fullpath
 def removeObject(request, fullpath):
 	result = tools.remove(fullpath)
-	return HttpResponseRedirect('/' + request.POST["url"].strip('/'))
+	return HttpResponseRedirect('/' + request.POST["url"])
 
 @add_fullpath
 def createSuite(request, fullpath):
 	result = {}
 	result['success'], result['result'] = tools.mksuite(fullpath, request.POST["object-name"])
-	
+	result['result'] += '?editor'
 	response = HttpResponse(mimetype='text/json')
 	response.write(simplejson.dumps(result))
 	
@@ -240,6 +240,7 @@ def editSuite(request):
 def createTest(request, fullpath):
 	result = {}
 	result['success'], result['result'] = tools.mktest(fullpath, request.POST["object-name"])
+	result['result'] += '?editor'
 	
 	response = HttpResponse(mimetype='text/json')
 	response.write(simplejson.dumps(result))
