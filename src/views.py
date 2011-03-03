@@ -261,10 +261,10 @@ def saveDraftTest(request, fullpath):
 	return HttpResponse(simplejson.dumps(result))
 
 def _patch_with_context(data, vars):
-	t = Template("""
+	t = Template("""{% load json_tags %}
 		var context = {
 			{% for option in options %}
-				{{ option.0 }}: '{{ option.1 }}'{% if not forloop.last %},{% endif %}
+				{{ option.0 }}: {{ option.1|json }}{% if not forloop.last %},{% endif %}
 			{% endfor %}
 		};
 	""")
