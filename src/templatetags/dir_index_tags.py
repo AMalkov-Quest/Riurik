@@ -44,6 +44,7 @@ def current(path):
 
 @register.filter
 def breadcrumbs(path):
+	path = path.replace('\\','/')
 	html = '<a href="/">/</a>&nbsp;'
 	if settings.STATIC_TESTS_URL:
 		root = '/' + settings.STATIC_TESTS_URL + '/'
@@ -66,6 +67,7 @@ def breadcrumbs(path):
 
 @register.filter
 def breadcrumbs_file(path):
+	path = path.replace('\\','/')
 	html = '<a href="/">/</a>&nbsp;'
 	lastpath = '/'
 	i = 0
