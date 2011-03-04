@@ -209,6 +209,35 @@ def add_fullpath(fn):
 		return fn(request)
 	return patch
 
+def log_errors(fn):
+	""" Catch errors and write it into logs then raise it up.
+		Normal result returned if no errors.
+
+		>>> def testF(k):
+		...	 	return k
+		>>> def testExc(k):
+		...	 	raise Exception(k)
+		>>> f = log_errors(testF)
+		>>> f(10)
+		10
+
+		>>> f = log_errors(testExc)
+		>>> f(10)
+		Traceback (most recent call last):
+			...
+		Exception: 10
+		
+	"""
+	def log_it(*args, **kwargs):
+		try:
+			result = fn(*args, **kwargs)
+		except Exception, ex:
+			log.error("%s", ex)
+			raise
+		return result
+	return log_it
+	
+
 @add_fullpath
 def createFolder(request, fullpath):
 	result = tools.mkdir(fullpath, request.POST["object-name"])
@@ -261,7 +290,7 @@ def saveDraftTest(request, fullpath):
 		result = { 'success': 'false' }
 	return HttpResponse(simplejson.dumps(result))
 
-def _patch_with_context(data, vars):
+def _patch_with_context(vars):
 	t = Template("""{% load json_tags %}
 		var context = {
 			{% for option in options %}
@@ -273,7 +302,7 @@ def _patch_with_context(data, vars):
 	c['options'] = []
 	for name, value in vars:
 		c['options'] += [ (name, value,), ]
-	return t.render(c) + data
+	return t.render(c)
 
 def submitTest(request):
 	testname = request.POST["path"]
@@ -300,7 +329,11 @@ def runTest(request, fullpath):
 		if localhost:
 			return runLocalTest(request.POST["path"], ctx)
 		else:
-			path = saveRemoteScripts(request.POST["path"], request.POST["content"], request.POST["url"], ctx, request)
+			contextjs = _patch_with_context(ctx.items())
+			log.debug('contextJS: '+ contextjs)
+			contextjs_path = os.path.join(os.path.dirname(request.POST["path"]), 'context.js')
+			saveRemoteScripts(contextjs_path, contextjs, ctx, request)
+			path = saveRemoteScripts(request.POST["path"], request.POST["content"], ctx, request)
 			return runRemoteTest(path, ctx)
 
 def runRemoteTest(path, context):
@@ -317,6 +350,18 @@ def runInnerTest(name, url):
 	jsfile = '/' + name.replace(settings.INNER_TESTS_ROOT, settings.TESTS_URL)
 	log.info("Run INNER test %s (%s)" % (jsfile, repr((name, url))))
 	return _render_to_response('testLoader.html', locals())
+
+@add_fullpath
+def runSuite(request, fullpath):
+	path		= request.REQUEST.get('path', None)
+	suite_name	= request.REQUEST.get('context', None)
+
+	if not suite_name:
+		raise Exception('No suite name supplied')
+	
+
+	return HttpResponseRedirect(url)
+
 
 def useLogin(url, login, password):
 	from ntlm import HTTPNtlmAuthHandler
@@ -350,20 +395,21 @@ def saveTestSatelliteScripts(url, test, request):
 		result = urllib2.urlopen(url, post).read()
 		log.info("... done as %s" % result)
 
-def saveRemoteScripts(path, content, testpath, ctx, request):
-	patched = _patch_with_context(content, ctx.items())
-	data = makeSaveContentPost(patched, path)
+def saveRemoteScripts(path, content, ctx, request):
+	data = makeSaveContentPost(content, path)
 	post = urllib.urlencode(data)
 	login = ctx.get('login')
 	password = ctx.get('password')
 	
 	url = "%s/%s/" % (ctx.get('url'), settings.PRODUCT_TESTS_URL)
 	url = url.replace(ctx.get('host'), context.host(ctx))
-	
+	log.debug((url, login, password))
 	useLogin(url, login, password)
 	saveTestSatelliteScripts(url, path, request)
 	log.info("Save test script %s to %s" % (path, url))
-	return urllib2.urlopen(url, post).read()
+	r = urllib2.urlopen(url, post).read()
+	log.info("Saved test script %s to %s" % (path, url))
+	return r
 
 def recvLogRecords(request):
 	log.warn('This is a warning')

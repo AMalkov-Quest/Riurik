@@ -47,6 +47,14 @@ function createAndEdit(srcObject, url) {
 	$("#create-dir-index-dialog").dialog({
 		title: srcObject.text(),
 		resizable: false,
+		open: function(event, ui) {
+			$('input[type=text]', this).keyup(function(e) {
+					if(e.keyCode == 13) {
+						//$(this).dialog()
+						console.log($(this).dialog( "option", "buttons" ))
+					};
+			});
+		},
 		buttons: {
 			"create": function() {
 				$(this).dialog("close");
