@@ -309,10 +309,19 @@ def submitTest(request):
 	url = request.POST["url"]
 	context = request.POST["context"]
 	content = request.POST.get("content", tools.gettest(testname))
-	
+
 	return _render_to_response( "runtest.html", locals() )
-	
-@add_fullpath	
+
+def submitSuite(request):
+	testname = request.POST["path"]
+	url = request.POST["url"]
+	context = request.POST["context"]
+	content = request.POST.get("content", tools.gettest(testname))
+
+	return _render_to_response( "runtest.html", locals() )
+
+
+@add_fullpath
 def runTest(request, fullpath):
 	result = tools.savetest(request.POST["content"], fullpath)
 	log.debug(request.POST)

@@ -28,16 +28,21 @@ def saveTestContent(path, content, test_root):
 def index(request):
 	if request.method == "POST":
 		try:
-			saveTestContent(request.REQUEST['path'], request.REQUEST['content'], 'cases')
+			saveTestContent(request.REQUEST['path'], request.REQUEST['content'], request.REQUEST['tests_root'])
 		except Exception, e:
 			log.Info(e)
 		
 		#redirect example cases/tests/?path=enterprise-report/web-applications/setup.js
-		redirect = request.path + '?path=/cases/' + request.REQUEST['path']
+		redirect = request.path + '?path=/' + request.REQUEST['tests_root'] + '/' + request.REQUEST['path']
 		response = HttpResponse(mimetype='text/plain')
 		response.write(redirect)
 		
 		return response
 	else:
-		jsfile = request.REQUEST['path']
+		if 'suite' in request.REQUEST:
+			suite = request.REQUEST.get('suite')
+			jspath = suite
+		else:
+			jsfile = request.REQUEST['path']
+			jspath = os.path.dirname(jsfile)
 		return render_to_response('testLoader.html', locals())

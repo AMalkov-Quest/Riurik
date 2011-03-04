@@ -2,9 +2,13 @@
 	<li class="edit"><a href="#edit">Edit</a></li>
 	<li class="delete"><a href="#remove">Delete</a></li>
 	<li class="move"><a href="#move">Move</a></li>
-	<li class="separator disabled"><b><a href="#run#default">Run at:</a></b></li>
+	<li class="separator disabled"><b><a href="#run#default">Run:</a></b></li>
 	{% for item in contexts %}
 	<li class="run context"><nobr><a href="#run#{{item}}" target="{{item}}">{{item}}</a></nobr></li>
+	{% endfor %}
+	<li class="separator disabled"><b><a href="#runsuite#default">Run suite:</a></b></li>
+	{% for item in contexts %}
+	<li class="run runsuite context"><nobr><a href="#runsuite#{{item}}" target="{{item}}">{{item}}</a></nobr></li>
 	{% endfor %}
 	<li class="separator"></li>
 </ul>

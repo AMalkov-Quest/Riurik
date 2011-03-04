@@ -1311,7 +1311,7 @@ QUnit.diff = (function() {
 				};
 			os[o[i]].rows.push(i);
 		}
-		
+		console.log(o,n,ns,os);
 		for (var i in ns) {
 			if (ns[i].rows.length == 1 && typeof(os[i]) != "undefined" && os[i].rows.length == 1) {
 				n[ns[i].rows[0]] = {

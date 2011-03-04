@@ -30,7 +30,18 @@ var frame = {
 		frame.document.write(html);
 		
 		console.log(message);
+	},
+	
+	jQuery: function() {
+		return window.frames[0].window.jQuery;
+	},
+	document: function(){
+		return window.frames[0].document;
+	},
+	window: function(){
+		return window.frames[0].window;
 	}
+
 };
 
 var suite = {
@@ -55,7 +66,7 @@ function jqextend( $ ) {
 		if ( time < timeout ) {
 			setTimeout(f, 100)
 		} else {
-			console.log('timeouted');
+			console.log('wait timeout');
 		}
     })();
     jq.extend( dfd, {
@@ -100,6 +111,7 @@ function jqextend( $ ) {
                     });
                 } else {
                     busy = false;
+					console.log('function call ended, no deferred')
                     console.log('stack is free now')
                 }
             };
@@ -300,19 +312,24 @@ function PowerShell(server) {
 	};
 
     this.invokeLambda = function(){
-        return this.invoke.apply(this, arguments);
+		var t = this; var a = arguments;
+        return function() { return t.invoke.apply(t, a); };
     };
 }
 
-var sharepoint = {
+var contexter = {
 	
 	webAppUrl: function(host, port) {
 		return 'http://' + host + ':' + port;
 	},
 
 	SCUrl: function(host, port, title) {
-		var waUrl = sharepoint.webAppUrl(host, port);
+		var waUrl = contexter.webAppUrl(host, port);
 		return waUrl + '/sites/' + title;
+	},
+	
+	full_url: function(url) {
+		return context.url + url;
 	}
 };
 

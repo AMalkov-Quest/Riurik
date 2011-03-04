@@ -11,8 +11,30 @@
 		
         <script type="text/javascript" src="/testsrc/loader/testLoader.js"></script>
 		<script type="text/javascript" src="/testsrc/cases/libraries/sharepoint.js"></script>
+		<script type="text/javascript" src="/testsrc/{{ jspath }}/context.js"></script>
+		<script type="text/javascript" src="/testsrc/{{ jspath }}/library.js"></script>
+		{% if suite %}
+        <script type="text/javascript">
+            stop();
+            $(document).ready(function(){
+                context.include = context.include || [];
+                for ( i in context.include ) {
+                    var jsfile = context.include[i];
+                    var script = document.createElement( 'script' );
+                    script.type = 'text/javascript';
+                    script.src = '/testsrc{{ jspath }}/'+jsfile;
+                    document.head.appendChild( script );    
+                };
+                var script = document.createElement( 'script' );
+                script.type = 'text/javascript';
+                script.innerHTML = '//start();';
+                document.head.appendChild( script );
+                
+            });
+        </script>          
+        {% else %}
         <script type="text/javascript" src="/testsrc/{{ jsfile }}"></script>
-        
+        {% endif %}
     </head>
 	<body>
 		<h1 id="qunit-header">QUnit example</h1>
