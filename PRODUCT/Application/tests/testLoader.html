@@ -1,14 +1,17 @@
-<html>
+{% load i18n %}<html>
     <head>
         <style>
-            iframe { width: 99%; height:99%; }
+			iframe { width: 99%; height:99%; }
         </style>
         <script type="text/javascript" src="/testsrc/loader/jquery-1.5.js"></script>
         <script type="text/javascript" src="/testsrc/loader/jquery.json-2.2.min.js"></script>
+		<script type="text/javascript" src="/testsrc/loader/jqueryui/js/jquery-ui-1.8.10.custom.min.js"></script>
+		<link rel="stylesheet" type="text/css" href="/testsrc/loader/jqueryui/css/redmond/jquery-ui-1.8.10.custom.css">
 		
 		<link rel="stylesheet" type="text/css" href="/testsrc/loader/qunit.css" media="screen" />
 		<script type="text/javascript" src="/testsrc/loader/qunit.js"></script>
 		
+		<link rel="stylesheet" type="text/css" href="/testsrc/static/testLoader.css" />
         <script type="text/javascript" src="/testsrc/loader/testLoader.js"></script>
 		<script type="text/javascript" src="/testsrc/cases/libraries/sharepoint.js"></script>
 		<script type="text/javascript" src="/testsrc/{{ jspath }}/context.js"></script>
@@ -35,6 +38,7 @@
         {% else %}
         <script type="text/javascript" src="/testsrc/{{ jsfile }}"></script>
         {% endif %}
+		<script type="text/javascript">$(function() { $( "#tabs" ).tabs(); });</script>
     </head>
 	<body>
 		<h1 id="qunit-header">QUnit example</h1>
@@ -46,12 +50,30 @@
 
 		{% if error %}<div id="error">{{error|default:""}}</div>{% endif %}
 		<div id="results"></div>
-		<iframe id="frame" name="frame">
-			<html>
-				<head>
-				</head>
-				<body>
-				</body>
-			</html>
-		</iframe>
+		<div id="tabs">
+			<ul>
+				<li><a href="#tabs-1">{% trans 'Frame' %}</a></li>
+				<li><a href="#tabs-2">{% trans 'Power-Shell console' %}</a></li>
+				<li><a href="#tabs-3">{% trans 'Javascript console' %}</a></li>
+			</ul>
+			<div id="tabs-1">
+				<iframe id="frame" name="frame">
+					<html>
+						<head>
+						</head>
+						<body>
+						</body>
+					</html>
+				</iframe>
+			</div>
+			<div id="tabs-2">
+				<div id="powershell-console">
+				</div>
+			</div>
+			<div id="tabs-3">
+				<div id="javascript-console">
+				</div>
+			</div>
+		</div>
+	</body>
 </html>

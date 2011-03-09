@@ -1,3 +1,42 @@
+if ( typeof console == 'undefined' || typeof console.log == 'undefined' ) {
+	alert('no console.log')
+	var console = { log: function(){} };
+}
+var _CONSOLE = console;
+var _CONSOLE_LOG = console.log;
+var _CONSOLE_LOG_QUEUE = new Array();
+var _CONSOLE_LOG_NEW = function() {
+	var a = new Array();
+	for ( i in arguments ) {
+		a.push(arguments[i]);
+	}
+	var html = a.join(', ') + '<hr/>';
+	if ( typeof _CONSOLE_LOG_QUEUE != 'undefined' ) {
+		try {
+			_CONSOLE_LOG_QUEUE.push(html);
+			//_CONSOLE_LOG.apply(_CONSOLE, ['quueue not undefined']);
+		} catch (ex) {
+			//_CONSOLE_LOG.apply(_CONSOLE, ['queue undefind'])
+			$('#javascript-console').append(html);
+		}
+	} else {
+		//_CONSOLE_LOG.apply(_CONSOLE, ['queue undefind'])
+		$('#javascript-console').append(html);
+	}
+	_CONSOLE_LOG.apply(_CONSOLE, a);
+}
+console.log = _CONSOLE_LOG_NEW;
+$(document).ready(function(){
+	console.log = _CONSOLE_LOG_NEW;
+	//_CONSOLE_LOG.apply(_CONSOLE, _CONSOLE_LOG_QUEUE);
+	for ( i in _CONSOLE_LOG_QUEUE ) {
+		var html  = _CONSOLE_LOG_QUEUE[i];
+		$('#javascript-console').append(html);
+	}
+	_CONSOLE_LOG_QUEUE = null;
+	//_CONSOLE_LOG.apply(_CONSOLE, ['queue loaded'])
+});
+
 var frame = {
 	
 	go: function(url) {
@@ -23,12 +62,9 @@ var frame = {
 	},
 	
 	println: function(message) {
-		var frame = window.frames[0];
 		var regexp = new RegExp('\\n', 'gi');
-		
-		html = message.replace(regexp, '<br>');
-		frame.document.write(html);
-		
+		var html = message.replace(regexp, '<br>')+'<hr/>';
+		$('#powershell-console').append(html);
 		console.log(message);
 	},
 	
