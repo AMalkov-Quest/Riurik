@@ -40,7 +40,7 @@
 	<div class="content">
 		<div style="float:right;">
 			{% block controls %}
-			<form id="run-suite" method="POST" action="/actions/suite/submit/">
+			<form id="run-suite" method="POST" action="/actions/suite/submit/" target="{{ directory }}">
 			<input type="hidden" name="path" value="{{ directory }}">
 			<input type="hidden" name="url" value="{{ directory }}">
 			<ul class="horizontal-menu">
