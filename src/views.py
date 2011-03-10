@@ -292,13 +292,19 @@ def saveDraftTest(request, fullpath):
 
 def _patch_context_adv(ctx):
 	vars = ctx.items()
-	if not 'include' in vars:
-		vars['include'] = []
+	hasInclude = False
+	for i,v in vars:
+		if i == 'include':
+			hasInclude = True
+			break
+	if not hasInclude:
+		include = []
 		for root, dirs, files in os.walk(ctx.get_folder()):
 			for file in files:
 				file_abspath = os.path.join(root, file)
 				file_relpath = file_abspath.replace(ctx.get_folder(), '').lstrip('/')
-				vars['include'] += [ file_relpath ]
+				include += [ file_relpath ]
+		vars = tuple(list(vars) + [ ('include', include) ])
 
 	return _patch_with_context(vars)
 
