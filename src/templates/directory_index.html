@@ -40,11 +40,28 @@
 	<div class="content">
 		<div style="float:right;">
 			{% block controls %}
+			<form id="run-suite" method="POST" action="/actions/suite/submit/">
+			<input type="hidden" name="path" value="{{ directory }}">
+			<input type="hidden" name="url" value="{{ directory }}">
 			<ul class="horizontal-menu">
-				<li><a id="new-folder" href="javascript:void(0);" onClick="javascript:createFolder('{{ directory }}')">Create Folder</a></li>
-				<li><a id="new-suite" href="javascript:void(0);" onClick="javascript:createSuite();">Create Suite</a></li>
-				<li><a id="new-test" href="javascript:void(0);" onClick="javascript:createTest();">Create Test</a></li>
+				{% with directory|dir_index_type:'' as type %}
+					{% ifequal type 'suite' %}
+						<li>
+							<a id="run-suite-btn" href="javascript:void(0);" onClick="javascript:$('#run-suite').submit();">Run Suite</a>
+							<select id="context" name="context">
+								{% for item in contexts %}
+									<option value="{{ item }}">{{ item }}</option>
+								{% endfor %}
+							</select>
+						</li>
+					{% else %}
+						<li><a id="new-folder" href="javascript:void(0);" onClick="javascript:createFolder('{{ directory }}')">Create Folder</a></li>
+						<li><a id="new-suite" href="javascript:void(0);" onClick="javascript:createSuite();">Create Suite</a></li>
+					{% endifequal %}
+					<li><a id="new-test" href="javascript:void(0);" onClick="javascript:createTest();">Create Test</a></li>
+				{% endwith %}
 			</ul>
+			</form>
 			{% endblock controls %}
 		</div>
 		{% block title %}

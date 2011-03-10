@@ -1,0 +1,28 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+{% load dir_index_tags %}
+<head>
+	<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+    <meta http-equiv="Content-Language" content="en-us" />
+    <meta name="robots" content="NONE,NOARCHIVE" />
+    
+    <script type="text/javascript" src="/static/jquery-ui/js/jquery-1.4.4.min.js"></script>
+    
+    <title>{{ suite|current }}</title>
+</head>
+<body>
+	<script type="text/javascript">
+		$(document).ready(function(){
+			$('#run-suite').submit();
+		});	
+	</script>
+	<form id='run-suite' action="/actions/suite/run/" method='POST'>
+		<input type="hidden" name="path" value="{{ suite }}" />
+		<input type="hidden" name="url" value="{{ url }}" />
+		<input type="hidden" name="context" value="{{ context }}" />
+	</form>
+	
+	<div style="position:absolute; top:50%; left:50%;">
+		<img src="/static/img/ajax-loader.gif">
+	</div>
+</body>

@@ -313,12 +313,31 @@ def submitTest(request):
 	return _render_to_response( "runtest.html", locals() )
 
 def submitSuite(request):
-	testname = request.POST["path"]
+	suite = request.POST["path"]
 	url = request.POST["url"]
 	context = request.POST["context"]
-	content = request.POST.get("content", tools.gettest(testname))
 
-	return _render_to_response( "runtest.html", locals() )
+	return _render_to_response( "runsuite.html", locals() )
+
+@add_fullpath
+def runSuite(request, fullpath):
+	path = request.POST["path"]
+	url = request.POST["url"]
+	context_name = request.POST["context"]
+
+	ctx = context.get(fullpath, section=context_name)
+	host = ctx.get( option='host' )
+	localhost = ctx.get( option='localhost' )
+
+	context_url = ctx.get( option='url' )
+
+	remote_url = "%s/tests/?suite=/%s" % ( context_url, path  )
+
+	contextjs = _patch_with_context(ctx.items())
+	contextjs_path = os.path.join(path, 'context.js')
+	saveRemoteScripts(contextjs_path, contextjs, ctx, request)
+
+	return HttpResponseRedirect( remote_url )
 
 
 @add_fullpath
@@ -359,18 +378,6 @@ def runInnerTest(name, url):
 	jsfile = '/' + name.replace(settings.INNER_TESTS_ROOT, settings.TESTS_URL)
 	log.info("Run INNER test %s (%s)" % (jsfile, repr((name, url))))
 	return _render_to_response('testLoader.html', locals())
-
-@add_fullpath
-def runSuite(request, fullpath):
-	path		= request.REQUEST.get('path', None)
-	suite_name	= request.REQUEST.get('context', None)
-
-	if not suite_name:
-		raise Exception('No suite name supplied')
-	
-
-	return HttpResponseRedirect(url)
-
 
 def useLogin(url, login, password):
 	from ntlm import HTTPNtlmAuthHandler
