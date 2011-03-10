@@ -331,7 +331,7 @@ def runSuite(request, fullpath):
 
 	context_url = ctx.get( option='url' )
 
-	remote_url = "%s/tests/?suite=/%s" % ( context_url, path  )
+	remote_url = "%s/tests/?suite=/cases/%s" % ( context_url, path  )
 
 	contextjs = _patch_with_context(ctx.items())
 	contextjs_path = os.path.join(path, 'context.js')
