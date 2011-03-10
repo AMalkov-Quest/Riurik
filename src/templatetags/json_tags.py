@@ -15,4 +15,4 @@ def json(input):
 		return mark_safe("%s" % input)
 	except Exception, ex:
 		pass
-	return mark_safe("'%s'" % input)
+	return mark_safe("\"%s\"" % input)
