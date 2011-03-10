@@ -301,7 +301,7 @@ def _patch_context_adv(ctx):
 		include = []
 		for root, dirs, files in os.walk(ctx.get_folder()):
 			for file in files:
-				if re.match('^.*\.js$', ):
+				if re.match('^.*\.js$', file):
 					file_abspath = os.path.abspath(os.path.join(root, file))
 					file_relpath = file_abspath.replace(os.path.abspath(ctx.get_folder()), '').lstrip('/')
 					include += [ file_relpath ]
