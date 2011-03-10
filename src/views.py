@@ -290,7 +290,7 @@ def saveDraftTest(request, fullpath):
 		result = { 'success': 'false' }
 	return HttpResponse(simplejson.dumps(result))
 
-def _path_context_adv(ctx):
+def _patch_context_adv(ctx):
 	vars = ctx.items()
 	if not 'include' in vars:
 		vars['include'] = []
