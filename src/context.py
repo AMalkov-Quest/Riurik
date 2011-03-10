@@ -33,3 +33,6 @@ class context():
 	
 	def sections(self):
 		return config.sections(self.inifile)
+	
+	def get_folder(self):
+		return os.path.dirname(self.inifile)

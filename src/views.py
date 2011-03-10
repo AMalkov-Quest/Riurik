@@ -290,6 +290,18 @@ def saveDraftTest(request, fullpath):
 		result = { 'success': 'false' }
 	return HttpResponse(simplejson.dumps(result))
 
+def _path_context_adv(ctx):
+	vars = ctx.items()
+	if not 'include' in vars:
+		vars['include'] = []
+		for root, dirs, files in os.walk(ctx.get_folder()):
+			for file in files:
+				file_abspath = os.path.join(root, file)
+				file_relpath = file_abspath.replace(ctx.get_folder(), '').lstrip('/')
+				vars['include'] += [ file_relpath ]
+
+	return _patch_with_context(vars)
+
 def _patch_with_context(vars):
 	t = Template("""{% load json_tags %}
 		var context = {
@@ -335,7 +347,7 @@ def runSuite(request, fullpath):
 	remote_url = urllib.unquote(remote_url).replace('\\','/')
 
 
-	contextjs = _patch_with_context(ctx.items())
+	contextjs = _patch_context_adv(ctx)
 	contextjs_path = os.path.join(path, 'context.js')
 	saveRemoteScripts(contextjs_path, contextjs, ctx, request)
 
@@ -359,7 +371,7 @@ def runTest(request, fullpath):
 		if localhost:
 			return runLocalTest(request.POST["path"], ctx)
 		else:
-			contextjs = _patch_with_context(ctx.items())
+			contextjs = _patch_context_adv(ctx)
 			log.debug('contextJS: '+ contextjs)
 			contextjs_path = os.path.join(os.path.dirname(request.POST["path"]), 'context.js')
 			saveRemoteScripts(contextjs_path, contextjs, ctx, request)
