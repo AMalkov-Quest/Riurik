@@ -19,7 +19,6 @@ import os
 import posixpath
 import re, datetime
 import stat
-import urllib
 from email.Utils import parsedate_tz, mktime_tz
 from contrib import *
 import urllib, urllib2
@@ -332,6 +331,8 @@ def runSuite(request, fullpath):
 	context_url = ctx.get( option='url' )
 
 	remote_url = "%s/tests/?suite=/cases/%s" % ( context_url, path  )
+	remote_url = urllib.unquote(remote_url)
+
 
 	contextjs = _patch_with_context(ctx.items())
 	contextjs_path = os.path.join(path, 'context.js')
