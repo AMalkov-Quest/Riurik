@@ -305,7 +305,7 @@ def _patch_context_adv(ctx):
 					file_abspath = os.path.abspath(os.path.join(root, file))
 					file_relpath = file_abspath.replace(os.path.abspath(ctx.get_folder()), '').lstrip('/').lstrip('\\')
 					include += [ str(file_relpath) ]
-		vars = tuple(list(vars) + [ ('include', include) ])
+		vars = tuple(list(vars) + [ ('include', str(include).replace('\'','\"')) ])
 
 	return _patch_with_context(vars)
 
