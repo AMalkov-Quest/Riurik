@@ -277,6 +277,7 @@ def createTest(request, fullpath):
 	
 @add_fullpath
 def saveTest(request, fullpath):
+	stubFile(request)
 	result = tools.savetest(request.POST["content"], fullpath)
 	return HttpResponseRedirect(request.POST["url"]+'?editor')
 
@@ -401,7 +402,7 @@ def saveTestSatelliteScripts(url, test, request):
 	saves all documents opened in the same browser(in other tabs)
 	as a test that is about to run 
 	'''
-	scripts = getOpenedFiles(request)
+	scripts = getOpenedFiles(request, clean=True)
 	if scripts.count(test) > 0: scripts.remove(test)
 	for path in scripts:
 		fullpath = get_fullpath(path)
@@ -466,7 +467,7 @@ def stubFile(request):
 	stub(request.GET['path'], request)
 	return HttpResponse('')
 
-def getOpenedFiles(request):
+def getOpenedFiles(request, clean=False):
 	'''
 	returns all scripts those are currently opened in a browser
 	'''
@@ -478,6 +479,10 @@ def getOpenedFiles(request):
 	for i,v in request.session.items():
 		if i != 'stub_key' and str(v) == key:
 			files += [ i ]
+			try:
+				del request.session[i]
+			except:
+				pass
 	return files
 
 
