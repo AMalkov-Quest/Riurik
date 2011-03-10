@@ -277,7 +277,7 @@ def createTest(request, fullpath):
 	
 @add_fullpath
 def saveTest(request, fullpath):
-	stubFile(request)
+	stub(request.POST["url"].lstrip('/'), request)
 	result = tools.savetest(request.POST["content"], fullpath)
 	return HttpResponseRedirect(request.POST["url"]+'?editor')
 
