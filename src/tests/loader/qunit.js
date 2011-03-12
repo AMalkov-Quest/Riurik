@@ -49,15 +49,18 @@ Test.prototype = {
 			if ( config.previousModule ) {
 				QUnit.moduleDone( {
 					name: config.previousModule,
+					testEnvironment: config.previousModuleTestEnvironment,
 					failed: config.moduleStats.bad,
 					passed: config.moduleStats.all - config.moduleStats.bad,
 					total: config.moduleStats.all
 				} );
 			}
 			config.previousModule = this.module;
+			config.previousModuleTestEnvironment = this.moduleTestEnvironment;
 			config.moduleStats = { all: 0, bad: 0 };
 			QUnit.moduleStart( {
-				name: this.module
+				name: this.module,
+				testEnvironment: this.moduleTestEnvironment
 			} );
 		}
 
@@ -705,6 +708,7 @@ function done() {
 	if ( config.currentModule ) {
 		QUnit.moduleDone( {
 			name: config.currentModule,
+			testEnvironment: config.previousModuleTestEnvironment,
 			failed: config.moduleStats.bad,
 			passed: config.moduleStats.all - config.moduleStats.bad,
 			total: config.moduleStats.all
