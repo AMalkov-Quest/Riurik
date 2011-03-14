@@ -13,8 +13,9 @@
 	<script type="text/javascript" src="/static/js/jquery.cookie.js"></script>
         <script type="text/javascript">
    	  $(document).ready(function() {
-	  try { var last_context = $.cookie('last_context');
-          if ( typeof last_context == 'string' ) 
+	  try {
+		  var last_context = $.cookie('last_context');
+		  if ( typeof last_context == 'string' ) 
           	$('select[name=context]').val(last_context);
 	  } catch (e) { console.log(e); }
           var source_value = draft_value = $('#code').val();
@@ -54,7 +55,9 @@
             $('#close').click(function(){ if ( ConfirmDiscardchanges() ) document.location='{{ request.path|above }}';});
             $('#run').click(function(){ 
 			var context = $('select[name=context]').val();
-			try { $.cookie('last_context', context); } catch (e) { console.log(e); }
+			try {
+				$.cookie('last_context', context);
+			} catch (e) { console.log(e); }
 			$('#apply-test input[name=context]')
 				.val(context); 
 			$('#apply-test')
@@ -64,8 +67,10 @@
 	   });
             $('#save').click(function(){ 
 		var context = $('select[name=context]').val();
-		try { $.cookie('last_context', context); } catch (e) { console.log(e); }
-        	$('#apply-test').attr('action', '/actions/test/save/').removeAttr('target');
+		try {
+			$.cookie('last_context', context);
+		} catch (e) { console.log(e); }
+        $('#apply-test').attr('action', '/actions/test/save/').removeAttr('target');
 		$('#apply-test').submit(); 
 	    });
             var ticks = 0;

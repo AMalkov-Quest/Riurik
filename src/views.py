@@ -375,7 +375,7 @@ def runTest(request, fullpath):
 	localhost = ctx.get( option='localhost' )
 	
 	if host == 'localhost':
-		return runInnerTest(request.POST["path"], request.POST["url"])
+		return runInnerTest(request.POST["path"], request.POST["url"], ctx)
 	else:
 		if localhost:
 			return runLocalTest(request.POST["path"], ctx)
@@ -397,9 +397,16 @@ def runLocalTest(path, context):
 	log.info("Run LOCAL test %s" % jsfile)
 	return _render_to_response('testLoader.html', locals())
 
-def runInnerTest(name, url):
+def runInnerTest(name, url, ctx):
+	contextjs = _patch_context_adv(ctx)
+	log.debug('contextJS: '+ contextjs)
+	contextjs_path = os.path.join(os.path.dirname(name), 'context.js')
+	contextjs_fullpath = get_fullpath(contextjs_path)
+	log.debug('contextjs_path: '+ contextjs_fullpath)
+	result = tools.savetest(contextjs, contextjs_fullpath)
 	jsfile = '/' + name.replace(settings.INNER_TESTS_ROOT, settings.TESTS_URL)
-	log.info("Run INNER test %s (%s)" % (jsfile, repr((name, url))))
+	jspath, file_name = os.path.split(jsfile)
+	log.info("Run INNER test %s %s (%s)" % (jspath, jsfile, repr((name, url))))
 	return _render_to_response('testLoader.html', locals())
 
 def useLogin(url, login, password):
@@ -451,8 +458,6 @@ def saveRemoteScripts(path, content, ctx, request):
 	return r
 
 def recvLogRecords(request):
-	log.warn('This is a warning')
-	
 	from logbook.queues import ZeroMQSubscriber
 	subscriber = ZeroMQSubscriber('tcp://127.0.0.1:5000')
 	records = subscriber.recv()
@@ -466,7 +471,6 @@ def is_stubbed(path, request):
 	session_key = request.session.get('stub_key') or None
 	print 'IS_STUBBED:', path, session_key, cache.get(path)
 	return cache.get(path) != None and cache.get(path) != session_key
-	#return False
 	
 
 def stub(path, request):

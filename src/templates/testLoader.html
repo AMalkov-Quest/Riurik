@@ -1,9 +1,10 @@
 {% load i18n %}<html>
     <head>
+		<title>{{ title }}</title>
         <style>
-			iframe { width: 99%; height:99%; }
+			iframe { width: 99%; height:700px; }
         </style>
-        <script type="text/javascript" src="/testsrc/loader/jquery-1.5.js"></script>
+        <script type="text/javascript" src="/testsrc/loader/jquery-1.5.1.js"></script>
         <script type="text/javascript" src="/testsrc/loader/jquery.json-2.2.min.js"></script>
 		<script type="text/javascript" src="/testsrc/loader/jqueryui/js/jquery-ui-1.8.10.custom.min.js"></script>
 		<link rel="stylesheet" type="text/css" href="/testsrc/loader/jqueryui/css/redmond/jquery-ui-1.8.10.custom.css">
@@ -11,7 +12,7 @@
 		<link rel="stylesheet" type="text/css" href="/testsrc/loader/qunit.css" media="screen" />
 		<script type="text/javascript" src="/testsrc/loader/qunit.js"></script>
 		
-		<link rel="stylesheet" type="text/css" href="/testsrc/static/testLoader.css" />
+		<link rel="stylesheet" type="text/css" href="/testsrc/loader/testLoader.css" />
         <script type="text/javascript" src="/testsrc/loader/testLoader.js"></script>
 		<script type="text/javascript" src="/testsrc/cases/libraries/sharepoint.js"></script>
 		<script type="text/javascript" src="/testsrc/{{ jspath }}/context.js"></script>
@@ -20,18 +21,22 @@
         <script type="text/javascript">
             stop();
             $(document).ready(function(){
+				if ( typeof context == 'undefined' ) {
+					context = { include: [] };
+					alert('No context loaded');
+				}
                 context.include = context.include || [];
                 for ( i in context.include ) {
                     var jsfile = context.include[i];
                     var script = document.createElement( 'script' );
                     script.type = 'text/javascript';
                     script.src = '/testsrc{{ jspath }}/'+jsfile;
-                    document.head.appendChild( script );    
+                    document.body.appendChild( script );    
                 };
                 var script = document.createElement( 'script' );
                 script.type = 'text/javascript';
                 script.innerHTML = '//start();';
-                document.head.appendChild( script );
+                document.body.appendChild( script );
                 
             });
         </script>          
@@ -53,7 +58,7 @@
 		<div id="tabs">
 			<ul>
 				<li><a href="#tabs-1">{% trans 'Frame' %}</a></li>
-				<li><a href="#tabs-2">{% trans 'Power-Shell console' %}</a></li>
+				<li><a href="#tabs-2">{% trans 'PowerShell console' %}</a></li>
 				<li><a href="#tabs-3">{% trans 'Javascript console' %}</a></li>
 			</ul>
 			<div id="tabs-1">
