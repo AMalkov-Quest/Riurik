@@ -464,14 +464,22 @@ def recvLogRecords(request):
 	
 	response = HttpResponse(mimetype='text/plain')
 	response.write(records)
-	
+
 	return response
 
 def is_stubbed(path, request):
 	session_key = request.session.get('stub_key') or None
-	print 'IS_STUBBED:', path, session_key, cache.get(path)
-	return cache.get(path) != None and cache.get(path) != session_key
-	
+	cache_value = cache.get(path)
+	if cache_value:
+		try:
+			cache_session_key = cache_value[0]
+			cache_request_control = cache_value[1]
+		except:
+			cache_session_key = None
+			cache_request_control = False
+
+		return cache_session_key != session_key
+	return False
 
 def stub(path, request):
 	if 'stub_key' in request.session:
@@ -479,17 +487,41 @@ def stub(path, request):
 	else:
 		request.session['stub_key'] = session_key = datetime.datetime.now()
 
-	print 'STUB:', path, session_key
-	if cache.get(path) == session_key:
+	cache_value = cache.get(path)
+	try:
+		cache_session_key = cache_value[0]
+		cache_request_control = cache_value[1]
+	except:
+		cache_session_key = None
+		cache_request_control = False
+
+	if cache_session_key == session_key:
 		request.session[path] = session_key
-		cache.set(path, session_key, 60)
-		return
-	if cache.add(path, session_key, 60):
+		cache.set(path, (session_key, cache_request_control) , 60)
+		return cache_request_control
+	if cache.add(path, (session_key, cache_request_control), 60):
 		request.session[path] = session_key
-	return
+	return cache_request_control
 
 def stubFile(request):
-	stub(request.GET['path'], request)
+	request_control = stub(request.GET['path'], request)
+	return HttpResponse(str(request_control))
+
+def getControl(request):
+	path = request.GET['path']
+	cache_value = cache.get(path)
+	session_key = request.session.get('stub_key') or None
+	if cache_value:
+		try:
+			cache_session_key = cache_value[0]
+			cache_request_control = cache_value[1]
+		except:
+			cache_session_key = None
+			cache_request_control = False
+		if cache_session_key != session_key:
+			cache.set(path, (cache_session_key, True), 30)
+		if 'cancel' in request.GET:
+			cache.set(path, (cache_session_key, False), 60)
 	return HttpResponse('')
 
 def getOpenedFiles(request, clean=False):
