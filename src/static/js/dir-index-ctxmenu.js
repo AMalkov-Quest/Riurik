@@ -1,4 +1,15 @@
-$(document).ready(function(){
+var dirIndexActions = {
+	
+	remove: function(target) {
+		var currentDir = $('#context-action > input[name=url]').val();
+		var fullPath = currentDir + target;
+		$('#context-action').attr('action', '/actions/remove/');
+		$('#context-action > input[name=path]').val(fullPath);
+		$('#context-action').submit();
+	}
+}
+
+$(document).ready(function() {
 	
 	$('#dir-index-menu').disableContextMenuItems('move');
 	
@@ -8,10 +19,10 @@ $(document).ready(function(){
             function(action, el, pos) {
                 var args = action.split('#');
                 action = args.shift();
-		args = ', [' + args.map(function(i){return '"'+i+'"';}).toString() + ']';
-        	var parmas = '("' + $(el).find('a').text() + '", "' + $(el).attr('class') + '"'+ args +')';
-		console.log(arguments, action + parmas)
-    		eval(action + parmas);
+                args = ', [' + args.map(function(i){return '"'+i+'"';}).toString() + ']';
+                var parmas = '("' + $(el).find('a').text() + '", "' + $(el).attr('class') + '"'+ args +')';
+                console.log(arguments, action + parmas)
+                eval(action + parmas);
             }
 	);
 	
@@ -25,12 +36,8 @@ $(document).ready(function(){
 	};
 	
 	function remove(target, context) {
-		var currentDir = $('#context-action > input[name=url]').val();
-		var fullPath = currentDir + target;
 		if ( confirm('Do you realy want to delete "'+ target  +'"?') ) {
-			$('#context-action').attr('action', '/actions/remove/');
-			$('#context-action > input[name=path]').val(fullPath);
-			$('#context-action').submit();
+			dirIndexActions.remove(target);
 		};
 	};
 	

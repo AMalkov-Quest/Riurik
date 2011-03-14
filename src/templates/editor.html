@@ -58,7 +58,9 @@
     
 		  $('#run').click(function(){ 
 			var context = $('select[name=context]').val();
-			try { $.cookie('last_context', context); } catch (e) { console.log(e); }
+			try {
+				$.cookie('last_context', context);
+			} catch (e) { console.log(e); }
 			$('#apply-test input[name=context]')
 				.val(context); 
 			$('#apply-test')

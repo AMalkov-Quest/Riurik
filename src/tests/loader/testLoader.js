@@ -1,3 +1,43 @@
+if ( typeof console == 'undefined' || typeof console.log == 'undefined' ) {
+	//alert('no console.log')
+	var console = { log: function(){} };
+}
+//TEMPORARY NOT USED cause have bugs in FF
+/*var _CONSOLE = console;
+var _CONSOLE_LOG = console.log;
+var _CONSOLE_LOG_QUEUE = new Array();
+var _CONSOLE_LOG_NEW = function() {
+	var a = new Array();
+	for ( i in arguments ) {
+		a.push(arguments[i]);
+	}
+	var html = (new Date()).toString()+':<br/>'+ a.join(', ') + '<hr/>';
+	if ( typeof _CONSOLE_LOG_QUEUE != 'undefined' ) {
+		try {
+			_CONSOLE_LOG_QUEUE.push(html);
+			//_CONSOLE_LOG.apply(_CONSOLE, ['quueue not undefined']);
+		} catch (ex) {
+			//_CONSOLE_LOG.apply(_CONSOLE, ['queue undefind'])
+			$('#javascript-console').prepend(html);
+		}
+	} else {
+		//_CONSOLE_LOG.apply(_CONSOLE, ['queue undefind'])
+		$('#javascript-console').prepend(html);
+	}
+	_CONSOLE_LOG.apply(_CONSOLE, a);
+}
+console.log = _CONSOLE_LOG_NEW;
+$(document).ready(function(){
+	console.log = _CONSOLE_LOG_NEW;
+	//_CONSOLE_LOG.apply(_CONSOLE, _CONSOLE_LOG_QUEUE);
+	for ( i in _CONSOLE_LOG_QUEUE ) {
+		var html  = _CONSOLE_LOG_QUEUE[i];
+		$('#javascript-console').append(html);
+	}
+	_CONSOLE_LOG_QUEUE = null;
+	//_CONSOLE_LOG.apply(_CONSOLE, ['queue loaded'])
+});
+*/
 var frame = {
 	
 	go: function(url) {
@@ -23,12 +63,10 @@ var frame = {
 	},
 	
 	println: function(message) {
-		var frame = window.frames[0];
 		var regexp = new RegExp('\\n', 'gi');
-		
-		html = message.replace(regexp, '<br>');
-		frame.document.write(html);
-		
+		//var html = (new Date()).toString()+':<br/>'+ message.replace(regexp, '<br>')+'<hr/>';
+		var html = message.replace(regexp, '<br>')+'<hr/>';
+		$('#powershell-console').prepend(html);
 		console.log(message);
 	},
 	
@@ -52,9 +90,9 @@ var suite = {
 }
 
 function jqextend( $ ) {
-  var jq = $;	
+  
   $.wait = function( lambda, timeout ){
-    var dfd = jq.Deferred();
+    var dfd = new $.Deferred();
     var timeout = timeout || 10 * 1000; // 10 sec by default
     var time = 0;
     (function f(){
@@ -67,14 +105,49 @@ function jqextend( $ ) {
 			setTimeout(f, 100)
 		} else {
 			console.log('wait timeout');
+			return dfd.resolve();
 		}
     })();
-    jq.extend( dfd, {
-		wait: jq.wait 
+    
+	$.extend( dfd, {
+		wait: $.wait 
     });
 	
     return dfd.promise(dfd);
   };
+  
+  $.wait_event = function( target, event_name, timeout ){
+    var dfd = new $.Deferred();
+    var timeout = timeout || 10 * 1000; // 10 sec by default
+    var time = 0;
+	var resolved = false;
+    
+	target.bind(event_name, function() {
+		console.log('resolve the ' + event_name + ' event wait')
+		resolved = true;
+		return dfd.resolve();
+	});
+	
+	(function f(){
+		if ( resolved ) {
+			return;
+		}
+		time += 100;
+		if ( time < timeout ) {
+			setTimeout(f, 100)
+		} else {
+			console.log('the ' + event_name + ' event wait timeout');
+			return dfd.resolve();
+		}
+    })();
+	
+	$.extend( dfd, {
+		wait_event: $.wait_event 
+    });
+	
+    return dfd.promise(dfd);
+  };
+  
   $.seq = function() {
     // Execute a sequense of functions supplied by arguments and wait until them are not finished.
     // One function executes at time;
@@ -141,9 +214,9 @@ function jqextend( $ ) {
 jQuery.extend(QUnit, {
   rowEqual: function(actual, expected, message) {
     QUnit.rowPush(
-		actual.map(function(i, e) {
+		jQuery.map(actual, function(e, i) {
 			if ( typeof e == 'object' ) return jQuery(e).text();
-			return i;
+			return e;
 		}).splice(0, expected.length), 
 		expected, 
 		message
@@ -281,10 +354,9 @@ function PowerShell(server) {
 		var pattert = '\\/\\*([\\S\\s]*?)\\*\\/';
 		var matchAll = new RegExp(pattert, 'img');
 		var matchOne = new RegExp(pattert, 'im');
-
-		return (fragment.toString().match(matchAll) || []).map(function(scriptTag) {
-			return (scriptTag.match(matchOne) || ['', ''])[1];
-		});
+		
+		result = fragment.toString().match(matchOne) || ['',''];
+		return [ result[1] ];
 	};
 	
 	this.invoke = function(func) {
@@ -331,6 +403,32 @@ var contexter = {
 	full_url: function(url) {
 		return context.url + url;
 	}
+};
+
+var riurik = {
+
+	sleep: function(msec) {
+		var dfd = new $.Deferred();
+		setTimeout( function() {
+			dfd.resolve(dfd);
+		}, msec);
+		
+		return dfd.promise(dfd);
+	}
+}
+
+QUnit.moduleStart = function(module) {
+	console.log('the ', module.name, ' module is started');
+	/*if( module.testEnvironment.module_setup != "undefined" ) {
+		module.testEnvironment.module_setup.call(module.testEnvironment);
+	}*/
+};
+  
+QUnit.moduleDone = function(module) {
+	console.log('the ', module.name, ' module is done');
+	/*if( module.testEnvironment.module_teardown != "undefined" ) {
+		module.testEnvironment.module_teardown.call(module.testEnvironment);
+	}*/
 };
 
 jqextend($);

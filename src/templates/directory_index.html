@@ -75,8 +75,8 @@
 	        	<ul>
 	        		<li></li>
 	        		{% for f in dir_list %}
-	        		<li class="{{ directory|dir_index_type:f }}" title="{{ f|strip:'/' }}">
-						<a id="{{ f|strip:'/' }}" href="{{ f }}">{{ f|strip:'/' }}</a>
+	        		<li id="{{ f|strip:'/' }}" class="{{ directory|dir_index_type:f }}" title="{{ f|strip:'/' }}">
+						<a href="{{ f }}">{{ f|strip:'/' }}</a>
 	    			</li>
 	    			{% endfor %}
 
