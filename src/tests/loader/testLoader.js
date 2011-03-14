@@ -423,6 +423,8 @@ var riurik = {
 	}
 }
 
+QUnit.config.reorder = false;
+
 QUnit.moduleStart = function(module) {
 	console.log('the "' + module.name + '" module is started');
 }
