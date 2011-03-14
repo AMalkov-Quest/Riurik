@@ -213,14 +213,16 @@ function jqextend( $ ) {
 
 jQuery.extend(QUnit, {
   rowEqual: function(actual, expected, message) {
-    QUnit.rowPush(
-		jQuery.map(actual, function(e, i) {
+    console.log('actual: ', actual);
+	if( actual )  {
+		var actual = jQuery.map(actual, function(e, i) {
 			if ( typeof e == 'object' ) return jQuery(e).text();
 			return e;
-		}).splice(0, expected.length), 
-		expected, 
-		message
-	);
+		}).splice(0, expected.length)
+	}else{
+		var actual = [];
+	}	
+	QUnit.rowPush(actual, expected, message);
   },
   rowPush: function(actual, expected, message) {
     // 
@@ -414,21 +416,27 @@ var riurik = {
 		}, msec);
 		
 		return dfd.promise(dfd);
+	},
+	
+	strip: function(s, c) {
+		return s.replace(new RegExp('^' + c + '+'), '').replace(new RegExp(c + '+$'), '');
 	}
 }
 
 QUnit.moduleStart = function(module) {
-	console.log('the ', module.name, ' module is started');
-	/*if( module.testEnvironment.module_setup != "undefined" ) {
-		module.testEnvironment.module_setup.call(module.testEnvironment);
-	}*/
-};
-  
+	console.log('the "' + module.name + '" module is started');
+}
+
 QUnit.moduleDone = function(module) {
-	console.log('the ', module.name, ' module is done');
-	/*if( module.testEnvironment.module_teardown != "undefined" ) {
-		module.testEnvironment.module_teardown.call(module.testEnvironment);
-	}*/
-};
+	console.log('the "' + module.name + '" module is done');
+}
+
+QUnit.testStart = function(test) {
+	console.log('the "' + test.name + '" test is started');
+}
+
+QUnit.testDone = function(test) {
+	console.log('the "' + test.name + '" test is done');
+}
 
 jqextend($);

@@ -86,9 +86,13 @@ Test.prototype = {
 				saveGlobal();
 			}
 			
-			if ( !this.moduleTestEnvironment.moduleSetupDone ) {
-				this.moduleTestEnvironment.moduleSetupDone = true;
-				this.moduleTestEnvironment.module_setup.call(this.testEnvironment);
+			if ( !this.moduleTestEnvironment  || !this.moduleTestEnvironment.moduleSetupDone ) {
+				
+				this.moduleTestEnvironment = extend({
+					moduleSetupDone: true
+				}, this.moduleTestEnvironment);
+				
+				this.testEnvironment.module_setup.call(this.testEnvironment);
 			}
 
 			this.testEnvironment.setup.call(this.testEnvironment);
@@ -124,7 +128,7 @@ Test.prototype = {
 			checkPollution();
 			
 			if ( config.queue.length == 1 ) {
-				this.moduleTestEnvironment.module_teardown.call(this.testEnvironment);
+				this.testEnvironment.module_teardown.call(this.testEnvironment);
 			}
 			
 			this.testEnvironment.teardown.call(this.testEnvironment);
