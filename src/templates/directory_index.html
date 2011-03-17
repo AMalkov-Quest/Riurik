@@ -4,6 +4,13 @@
 {% load dir_index_tags %}
 
 <head>
+	<script type="text/javascript">
+		// Define a cross-browser window.console.log method.
+		// For IE and FF without Firebug, fallback to using an alert.
+		if (!window.console) {
+			window.console = { log: function() {  } };
+		}
+	</script>
     <link rel="stylesheet" type="text/css" href="/static/jquery-ui/css/start/jquery-ui-1.8.9.custom.css" />
 	<script type="text/javascript" src="/static/jquery-ui/js/jquery-1.4.4.min.js"></script>
   	<script type="text/javascript" src="/static/jquery-ui/js/jquery.json-2.2.min.js"></script>

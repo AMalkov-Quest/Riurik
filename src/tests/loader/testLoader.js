@@ -1,3 +1,15 @@
+/*var PShell = {
+  
+  StopService: "" + <r><![CDATA[
+    Stop-Service Quest.InfoPortal.SPBrowserBroker;
+  ]]></r>,
+  
+  RestartService: "" + <r><![CDATA[
+    Stop-Service Quest.InfoPortal.SPBrowserBroker;
+    Start-Service Quest.InfoPortal.SPBrowserBroker;
+  ]]></r>
+}*/
+
 if ( typeof console == 'undefined' || typeof console.log == 'undefined' ) {
 	//alert('no console.log')
 	var console = { log: function(){} };
@@ -424,6 +436,14 @@ var riurik = {
 }
 
 QUnit.config.reorder = false;
+
+QUnit.begin = function(module) {
+	console.log('tests begin');
+}
+
+QUnit.done = function(module) {
+	console.log('tests done');
+}
 
 QUnit.moduleStart = function(module) {
 	console.log('the "' + module.name + '" module is started');
