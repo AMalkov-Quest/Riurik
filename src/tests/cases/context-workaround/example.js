@@ -1,1 +1,1 @@
-ok( true, 'all OK' );
+var a = 1;
