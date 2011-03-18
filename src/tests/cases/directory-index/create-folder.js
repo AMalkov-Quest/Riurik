@@ -1,11 +1,11 @@
 module('folder', {
   
-  module_setup: function() {
+  setup: function() {
     context.folder_name = 'first-test-dir';
     console.log('module is started');
   },
   
-  module_teardown: function() {
+  teardown: function() {
     frame.window().dirIndexActions.remove(context.folder_name);
     console.log('module is done');
   }
@@ -33,16 +33,4 @@ asyncTest('create new', function() {
       });
     });
   });
-});
-
-asyncTest('test 2', function() {
-  console.log('test 2');
-  ok(true);
-  start();
-});
-
-asyncTest('test 3', function() {
-  console.log('test 3');
-  ok(true);
-  start();
 });
