@@ -461,4 +461,37 @@ QUnit.testDone = function(test) {
 	console.log('the "' + test.name + '" test is done');
 }
 
+QUnit.__log_storage = new Array(); // storage for QUnit.log messages
+QUnit.__log = function() {
+	/* Private log function. 
+	 * It gets messages from QUnit message storage and put to qunit-console tab
+	 * */
+	if ( QUnit.__log_storage.length > 0 && $('#qunit-console').length > 0 ) {
+		while ( QUnit.__log_storage.length > 0 ) {
+			var o = QUnit.__log_storage.shift();
+			$('#qunit-console').prepend( o.toString()+'<hr/>' );
+		}
+	}
+};
+setInterval( QUnit.__log, 500 );
+QUnit.log = function(){
+	/* QUnit.log interface
+	 * Put message into QUnit message storage
+	 * */
+	var args = new Array();
+	for (i in arguments) {
+		var o = arguments[i];
+		if ( typeof o == 'object' ) {
+			o = $.toJSON(o);
+		}
+		if ( typeof o == 'function' ) {
+			o = o.toString();
+		}
+		args.push(o);
+	}
+	QUnit.__log_storage.push(o);
+}
+
+QUnit.log('QUnit console: inited');
+
 jqextend($);
