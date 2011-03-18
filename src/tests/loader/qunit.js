@@ -86,12 +86,9 @@ Test.prototype = {
 				saveGlobal();
 			}
 			
-			if ( !this.moduleTestEnvironment  || !this.moduleTestEnvironment.moduleSetupDone ) {
+			if ( !this.moduleTestEnvironment.moduleSetupDone ) {
 				
-				this.moduleTestEnvironment = extend({
-					moduleSetupDone: true
-				}, this.moduleTestEnvironment);
-				
+				this.moduleTestEnvironment.moduleSetupDone = true;
 				this.testEnvironment.module_setup.call(this.testEnvironment);
 			}
 
@@ -127,11 +124,11 @@ Test.prototype = {
 		try {
 			checkPollution();
 			
+			this.testEnvironment.teardown.call(this.testEnvironment);
+			
 			if ( config.queue.length == 1 ) {
 				this.testEnvironment.module_teardown.call(this.testEnvironment);
 			}
-			
-			this.testEnvironment.teardown.call(this.testEnvironment);
 		} catch(e) {
 			QUnit.ok( false, "Teardown failed on " + this.testName + ": " + e.message );
 		}
@@ -299,7 +296,7 @@ var QUnit = {
 		
 		var test = new Test(name, testName, expected, testEnvironmentArg, async, callback);
 		test.module = config.currentModule;
-		test.moduleTestEnvironment = config.currentModuleTestEnviroment;
+		test.moduleTestEnvironment = config.currentModuleTestEnviroment || {};
 		test.queue();
 	},
 	

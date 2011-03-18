@@ -2,42 +2,7 @@ if ( typeof console == 'undefined' || typeof console.log == 'undefined' ) {
 	//alert('no console.log')
 	var console = { log: function(){} };
 }
-//TEMPORARY NOT USED cause have bugs in FF
-/*var _CONSOLE = console;
-var _CONSOLE_LOG = console.log;
-var _CONSOLE_LOG_QUEUE = new Array();
-var _CONSOLE_LOG_NEW = function() {
-	var a = new Array();
-	for ( i in arguments ) {
-		a.push(arguments[i]);
-	}
-	var html = (new Date()).toString()+':<br/>'+ a.join(', ') + '<hr/>';
-	if ( typeof _CONSOLE_LOG_QUEUE != 'undefined' ) {
-		try {
-			_CONSOLE_LOG_QUEUE.push(html);
-			//_CONSOLE_LOG.apply(_CONSOLE, ['quueue not undefined']);
-		} catch (ex) {
-			//_CONSOLE_LOG.apply(_CONSOLE, ['queue undefind'])
-			$('#javascript-console').prepend(html);
-		}
-	} else {
-		//_CONSOLE_LOG.apply(_CONSOLE, ['queue undefind'])
-		$('#javascript-console').prepend(html);
-	}
-	_CONSOLE_LOG.apply(_CONSOLE, a);
-}
-console.log = _CONSOLE_LOG_NEW;
-$(document).ready(function(){
-	console.log = _CONSOLE_LOG_NEW;
-	//_CONSOLE_LOG.apply(_CONSOLE, _CONSOLE_LOG_QUEUE);
-	for ( i in _CONSOLE_LOG_QUEUE ) {
-		var html  = _CONSOLE_LOG_QUEUE[i];
-		$('#javascript-console').append(html);
-	}
-	_CONSOLE_LOG_QUEUE = null;
-	//_CONSOLE_LOG.apply(_CONSOLE, ['queue loaded'])
-});
-*/
+
 var frame = {
 	
 	go: function(url) {
@@ -333,10 +298,8 @@ function PowerShell(server) {
 			dfd.resolve();
 		};
 		
-		//script.src = "http://" + this.server + ":35/?cmd=" + escape(cmd) + "&callback=" + callback;
 		script.src = "http://" + this.server + ":35/?cmd=" + escape(cmd) + "&callback=" + callback + "&_=" + Math.floor( Math.random() * 1000000000 ).toString();
 		window.document.body.appendChild( script );
-	  
 		return dfd.promise();
 	};
 	
@@ -426,27 +389,39 @@ var riurik = {
 QUnit.config.reorder = false;
 
 QUnit.begin = function(module) {
-	console.log('tests begin');
+	QUnit.log('tests are begun');
+	QUnit.riurik = {};
+	QUnit.riurik.current = { 'module': {} };
+	QUnit.riurik.status = 'started';
 }
 
 QUnit.done = function(module) {
-	console.log('tests done');
+	QUnit.log('tests are done');
+	QUnit.riurik.status = 'done';
 }
 
 QUnit.moduleStart = function(module) {
-	console.log('the "' + module.name + '" module is started');
+	QUnit.log('the "' + module.name + '" module is started');
+	QUnit.riurik.current.module.name = module.name;
+	QUnit.riurik.current.module.status = 'started';
+	QUnit.riurik.current.test = '';
 }
 
 QUnit.moduleDone = function(module) {
-	console.log('the "' + module.name + '" module is done');
+	QUnit.log('the "' + module.name + '" module is done');
+	QUnit.riurik.current.module.status = 'done';
+	QUnit.riurik.current.module[module.name].failed = module.failed;
+	QUnit.riurik.current.module[module.name].passed = module.passed;
+	QUnit.riurik.current.module[module.name].total = module.total;
 }
 
 QUnit.testStart = function(test) {
-	console.log('the "' + test.name + '" test is started');
+	QUnit.log('the "' + test.name + '" test is started');
+	QUnit.riurik.current.test = test.name;
 }
 
 QUnit.testDone = function(test) {
-	console.log('the "' + test.name + '" test is done');
+	QUnit.log('the "' + test.name + '" test is done');
 }
 
 QUnit.__log_storage = new Array(); // storage for QUnit.log messages
@@ -467,17 +442,17 @@ QUnit.log = function(){
 	 * Put message into QUnit message storage
 	 * */
 	var args = new Array();
-	for (i in arguments) {
-		var o = arguments[i];
-		if ( typeof o == 'object' ) {
-			o = $.toJSON(o);
+	$( arguments ).each(function(i, e){
+		var o = e;
+		if ( typeof e == 'object' ) {
+			o = $.toJSON(e);
 		}
-		if ( typeof o == 'function' ) {
-			o = o.toString();
+		if ( typeof e == 'function' ) {
+			o = e.toString();
 		}
 		args.push(o);
-	}
-	QUnit.__log_storage.push(o);
+	});
+	QUnit.__log_storage.push(args);
 }
 
 QUnit.log('QUnit console: inited');
