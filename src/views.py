@@ -14,10 +14,7 @@ import django.conf
 import settings
 from logger import log
 import context
-import mimetypes
-import os
-import posixpath
-import re, datetime
+import mimetypes, os, random, posixpath, re, datetime
 import stat
 from email.Utils import parsedate_tz, mktime_tz
 from contrib import *
@@ -196,6 +193,8 @@ def get_path(request):
 		return request.POST['path']
 	elif request.GET and 'path' in request.GET:
 		return request.GET['path']
+	elif request.GET and 'suite' in request.GET:
+		return request.GET['suite']
 	else:
 		return None
 
@@ -330,7 +329,7 @@ def submitTest(request):
 	url = request.POST["url"]
 	context = request.POST["context"]
 	content = request.POST.get("content", tools.gettest(testname))
-
+	log.debug('submitTest POST')
 	return _render_to_response( "runtest.html", locals() )
 
 def submitSuite(request):
@@ -365,17 +364,36 @@ def runSuite(request, fullpath):
 
 @add_fullpath
 def runTest(request, fullpath):
-	result = tools.savetest(request.POST["content"], fullpath)
-	log.debug(request.POST)
-	
-	context_name = request.POST.get("context", None)
-	
-	ctx = context.get(fullpath, section=context_name)
-	host = ctx.get( option='host' )
-	localhost = ctx.get( option='localhost' )
-	
+	if request.POST:
+		result = tools.savetest(request.POST["content"], fullpath)
+
+		context_name = request.POST.get("context", None)
+
+		ctx = context.get(fullpath, section=context_name)
+		log.debug('renTest: Fullpath is '+ fullpath +', Context is ' + str(context_name)+ ', Items: '+ str(ctx.items()))
+		host = ctx.get( option='host' )
+		localhost = ctx.get( option='localhost' )
+		log.debug('runTest POST: '+ str(ctx.items()))
+	else:
+		if 'path' in request.GET or 'suite' in request.GET:
+			path = request.GET.get('path', request.GET.get('suite', None))
+			return runInnerTest(path, fullpath)
+
 	if host == 'localhost':
-		return runInnerTest(request.POST["path"], request.POST["url"], ctx)
+		contextjs = _patch_context_adv(ctx)
+		log.debug('contextJS: '+ contextjs)
+		if os.path.isdir(fullpath):
+			contextjs_path = os.path.join(fullpath, 'context.js')
+		else:
+			contextjs_path = os.path.join(os.path.dirname(fullpath), 'context.js')
+		f = open(contextjs_path, 'wt')
+		f.write(contextjs)
+		f.close()
+
+		from django.core.urlresolvers import reverse
+		url = reverse('run-test') + '?path='+request.POST['path']
+		return HttpResponseRedirect(url)
+		runInnerTest(request.POST["path"], request.POST["url"], ctx)
 	else:
 		if localhost:
 			return runLocalTest(request.POST["path"], ctx)
@@ -397,25 +415,31 @@ def runLocalTest(path, context):
 	log.info("Run LOCAL test %s" % jsfile)
 	return _render_to_response('testLoader.html', locals())
 
-def runInnerTest(name, url, ctx):
-	contextjs = _patch_context_adv(ctx)
-	log.debug('contextJS: '+ contextjs)
-	contextjs_path = os.path.join(os.path.dirname(name), 'context.js')
-	contextjs_fullpath = get_fullpath(contextjs_path)
-	log.debug('contextjs_path: '+ contextjs_fullpath)
-	result = tools.savetest(contextjs, contextjs_fullpath)
-	jsfile = '/' + name.replace(settings.INNER_TESTS_ROOT, settings.TESTS_URL)
-	jspath, file_name = os.path.split(jsfile)
-	log.info("Run INNER test %s %s (%s)" % (jspath, jsfile, repr((name, url))))
+def runInnerTest(name, fullpath):
+	jsfile = '/'+name.replace(settings.INNER_TESTS_ROOT, settings.TESTS_URL)
+	suite = None
+	rand = random.random()
+	if os.path.isdir(fullpath):
+		jspath = jsfile
+		suite = jspath
+		title = os.path.basename(jsfile)
+		log.info('SUITE')
+	else:
+		jspath, file_name = os.path.split(jsfile)
+		title = file_name
+	log.info("Run INNER test %s %s, %s %s" % (jspath, jsfile, locals(), os.path.isdir(fullpath)))
 	return _render_to_response('testLoader.html', locals())
 
-def useLogin(url, login, password):
-	from ntlm import HTTPNtlmAuthHandler
+def useLogin(url, login, password, skip_ntlm=False):
+	if not skip_ntlm:
+		from ntlm import HTTPNtlmAuthHandler
 	
-	passman = urllib2.HTTPPasswordMgrWithDefaultRealm()
-	passman.add_password(None, url, login, password)
-	auth_NTLM = HTTPNtlmAuthHandler.HTTPNtlmAuthHandler(passman)
-	opener = urllib2.build_opener(auth_NTLM)
+		passman = urllib2.HTTPPasswordMgrWithDefaultRealm()
+		passman.add_password(None, url, login, password)
+		auth_NTLM = HTTPNtlmAuthHandler.HTTPNtlmAuthHandler(passman)
+		opener = urllib2.build_opener(auth_NTLM)
+	else:
+		opener = urllib2.build_opener()
 	urllib2.install_opener(opener)
 	
 def makeSaveContentPost(content, path):
