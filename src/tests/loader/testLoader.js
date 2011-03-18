@@ -1,15 +1,3 @@
-/*var PShell = {
-  
-  StopService: "" + <r><![CDATA[
-    Stop-Service Quest.InfoPortal.SPBrowserBroker;
-  ]]></r>,
-  
-  RestartService: "" + <r><![CDATA[
-    Stop-Service Quest.InfoPortal.SPBrowserBroker;
-    Start-Service Quest.InfoPortal.SPBrowserBroker;
-  ]]></r>
-}*/
-
 if ( typeof console == 'undefined' || typeof console.log == 'undefined' ) {
 	//alert('no console.log')
 	var console = { log: function(){} };
