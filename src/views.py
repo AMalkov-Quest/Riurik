@@ -379,7 +379,7 @@ def runTest(request, fullpath):
 			path = request.GET.get('path', request.GET.get('suite', None))
 			return runInnerTest(path, fullpath)
 
-	if host == 'localhost':
+	if host == 'localhost' or localhost:
 		contextjs = _patch_context_adv(ctx)
 		log.debug('contextJS: '+ contextjs)
 		if os.path.isdir(fullpath):
@@ -395,15 +395,12 @@ def runTest(request, fullpath):
 		return HttpResponseRedirect(url)
 		runInnerTest(request.POST["path"], request.POST["url"], ctx)
 	else:
-		if localhost:
-			return runLocalTest(request.POST["path"], ctx)
-		else:
-			contextjs = _patch_context_adv(ctx)
-			log.debug('contextJS: '+ contextjs)
-			contextjs_path = os.path.join(os.path.dirname(request.POST["path"]), 'context.js')
-			saveRemoteScripts(contextjs_path, contextjs, ctx, request)
-			path = saveRemoteScripts(request.POST["path"], request.POST["content"], ctx, request)
-			return runRemoteTest(path, ctx)
+		contextjs = _patch_context_adv(ctx)
+		log.debug('contextJS: '+ contextjs)
+		contextjs_path = os.path.join(os.path.dirname(request.POST["path"]), 'context.js')
+		saveRemoteScripts(contextjs_path, contextjs, ctx, request)
+		path = saveRemoteScripts(request.POST["path"], request.POST["content"], ctx, request)
+		return runRemoteTest(path, ctx)
 
 def runRemoteTest(path, context):
 	url = "%s%s" % (context.get('url'), path)
