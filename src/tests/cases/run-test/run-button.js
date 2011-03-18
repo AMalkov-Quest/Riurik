@@ -14,7 +14,11 @@ asyncTest('running', function(){
     
     _$('select[name=context]').val('test-context');
     console.log(_$('#run'));
-    _$('#run').trigger('click');
+    var runButton = frame.document().getElementById('run');
+    var evObj = document.createEvent('MouseEvents');
+    evObj.initEvent( 'click', true, true );
+    runButton.dispatchEvent(evObj);
+    
     start();
   });
 });
