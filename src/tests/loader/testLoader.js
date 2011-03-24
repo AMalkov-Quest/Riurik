@@ -1,5 +1,4 @@
 if ( typeof console == 'undefined' || typeof console.log == 'undefined' ) {
-	//alert('no console.log')
 	var console = { log: function(){} };
 }
 
@@ -10,7 +9,7 @@ var frame = {
 	  
 	  $('#frame').attr('src', url);
 	  $('#frame').load(function() {
-			jqextend(window.frames[0].window.jQuery);
+			jQExtend(window.frames[0].window.jQuery);
 			dfd.resolve(window.frames[0].window.jQuery);
 	  });
 	  
@@ -29,7 +28,6 @@ var frame = {
 	
 	println: function(message) {
 		var regexp = new RegExp('\\n', 'gi');
-		//var html = (new Date()).toString()+':<br/>'+ message.replace(regexp, '<br>')+'<hr/>';
 		var html = message.replace(regexp, '<br>')+'<hr/>';
 		$('#powershell-console').prepend(html);
 		console.log(message);
@@ -47,50 +45,42 @@ var frame = {
 
 };
 
-var suite = {
-
-	setup: function() {},
-	teardown: function() {}
-
-}
-
-function jqextend( $ ) {
+function jQExtend( $ ) {
   
   $.wait = function( lambda, timeout ){
-    var dfd = new $.Deferred();
+    var dfd = $.Deferred();
     var timeout = timeout || 10 * 1000; // 10 sec by default
     var time = 0;
     (function f(){
 		if ( lambda() === true ) {
-			console.log('resolve wait')
-			return dfd.resolve();
+			QUnit.log('resolve wait')
+			dfd.resolve();
 		}
 		time += 100;
 		if ( time < timeout ) {
 			setTimeout(f, 100)
 		} else {
-			console.log('wait timeout');
-			return dfd.resolve();
+			QUnit.log('wait timeout');
+			dfd.resolve();
 		}
     })();
-    
-	$.extend( dfd, {
-		wait: $.wait 
-    });
 	
     return dfd.promise(dfd);
   };
   
   $.wait_event = function( target, event_name, timeout ){
-    var dfd = new $.Deferred();
+    var dfd = $.Deferred();
     var timeout = timeout || 10 * 1000; // 10 sec by default
     var time = 0;
 	var resolved = false;
+	var promise = dfd.promise();
     
 	target.bind(event_name, function() {
-		console.log('resolve the ' + event_name + ' event wait')
+		QUnit.log('resolve the ' + event_name + ' event wait')
 		resolved = true;
-		return dfd.resolve();
+		setTimeout(function(){
+			dfd.resolveWith(promise); 
+		}, 1);
 	});
 	
 	(function f(){
@@ -101,16 +91,12 @@ function jqextend( $ ) {
 		if ( time < timeout ) {
 			setTimeout(f, 100)
 		} else {
-			console.log('the ' + event_name + ' event wait timeout');
-			return dfd.resolve();
+			QUnit.log('the ' + event_name + ' event wait timeout');
+			return dfd.resolveWith(promise);
 		}
     })();
 	
-	$.extend( dfd, {
-		wait_event: $.wait_event 
-    });
-	
-    return dfd.promise(dfd);
+    return promise;
   };
   
   $.seq = function() {
@@ -391,7 +377,7 @@ QUnit.config.reorder = false;
 QUnit.begin = function(module) {
 	QUnit.log('tests are begun');
 	QUnit.riurik = {};
-	QUnit.riurik.current = { 'module': {} };
+	QUnit.riurik.current = { 'module': {}, 'test': '' };
 	QUnit.riurik.status = 'started';
 }
 
@@ -404,15 +390,29 @@ QUnit.moduleStart = function(module) {
 	QUnit.log('the "' + module.name + '" module is started');
 	QUnit.riurik.current.module.name = module.name;
 	QUnit.riurik.current.module.status = 'started';
-	QUnit.riurik.current.test = '';
 }
+
+QUnit.__tests_result_storage = new Array();
+QUnit.get_results = function() {
+	if ( QUnit.__tests_result_storage.length > 0 ) {
+		return QUnit.__tests_result_storage.shift();
+	}else{
+		return '';
+	}
+};
 
 QUnit.moduleDone = function(module) {
 	QUnit.log('the "' + module.name + '" module is done');
 	QUnit.riurik.current.module.status = 'done';
-	QUnit.riurik.current.module[module.name].failed = module.failed;
-	QUnit.riurik.current.module[module.name].passed = module.passed;
-	QUnit.riurik.current.module[module.name].total = module.total;
+	
+	var module_results = {
+		name: module.name,
+		failed: module.failed,
+		passed: module.passed,
+		total: module.total
+	}
+	
+	QUnit.__tests_result_storage.push($.toJSON(module_results));
 }
 
 QUnit.testStart = function(test) {
@@ -457,4 +457,14 @@ QUnit.log = function(){
 
 QUnit.log('QUnit console: inited');
 
-jqextend($);
+jQExtend($);
+
+$(document).ready(function() {
+	
+	window.onerror = function(msg, url, line) {
+		QUnit.log("Error(" + url + ": " +  line + "): " + msg);
+		QUnit.ok(false, msg);
+		QUnit.start();
+		return true;
+	};
+});
