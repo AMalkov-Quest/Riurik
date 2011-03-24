@@ -341,9 +341,8 @@ def submitSuite(request):
 
 @add_fullpath
 def runSuite(request, fullpath):
-	path = request.POST["path"]
-	url = request.POST["url"]
-	context_name = request.POST["context"]
+	path = request.REQUEST["path"]
+	context_name = request.REQUEST["context"]
 
 	ctx = context.get(fullpath, section=context_name)
 	host = ctx.get( option='host' )
