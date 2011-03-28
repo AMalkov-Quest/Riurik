@@ -1,11 +1,11 @@
 module('folder', {
   
-  module_setup: function() {
+  setup: function() {
     context.folder_name = 'first-test-dir';
     console.log('module is started');
   },
   
-  module_teardown: function() {
+  teardown: function() {
     frame.window().dirIndexActions.remove(context.folder_name);
     console.log('module is done');
   }
@@ -27,22 +27,10 @@ asyncTest('create new', function() {
         equal(_$('li#'+ context.folder_name + '.folder').length, 1, 'new folder has been created');
         var folder_link = _$('li#'+ context.folder_name + ' > a');
         ok(folder_link.is(":visible"), 'link to the folder is visible');
-        equal(folder_link.attr('href'), context.folder_name, 'link to the folder has right href');
+        equal(folder_link.attr('href'), context.folder_name+"/", 'link to the folder has right href');
         
         start();
       });
     });
   });
-});
-
-asyncTest('test 2', function() {
-  console.log('test 2');
-  ok(true);
-  start();
-});
-
-asyncTest('test 3', function() {
-  console.log('test 3');
-  ok(true);
-  start();
 });

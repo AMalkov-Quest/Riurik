@@ -13,12 +13,13 @@ asyncTest('running', function(){
   $.when( frame.go( url ) ).then(function(_$){
     
     _$('select[name=context]').val('test-context');
-    console.log(_$('#run'));
-    var runButton = frame.document().getElementById('run');
-    var evObj = document.createEvent('MouseEvents');
+    
+    var runButton = frame.document().getElementById('close');
+    var evObj = frame.document().createEvent('MouseEvents');
     evObj.initEvent( 'click', true, true );
     runButton.dispatchEvent(evObj);
-    
+    console.log(runButton);
+    ok( runButton, 'runButton' )
     start();
   });
 });

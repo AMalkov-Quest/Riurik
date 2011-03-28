@@ -21,7 +21,7 @@ class context():
 		else:
 			self.inifile = os.path.join(os.path.dirname(test), settings.TEST_CONTEXT_FILE_NAME)
 		self.section = section
-		log.debug('context: %s, section: %s' % (self.inifile, self.section))
+		log.debug('context: %s, section: %s, test: %s' % (self.inifile, self.section, test))
 		
 	def get(self, option):
 		value = config.get(self.inifile, self.section, option)
@@ -29,6 +29,7 @@ class context():
 		return value
 
 	def items(self):
+		log.debug('context get items(): %s, section: %s' % (self.inifile, self.section))
 		return config.items(self.inifile, self.section)
 	
 	def sections(self):
