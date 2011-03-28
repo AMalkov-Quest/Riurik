@@ -53,8 +53,9 @@ function jQExtend( $ ) {
     var time = 0;
     (function f(){
 		if ( lambda() === true ) {
-			QUnit.log('resolve wait')
+			QUnit.log('resolve wait');
 			dfd.resolve();
+			return;
 		}
 		time += 100;
 		if ( time < timeout ) {
@@ -79,7 +80,7 @@ function jQExtend( $ ) {
 		resolved = true;
 		setTimeout(function(){
 			QUnit.log('resolve the ' + event_name + ' event wait');
-			dfd.resolve.call(null, args); 
+			dfd.resolve.apply(null, args); 
 		}, 1);
 	});
 	
@@ -92,7 +93,8 @@ function jQExtend( $ ) {
 			setTimeout(f, 100)
 		} else {
 			QUnit.log('the ' + event_name + ' event wait timeout');
-			return dfd.resolve();
+			dfd.resolve();
+			return;
 		}
     })();
 	
@@ -459,7 +461,7 @@ QUnit.log('QUnit console: inited');
 
 jQExtend($);
 
-/*$(document).ready(function() {
+$(document).ready(function() {
 	
 	window.onerror = function(msg, url, line) {
 		QUnit.log("Error(" + url + ": " +  line + "): " + msg);
@@ -467,4 +469,4 @@ jQExtend($);
 		QUnit.start();
 		return true;
 	};
-});*/
+});

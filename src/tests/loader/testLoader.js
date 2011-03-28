@@ -80,7 +80,7 @@ function jQExtend( $ ) {
 		resolved = true;
 		setTimeout(function(){
 			QUnit.log('resolve the ' + event_name + ' event wait');
-			dfd.resolve.call(null, args); 
+			dfd.resolve.apply(null, args); 
 		}, 1);
 	});
 	
