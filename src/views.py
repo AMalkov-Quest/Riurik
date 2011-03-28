@@ -374,33 +374,35 @@ def runTest(request, fullpath):
 		host = ctx.get( option='host' )
 		localhost = ctx.get( option='localhost' )
 		log.debug('runTest POST: '+ str(ctx.items()))
+		if host == 'localhost' or localhost:
+			contextjs = _patch_context_adv(ctx)
+			log.debug('contextJS: '+ contextjs)
+			if os.path.isdir(fullpath):
+				contextjs_path = os.path.join(fullpath, 'context.js')
+			else:
+				contextjs_path = os.path.join(os.path.dirname(fullpath), 'context.js')
+			f = open(contextjs_path, 'wt')
+			f.write(contextjs)
+			f.close()
+
+			from django.core.urlresolvers import reverse
+			url = reverse('run-test') + '?path='+request.POST['path']
+			return HttpResponseRedirect(url)
+			runInnerTest(request.POST["path"], request.POST["url"], ctx)
+		else:
+			contextjs = _patch_context_adv(ctx)
+			log.debug('contextJS: '+ contextjs)
+			contextjs_path = os.path.join(os.path.dirname(request.POST["path"]), 'context.js')
+			saveRemoteScripts(contextjs_path, contextjs, ctx, request)
+			path = saveRemoteScripts(request.POST["path"], request.POST["content"], ctx, request)
+			return runRemoteTest(path, ctx)
 	else:
 		if 'path' in request.GET or 'suite' in request.GET:
 			path = request.GET.get('path', request.GET.get('suite', None))
 			return runInnerTest(path, fullpath)
+		raise 'Invalid test'
 
-	if host == 'localhost' or localhost:
-		contextjs = _patch_context_adv(ctx)
-		log.debug('contextJS: '+ contextjs)
-		if os.path.isdir(fullpath):
-			contextjs_path = os.path.join(fullpath, 'context.js')
-		else:
-			contextjs_path = os.path.join(os.path.dirname(fullpath), 'context.js')
-		f = open(contextjs_path, 'wt')
-		f.write(contextjs)
-		f.close()
 
-		from django.core.urlresolvers import reverse
-		url = reverse('run-test') + '?path='+request.POST['path']
-		return HttpResponseRedirect(url)
-		runInnerTest(request.POST["path"], request.POST["url"], ctx)
-	else:
-		contextjs = _patch_context_adv(ctx)
-		log.debug('contextJS: '+ contextjs)
-		contextjs_path = os.path.join(os.path.dirname(request.POST["path"]), 'context.js')
-		saveRemoteScripts(contextjs_path, contextjs, ctx, request)
-		path = saveRemoteScripts(request.POST["path"], request.POST["content"], ctx, request)
-		return runRemoteTest(path, ctx)
 
 def runRemoteTest(path, context):
 	url = "%s%s" % (context.get('url'), path)
@@ -416,6 +418,7 @@ def runInnerTest(name, fullpath):
 	jsfile = '/'+name.replace(settings.INNER_TESTS_ROOT, settings.TESTS_URL)
 	suite = None
 	rand = random.random()
+	log.debug('runInnerTest: ' + fullpath+', name: '+name)
 	if os.path.isdir(fullpath):
 		jspath = jsfile
 		suite = jspath
