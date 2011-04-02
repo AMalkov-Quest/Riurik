@@ -53,8 +53,9 @@ function jQExtend( $ ) {
     var time = 0;
     (function f(){
 		if ( lambda() === true ) {
-			QUnit.log('resolve wait')
+			QUnit.log('resolve wait');
 			dfd.resolve();
+			return;
 		}
 		time += 100;
 		if ( time < timeout ) {
@@ -73,13 +74,13 @@ function jQExtend( $ ) {
     var timeout = timeout || 10 * 1000; // 10 sec by default
     var time = 0;
 	var resolved = false;
-	var promise = dfd.promise();
     
 	target.bind(event_name, function() {
-		QUnit.log('resolve the ' + event_name + ' event wait')
+		var args = arguments;
 		resolved = true;
 		setTimeout(function(){
-			dfd.resolveWith(promise); 
+			QUnit.log('resolve the ' + event_name + ' event wait');
+			dfd.resolve.apply(null, args); 
 		}, 1);
 	});
 	
@@ -92,11 +93,12 @@ function jQExtend( $ ) {
 			setTimeout(f, 100)
 		} else {
 			QUnit.log('the ' + event_name + ' event wait timeout');
-			return dfd.resolveWith(promise);
+			dfd.resolve();
+			return;
 		}
     })();
 	
-    return promise;
+    return dfd.promise();
   };
   
   $.seq = function() {
@@ -145,8 +147,9 @@ function jQExtend( $ ) {
     })();
     return dfd.promise(dfd);
   };
+  
   $.fn.extend({ 
-    sameAs : function(checks){
+    sameAs : function(checks) {
        console.log('check', this, arguments)
        var options = {
          checks: checks
@@ -157,14 +160,28 @@ function jQExtend( $ ) {
            equals(_$(el).html(), value, 'test');
          };
        });
-     }
+     },
+	 
+	strip: function(c) {
+		return this.replace(new RegExp('^' + c + '+'), '').replace(new RegExp(c + '+$'), '');
+	},
+	outerHTML: function(s) {
+		return (s) 
+			? this.before(s).remove() 
+			: $('<p>').append(this.eq(0).clone()).html();
+	}
   });
-
+  String.prototype.strip = function(c) {
+		return this.replace(new RegExp('^' + c + '+'), '').replace(new RegExp(c + '+$'), '');
+  };
 };
 
 jQuery.extend(QUnit, {
+  substring: function(actual, expected, message) {
+	QUnit.push(actual.indexOf(expected) >= 0, actual, expected, message);
+  },
   rowEqual: function(actual, expected, message) {
-    console.log('actual: ', actual);
+    
 	if( actual )  {
 		var actual = jQuery.map(actual, function(e, i) {
 			if ( typeof e == 'object' ) return jQuery(e).text();
@@ -390,6 +407,7 @@ QUnit.moduleStart = function(module) {
 	QUnit.log('the "' + module.name + '" module is started');
 	QUnit.riurik.current.module.name = module.name;
 	QUnit.riurik.current.module.status = 'started';
+	QUnit.riurik.current.module.started = new Date();
 }
 
 QUnit.__tests_result_storage = new Array();
@@ -401,27 +419,59 @@ QUnit.get_results = function() {
 	}
 };
 
+QUnit.getCSS = function(){
+	if ( QUnit.__css ) return QUnit.__css;
+	var result = '';
+	$.ajax('/testsrc/loader/qunit.css', {
+		success: function(data){
+			result = data;
+		},
+		async: false,
+		cache: true
+	});
+	QUnit.__css = result;
+	return result;
+};
+
 QUnit.moduleDone = function(module) {
 	QUnit.log('the "' + module.name + '" module is done');
 	QUnit.riurik.current.module.status = 'done';
+	QUnit.riurik.current.module.finished = new Date();
+	
+	var results = (function getTestResultDivs(module) {
+		var html = '<html><head><link rel="stylesheet" type="text/css" href="qunit.css"></head><body>'
+		html += '<ol class="qunit-tests" id="qunit-tests">';
+		$('#qunit-tests li').each(function(i, el){
+			var moduleName = $('.module-name',el).text();
+			if ( moduleName == module.name ){
+				html += $(el).outerHTML();
+			};
+		});
+		html += '</ol></body></html>';
+		html = html.replace('display: none', 'display: block');
+		return escape(html);
+	})(module);
 	
 	var module_results = {
 		name: module.name,
 		failed: module.failed,
 		passed: module.passed,
-		total: module.total
+		total: module.total,
+		duration: (QUnit.riurik.current.module.finished - QUnit.riurik.current.module.started)/1000,
+		results: results
 	}
-	
 	QUnit.__tests_result_storage.push($.toJSON(module_results));
 }
 
 QUnit.testStart = function(test) {
 	QUnit.log('the "' + test.name + '" test is started');
 	QUnit.riurik.current.test = test.name;
+	console.log('Test start: ', test);
 }
 
 QUnit.testDone = function(test) {
 	QUnit.log('the "' + test.name + '" test is done');
+	console.log('Test done: ', test);
 }
 
 QUnit.__log_storage = new Array(); // storage for QUnit.log messages
