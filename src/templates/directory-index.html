@@ -61,11 +61,11 @@
 								{% endfor %}
 							</select>
 						</li>
+						<li><a id="new-test" href="javascript:void(0);" onClick="javascript:createTest();">Create Test</a></li>
 					{% else %}
 						<li><a id="new-folder" href="javascript:void(0);" onClick="javascript:createFolder('{{ directory }}')">Create Folder</a></li>
 						<li><a id="new-suite" href="javascript:void(0);" onClick="javascript:createSuite();">Create Suite</a></li>
 					{% endifequal %}
-					<li><a id="new-test" href="javascript:void(0);" onClick="javascript:createTest();">Create Test</a></li>
 				{% endwith %}
 			</ul>
 			</form>

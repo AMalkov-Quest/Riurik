@@ -118,8 +118,8 @@ def serve(request, path, document_root=None, show_indexes=False):
 	if os.path.isdir(fullpath):
 		if show_indexes:
 			try:
-				t = loader.select_template(['directory_index.html',
-						'directory_index'])
+				t = loader.select_template(['directory-index.html',
+						'directory-index'])
 			except TemplateDoesNotExist:
 				t = Template(django.views.static.DEFAULT_DIRECTORY_INDEX_TEMPLATE, name='Default directory index template')
 			files = []
