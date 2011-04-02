@@ -15,6 +15,7 @@ function createFolderClick() {
 }
 
 function createFolder(path) {
+	$("#create-dir-index-dialog span").text($("#folder-tip").text())
 	$("#create-dir-index-dialog").dialog({
 		title: $('#new-folder').text(),
 		resizable: false,
@@ -36,10 +37,12 @@ function createFolder(path) {
 }
 
 function createSuite() {
+	$("#create-dir-index-dialog span").text($("#suite-tip").text())
 	createAndEdit($('#new-suite'), "/actions/suite/create/");
 }
 
 function createTest() {
+	$("#create-dir-index-dialog span").text($("#test-tip").text())
 	createAndEdit($('#new-test'), "/actions/test/create/");
 }
 
