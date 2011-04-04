@@ -37,7 +37,7 @@ def enumerate_suites(request):
 			ctx = context_get(contextfile)
 			ctx_sections = ctx.sections()
 			if not context in ctx_sections: continue
-		suites += [ dirpath.replace(_root, '').lstrip('/') ]
+		suites += [ dirpath.replace(_root, '').replace('\\\\','/').lstrip('/') ]
 	if json:
 		import simplejson
 		return HttpResponse(simplejson.dumps(suites))
