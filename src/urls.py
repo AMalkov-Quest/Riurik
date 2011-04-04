@@ -41,7 +41,7 @@ def enumerate_suites(request):
 	if json:
 		import simplejson
 		return HttpResponse(simplejson.dumps(suites))
-	return HttpResponse(str(suites).replace('[','').replace(']','').rstrip(','))
+	return HttpResponse(str(suites).replace('[','').replace(']','').rstrip(',').replace('\'',''))
 
 urlpatterns = patterns('',
 	(r'^favicon\.ico$', 'django.views.generic.simple.redirect_to', {'url': '/static/img/favicon.gif'}),
