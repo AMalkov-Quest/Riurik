@@ -448,7 +448,7 @@ QUnit.moduleDone = function(module) {
 			};
 		});
 		html += '</ol></body></html>';
-		html = html.replace('display: none', 'display: block');
+		html = html.replace(new RegExp('display: none', 'i'), 'display: block');
 		return escape(html);
 	})(module);
 	
