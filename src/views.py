@@ -432,7 +432,7 @@ def runRemoteTest(path, context):
 def runLocalTest(name, fullpath):
 	rand = random.random()
 	root = ''
-	loader = root +'/loader'
+	loader = '/testsrc/loader'
 	jsfile = '/'+name.replace(settings.INNER_TESTS_ROOT, settings.TESTS_URL)
 	suite = None
 	rand = random.random()
