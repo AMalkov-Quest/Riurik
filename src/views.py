@@ -372,9 +372,9 @@ def runTest(request, fullpath):
 		ctx = context.get(fullpath, section=context_name)
 		log.debug('renTest: Fullpath is '+ fullpath +', Context is ' + str(context_name)+ ', Items: '+ str(ctx.items()))
 		host = ctx.get( option='host' )
-		run = str(ctx.get( option='run' ))
+		run = ctx.get( option='run' )
 		if not run: run = 'remote'
-		run = run.strip('\'')
+		run = str(run).strip('\'')
 		log.debug('runTest POST: '+ str(ctx.items())+'; run: '+run)
 		if run == 'inner':
 			log.debug('InnerTest: prepearing' )
