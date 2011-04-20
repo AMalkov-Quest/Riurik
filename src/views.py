@@ -292,16 +292,22 @@ def saveDraftTest(request, fullpath):
 def _patch_context_adv(ctx):
 	vars = ctx.items()
 	hasInclude = False
+	hasExclude = False
 	for i,v in vars:
 		if i == 'include':
 			hasInclude = True
-			break
+		if i == 'exclude':
+			hasExclude = True
+			
 	if not hasInclude:
+		exclude = ['setup.js','library.js']
+		if hasExclude:
+			exclude = exclude + simplejson.loads(ctx.get( option='exclude' ))
 		include = []
 		for root, dirs, files in os.walk(ctx.get_folder()):
 			for file in files:
 				if re.match('^.*\.js$', file):
-					if file in ['setup.js','library.js']:
+					if file in exclude:
 						continue
 					file_abspath = os.path.abspath(os.path.join(root, file))
 					file_relpath = file_abspath.replace(os.path.abspath(ctx.get_folder()), '').lstrip('/').lstrip('\\')
