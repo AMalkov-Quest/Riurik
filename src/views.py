@@ -508,7 +508,13 @@ def saveTestSatelliteScripts(url, test, request):
 
 def saveRemoteScripts(path, content, ctx, request):
 	data = makeSaveContentPost(content, path)
-	post = urllib.urlencode(data)
+	def _patch_strings(obj):
+		#return obj
+		for key, val in obj.iteritems():
+			if val.__class__.__name__ == 'unicode':
+				obj[key] = val.encode('utf-8')
+		return obj
+	post = urllib.urlencode(_patch_strings(data))
 	login = ctx.get('login')
 	password = ctx.get('password')
 	
