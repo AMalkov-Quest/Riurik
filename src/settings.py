@@ -80,7 +80,6 @@ CACHE_MIDDLEWARE_ANONYMOUS_ONLY = False
 CACHE_MIDDLEWARE_SECONDS = 600
 
 MIDDLEWARE_CLASSES = (
-	'django_websocket.middleware.WebSocketMiddleware',
 	'django.contrib.sessions.middleware.SessionMiddleware',
 )
 
@@ -100,11 +99,10 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 
 INSTALLED_APPS = (
 	'django.contrib.auth',
-        'django.contrib.contenttypes',
+    'django.contrib.contenttypes',
 	'django.contrib.sessions',
 	'django.contrib.sites',
 	'django.contrib.messages',
-	'django_websocket',
 	'src',
 )
 
@@ -115,7 +113,7 @@ Actually it contains:
  - html\javascript code that loads and runs tests (testLoader.html & the 'loader' folder);
  - test cases (the 'cases' folder)
 '''
-PRODUCT_TESTS_ROOT = 'C:/saip/SharePoint Information Portal/Application/tests'
+PRODUCT_TESTS_ROOT = 'C:/tests'
 PRODUCT_TEST_CASES_ROOT = 'cases'
 PRODUCT_TESTS_URL = 'tests'
 STATIC_TESTS_ROOT = os.path.join(PRODUCT_TESTS_ROOT, PRODUCT_TEST_CASES_ROOT)
