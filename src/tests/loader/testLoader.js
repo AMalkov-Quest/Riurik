@@ -33,6 +33,19 @@ var frame = {
 		console.log(message);
 	},
 	
+	console_complete: function(){
+		frame.__console_timeout = setTimeout(function(){
+			$('#tabs-2-loading').hide();
+		}, 500);
+		$('#tabs-2').parent().attr('title', '');
+	},
+
+	console_working: function(title){
+		if ( frame.__console_timeout ) { clearTimeout(frame.__console_timeout) }
+		$('#tabs-2').parent().attr('title', title);
+		$('#tabs-2-loading').show();
+	},
+	
 	jQuery: function() {
 		return window.frames[0].window.jQuery;
 	},
@@ -178,7 +191,9 @@ function jQExtend( $ ) {
 
 jQuery.extend(QUnit, {
   substring: function(actual, expected, message) {
-	QUnit.push(actual.indexOf(expected) >= 0, actual, expected, message);
+	var i = actual.indexOf(expected);
+	var a = actual.substring(i, i + expected.length)
+	QUnit.push(i >= 0, a, expected, message);
   },
   rowEqual: function(actual, expected, message) {
     
@@ -288,6 +303,7 @@ function PowerShell(server) {
 	
 	this.exec = function(name, args, cmd) {
 		var dfd = $.Deferred();
+		frame.console_working(name + '( ' + args + ' )');
 		var script = document.createElement('script');
 		
 		frame.println('queue up ' + name + '( ' + args + ' )\n');
@@ -298,9 +314,9 @@ function PowerShell(server) {
 		window[callback] = function(result) {
 			frame.println(name + '( ' + args + ' ) is done whis result:\n');
 			frame.println(result?result:'OK\n');
+			frame.console_complete();
 			dfd.resolve();
 		};
-		
 		script.src = "http://" + this.server + ":35/?cmd=" + escape(cmd) + "&callback=" + callback + "&_=" + Math.floor( Math.random() * 1000000000 ).toString();
 		window.document.body.appendChild( script );
 		return dfd.promise();
@@ -389,10 +405,9 @@ var riurik = {
 	}
 }
 
-QUnit.config.reorder = false;
-
 QUnit.begin = function(module) {
 	QUnit.log('tests are begun');
+	QUnit.__tests_result_storage = new Array();
 	QUnit.riurik = {};
 	QUnit.riurik.current = { 'module': {}, 'test': '' };
 	QUnit.riurik.status = 'started';
@@ -404,19 +419,100 @@ QUnit.done = function(module) {
 }
 
 QUnit.moduleStart = function(module) {
-	QUnit.log('the "' + module.name + '" module is started');
 	QUnit.riurik.current.module.name = module.name;
 	QUnit.riurik.current.module.status = 'started';
 	QUnit.riurik.current.module.started = new Date();
+	QUnit.log('the "' + module.name + '" module is started ', QUnit.riurik.current.module.started);
 }
 
-QUnit.__tests_result_storage = new Array();
+QUnit.moduleDone = function(module) {
+	QUnit.log('the "' + module.name + '" module is done');
+	QUnit.riurik.current.module.status = 'done';
+	QUnit.riurik.current.module.finished = new Date();
+	
+	function getTestResultDivs(moduleName) {
+		var html = '<html><head><link rel="stylesheet" type="text/css" href="qunit.css"></head><body>'
+		html += '<ol class="qunit-tests" id="qunit-tests">';
+		$('#qunit-tests li').each(function(i, el){
+			if ( $('.module-name',el).text() == moduleName ) {
+				html += $(el).outerHTML();
+			};
+		});
+		html += '</ol></body></html>';
+		html = html.replace(new RegExp('display: none', 'i'), 'display: block');
+		//html = escape(html)
+		return html;
+	};
+	
+	var time = (QUnit.riurik.current.module.finished - QUnit.riurik.current.module.started)/1000;
+	if(isNaN(time)) {
+		time = 0;
+	}
+	var module_results = {
+		name: module.name,
+		failed: module.failed,
+		passed: module.passed,
+		total: module.total,
+		duration: time,
+		results: getTestResultDivs(module.name)
+	}
+	QUnit.__tests_result_storage.push($.toJSON(module_results));
+}
+
+QUnit.testStart = function(test) {
+	QUnit.log('the "' + test.name + '" test is started');
+	QUnit.riurik.current.test = test.name;
+	console.log('Test start: ', test);
+}
+
+QUnit.testDone = function(test) {
+	QUnit.log('the "' + test.name + '" test is done');
+	console.log('Test done: ', test);
+}
+
 QUnit.get_results = function() {
-	if ( QUnit.__tests_result_storage.length > 0 ) {
+	if ( QUnit.__tests_result_storage != 'undefined' && QUnit.__tests_result_storage.length > 0 ) {
 		return QUnit.__tests_result_storage.shift();
 	}else{
 		return '';
 	}
+};
+
+QUnit._get_results_view = function() {
+	var html = '<html><head><link rel="stylesheet" type="text/css" href="qunit.css"></head><body>'
+	html += '<ol class="qunit-tests" id="qunit-tests">';
+	$('#qunit-tests').each(function(i, el){
+		var ohtml = $(el).outerHTML().replace(new RegExp('display: none', 'gi'), 'display: block');
+		html += ohtml;
+	});
+	html += '</ol></body></html>';
+	return html;
+};
+
+QUnit.get_results_view = function() {
+	var html = '<html><head><link rel="stylesheet" type="text/css" href="qunit.css"></head><body>'
+	html += '<ol class="qunit-tests" id="qunit-tests">';
+	html += $('#qunit-tests').html().replace(new RegExp('display: none', 'gi'), 'display: block');
+	html += '</ol></body></html>';
+	return html;
+};
+
+QUnit.get_qunit_console = function() {
+	return (function getConsoleDivs() {
+		var html = '<html><head><title>QUnit console</title></head><body>'
+		html += $('#qunit-console').html();
+		html += '</body></html>';
+		return html;
+	})();
+};
+
+QUnit.get_tools_console = function() {
+	return (function getConsoleDivs() {
+		var html = '<html><head><title>PowerShell console</title></head><body>'
+		html += $('#powershell-console').html();
+		html += '</body></html>';
+		return html;
+	})();
 };
 
 QUnit.getCSS = function(){
@@ -432,47 +528,6 @@ QUnit.getCSS = function(){
 	QUnit.__css = result;
 	return result;
 };
-
-QUnit.moduleDone = function(module) {
-	QUnit.log('the "' + module.name + '" module is done');
-	QUnit.riurik.current.module.status = 'done';
-	QUnit.riurik.current.module.finished = new Date();
-	
-	var results = (function getTestResultDivs(module) {
-		var html = '<html><head><link rel="stylesheet" type="text/css" href="qunit.css"></head><body>'
-		html += '<ol class="qunit-tests" id="qunit-tests">';
-		$('#qunit-tests li').each(function(i, el){
-			var moduleName = $('.module-name',el).text();
-			if ( moduleName == module.name ){
-				html += $(el).outerHTML();
-			};
-		});
-		html += '</ol></body></html>';
-		html = html.replace(new RegExp('display: none', 'i'), 'display: block');
-		return escape(html);
-	})(module);
-	
-	var module_results = {
-		name: module.name,
-		failed: module.failed,
-		passed: module.passed,
-		total: module.total,
-		duration: (QUnit.riurik.current.module.finished - QUnit.riurik.current.module.started)/1000,
-		results: results
-	}
-	QUnit.__tests_result_storage.push($.toJSON(module_results));
-}
-
-QUnit.testStart = function(test) {
-	QUnit.log('the "' + test.name + '" test is started');
-	QUnit.riurik.current.test = test.name;
-	console.log('Test start: ', test);
-}
-
-QUnit.testDone = function(test) {
-	QUnit.log('the "' + test.name + '" test is done');
-	console.log('Test done: ', test);
-}
 
 QUnit.__log_storage = new Array(); // storage for QUnit.log messages
 QUnit.__log = function() {
@@ -494,11 +549,16 @@ QUnit.log = function(){
 	var args = new Array();
 	$( arguments ).each(function(i, e){
 		var o = e;
-		if ( typeof e == 'object' ) {
-			o = $.toJSON(e);
-		}
-		if ( typeof e == 'function' ) {
+		try {
+			if ( typeof e == 'object' ) {
+				o = $.toJSON(e);
+			}
+			if ( typeof e == 'function' ) {
+				o = e.toString();
+			}
+		} catch (ex) {
 			o = e.toString();
+			args.push('QUnit.log raised a error during formatting: ' + ex.toString());
 		}
 		args.push(o);
 	});
@@ -506,6 +566,10 @@ QUnit.log = function(){
 }
 
 QUnit.log('QUnit console: inited');
+
+
+QUnit.config.reorder = false;
+QUnit.config.autostart = true;
 
 jQExtend($);
 

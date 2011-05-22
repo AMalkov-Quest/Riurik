@@ -1,7 +1,6 @@
 module('suite', {  
   setup: function() {
     context.suite_name = 'suite-for-test';
-    console.log('module is started');
   },
   
   teardown: function() {
@@ -10,14 +9,12 @@ module('suite', {
     $.when( frame.go(context.url) ).then(function(_$) {
       frame.window().dirIndexActions.remove(context.suite_name);
       start()
-    }                                                                                 )           
-    console.log('module is done');
+    })
   }
 });
 
 asyncTest('create new', function() {
    
-  console.log('test 1');
   $.when( frame.go(context.url) ).then(function(_$) {
     
     $.when( _$('a#new-suite').click() ).then(function() {

@@ -28,7 +28,7 @@
 		<script type="text/javascript" src="{{ jspath }}/context.js?_={{rand}}"></script>
 		<script type="text/javascript" src="{{ jspath }}/library.js?_={{rand}}"></script>
 		<script type="text/javascript">
-			stop();
+			//QUnit.stop();
 			$(document).ready(function(){
 				if ( typeof context == 'undefined' ) {
 					context = { include: [] };
@@ -57,6 +57,8 @@
 				script.src = '{{ jsfile }}?_={{rand}}';
 				document.body.appendChild( script );
 				{% endif %}
+				
+				//QUnit.start();
 			});
 		</script>		  
 		<script type="text/javascript">$(document).ready(function() { $( "#tabs" ).tabs(); } );</script>
@@ -74,7 +76,12 @@
 		<div id="tabs">
 			<ul>
 				<li><a href="#tabs-1">{% trans 'Frame' %}</a></li>
-				<li><a href="#tabs-2">{% trans 'PowerShell console' %}</a></li>
+				<li>
+					<a href="#tabs-2">{% trans 'Tools console' %}</a>
+					<div style="width:16px; height: 16px; float: left; padding: .5em 0;">
+						<img id="tabs-2-loading" src="{{ loader }}/loading.gif" style="display:none;">
+					</div>
+					</li>
 				<li><a href="#tabs-3">{% trans 'QUnit console' %}</a></li>
 			</ul>
 			<div id="tabs-1">
