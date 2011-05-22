@@ -28,6 +28,7 @@
 		<script type="text/javascript" src="{{ jspath }}/context.js?_={{rand}}"></script>
 		<script type="text/javascript" src="{{ jspath }}/library.js?_={{rand}}"></script>
 		<script type="text/javascript">
+
 			//QUnit.stop();
 			$(document).ready(function(){
 				if ( typeof context == 'undefined' ) {
@@ -58,6 +59,7 @@
 				document.body.appendChild( script );
 				{% endif %}
 				
+
 				//QUnit.start();
 			});
 		</script>		  
