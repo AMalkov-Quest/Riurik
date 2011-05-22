@@ -45,7 +45,6 @@ def enumerate_suites(request):
 
 urlpatterns = patterns('',
 	(r'^favicon\.ico$', 'django.views.generic.simple.redirect_to', {'url': '/static/img/favicon.gif'}),
-	(r'^websocket$', 'views.handler' ),
 	(r'^actions/folder/create/$', 'views.createFolder'),
 	(r'^actions/suite/create/$', 'views.createSuite'),
 	(r'^actions/suite/edit/$', 'views.editSuite'),

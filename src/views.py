@@ -325,65 +325,66 @@ def runSuite(request, fullpath):
 
 @add_fullpath
 def runTest(request, fullpath):
-	if request.POST:
-		result = tools.savetest(request.POST["content"], fullpath)
-
-		context_name = request.POST.get("context", None)
-
-		ctx = context.get(fullpath, section=context_name)
-		log.debug('renTest: Fullpath is '+ fullpath +', Context is ' + str(context_name)+ ', Items: '+ str(ctx.items()))
-		host = ctx.get( option='host' )
-		run = ctx.get( option='run' )
-		if not run: run = 'remote'
-		run = str(run).strip('\'')
-		log.debug('runTest POST: '+ str(ctx.items())+'; run: '+run)
-		if run == 'inner':
-			log.debug('InnerTest: prepearing' )
-			contextjs = _patch_context_adv(ctx)
-			if os.path.isdir(fullpath):
-				contextjs_path = os.path.join(fullpath, 'context.js')
-			else:
-				contextjs_path = os.path.join(os.path.dirname(fullpath), 'context.js')
-			f = open(contextjs_path, 'wt')
-			f.write(contextjs)
-			f.close()
-			log.debug('context saved to: '+contextjs_path)
-			from django.core.urlresolvers import reverse
-			path = request.POST.get('path','').lstrip('/')
-			url = reverse('run-test') + '?path=/'+path
-			log.debug('Redirect to URL: '+ url)
-			return HttpResponseRedirect(url)
-		elif run == 'local':
-			contextjs = _patch_context_adv(ctx)
-			if os.path.isdir(fullpath):
-				contextjs_path = os.path.join(fullpath, 'context.js')
-			else:
-				contextjs_path = os.path.join(os.path.dirname(fullpath), 'context.js')
-			f = open(contextjs_path, 'wt')
-			f.write(contextjs)
-			f.close()
-			from django.core.urlresolvers import reverse
-			url = reverse('run-test') + '?path='+request.POST['path']+'&run=local'
-			return HttpResponseRedirect(url)
-		elif run == 'remote':
-			contextjs = _patch_context_adv(ctx)
-			log.debug('contextJS: '+ contextjs)
-			contextjs_path = os.path.join(os.path.dirname(request.POST["path"]), 'context.js')
-			saveRemoteScripts(contextjs_path, contextjs, ctx, request)
-			path = saveRemoteScripts(request.POST["path"], request.POST["content"], ctx, request)
-			return runRemoteTest(path, ctx)
-		raise Exception('Invalid test, run method: ' + run)
-	else:
-		if 'path' in request.GET or 'suite' in request.GET:
-			run = request.GET.get('run', 'inner')
-			path = request.GET.get('path', request.GET.get('suite', None))
-			if run == 'local':
-				return runLocalTest(path, fullpath)
-			elif run == 'inner':
-				return runInnerTest(path, fullpath)
-		raise Exception('Invalid test')
-
-
+	try:
+		if request.POST:
+			result = tools.savetest(request.POST["content"], fullpath)
+	
+			context_name = request.POST.get("context", None)
+	
+			ctx = context.get(fullpath, section=context_name)
+			log.debug('renTest: Fullpath is '+ fullpath +', Context is ' + str(context_name)+ ', Items: '+ str(ctx.items()))
+			host = ctx.get( option='host' )
+			run = ctx.get( option='run' )
+			if not run: run = 'remote'
+			run = str(run).strip('\'')
+			log.debug('runTest POST: '+ str(ctx.items())+'; run: '+run)
+			if run == 'inner':
+				log.debug('InnerTest: prepearing' )
+				contextjs = _patch_context_adv(ctx)
+				if os.path.isdir(fullpath):
+					contextjs_path = os.path.join(fullpath, 'context.js')
+				else:
+					contextjs_path = os.path.join(os.path.dirname(fullpath), 'context.js')
+				f = open(contextjs_path, 'wt')
+				f.write(contextjs)
+				f.close()
+				log.debug('context saved to: '+contextjs_path)
+				from django.core.urlresolvers import reverse
+				path = request.POST.get('path','').lstrip('/')
+				url = reverse('run-test') + '?path=/'+path
+				log.debug('Redirect to URL: '+ url)
+				return HttpResponseRedirect(url)
+			elif run == 'local':
+				contextjs = _patch_context_adv(ctx)
+				if os.path.isdir(fullpath):
+					contextjs_path = os.path.join(fullpath, 'context.js')
+				else:
+					contextjs_path = os.path.join(os.path.dirname(fullpath), 'context.js')
+				f = open(contextjs_path, 'wt')
+				f.write(contextjs)
+				f.close()
+				from django.core.urlresolvers import reverse
+				url = reverse('run-test') + '?path='+request.POST['path']+'&run=local'
+				return HttpResponseRedirect(url)
+			elif run == 'remote':
+				contextjs = _patch_context_adv(ctx)
+				log.debug('contextJS: '+ contextjs)
+				contextjs_path = os.path.join(os.path.dirname(request.POST["path"]), 'context.js')
+				saveRemoteScripts(contextjs_path, contextjs, ctx, request)
+				path = saveRemoteScripts(request.POST["path"], request.POST["content"], ctx, request)
+				return runRemoteTest(path, ctx)
+			raise Exception('Invalid test, run method: ' + run)
+		else:
+			if 'path' in request.GET or 'suite' in request.GET:
+				run = request.GET.get('run', 'inner')
+				path = request.GET.get('path', request.GET.get('suite', None))
+				if run == 'local':
+					return runLocalTest(path, fullpath)
+				elif run == 'inner':
+					return runInnerTest(path, fullpath)
+			raise Exception('Invalid test')
+	except Exception, e:
+		log.exception(e)
 
 def runRemoteTest(path, context):
 	url = "%s%s" % (context.get('url'), path)

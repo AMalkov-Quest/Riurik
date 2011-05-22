@@ -113,7 +113,7 @@ Actually it contains:
  - html\javascript code that loads and runs tests (testLoader.html & the 'loader' folder);
  - test cases (the 'cases' folder)
 '''
-PRODUCT_TESTS_ROOT = 'C:/tests'
+PRODUCT_TESTS_ROOT = 'C:/saip/SharePoint Information Portal/Application/tests'
 PRODUCT_TEST_CASES_ROOT = 'cases'
 PRODUCT_TESTS_URL = 'tests'
 STATIC_TESTS_ROOT = os.path.join(PRODUCT_TESTS_ROOT, PRODUCT_TEST_CASES_ROOT)
