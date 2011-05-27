@@ -128,6 +128,7 @@ VIRTUAL_URLS = {
 }
 
 TEST_CONTEXT_FILE_NAME = '.context.ini'
+TEST_CONTEXT_JS_FILE_NAME = '.context.js'
 TEST_FILE_EXT = '.js'
 TEST_SWAP_FILE_NAME = '.%s.swp'
 

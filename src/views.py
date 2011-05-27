@@ -245,47 +245,6 @@ def saveDraftTest(request, fullpath):
 		result = { 'success': 'false' }
 	return HttpResponse(simplejson.dumps(result))
 
-def _patch_context_adv(ctx):
-	vars = ctx.items()
-	hasInclude = False
-	hasExclude = False
-	for i,v in vars:
-		if i == 'include':
-			hasInclude = True
-		if i == 'exclude':
-			hasExclude = True
-			
-	if not hasInclude:
-		exclude = ['setup.js','library.js']
-		if hasExclude:
-			exclude = exclude + simplejson.loads(ctx.get( option='exclude' ))
-		include = []
-		for root, dirs, files in os.walk(ctx.get_folder()):
-			for file in files:
-				if re.match('^.*\.js$', file):
-					if file in exclude:
-						continue
-					file_abspath = os.path.abspath(os.path.join(root, file))
-					file_relpath = file_abspath.replace(os.path.abspath(ctx.get_folder()), '').lstrip('/').lstrip('\\')
-					include += [ str(file_relpath) ]
-		vars = tuple(list(vars) + [ ('include', str(include).replace('\'','\"')) ])
-
-	return _patch_with_context(vars)
-
-def _patch_with_context(vars):
-	t = Template("""{% load json_tags %}
-		var context = {
-			{% for option in options %}
-				{{ option.0 }}: {{ option.1|json }}{% if not forloop.last %},{% endif %}
-			{% endfor %}
-		};
-	""")
-	c = Context();
-	c['options'] = []
-	for name, value in vars:
-		c['options'] += [ (name, value,), ]
-	return t.render(c)
-
 def submitTest(request):
 	testname = request.POST["path"]
 	url = request.POST["url"]
@@ -316,12 +275,11 @@ def runSuite(request, fullpath):
 	remote_url = urllib.unquote(remote_url).replace('\\','/')
 
 
-	contextjs = _patch_context_adv(ctx)
-	contextjs_path = os.path.join(path, 'context.js')
+	contextjs = context.patch(ctx)
+	contextjs_path = os.path.join(path, settings.TEST_CONTEXT_JS_FILE_NAME)
 	saveRemoteScripts(contextjs_path, contextjs, ctx, request)
 
 	return HttpResponseRedirect( remote_url )
-
 
 @add_fullpath
 def runTest(request, fullpath):
@@ -331,19 +289,19 @@ def runTest(request, fullpath):
 		context_name = request.POST.get("context", None)
 
 		ctx = context.get(fullpath, section=context_name)
-		log.debug('renTest: Fullpath is '+ fullpath +', Context is ' + str(context_name)+ ', Items: '+ str(ctx.items()))
+		log.debug('runTest: Fullpath is '+ fullpath +', Context is ' + str(context_name)+ ', Items: '+ str(ctx.items()))
 		host = ctx.get( option='host' )
 		run = ctx.get( option='run' )
 		if not run: run = 'remote'
 		run = str(run).strip('\'')
 		log.debug('runTest POST: '+ str(ctx.items())+'; run: '+run)
+		contextjs = context.patch(ctx)
 		if run == 'inner':
 			log.debug('InnerTest: prepearing' )
-			contextjs = _patch_context_adv(ctx)
 			if os.path.isdir(fullpath):
-				contextjs_path = os.path.join(fullpath, 'context.js')
+				contextjs_path = os.path.join(fullpath, settings.TEST_CONTEXT_JS_FILE_NAME)
 			else:
-				contextjs_path = os.path.join(os.path.dirname(fullpath), 'context.js')
+				contextjs_path = os.path.join(os.path.dirname(fullpath), settings.TEST_CONTEXT_JS_FILE_NAME)
 			f = open(contextjs_path, 'wt')
 			f.write(contextjs)
 			f.close()
@@ -354,11 +312,10 @@ def runTest(request, fullpath):
 			log.debug('Redirect to URL: '+ url)
 			return HttpResponseRedirect(url)
 		elif run == 'local':
-			contextjs = _patch_context_adv(ctx)
 			if os.path.isdir(fullpath):
-				contextjs_path = os.path.join(fullpath, 'context.js')
+				contextjs_path = os.path.join(fullpath, settings.TEST_CONTEXT_JS_FILE_NAME)
 			else:
-				contextjs_path = os.path.join(os.path.dirname(fullpath), 'context.js')
+				contextjs_path = os.path.join(os.path.dirname(fullpath), settings.TEST_CONTEXT_JS_FILE_NAME)
 			f = open(contextjs_path, 'wt')
 			f.write(contextjs)
 			f.close()
@@ -366,9 +323,8 @@ def runTest(request, fullpath):
 			url = reverse('run-test') + '?path='+request.POST['path']+'&run=local'
 			return HttpResponseRedirect(url)
 		elif run == 'remote':
-			contextjs = _patch_context_adv(ctx)
 			log.debug('contextJS: '+ contextjs)
-			contextjs_path = os.path.join(os.path.dirname(request.POST["path"]), 'context.js')
+			contextjs_path = os.path.join(os.path.dirname(request.POST["path"]), settings.TEST_CONTEXT_JS_FILE_NAME)
 			saveRemoteScripts(contextjs_path, contextjs, ctx, request)
 			path = saveRemoteScripts(request.POST["path"], request.POST["content"], ctx, request)
 			return runRemoteTest(path, ctx)
