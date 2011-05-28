@@ -88,6 +88,7 @@ ROOT_URLCONF = 'urls'
 TEMPLATE_DIRS = (
 
     os.path.join(os.path.dirname( __file__ ), 'templates'),
+    os.path.join(os.path.dirname( __file__ ), 'tests'),
 )
 
 TEMPLATE_CONTEXT_PROCESSORS = (
@@ -115,9 +116,10 @@ Actually it contains:
 '''
 PRODUCT_TESTS_ROOT = 'C:/saip/SharePoint Information Portal/Application/tests'
 PRODUCT_TEST_CASES_ROOT = 'cases'
-PRODUCT_TESTS_URL = 'tests'
+PRODUCT_TESTS_URL = 'tests/execute'
 STATIC_TESTS_ROOT = os.path.join(PRODUCT_TESTS_ROOT, PRODUCT_TEST_CASES_ROOT)
 STATIC_TESTS_URL = ''
+ROOT_TESTS = 'src.tests'
 
 INNER_TESTS_ROOT = 'tests'
 TESTS_URL = 'cases' #INNER_TESTS_ROOT + 'rc'

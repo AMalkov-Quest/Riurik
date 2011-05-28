@@ -8,6 +8,7 @@ def patch_fullpaths(fullpath, newpath=''):
 		if m:
 			fullpath = settings.VIRTUAL_URLS[key] + m.group(1)
 			return fullpath
+	
 	return fullpath
 
 def get_fullpath(path):
@@ -21,7 +22,6 @@ def getHostByName(host):
 	return r
 
 def resolveRemoteAddr(host):
-	#return cache.get(host, getHostByName(host))
 	addr =  cache.get(host, None)
 	if not addr:
 		addr = getHostByName(host)
@@ -30,3 +30,10 @@ def resolveRemoteAddr(host):
 		log.info('%s addr is got from cach: %s' % (str(host), str(addr)))
 		
 	return addr
+
+def normpath(path):
+	return path.replace('\\', '/')
+
+def localhost(host):
+	import socket
+	return host == 'localhost' or host == socket.gethostname()

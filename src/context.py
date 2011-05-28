@@ -2,6 +2,7 @@ import os, re
 from logger import log
 import settings, config, contrib
 from django.template import Context, Template
+import socket
 		
 def host(instance, resolve=True):
 	key = 'host'
@@ -11,6 +12,15 @@ def host(instance, resolve=True):
 		
 def get(name, section='default'):
 	return context(name, section)
+
+def get_URL(instance):
+	url = instance.get('url')
+	if not url:
+		host = instance.get('host')
+		if host == 'localhost':
+			host = socket.gethostname()
+		url =  'http://%s:%s' % (host, instance.get('port'))
+	return url
 
 def patch(ctx):
 	vars = ctx.items()
@@ -45,7 +55,6 @@ def patch(ctx):
 	if localhost:
 		vars = list(vars)
 		vars.remove(('host', 'localhost'))
-		import socket
 		vars = tuple( vars + [ ('host', socket.gethostname()) ] )
 
 	return _render(vars)

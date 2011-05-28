@@ -4,6 +4,7 @@
 
 	{{ root }}   contains '/testsrc/'
 	{{ loader }} contains '/testsrc/loader/'
+	{{ cases }} contains '/testsrc/cases/'
 	{{ jspath }} contains full directory urlpath to test or suite including {{ root }}
 	{{ jsfile }} contains full urlpath to test including {{ root }}
 	{{ error }} contains errors
@@ -28,8 +29,6 @@
 		<script type="text/javascript" src="{{ jspath }}/.context.js?_={{rand}}"></script>
 		<script type="text/javascript" src="{{ jspath }}/library.js?_={{rand}}"></script>
 		<script type="text/javascript">
-
-			//QUnit.stop();
 			$(document).ready(function(){
 				if ( typeof context == 'undefined' ) {
 					context = { include: [] };
@@ -40,7 +39,7 @@
 					var jsfile = context.libraries[i];
 					var script = document.createElement( 'script' );
 					script.type = 'text/javascript';
-					script.src = '{{ root }}'+jsfile+'?_={{rand}}';
+					script.src = '{{ cases }}/'+jsfile+'?_={{rand}}';
 					document.body.appendChild( script );	
 				};
 				{% if suite %}
@@ -59,7 +58,6 @@
 				document.body.appendChild( script );
 				{% endif %}
 				
-
 				//QUnit.start();
 			});
 		</script>		  

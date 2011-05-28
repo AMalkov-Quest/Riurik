@@ -15,7 +15,7 @@ import context
 import mimetypes, os, random, posixpath, re, datetime
 import stat
 from email.Utils import parsedate_tz, mktime_tz
-from contrib import *
+import contrib
 import urllib, urllib2
 
 __all__ = ('handler','serve',)
@@ -51,13 +51,13 @@ def serve(request, path, document_root=None, show_indexes=False):
 	``static/directory_index.html``.
 	"""
 	# Clean up given path to only allow serving files below document_root.
-	log.debug((request.GET, path,document_root,show_indexes, path))
+	log.debug('Serve static files. Path %s, document_root %s' % (path, document_root))
 	path = posixpath.normpath(urllib.unquote(path))
 	path = path.lstrip('/')
 	newpath = ''
 	for part in path.split('/'):
 		if not part:
-			# Strip empty path components.
+			#Strip empty path components.
 			continue
 		drive, part = os.path.splitdrive(part)
 		head, part = os.path.split(part) 
@@ -65,17 +65,12 @@ def serve(request, path, document_root=None, show_indexes=False):
 			# Strip '.' and '..' in path.
 			continue
 		newpath = os.path.join(newpath, part)
-	fullpath = os.path.abspath(os.path.join(document_root, newpath))#.replace('/', '\\')
-	log.debug(('before patching fullpath',fullpath, newpath))
-	fullpath = patch_fullpaths(fullpath, newpath)
-	log.debug(('after patching fullpath',fullpath, newpath))
-	log.debug(fullpath)
-	log.debug(os.path.isdir(fullpath))
+	fullpath = os.path.abspath(os.path.join(document_root, newpath))
+	fullpath = contrib.patch_fullpaths(fullpath, newpath)
 	if os.path.isdir(fullpath):
 		if show_indexes:
 			try:
-				t = loader.select_template(['directory-index.html',
-						'directory-index'])
+				t = loader.select_template(['directory-index.html', 'directory-index'])
 			except TemplateDoesNotExist:
 				t = Template(django.views.static.DEFAULT_DIRECTORY_INDEX_TEMPLATE, name='Default directory index template')
 			files = []
@@ -158,8 +153,8 @@ def add_fullpath(fn):
 	def patch(request):
 		path = get_path(request)
 		if path:
-			log.debug('add_fullpath: func (%s) arguments patched. path: %s , fullpath: %s' % (fn, path, get_fullpath(path)))
-			return fn(request, get_fullpath(path))
+			log.debug('add_fullpath: func (%s) arguments patched. path: %s , fullpath: %s' % (fn, path, contrib.get_fullpath(path)))
+			return fn(request, contrib.get_fullpath(path))
 		return fn(request)
 	return patch
 
@@ -262,124 +257,63 @@ def submitSuite(request):
 
 @add_fullpath
 def runSuite(request, fullpath):
-	path = request.REQUEST["path"]
+	path = contrib.normpath(request.REQUEST["path"])
 	context_name = request.REQUEST["context"]
 
 	ctx = context.get(fullpath, section=context_name)
 	host = ctx.get( option='host' )
-	localhost = ctx.get( option='localhost' )
-
-	context_url = ctx.get( option='url' )
-
-	remote_url = "%s/tests/?suite=/cases/%s" % ( context_url, path  )
-	remote_url = urllib.unquote(remote_url).replace('\\','/')
-
-
+	
 	contextjs = context.patch(ctx)
-	contextjs_path = os.path.join(path, settings.TEST_CONTEXT_JS_FILE_NAME)
-	saveRemoteScripts(contextjs_path, contextjs, ctx, request)
-
-	return HttpResponseRedirect( remote_url )
+	
+	if contrib.localhost(host):
+		saveLocalContext(fullpath, contextjs)
+		path = removeVitualFolderFromPath(path)
+	else:
+		contextjs_path = os.path.join(path, settings.TEST_CONTEXT_JS_FILE_NAME)
+		saveRemoteScripts(contextjs_path, contextjs, ctx, request)
+	
+	url = "%s/%s?suite=/%s/%s" % ( context.get_URL(ctx), settings.PRODUCT_TESTS_URL, settings.PRODUCT_TEST_CASES_ROOT, path  )
+	url = contrib.normpath(urllib.unquote(url))
+	log.debug("Run suite %s" % url)
+	return HttpResponseRedirect( url )
 
 @add_fullpath
 def runTest(request, fullpath):
-	if request.POST:
-		result = tools.savetest(request.POST["content"], fullpath)
+	if "content" in request.REQUEST:
+		result = tools.savetest(request.REQUEST["content"], fullpath)
 
-		context_name = request.POST.get("context", None)
-
-		ctx = context.get(fullpath, section=context_name)
-		log.debug('runTest: Fullpath is '+ fullpath +', Context is ' + str(context_name)+ ', Items: '+ str(ctx.items()))
-		host = ctx.get( option='host' )
-		run = ctx.get( option='run' )
-		if not run: run = 'remote'
-		run = str(run).strip('\'')
-		log.debug('runTest POST: '+ str(ctx.items())+'; run: '+run)
-		contextjs = context.patch(ctx)
-		if run == 'inner':
-			log.debug('InnerTest: prepearing' )
-			if os.path.isdir(fullpath):
-				contextjs_path = os.path.join(fullpath, settings.TEST_CONTEXT_JS_FILE_NAME)
-			else:
-				contextjs_path = os.path.join(os.path.dirname(fullpath), settings.TEST_CONTEXT_JS_FILE_NAME)
-			f = open(contextjs_path, 'wt')
-			f.write(contextjs)
-			f.close()
-			log.debug('context saved to: '+contextjs_path)
-			from django.core.urlresolvers import reverse
-			path = request.POST.get('path','').lstrip('/')
-			url = reverse('run-test') + '?path=/'+path
-			log.debug('Redirect to URL: '+ url)
-			return HttpResponseRedirect(url)
-		elif run == 'local':
-			if os.path.isdir(fullpath):
-				contextjs_path = os.path.join(fullpath, settings.TEST_CONTEXT_JS_FILE_NAME)
-			else:
-				contextjs_path = os.path.join(os.path.dirname(fullpath), settings.TEST_CONTEXT_JS_FILE_NAME)
-			f = open(contextjs_path, 'wt')
-			f.write(contextjs)
-			f.close()
-			from django.core.urlresolvers import reverse
-			url = reverse('run-test') + '?path='+request.POST['path']+'&run=local'
-			return HttpResponseRedirect(url)
-		elif run == 'remote':
-			log.debug('contextJS: '+ contextjs)
-			contextjs_path = os.path.join(os.path.dirname(request.POST["path"]), settings.TEST_CONTEXT_JS_FILE_NAME)
-			saveRemoteScripts(contextjs_path, contextjs, ctx, request)
-			path = saveRemoteScripts(request.POST["path"], request.POST["content"], ctx, request)
-			return runRemoteTest(path, ctx)
-		raise Exception('Invalid test, run method: ' + run)
-	else:
-		if 'path' in request.GET or 'suite' in request.GET:
-			run = request.GET.get('run', 'inner')
-			path = request.GET.get('path', request.GET.get('suite', None))
-			if run == 'local':
-				return runLocalTest(path, fullpath)
-			elif run == 'inner':
-				return runInnerTest(path, fullpath)
-		raise Exception('Invalid test')
-
-def runRemoteTest(path, context):
-	url = "%s%s" % (context.get('url'), path)
-	log.info("Run REMOTE test %s" % url)
-	return HttpResponseRedirect(url)
+	path = contrib.normpath(request.REQUEST["path"])
+	context_name = request.REQUEST.get("context", None)
+	ctx = context.get(fullpath, section=context_name)
+	log.debug('runTest: Fullpath is '+ fullpath +', Context is ' + str(context_name)+ ', Items: '+ str(ctx.items()))
+	host = ctx.get( option='host' )
+	contextjs = context.patch(ctx)
 	
-def runLocalTest(name, fullpath):
-	rand = random.random()
-	root = ''
-	loader = '/testsrc/loader'
-	jsfile = '/'+name.replace(settings.INNER_TESTS_ROOT, settings.TESTS_URL)
-	suite = None
-	rand = random.random()
-	log.debug('runInnerTest: ' + fullpath+', name: '+name)
-	if os.path.isdir(fullpath):
-		jspath = jsfile
-		suite = jspath
-		title = os.path.basename(jsfile)
-		log.info('SUITE')
+	if contrib.localhost(host):
+		saveLocalContext(fullpath, contextjs)
+		path = removeVitualFolderFromPath(path)
 	else:
-		jspath, file_name = os.path.split(jsfile)
-		title = file_name
-	log.info("Run INNER test %s %s, %s %s" % (jspath, jsfile, locals(), os.path.isdir(fullpath)))
-	return _render_to_response('testLoader.html', locals())
+		log.debug('contextJS: '+ contextjs)
+		contextjs_path = os.path.join(os.path.dirname(path), settings.TEST_CONTEXT_JS_FILE_NAME)
+		saveRemoteScripts(contextjs_path, contextjs, ctx, request)
+		saveRemoteScripts(request.REQUEST["path"], request.REQUEST["content"], ctx, request)
+		path = request.REQUEST["path"]
+	
+	url = "%s/%s?path=/%s/%s" % (context.get_URL(ctx), settings.PRODUCT_TESTS_URL, settings.PRODUCT_TEST_CASES_ROOT, path)
+	log.info("Run test %s" % url)
+	return HttpResponseRedirect(url)
 
-def runInnerTest(name, fullpath):
-	rand = random.random()
-	root = ''
-	loader = root +'/loader'
-	jsfile = name
-	rand = random.random()
-	log.debug('runInnerTest: ' + fullpath+', name: '+name)
+def removeVitualFolderFromPath(path):
+	return path.lstrip('/').replace(settings.INNER_TESTS_ROOT + '/', '')
+
+def saveLocalContext(fullpath, contextjs):
 	if os.path.isdir(fullpath):
-		jspath = jsfile
-		suite = jspath
-		title = os.path.basename(jsfile)
-		log.info('SUITE')
+		contextjs_path = os.path.join(fullpath, settings.TEST_CONTEXT_JS_FILE_NAME)
 	else:
-		jspath, file_name = os.path.split(jsfile)
-		title = file_name
-	log.info("Run INNER test %s %s, %s %s" % (jspath, jsfile, locals(), os.path.isdir(fullpath)))
-	return _render_to_response('testLoader.html', locals())
+		contextjs_path = os.path.join(os.path.dirname(fullpath), settings.TEST_CONTEXT_JS_FILE_NAME)
+	f = open(contextjs_path, 'wt')
+	f.write(contextjs)
+	f.close()
 
 def useLogin(url, login, password, skip_ntlm=False):
 	if not skip_ntlm:
@@ -408,7 +342,7 @@ def saveTestSatelliteScripts(url, test, request):
 	scripts = getOpenedFiles(request, clean=True)
 	if scripts.count(test) > 0: scripts.remove(test)
 	for path in scripts:
-		fullpath = get_fullpath(path)
+		fullpath = contrib.get_fullpath(path)
 		content = tools.gettest(fullpath)
 		data = makeSaveContentPost(content, path)
 		post = urllib.urlencode(data)
@@ -419,7 +353,6 @@ def saveTestSatelliteScripts(url, test, request):
 def saveRemoteScripts(path, content, ctx, request):
 	data = makeSaveContentPost(content, path)
 	def _patch_strings(obj):
-		#return obj
 		for key, val in obj.iteritems():
 			if val.__class__.__name__ == 'unicode':
 				obj[key] = val.encode('utf-8')
@@ -428,10 +361,11 @@ def saveRemoteScripts(path, content, ctx, request):
 	login = ctx.get('login')
 	password = ctx.get('password')
 	
-	url = "%s/%s/" % (ctx.get('url'), settings.PRODUCT_TESTS_URL)
+	url = "%s/%s" % (context.get_URL(ctx), settings.PRODUCT_TESTS_URL)
 	url = url.replace(ctx.get('host'), context.host(ctx))
-	log.debug((url, login, password))
-	useLogin(url, login, password)
+	if login and password:
+		log.debug((url, login, password))
+		useLogin(url, login, password)
 	saveTestSatelliteScripts(url, path, request)
 	log.info("Save test script %s to %s" % (path, url))
 	r = urllib2.urlopen(url, post).read()

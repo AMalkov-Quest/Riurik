@@ -54,12 +54,17 @@ urlpatterns = patterns('',
 	(r'^actions/test/save/$', 'views.saveTest'),
 	(r'^actions/test/save/draft/$', 'views.saveDraftTest'),
 	url(r'^actions/test/run/$', 'views.runTest', name='run-test'),
+	url(r'^actions/test/runlocal/$', 'views.runLocalTest', name='run-local-test'),
 	(r'^actions/test/stub/$', 'views.stubFile'),
 	(r'^actions/test/submit/$', 'views.submitTest'),
 	(r'^actions/test/control/$', 'views.getControl'),
 	(r'^logger/records/recv/$', 'views.recvLogRecords'),
 	(r'^actions/remove/$', 'views.removeObject'),
 	(r'^actions/suite/enumerate/$', enumerate_suites),
+)
+
+urlpatterns += patterns('',
+	(r'^tests/execute', include(settings.ROOT_TESTS + '.urls')),
 )
 
 urlpatterns += patterns('',
