@@ -1,4 +1,4 @@
-import os, re
+import os, re, simplejson
 from logger import log
 import settings, config, contrib
 from django.template import Context, Template
@@ -38,9 +38,8 @@ def patch(ctx):
 			localhost = True
 			
 	if not hasInclude:
-		exclude = ['setup.js','library.js']
 		if hasExclude:
-			exclude = exclude + simplejson.loads(ctx.get( option='exclude' ))
+			exclude = simplejson.loads(ctx.get( option='exclude' ))
 		include = []
 		for root, dirs, files in os.walk(ctx.get_folder()):
 			for file in files:

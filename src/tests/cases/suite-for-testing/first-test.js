@@ -1,4 +1,13 @@
 test('first test', function() {
-  QUnit.log(context);
-  ok(true);
+
+  ok(true, 'first check');
+  ok(true, 'second check');
+  
+});
+
+test('second test', function() {
+
+  ok(true, 'third check');
+  ok(true, 'fourth check');
+  
 });

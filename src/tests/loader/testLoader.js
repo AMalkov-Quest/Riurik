@@ -386,6 +386,10 @@ var contexter = {
 	
 	full_url: function(url) {
 		return context.url + url;
+	},
+	
+	URL: function(context, path) {
+		return 'http://' + context.host + ':' + context.port + '/' + path;
 	}
 };
 

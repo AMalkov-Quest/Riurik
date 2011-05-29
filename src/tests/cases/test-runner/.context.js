@@ -1,13 +1,13 @@
 
 		var context = {
 			
-				libraries: ["libraries/context-helper.js"],
+				libraries: ["libraries/library-1.js", "libraries/library-2.js", "test-runner/library.js"],
 			
-				url: "http://spb0281:8000",
+				var1: "value2",
 			
 				port: 8000,
 			
-				include: [".context.js", "execute-test.js", "generate-context.js"],
+				include: [".context.js", "context-generator.js", "library.js", "suite-runner.js", "test-runner.js"],
 			
 				host: "spb0281"
 			
