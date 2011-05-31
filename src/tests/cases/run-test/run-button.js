@@ -1,6 +1,12 @@
+module('', {
+  setup: function() {
+    var path = 'tests/run-test/example1.js?editor';
+    context.url = contexter.URL(context, path);
+  }
+});
+
 asyncTest('run interface', function(){
-  var url = context.url + '/run-test/example.js?editor'
-  $.when( frame.go( url ) ).then(function(_$){
+  $.when( frame.go( context.url ) ).then(function(_$){
     ok(_$('#run').length == 1, 'run button exists');
     ok(_$('select[name=context]').length == 1, 'context select exists');
     ok(_$('select[name=context] option[value=test-context]').length == 1, 'test context option exists');
@@ -8,7 +14,7 @@ asyncTest('run interface', function(){
   });
 });
 
-asyncTest('running', function(){
+/*asyncTest('running', function(){
   var url = context.url + '/run-test/example.js?editor'
   $.when( frame.go( url ) ).then(function(_$){
     
@@ -22,4 +28,4 @@ asyncTest('running', function(){
     ok( runButton, 'runButton' )
     start();
   });
-});
+});*/

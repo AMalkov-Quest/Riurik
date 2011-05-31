@@ -216,6 +216,7 @@ def editSuite(request):
 	
 @add_fullpath
 def createTest(request, fullpath):
+	log.debug('createTest: '+ request.POST["object-name"])
 	result = {}
 	result['success'], result['result'] = tools.mktest(fullpath, request.POST["object-name"])
 	result['result'] += '?editor'
@@ -263,7 +264,7 @@ def runSuite(request, fullpath):
 	ctx = context.get(fullpath, section=context_name)
 	host = ctx.get( option='host' )
 	
-	contextjs = context.patch(ctx)
+	contextjs = context.render(ctx)
 	
 	if contrib.localhost(host):
 		saveLocalContext(fullpath, contextjs)
@@ -287,13 +288,14 @@ def runTest(request, fullpath):
 	ctx = context.get(fullpath, section=context_name)
 	log.debug('runTest: Fullpath is '+ fullpath +', Context is ' + str(context_name)+ ', Items: '+ str(ctx.items()))
 	host = ctx.get( option='host' )
-	contextjs = context.patch(ctx)
+	run = ctx.get( option='run' )
+	contextjs = context.render(ctx)
+	log.debug('contextJS: '+ contextjs)
 	
-	if contrib.localhost(host):
+	if contrib.localhost(host) and not run == 'remote':
 		saveLocalContext(fullpath, contextjs)
 		path = removeVitualFolderFromPath(path)
 	else:
-		log.debug('contextJS: '+ contextjs)
 		contextjs_path = os.path.join(os.path.dirname(path), settings.TEST_CONTEXT_JS_FILE_NAME)
 		saveRemoteScripts(contextjs_path, contextjs, ctx, request)
 		saveRemoteScripts(request.REQUEST["path"], request.REQUEST["content"], ctx, request)
@@ -346,7 +348,7 @@ def saveTestSatelliteScripts(url, test, request):
 		content = tools.gettest(fullpath)
 		data = makeSaveContentPost(content, path)
 		post = urllib.urlencode(data)
-		log.info("Save satellite script %s to %s" % (path, url))
+		log.info("Save satellite script %s to %s\ndata:\n%s" % (path, url, data))
 		result = urllib2.urlopen(url, post).read()
 		log.info("... done as %s" % result)
 

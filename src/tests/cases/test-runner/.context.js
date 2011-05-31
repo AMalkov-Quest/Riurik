@@ -7,7 +7,7 @@
 			
 				port: 8000,
 			
-				include: [".context.js", "context-generator.js", "library.js", "suite-runner.js", "test-runner.js"],
+				include: [".context.js", "context-generator.js", "exclude-tests.js", "first-example.js", "include-tests.js", "library.js", "save-test-remote.js", "suite-runner.js", "test-runner.js", "test-test.js"],
 			
 				host: "spb0281"
 			

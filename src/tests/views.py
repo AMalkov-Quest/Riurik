@@ -28,7 +28,6 @@ def saveTestContent(path, content, test_root):
 def index(request):
 	if request.method == "POST":
 		response = HttpResponse(mimetype='text/plain')
-		log.Info("------------------------")
 		try:
 			saveTestContent(request.REQUEST['path'], request.REQUEST['content'], request.REQUEST['tests_root'])
 			response.write('OK')

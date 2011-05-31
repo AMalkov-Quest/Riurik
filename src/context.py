@@ -22,6 +22,21 @@ def get_URL(instance):
 		url =  'http://%s:%s' % (host, instance.get('port'))
 	return url
 
+def render(ctx):
+	vars = patch(ctx)
+	t = Template("""{% load json_tags %}
+		var context = {
+			{% for option in options %}
+				{{ option.0 }}: {{ option.1|json }}{% if not forloop.last %},{% endif %}
+			{% endfor %}
+		};
+	""")
+	c = Context();
+	c['options'] = []
+	for name, value in vars:
+		c['options'] += [ (name, value,), ]
+	return t.render(c)
+
 def patch(ctx):
 	vars = ctx.items()
 	hasInclude = False
@@ -38,6 +53,7 @@ def patch(ctx):
 			localhost = True
 			
 	if not hasInclude:
+		exclude = []
 		if hasExclude:
 			exclude = simplejson.loads(ctx.get( option='exclude' ))
 		include = []
@@ -56,21 +72,7 @@ def patch(ctx):
 		vars.remove(('host', 'localhost'))
 		vars = tuple( vars + [ ('host', socket.gethostname()) ] )
 
-	return _render(vars)
-
-def _render(vars):
-	t = Template("""{% load json_tags %}
-		var context = {
-			{% for option in options %}
-				{{ option.0 }}: {{ option.1|json }}{% if not forloop.last %},{% endif %}
-			{% endfor %}
-		};
-	""")
-	c = Context();
-	c['options'] = []
-	for name, value in vars:
-		c['options'] += [ (name, value,), ]
-	return t.render(c)
+	return vars
 
 class context():
 	
