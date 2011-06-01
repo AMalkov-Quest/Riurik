@@ -1,7 +1,6 @@
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response
 from django.views.decorators.cache import never_cache
-from logger import log
 from django.conf import settings
 from django.utils.translation import ugettext as _
 import os, random
@@ -15,7 +14,6 @@ except ImportError:
 def saveTestContent(path, content, test_root):
 	root = os.path.dirname(__file__)
 	path = os.path.join(root, test_root, path)
-	log.Info(path)
 	
 	if not os.path.exists(os.path.dirname(path)):
 		os.makedirs(os.path.dirname(path))
@@ -32,7 +30,6 @@ def index(request):
 			saveTestContent(request.REQUEST['path'], request.REQUEST['content'], request.REQUEST['tests_root'])
 			response.write('OK')
 		except Exception, e:
-			log.Info(e)
 			response.write('FAILED')
 		
 		return response
