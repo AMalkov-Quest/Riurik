@@ -21,11 +21,6 @@
 		<script type="text/javascript" src="{{ loader }}/jqueryui/js/jquery-ui-1.8.10.custom.min.js"></script>
 		<link rel="stylesheet" type="text/css" href="{{ loader }}/jqueryui/css/redmond/jquery-ui-1.8.10.custom.css">
 		
-		<link rel="stylesheet" type="text/css" href="{{ loader }}/qunit.css" media="screen" />
-		<script type="text/javascript" src="{{ loader }}/qunit.js"></script>
-		
-		<link rel="stylesheet" type="text/css" href="{{ loader }}/testLoader.css" />
-		<script type="text/javascript" src="{{ loader }}/testLoader.js?_={{rand}}"></script>
 		<script type="text/javascript" src="{{ jspath }}/.context.js?_={{rand}}"></script>
 		<script type="text/javascript">
 			$(document).ready(function(){
@@ -56,11 +51,14 @@
 				script.src = '{{ jsfile }}?_={{rand}}';
 				document.body.appendChild( script );
 				{% endif %}
-				
-				//QUnit.start();
 			});
 		</script>		  
 		<script type="text/javascript">$(document).ready(function() { $( "#tabs" ).tabs(); } );</script>
+		<link rel="stylesheet" type="text/css" href="{{ loader }}/qunit.css" media="screen" />
+		<script type="text/javascript" src="{{ loader }}/qunit.js"></script>
+		<link rel="stylesheet" type="text/css" href="{{ loader }}/testLoader.css" />
+		<script type="text/javascript" src="{{ loader }}/testLoader.js?_={{rand}}"></script>
+		
 	</head>
 	<body>
 		<h1 id="qunit-header">QUnit example</h1>
