@@ -122,11 +122,10 @@ STATIC_TESTS_URL = ''
 ROOT_TESTS = 'src.tests'
 
 INNER_TESTS_ROOT = 'tests'
-TESTS_URL = 'cases' #INNER_TESTS_ROOT + 'rc'
+TESTS_URL = 'cases'
 
 VIRTUAL_URLS = {
     INNER_TESTS_ROOT: os.path.join(os.path.dirname( __file__ ), INNER_TESTS_ROOT, 'cases'),
-    #'out': 'C:/saip/SharePoint Information Portal/Application/tests',
 }
 
 TEST_CONTEXT_FILE_NAME = '.context.ini'

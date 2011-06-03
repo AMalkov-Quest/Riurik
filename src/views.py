@@ -17,6 +17,7 @@ import stat
 from email.Utils import parsedate_tz, mktime_tz
 import contrib
 import urllib, urllib2
+import codecs, time
 
 __all__ = ('handler','serve',)
 _isolate_imports = False
@@ -280,33 +281,38 @@ def runSuite(request, fullpath):
 
 @add_fullpath
 def runTest(request, fullpath):
-	if "content" in request.REQUEST:
-		result = tools.savetest(request.REQUEST["content"], fullpath)
-
 	path = contrib.normpath(request.REQUEST["path"])
 	context_name = request.REQUEST.get("context", None)
 	ctx = context.get(fullpath, section=context_name)
-	log.debug('runTest: Fullpath is '+ fullpath +', Context is ' + str(context_name)+ ', Items: '+ str(ctx.items()))
+	
+	log.debug('run test %s' % path)
+	log.debug('Fullpath %s' % fullpath)
+	log.debug('Context name %s' % str(context_name))
+	log.debug('Context items: '+ str(ctx.items()))
+	
 	host = ctx.get( option='host' )
 	run = ctx.get( option='run' )
 	contextjs = context.render(ctx)
 	log.debug('contextJS: '+ contextjs)
 	
+	path = removeVirtualFolderFromPath(path)
 	if contrib.localhost(host) and not run == 'remote':
 		saveLocalContext(fullpath, contextjs)
-		path = removeVitualFolderFromPath(path)
 	else:
-		contextjs_path = os.path.join(os.path.dirname(path), settings.TEST_CONTEXT_JS_FILE_NAME)
-		saveRemoteScripts(contextjs_path, contextjs, ctx, request)
-		saveRemoteScripts(request.REQUEST["path"], request.REQUEST["content"], ctx, request)
-		path = request.REQUEST["path"]
+		saveRemoteScripts(path, request.REQUEST["content"], contextjs, ctx, request)
 	
 	url = "%s/%s?path=/%s/%s" % (context.get_URL(ctx), settings.PRODUCT_TESTS_URL, settings.PRODUCT_TEST_CASES_ROOT, path)
 	log.info("Run test %s" % url)
 	return HttpResponseRedirect(url)
 
-def removeVitualFolderFromPath(path):
-	return path.lstrip('/').replace(settings.INNER_TESTS_ROOT + '/', '')
+def removeVirtualFolderFromPath(path):
+	'''virtual folder is a folder that contains inner riurik tests'''
+	path = path.lstrip('/')
+	index = path.find(settings.INNER_TESTS_ROOT + '/')
+	if index == 0:
+		log.debug('remove virtual folder %s from path %s' % (settings.INNER_TESTS_ROOT, path))
+		return path.replace(settings.INNER_TESTS_ROOT + '/', '', 1)
+	return path
 
 def saveLocalContext(fullpath, contextjs):
 	if os.path.isdir(fullpath):
@@ -346,13 +352,29 @@ def saveTestSatelliteScripts(url, test, request):
 	for path in scripts:
 		fullpath = contrib.get_fullpath(path)
 		content = tools.gettest(fullpath)
+		path = removeVirtualFolderFromPath(path)
 		data = makeSaveContentPost(content, path)
 		post = urllib.urlencode(data)
-		log.info("Save satellite script %s to %s\ndata:\n%s" % (path, url, data))
+		log.debug("Save satellite script %s to %s" % (path, url))
 		result = urllib2.urlopen(url, post).read()
-		log.info("... done as %s" % result)
+		log.debug("... done as %s" % result)
 
-def saveRemoteScripts(path, content, ctx, request):
+def saveRemoteScripts(path, content, contextjs, ctx, request):
+	login = ctx.get('login')
+	password = ctx.get('password')
+	url = "%s/%s" % (context.get_URL(ctx), settings.PRODUCT_TESTS_URL)
+	url = url.replace(ctx.get('host'), context.host(ctx))
+	if login and password:
+		log.debug((url, login, password))
+		useLogin(url, login, password)
+	saveTestSatelliteScripts(url, path, request)
+	
+	contextjs_path = os.path.join(os.path.dirname(path), settings.TEST_CONTEXT_JS_FILE_NAME)
+	sendContentToRemote(contextjs_path, contextjs, url)
+	
+	return sendContentToRemote(path, content, url)
+
+def sendContentToRemote(path, content, url):
 	data = makeSaveContentPost(content, path)
 	def _patch_strings(obj):
 		for key, val in obj.iteritems():
@@ -360,29 +382,48 @@ def saveRemoteScripts(path, content, ctx, request):
 				obj[key] = val.encode('utf-8')
 		return obj
 	post = urllib.urlencode(_patch_strings(data))
-	login = ctx.get('login')
-	password = ctx.get('password')
-	
-	url = "%s/%s" % (context.get_URL(ctx), settings.PRODUCT_TESTS_URL)
-	url = url.replace(ctx.get('host'), context.host(ctx))
-	if login and password:
-		log.debug((url, login, password))
-		useLogin(url, login, password)
-	saveTestSatelliteScripts(url, path, request)
-	log.info("Save test script %s to %s" % (path, url))
-	r = urllib2.urlopen(url, post).read()
-	log.info("Saved test script %s to %s" % (path, url))
-	return r
+	result = urllib2.urlopen(url, post).read()
+	log.info("saving script %s result: %s" % (path, result))
+	return result
 
 def recvLogRecords(request):
-	from logbook.queues import ZeroMQSubscriber
-	subscriber = ZeroMQSubscriber('tcp://127.0.0.1:5000')
-	records = subscriber.recv()
+	from logger import FILENAME, timeFormat
+	f = codecs.open(FILENAME, 'r', 'utf-8')
+	records = f.read()
+	f.close()
+	
+	result = []
+	from_time = request.REQUEST.get('from', '')
+	if from_time:
+		epoch_sec = float(from_time) / 1000 - 2
+		from_time = time.strftime(timeFormat, time.localtime(epoch_sec))
+		log.debug('find log records those were made after %s' % from_time)
+		result = getLogRecordsFromGivenTime(records, timeFormat, epoch_sec)
+	else:
+		result = records
 	
 	response = HttpResponse(mimetype='text/plain')
-	response.write(records)
+	response.write(result)
 
 	return response
+
+def getLogRecordsFromGivenTime(records, format, from_time):
+	import re
+	result = []
+	lines = records.split('\n')
+	regex = re.compile("\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d")
+	log.debug('from_time %d' % from_time)
+	for i in reversed(range(len(lines))):		
+		line = lines[i]						
+		m = regex.match(line)
+		if m:
+			t = time.mktime(time.strptime(m.group(), format))						
+			if float( t ) <= from_time:				
+				break						
+			log.debug('line %s' % line)
+			result.append(line)
+	
+	return result
 
 def is_stubbed(path, request):
 	session_key = request.session.get('stub_key') or None

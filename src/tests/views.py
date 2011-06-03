@@ -12,7 +12,7 @@ except ImportError:
     _USE_MESSAGES = False
 
 def saveTestContent(path, content, test_root):
-	root = os.path.dirname(__file__)
+	root = os.path.dirname(os.path.abspath(__file__))
 	path = os.path.join(root, test_root, path)
 	
 	if not os.path.exists(os.path.dirname(path)):
