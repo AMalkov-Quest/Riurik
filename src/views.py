@@ -199,7 +199,9 @@ def createFolder(request, fullpath):
 
 @add_fullpath
 def removeObject(request, fullpath):
+	log.debug('removeObject: ' + fullpath)
 	result = tools.remove(fullpath)
+	log.debug('redirect to : ' + '/' + request.POST["url"])
 	return HttpResponseRedirect('/' + request.POST["url"])
 
 @add_fullpath
@@ -229,9 +231,10 @@ def createTest(request, fullpath):
 	
 @add_fullpath
 def saveTest(request, fullpath):
-	stub(request.POST["url"].lstrip('/'), request)
+	url = request.POST["url"].lstrip('/')
+	stub(url, request)
 	result = tools.savetest(request.POST["content"], fullpath)
-	return HttpResponseRedirect(request.POST["url"]+'?editor')
+	return HttpResponseRedirect('/' + url + '?editor')
 
 @add_fullpath	
 def saveDraftTest(request, fullpath):
@@ -264,19 +267,21 @@ def runSuite(request, fullpath):
 
 	ctx = context.get(fullpath, section=context_name)
 	host = ctx.get( option='host' )
+	run = ctx.get( option='run' )
 	
 	contextjs = context.render(ctx)
 	
-	if contrib.localhost(host):
+	path = removeVirtualFolderFromPath(path)
+	if contrib.localhost(host) and not run == 'remote':
 		saveLocalContext(fullpath, contextjs)
-		path = removeVitualFolderFromPath(path)
 	else:
+		url = "%s/%s" % (context.get_URL(ctx, True), settings.PRODUCT_TESTS_URL)
 		contextjs_path = os.path.join(path, settings.TEST_CONTEXT_JS_FILE_NAME)
-		saveRemoteScripts(contextjs_path, contextjs, ctx, request)
+		sendContentToRemote(contextjs_path, contextjs, url, ctx)
 	
 	url = "%s/%s?suite=/%s/%s" % ( context.get_URL(ctx), settings.PRODUCT_TESTS_URL, settings.PRODUCT_TEST_CASES_ROOT, path  )
 	url = contrib.normpath(urllib.unquote(url))
-	log.debug("Run suite %s" % url)
+	log.debug("Run suite %s" % path)
 	return HttpResponseRedirect( url )
 
 @add_fullpath
@@ -299,10 +304,13 @@ def runTest(request, fullpath):
 	if contrib.localhost(host) and not run == 'remote':
 		saveLocalContext(fullpath, contextjs)
 	else:
-		saveRemoteScripts(path, request.REQUEST["content"], contextjs, ctx, request)
+		url = "%s/%s" % (context.get_URL(ctx, True), settings.PRODUCT_TESTS_URL)
+		contextjs_path = os.path.join(os.path.dirname(path), settings.TEST_CONTEXT_JS_FILE_NAME)
+		sendContentToRemote(contextjs_path, contextjs, url, ctx)
+		saveRemoteScripts(path, url, request.REQUEST["content"], ctx, request)
 	
 	url = "%s/%s?path=/%s/%s" % (context.get_URL(ctx), settings.PRODUCT_TESTS_URL, settings.PRODUCT_TEST_CASES_ROOT, path)
-	log.info("Run test %s" % url)
+	log.info("Run test %s" % path)
 	return HttpResponseRedirect(url)
 
 def removeVirtualFolderFromPath(path):
@@ -323,18 +331,6 @@ def saveLocalContext(fullpath, contextjs):
 	f.write(contextjs)
 	f.close()
 
-def useLogin(url, login, password, skip_ntlm=False):
-	if not skip_ntlm:
-		from ntlm import HTTPNtlmAuthHandler
-	
-		passman = urllib2.HTTPPasswordMgrWithDefaultRealm()
-		passman.add_password(None, url, login, password)
-		auth_NTLM = HTTPNtlmAuthHandler.HTTPNtlmAuthHandler(passman)
-		opener = urllib2.build_opener(auth_NTLM)
-	else:
-		opener = urllib2.build_opener()
-	urllib2.install_opener(opener)
-	
 def makeSaveContentPost(content, path):
 	return {
 		'content': content,
@@ -359,31 +355,36 @@ def saveTestSatelliteScripts(url, test, request):
 		result = urllib2.urlopen(url, post).read()
 		log.debug("... done as %s" % result)
 
-def saveRemoteScripts(path, content, contextjs, ctx, request):
+def saveRemoteScripts(path, url, content, ctx, request):
+	saveTestSatelliteScripts(url, path, request)
+	return sendContentToRemote(path, content, url, ctx)
+
+def auth(url, ctx):
 	login = ctx.get('login')
 	password = ctx.get('password')
-	url = "%s/%s" % (context.get_URL(ctx), settings.PRODUCT_TESTS_URL)
-	url = url.replace(ctx.get('host'), context.host(ctx))
 	if login and password:
-		log.debug((url, login, password))
-		useLogin(url, login, password)
-	saveTestSatelliteScripts(url, path, request)
+		from ntlm import HTTPNtlmAuthHandler
 	
-	contextjs_path = os.path.join(os.path.dirname(path), settings.TEST_CONTEXT_JS_FILE_NAME)
-	sendContentToRemote(contextjs_path, contextjs, url)
+		passman = urllib2.HTTPPasswordMgrWithDefaultRealm()
+		passman.add_password(None, url, login, password)
+		auth_NTLM = HTTPNtlmAuthHandler.HTTPNtlmAuthHandler(passman)
+		opener = urllib2.build_opener(auth_NTLM)
+	else:
+		opener = urllib2.build_opener()
 	
-	return sendContentToRemote(path, content, url)
-
-def sendContentToRemote(path, content, url):
+	urllib2.install_opener(opener)
+	
+def sendContentToRemote(path, content, url, ctx):
 	data = makeSaveContentPost(content, path)
 	def _patch_strings(obj):
 		for key, val in obj.iteritems():
 			if val.__class__.__name__ == 'unicode':
 				obj[key] = val.encode('utf-8')
 		return obj
+	auth(url, ctx)
 	post = urllib.urlencode(_patch_strings(data))
 	result = urllib2.urlopen(url, post).read()
-	log.info("saving script %s result: %s" % (path, result))
+	log.info("remote script %s saving result: %s" % (path, result))
 	return result
 
 def recvLogRecords(request):
@@ -393,13 +394,18 @@ def recvLogRecords(request):
 	f.close()
 	
 	result = []
-	from_time = request.REQUEST.get('from', '')
-	if from_time:
-		epoch_sec = float(from_time) / 1000 - 2
-		from_time = time.strftime(timeFormat, time.localtime(epoch_sec))
-		log.debug('find log records those were made after %s' % from_time)
-		result = getLogRecordsFromGivenTime(records, timeFormat, epoch_sec)
+	start = request.REQUEST.get('start', '')
+	if start != 'undefined':
+		if start != 'last':
+			epoch_sec = float(start)
+			since_time = time.strftime(timeFormat, time.localtime(epoch_sec))
+			log.debug('find log records those were made after %s' % since_time)
+			result = getLogRecordsSinceGivenTime(records, timeFormat, epoch_sec)
+		else:
+			result = getLastLogRecordTime(records, timeFormat);
+			log.debug('find last log record time: %s' % result)
 	else:
+		log.debug('find all log records')
 		result = records
 	
 	response = HttpResponse(mimetype='text/plain')
@@ -407,20 +413,32 @@ def recvLogRecords(request):
 
 	return response
 
-def getLogRecordsFromGivenTime(records, format, from_time):
+def getLastLogRecordTime(records, format):
+	import re
+	result = None
+	lines = records.split('\n')
+	regex = re.compile("\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d")
+	for i in reversed(range(len(lines))):		
+		line = lines[i]
+		m = regex.match(line)
+		if m:
+			result = time.mktime(time.strptime(m.group(), format))				
+			break
+	return result
+
+def getLogRecordsSinceGivenTime(records, format, sinse_time):
 	import re
 	result = []
 	lines = records.split('\n')
 	regex = re.compile("\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d")
-	log.debug('from_time %d' % from_time)
+	log.debug('since time %d' % sinse_time)
 	for i in reversed(range(len(lines))):		
 		line = lines[i]						
 		m = regex.match(line)
 		if m:
-			t = time.mktime(time.strptime(m.group(), format))						
-			if float( t ) <= from_time:				
-				break						
-			log.debug('line %s' % line)
+			t = time.mktime(time.strptime(m.group(), format))
+			if float( t ) < sinse_time:				
+				break
 			result.append(line)
 	
 	return result

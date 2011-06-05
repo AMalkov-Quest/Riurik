@@ -13,12 +13,14 @@ def host(instance, resolve=True):
 def get(name, section='default'):
 	return context(name, section)
 
-def get_URL(instance):
+def get_URL(instance, resolve=False):
 	url = instance.get('url')
 	if not url:
 		host = instance.get('host')
 		if host == 'localhost':
 			host = socket.gethostname()
+		if resolve:
+			host = contrib.resolveRemoteAddr(host)
 		url =  'http://%s:%s' % (host, instance.get('port'))
 	return url
 

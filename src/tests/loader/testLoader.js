@@ -30,7 +30,6 @@ var frame = {
 		var regexp = new RegExp('\\n', 'gi');
 		var html = message.replace(regexp, '<br>')+'<hr/>';
 		$('#powershell-console').prepend(html);
-		console.log(message);
 	},
 	
 	console_complete: function(){
@@ -574,6 +573,14 @@ QUnit.log('QUnit console: inited');
 
 QUnit.config.reorder = false;
 QUnit.config.autostart = true;
+
+QUnit.setup = function(callback) {
+	QUnit.test('setup', 0, callback, true);
+}
+
+QUnit.teardown = function(callback) {
+	QUnit.test('teardown', 0, callback, true);
+}
 
 jQExtend($);
 
