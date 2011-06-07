@@ -42,7 +42,8 @@ def mksuite(path, name):
 
 def mktest(path, name):
 	try:
-		filename = os.path.join(name + settings.TEST_FILE_EXT)
+		#filename = os.path.join(name + settings.TEST_FILE_EXT)
+		filename = os.path.join(name)
 		fullpath = os.path.join(getWorkingDir(), path.strip('/'), filename)
 		f = open(fullpath, 'w')
 		f.close()
