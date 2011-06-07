@@ -87,9 +87,12 @@ class context():
 		self.section = section
 		log.debug('context: %s, section: %s, test: %s' % (self.inifile, self.section, test))
 		
-	def get(self, option):
+	def get(self, option, default=None):
 		value = config.get(self.inifile, self.section, option)
 		log.debug('get context option: %s=%s' % (option, value))
+		if not value:
+			value = default
+		
 		return value
 	
 	def set(self, option, value):
