@@ -6,18 +6,19 @@ module('save test remote');
 
 // setup creates new empty test file on a file system
 QUnit.setup(function() {
-  context.test_name = 'first-example';
-  context.test_path = 'tests/remote-tests';
+  context.test_name = 'first-example.js';
+  context.suite_path = 'tests/remote-tests';
+  context.test_path = context.suite_path + '/' + context.test_name;
   context.test_context = 'save-remote';
   context.test_content = "ok(true, 'test is run');";
   context.start = getLogs('last');
     
-  var path = 'actions/test/run/?path='+context.test_path+'/'+context.test_name+'.js&context='+context.test_context;
+  var path = 'actions/test/run/?path=' + context.test_path + '&context=' + context.test_context;
   context.url = contexter.URL(context, path + "&content=" + escape(context.test_content));
     
   $.seq(
-    function(){ delete_test( context.test_name, context.test_path, function(){}, function(){} ); },
-    function(){ create_test( context.test_name, context.test_path, function(){}, function(){} ); }
+    function(){ delete_test( context.test_path, function(){}, function(){} ); },
+    function(){ create_test( context.test_name, context.suite_path, function(){}, function(){} ); }
   ).then(function() {
     start();
   });
@@ -31,14 +32,15 @@ QUnit.setup(function() {
 asyncTest('test is saved', function() {
   expect(3);
   $('#frame').attr('src', context.url);
+  $('#frame').unbind('load');
   $('#frame').load(function() {
-    $.ajax('/' + context.test_path + '/' + context.test_name + '.js',
+    $.ajax('/' + context.test_path,
     { 
       async: false, 
       success: function(data) {
         equals(data, context.test_content, 'test content is OK');
         var logs = getLogs(context.start);
-        var regex = new RegExp("remote script remote-tests/" + context.test_name + ".js saving result: OK");
+        var regex = new RegExp("remote script " + delVirtualDir(context.test_path) + " saving result: OK");
         ok(regex.test(logs), regex);
         start();
       } 
@@ -56,6 +58,6 @@ test('test context is saved', function() {
 });
 
 QUnit.teardown(function() {
-  delete_test( context.test_name, context.test_path, function(){}, function(){} );
+  delete_test( context.test_path, function(){}, function(){} );
   start();
 });
