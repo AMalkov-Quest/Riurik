@@ -1,1 +1,0 @@
-[Errno 2] No such file or directory: u'C:\\riurik\\src\\tests\\cases/libraries/dir-index-contrib.js'

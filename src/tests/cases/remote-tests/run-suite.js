@@ -9,16 +9,13 @@ QUnit.setup(function() {
   var path = 'actions/suite/run/?path=/' + context.suite_path  + '&context=' + context_name;
   context.url = contexter.URL(context, path);
   
-  $.seq(
-    function(){ delete_suite(context.suite_path); },
-    function(){ create_suite(context.suite_name, 'tests'); },
-    function(){ set_context(context.suite_path, '[' + context_name + ']\nrun=remote\nhost=localhost\nport=8001'); },
-    function(){ write_test(context.suite_path + '/' + context.test1_name, "test('first test', function(){ok(true, 'is run')});"); },
-    function(){ write_test(context.suite_path + '/' + context.test2_name, "test('second test', function(){ok(true, 'is run')});"); }
-  ).then(function() {
-    context.start = getLogs('last');
-    start();
-  });
+  delete_suite(context.suite_path);
+  create_suite(context.suite_name, 'tests');
+  set_context(context.suite_path, '[' + context_name + ']\nrun=remote\nhost=localhost\nport=8001');
+  write_test(context.suite_path + '/' + context.test1_name, "test('first test', function(){ok(true, 'is run')});");
+  write_test(context.suite_path + '/' + context.test2_name, "test('second test', function(){ok(true, 'is run')});");
+  context.start = getLogs('last');
+  start();
 });
 
 asyncTest('suite is executed', function() {
@@ -52,9 +49,6 @@ asyncTest('context is saved', function() {
 });
 
 QUnit.teardown(function() {
-  $.seq(
-    function(){ delete_suite(context.suite_path); }
-  ).then(function() {
-    start();
-  });
+  delete_suite(context.suite_path);
+  start();
 });

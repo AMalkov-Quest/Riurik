@@ -16,12 +16,9 @@ QUnit.setup(function() {
   var path = 'actions/test/run/?path=' + context.test_path + '&context=' + context.test_context;
   context.url = contexter.URL(context, path + "&content=" + escape(context.test_content));
     
-  $.seq(
-    function(){ delete_test( context.test_path, function(){}, function(){} ); },
-    function(){ create_test( context.test_name, context.suite_path, function(){}, function(){} ); }
-  ).then(function() {
-    start();
-  });
+  delete_test( context.test_path );
+  create_test( context.test_name, context.suite_path );
+  start();
 });
 
 /* this new empty test file is queried to be run with the given content in the frame
@@ -58,6 +55,6 @@ test('test context is saved', function() {
 });
 
 QUnit.teardown(function() {
-  delete_test( context.test_path, function(){}, function(){} );
+  delete_test( context.test_path );
   start();
 });
