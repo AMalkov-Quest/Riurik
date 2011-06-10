@@ -14,7 +14,7 @@ function createFolderClick() {
 	);
 }
 
-function createFolder(path) {
+function createFolder() {
 	$("#create-dir-index-dialog span").text($("#folder-tip").text())
 	$("#create-dir-index-dialog").dialog({
 		title: $('#new-folder').text(),

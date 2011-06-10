@@ -201,8 +201,8 @@ def createFolder(request, fullpath):
 def removeObject(request, fullpath):
 	log.debug('removeObject: ' + fullpath)
 	result = tools.remove(fullpath)
-	log.debug('redirect to : ' + '/' + request.POST["url"])
-	return HttpResponseRedirect('/' + request.POST["url"])
+	redirect = '/' + request.POST["url"].lstrip('/')
+	return HttpResponseRedirect(redirect)
 
 @add_fullpath
 def createSuite(request, fullpath):
