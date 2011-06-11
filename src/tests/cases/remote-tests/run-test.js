@@ -18,7 +18,6 @@ QUnit.setup(function() {
     
   delete_test( context.test_path );
   create_test( context.test_name, context.suite_path );
-  start();
 });
 
 asyncTest('test is run', function() {
@@ -34,5 +33,4 @@ asyncTest('test is run', function() {
 
 QUnit.teardown(function() {
   delete_test( context.test_path );
-  start();
 });

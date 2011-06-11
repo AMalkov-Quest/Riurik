@@ -1,3 +1,7 @@
+/* this test require one more riurik instance on the 8001 port
+*  that will allow to test of saving test content in the editor
+*  to remote file system where test will be loaded
+*/
 module('run suite remote');
 
 QUnit.setup(function() {
@@ -15,7 +19,6 @@ QUnit.setup(function() {
   write_test(context.suite_path + '/' + context.test1_name, "test('first test', function(){ok(true, 'is run')});");
   write_test(context.suite_path + '/' + context.test2_name, "test('second test', function(){ok(true, 'is run')});");
   context.start = getLogs('last');
-  start();
 });
 
 asyncTest('suite is executed', function() {
@@ -50,5 +53,4 @@ asyncTest('context is saved', function() {
 
 QUnit.teardown(function() {
   delete_folder(context.suite_path);
-  start();
 });

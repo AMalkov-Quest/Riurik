@@ -23,7 +23,6 @@ QUnit.setup(function() {
   stubFile(context.non_satellite_path);
   
   context.start = getLogs('last');
-  start();
 });
 
 asyncTest('test is run', function() {
@@ -41,5 +40,4 @@ asyncTest('test is run', function() {
 
 QUnit.teardown(function() {
   delete_folder(context.suite_path);
-  start();
 });

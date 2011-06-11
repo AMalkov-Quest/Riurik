@@ -18,7 +18,6 @@ QUnit.setup(function() {
     
   delete_test( context.test_path );
   create_test( context.test_name, context.suite_path );
-  start();
 });
 
 /* this new empty test file is queried to be run with the given content in the frame
@@ -56,5 +55,4 @@ test('test context is saved', function() {
 
 QUnit.teardown(function() {
   delete_test( context.test_path );
-  start();
 });

@@ -5,7 +5,6 @@ QUnit.setup(function() {
   context.suite_name = 'first-suite';
   context.suite_path = context.current_folder + '/' + context.suite_name;
   context.test_name = 'first-test.js';
-  start();
 });
 
 asyncTest('title for folder', function() {

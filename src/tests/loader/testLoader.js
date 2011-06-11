@@ -609,11 +609,11 @@ QUnit.config.reorder = false;
 QUnit.config.autostart = true;
 
 QUnit.setup = function(callback) {
-	QUnit.test('setup', 0, callback, true);
+	QUnit.test('setup', 0, callback, false);
 }
 
 QUnit.teardown = function(callback) {
-	QUnit.test('teardown', 0, callback, true);
+	QUnit.test('teardown', 0, callback, false);
 }
 
 
