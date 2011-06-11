@@ -36,6 +36,23 @@ function create_suite(name, path) {
   
 };
 
+function create_folder(name, path) {
+  
+  $.ajax({
+    type: 'POST',
+    async: false,
+    url: contexter.URL(context, 'actions/folder/create/'),
+    data: { 'object-name': name, 'path': path },
+    success: function(data) {
+      QUnit.log('suite "' + name + '" at "' + path + '" is created');
+    },
+    error: function() {
+      QUnit.log('suite "' + name + '" at "' + path + '" is failed');
+    }
+  });
+  
+};
+
 function create_test(test_name, suite_path) {
   
   $.ajax({
@@ -72,8 +89,8 @@ function delete_test(test_path) {
   delete_object('test', test_path)
 };
 
-function delete_suite(path) {
-  delete_object('suite', path)
+function delete_folder(path) {
+  delete_object('folder', path)
 };
 
 function write_test(path, content) {

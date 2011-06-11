@@ -15,8 +15,8 @@ QUnit.setup(function() {
   var context_content = 'run=remote\nhost=localhost\nport=8001\nlibraries=["' + context.satellite_path + '"]';
   context.start = getLogs('last');
   
-  delete_suite(context.suite_path);
-  create_suite(context.suite_name, 'tests');
+  delete_folder(context.suite_path);
+  create_folder(context.suite_name, 'tests');
   create_test(satellite_name, context.suite_path + '/' +  satellite_name);
   set_context(context.suite_path, '[' + context_name + ']\n' + context_content);
   stubFile(context.satellite_path);
@@ -40,6 +40,6 @@ asyncTest('test is run', function() {
 });
 
 QUnit.teardown(function() {
-  delete_suite(context.suite_path);
+  delete_folder(context.suite_path);
   start();
 });

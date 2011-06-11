@@ -118,7 +118,7 @@ def serve(request, path, document_root=None, show_indexes=False):
 			try:
 				contexts = context.get( fullpath ).sections()
 			except Exception, e:
-				log.error(e)
+				log.exception(e)
 				contexts = []
 
 			ret = _render_to_response(
@@ -127,6 +127,7 @@ def serve(request, path, document_root=None, show_indexes=False):
 					'content': content,
 					'contexts': contexts,
 					'relative_file_path': path,
+					'directory': path,
 					'is_stubbed': is_stubbed(path, request),
 	
 				}, 
@@ -134,9 +135,8 @@ def serve(request, path, document_root=None, show_indexes=False):
 			)
 			stub(path, request)
 			return ret
-	except Exception, ex:
-		print ex
-		log.error(str(ex))
+	except Exception, e:
+		log.exception(e)
 		
 	return response
 
@@ -207,15 +207,20 @@ def removeObject(request, fullpath):
 @add_fullpath
 def createSuite(request, fullpath):
 	result = {}
-	result['success'], result['result'] = tools.mksuite(fullpath, request.POST["object-name"])
+	result['success'], result['result'] = tools.mkcontext(fullpath, request.POST["object-name"])
 	result['result'] += '?editor'
 	response = HttpResponse(mimetype='text/json')
 	response.write(simplejson.dumps(result))
 	
 	return response
-	
-def editSuite(request):
-	return HttpResponseRedirect('/' + request.GET['path'] + '/' + settings.TEST_CONTEXT_FILE_NAME+'?editor')
+
+@add_fullpath	
+def editSuite(request, fullpath):
+	log.debug('edit context %s' % fullpath)
+	if not os.path.exists(os.path.join(fullpath, settings.TEST_CONTEXT_FILE_NAME)):
+		tools.mktest(fullpath, settings.TEST_CONTEXT_FILE_NAME)
+	redirect = '/' + request.GET['path'] + '/' + settings.TEST_CONTEXT_FILE_NAME + '?editor'
+	return HttpResponseRedirect(redirect)
 	
 @add_fullpath
 def createTest(request, fullpath):
@@ -223,7 +228,7 @@ def createTest(request, fullpath):
 	result = {}
 	result['success'], result['result'] = tools.mktest(fullpath, request.POST["object-name"])
 	result['result'] += '?editor'
-	
+	log.debug('createTest results: %s' % result)
 	response = HttpResponse(mimetype='text/json')
 	response.write(simplejson.dumps(result))
 	

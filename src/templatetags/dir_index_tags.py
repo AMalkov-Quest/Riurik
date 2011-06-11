@@ -42,31 +42,35 @@ def above(path):
 
 @register.filter
 def current(path):
-	if path.rstrip('/').find('/') == -1:
-		return path.rstrip('/')
-	return path.rstrip('/').rsplit('/', 1)[1]
+	path = path.replace('\\', '/').rstrip('/')
+	if path.find('/') == -1:
+		return path
+	return path.rsplit('/')[-1]
 
 @register.filter
 def breadcrumbs(path):
 	path = path.replace('\\','/')
-	html = '<a href="/">/</a>&nbsp;'
+	html = '<a href="/">&#8226;</a>&nbsp;&nbsp;'
 	if settings.STATIC_TESTS_URL:
 		root = '/' + settings.STATIC_TESTS_URL + '/'
 	else:
 		root = '/'
 	
 	lastpath = root
-	i = 0
+	i = 1
 	crumbs = path.split('/')
 	for p in crumbs:
 		i += 1
 		if p:
 			lastpath += p 
 			lastpath += '/'
-			html += '<a href="%s">%s</a>&nbsp;/&nbsp;' % ( lastpath, p )
+			if i < len(crumbs):
+				html += '<a href="%s">%s</a>&nbsp;&nbsp;&#8227;&nbsp;&nbsp;' % ( lastpath, p )
+			else:
+				html += '%s&nbsp;&nbsp;' % ( p )
 			
 	if not path == '/':
-		html += '<a style="text-decoration: none;" href="%s%s">...</a>' % (root, above(path))
+		html += '<a href="%s%s"><img height="11" src="/static/img/up.png" /></a>' % (root, above(path))
 	return mark_safe(html)
 
 @register.filter

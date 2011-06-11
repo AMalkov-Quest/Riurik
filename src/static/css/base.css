@@ -90,10 +90,13 @@ li img {
 	display: none;
 }
 
-h4 a {
-    text-decoration: none;
+.breadcrumbs {
     color: navy;
     font-weight: normal;
+}
+
+.breadcrumbs a {
+    text-decoration: none;
 }
 
 .dir-index li {

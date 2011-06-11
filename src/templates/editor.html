@@ -193,7 +193,7 @@
 	{% endif %}
 {% endblock controls %}
 
-{% block title %}<h4>{{ request.path|breadcrumbs_file }}</h4>{% endblock title %}
+{% block title %}<p class="breadcrumbs">{{ request.path }}</p>{% endblock title %}
 
 {% block content %}
 		<form id='apply-test' method='POST'{% if is_stubbed %} style="display:none;"{% endif %} >

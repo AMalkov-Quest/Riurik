@@ -40,17 +40,36 @@ def mksuite(path, name):
 	
 	return (True, os.path.join(name, settings.TEST_CONTEXT_FILE_NAME))
 
-def mktest(path, name):
+def template(name):
+	content = ''
 	try:
-		#filename = os.path.join(name + settings.TEST_FILE_EXT)
-		filename = os.path.join(name)
-		fullpath = os.path.join(getWorkingDir(), path.strip('/'), filename)
-		f = open(fullpath, 'w')
+		file = os.path.join(os.path.dirname(__file__), name)
+		f = open(file, 'r')
+		content = f.read()
 		f.close()
 	except Exception, e:
+		log.exception(e)
+	
+	return content
+
+def mktest(path, name):
+	return mkscript(path, name, 'template_test.txt')
+
+def mkcontext(path, name):
+	return mkscript(path, name, 'template_context.txt')
+
+def mkscript(path, name, template_name=None):
+	try:
+		fullpath = os.path.join(getWorkingDir(), path.strip('/'), name)
+		f = open(fullpath, 'w')
+		if template:
+			f.write(template(template_name))
+		f.close()
+	except Exception, e:
+		log.exception(e)
 		return (False, str(e))
 	
-	return (True, filename)
+	return (True, name)
 
 def savetmptest(content, fullpath):
 	try:

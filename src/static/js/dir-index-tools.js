@@ -1,3 +1,13 @@
+function relocate(new_location){
+	console.log(window.location.toString());
+	len = window.location.toString().length;
+	if( document.location.toString().charAt(len - 1) == '/' ) {
+		document.location += new_location;
+	}else{
+		document.location += '/' + new_location;
+	}	 
+}
+
 function createFolderClick() {
 	$(this).dialog("close");
 	$.post(
@@ -54,7 +64,6 @@ function createAndEdit(srcObject, url) {
 		open: function(event, ui) {
 			$('input[type=text]', this).keyup(function(e) {
 					if(e.keyCode == 13) {
-						//$(this).dialog()
 						console.log($(this).dialog( "option", "buttons" ))
 					};
 			});
@@ -67,7 +76,7 @@ function createAndEdit(srcObject, url) {
 					$("#create-fsobject").serialize(), 
 					function(data) {
 						if (data['success'] == true) {
-							document.location += '\\' + data['result'];
+							relocate(data['result']);
 						}else{
 							showError(data['result']);
 						}

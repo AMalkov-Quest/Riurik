@@ -9,8 +9,8 @@ QUnit.setup(function() {
   var path = 'actions/suite/run/?path=/' + context.suite_path  + '&context=' + context_name;
   context.url = contexter.URL(context, path);
   
-  delete_suite(context.suite_path);
-  create_suite(context.suite_name, 'tests');
+  delete_folder(context.suite_path);
+  create_folder(context.suite_name, 'tests');
   set_context(context.suite_path, '[' + context_name + ']\nrun=remote\nhost=localhost\nport=8001');
   write_test(context.suite_path + '/' + context.test1_name, "test('first test', function(){ok(true, 'is run')});");
   write_test(context.suite_path + '/' + context.test2_name, "test('second test', function(){ok(true, 'is run')});");
@@ -49,6 +49,6 @@ asyncTest('context is saved', function() {
 });
 
 QUnit.teardown(function() {
-  delete_suite(context.suite_path);
+  delete_folder(context.suite_path);
   start();
 });
