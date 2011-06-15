@@ -44,7 +44,7 @@ def enumerate_suites(request):
 	return HttpResponse(str(suites).replace('[','').replace(']','').rstrip(',').replace('\'',''))
 
 urlpatterns = patterns('',
-	(r'^favicon\.ico$', 'django.views.generic.simple.redirect_to', {'url': '/static/img/dir-index-folder.gif'}),
+	(r'^favicon\.ico$', 'django.views.generic.simple.redirect_to', {'url': '/static/img/favicon.gif'}),
 	(r'^actions/folder/create/$', 'views.createFolder'),
 	(r'^actions/suite/create/$', 'views.createSuite'),
 	(r'^actions/suite/edit/$', 'views.editSuite'),

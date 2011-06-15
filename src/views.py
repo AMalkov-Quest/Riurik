@@ -91,12 +91,15 @@ def serve(request, path, document_root=None, show_indexes=False):
 			except Exception, e:
 				log.error(e)
 				contexts = []
+				
+			favicon = 'dir-index-%s.gif' % tools.get_type(fullpath)
 
 			c = Context({
 				'directory' : newpath + '/',
 				'file_list' : files,
 				'dir_list'  : dirs,
 				'contexts'  : contexts,
+				'favicon'   : favicon,
 			})
 			return HttpResponse(t.render(c))
 		raise Http404("Directory indexes are not allowed here.")
@@ -124,12 +127,12 @@ def serve(request, path, document_root=None, show_indexes=False):
 			ret = _render_to_response(
 				'editor.html', 
 				{ 
+					'directory': path,
 					'content': content,
 					'contexts': contexts,
 					'relative_file_path': path,
-					'directory': path,
 					'is_stubbed': is_stubbed(path, request),
-	
+					'favicon'   : 'dir-index-test.gif',
 				}, 
 				context_instance=RequestContext(request)
 			)
@@ -186,7 +189,6 @@ def log_errors(fn):
 			raise
 		return result
 	return log_it
-	
 
 @add_fullpath
 def createFolder(request, fullpath):

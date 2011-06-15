@@ -4,6 +4,7 @@ from django.utils.safestring import mark_safe
 import settings
 import contrib
 from logger import log
+import dir_index_tools
 
 register = template.Library()
 
@@ -16,11 +17,7 @@ def dir_index_type(path, fsobject):
 	log.debug(path + fsobject)
 	fullpath = contrib.get_fullpath(path + fsobject)
 	log.debug(fullpath)
-	if os.path.isdir(fullpath):
-		if os.path.exists( os.path.join(fullpath, settings.TEST_CONTEXT_FILE_NAME) ):
-			return 'suite'
-		return 'folder'
-	return 'test'
+	return dir_index_tools.get_type(fullpath)
 
 @register.filter
 def make_url(val):

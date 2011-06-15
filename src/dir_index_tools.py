@@ -5,6 +5,13 @@ from logger import log
 def getWorkingDir():
 	return settings.STATIC_TESTS_ROOT
 
+def get_type(path):
+	if os.path.isdir(path):
+		if os.path.exists( os.path.join(path, settings.TEST_CONTEXT_FILE_NAME) ):
+			return 'suite'
+		return 'folder'
+	return 'test'
+
 def mkdir(path, name):
 	try:
 		fullpath = os.path.join(getWorkingDir(), path.strip('/'), name)
