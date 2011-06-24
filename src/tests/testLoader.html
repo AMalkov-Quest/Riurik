@@ -21,43 +21,50 @@
 		<script type="text/javascript" src="{{ loader }}/jqueryui/js/jquery-ui-1.8.10.custom.min.js"></script>
 		<link rel="stylesheet" type="text/css" href="{{ loader }}/jqueryui/css/redmond/jquery-ui-1.8.10.custom.css">
 		
+		<link rel="stylesheet" type="text/css" href="{{ loader }}/qunit.css" media="screen" />
+		<script type="text/javascript" src="{{ loader }}/qunit.js"></script>
+		
+		<link rel="stylesheet" type="text/css" href="{{ loader }}/testLoader.css" />
+		<script type="text/javascript" src="{{ loader }}/testLoader.js?_={{rand}}"></script>
+		
 		<script type="text/javascript" src="{{ jspath }}/.context.js?_={{rand}}"></script>
 		<script type="text/javascript">
-			$(document).ready(function(){
+			riurik.load = function() {
+				QUnit.config.autostart = false;
+				
 				if ( typeof context == 'undefined' ) {
 					context = { include: [] };
 					alert('No context loaded');
 				}
+				
+				var loading_complete = new Array();
+				
 				context.libraries = context.libraries || [];
 				for ( i in context.libraries ) {
 					var jsfile = context.libraries[i];
-					var script = document.createElement( 'script' );
-					script.type = 'text/javascript';
-					script.src = '{{ cases }}/'+jsfile+'?_={{rand}}';
-					document.body.appendChild( script );	
+					loading_complete.push( riurik.load_js( '{{ cases }}/' + jsfile + '?_={{rand}}' ) );
 				};
+				
 				{% if suite %}
+				
 				context.include = context.include || [];
 				for ( i in context.include ) {
 					var jsfile = context.include[i];
-					var script = document.createElement( 'script' );
-					script.type = 'text/javascript';
-					script.src = '{{ jspath }}/'+jsfile+'?_={{rand}}';
-					document.body.appendChild( script );	
+					loading_complete.push( riurik.load_js( '{{ jspath }}/' + jsfile + '?_={{rand}}' ) );
 				};
+				
 				{% else %}
-				var script = document.createElement( 'script' );
-				script.type = 'text/javascript';
-				script.src = '{{ jsfile }}?_={{rand}}';
-				document.body.appendChild( script );
+				
+				loading_complete.push( riurik.load_js('{{ jsfile }}?_={{rand}}') );
+				
 				{% endif %}
-			});
+				
+				$.when.apply( this, loading_complete ).then(function() {
+					QUnit.start();
+				});
+			};
 		</script>		  
 		<script type="text/javascript">$(document).ready(function() { $( "#tabs" ).tabs(); } );</script>
-		<link rel="stylesheet" type="text/css" href="{{ loader }}/qunit.css" media="screen" />
-		<script type="text/javascript" src="{{ loader }}/qunit.js"></script>
-		<link rel="stylesheet" type="text/css" href="{{ loader }}/testLoader.css" />
-		<script type="text/javascript" src="{{ loader }}/testLoader.js?_={{rand}}"></script>
 		
 	</head>
 	<body>
