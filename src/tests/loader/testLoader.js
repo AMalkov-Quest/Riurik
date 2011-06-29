@@ -8,6 +8,7 @@ var frame = {
 			var dfd = $.Deferred();
 
 			$('#frame').attr('src', url);
+			$('#frame-url').html('<a href="'+url+'">'+url+'</a>');
 			$('#frame').load(function() {
 				jQExtend(window.frames[0].window.jQuery);
 				dfd.resolve(window.frames[0].window.jQuery);
