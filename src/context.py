@@ -61,7 +61,7 @@ def patch(ctx):
 		include = []
 		for root, dirs, files in os.walk(ctx.get_folder()):
 			for file in files:
-				if re.match('^.*\.js$', file):
+				if re.match('^.*\.js$', file) and not file.startswith('.'):
 					if file in exclude:
 						continue
 					file_abspath = os.path.abspath(os.path.join(root, file))

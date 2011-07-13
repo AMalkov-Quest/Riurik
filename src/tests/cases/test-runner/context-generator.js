@@ -1,7 +1,15 @@
-module('context generator', {
-  setup: function() {
-    context.setup_value = 10;
-  }
+module('context generator');
+
+QUnit.setup(function() {
+  context.setup_value = 10;
+  context.hidden_file = '.hidden-file.js';
+  context.suite_path = 'tests/suite-for-testing';
+  context.hidden_path = context.suite_path + '/' + context.hidden_file;
+  var path = 'actions/suite/run/?path=/' + context.suite_path + '&context=localhost';
+  context.url = contexter.URL(context, path);
+  
+  delete_test( context.hidden_path );
+  create_test( context.hidden_file, context.suite_path );
 });
 
 test('context is generated', function() {
@@ -15,4 +23,19 @@ test('context is generated', function() {
   equal( library2.method2(40), 40, 'method from library 2 is available' );
   equal( library3.method3(60), 60, 'method from library 3 is available' );
   
+});
+
+asyncTest('hidden file is not included into suite', function() {
+  $.when( frame.go( context.url ) ).then(function(_$) {
+
+    $.each( frame.window().context.include, function(index, value){ 
+      ok( value != context.hidden_file, value );
+    });
+    
+    start();
+  });
+});
+
+QUnit.teardown(function() {
+  delete_test( context.hidden_path );
 });
