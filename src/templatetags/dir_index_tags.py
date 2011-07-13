@@ -47,6 +47,10 @@ def current(path):
 @register.filter
 def breadcrumbs(path):
 	path = path.replace('\\','/')
+	
+	fullpath = contrib.get_fullpath(path)
+	type = dir_index_tools.get_type(fullpath)
+	
 	html = '<a href="/">&#8226;</a>&nbsp;&nbsp;'
 	if settings.STATIC_TESTS_URL:
 		root = '/' + settings.STATIC_TESTS_URL + '/'
@@ -54,8 +58,8 @@ def breadcrumbs(path):
 		root = '/'
 	
 	lastpath = root
-	i = 1
-	crumbs = path.split('/')
+	i = 0
+	crumbs = path.rstrip('/').split('/')
 	for p in crumbs:
 		i += 1
 		if p:
@@ -64,10 +68,14 @@ def breadcrumbs(path):
 			if i < len(crumbs):
 				html += '<a href="%s">%s</a>&nbsp;&nbsp;&#8227;&nbsp;&nbsp;' % ( lastpath, p )
 			else:
-				html += '%s&nbsp;&nbsp;' % ( p )
+				html += '<a>%s&nbsp;&nbsp;</a>' % ( p )
 			
 	if not path == '/':
-		html += '<a href="%s%s"><img height="11" src="/static/img/up.png" /></a>' % (root, above(path))
+		if type != 'test':
+			html += '<a href="%s%s"><img height="11" src="/static/img/up.png" /></a>' % (root, above(path))
+	else:
+		html = ''
+		
 	return mark_safe(html)
 
 @register.filter

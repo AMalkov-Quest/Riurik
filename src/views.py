@@ -69,6 +69,8 @@ def serve(request, path, document_root=None, show_indexes=False):
 	fullpath = os.path.abspath(os.path.join(document_root, newpath))
 	fullpath = contrib.patch_fullpaths(fullpath, newpath)
 	if os.path.isdir(fullpath):
+		if request.path and request.path[-1:] != '/':
+			return HttpResponseRedirect(request.path + '/')
 		if show_indexes:
 			try:
 				t = loader.select_template(['directory-index.html', 'directory-index'])
@@ -267,6 +269,9 @@ def submitSuite(request):
 
 	return _render_to_response( "runsuite.html", locals() )
 
+def get_root():
+	return '/testsrc/' + settings.PRODUCT_TEST_CASES_ROOT
+
 @add_fullpath
 def runSuite(request, fullpath):
 	path = contrib.normpath(request.REQUEST["path"])
@@ -286,7 +291,7 @@ def runSuite(request, fullpath):
 		contextjs_path = os.path.join(path, settings.TEST_CONTEXT_JS_FILE_NAME)
 		sendContentToRemote(contextjs_path, contextjs, url, ctx)
 	
-	url = "%s/%s?suite=/%s/%s" % ( context.get_URL(ctx), settings.PRODUCT_TESTS_URL, settings.PRODUCT_TEST_CASES_ROOT, path  )
+	url = "%s/%s?suite=/%s&root=%s" % ( context.get_URL(ctx), settings.PRODUCT_TESTS_URL, path, get_root()  )
 	url = contrib.normpath(urllib.unquote(url))
 	log.info("Run suite %s" % path)
 	return HttpResponseRedirect( url )
@@ -308,15 +313,19 @@ def runTest(request, fullpath):
 	log.debug('contextJS: '+ contextjs)
 	
 	path = removeVirtualFolderFromPath(path)
-	if contrib.localhost(host) and not run == 'remote':
+	root = get_root()
+	if (contrib.localhost(host) and not run == 'remote') or run == 'local':
 		saveLocalContext(fullpath, contextjs)
+		if run == 'local':
+			root = ''
 	else:
 		url = "%s/%s" % (context.get_URL(ctx, True), settings.PRODUCT_TESTS_URL)
 		contextjs_path = os.path.join(os.path.dirname(path), settings.TEST_CONTEXT_JS_FILE_NAME)
 		sendContentToRemote(contextjs_path, contextjs, url, ctx)
 		saveRemoteScripts(path, url, request.REQUEST["content"], ctx, request)
-	
-	url = "%s/%s?path=/%s/%s" % (context.get_URL(ctx), settings.PRODUCT_TESTS_URL, settings.PRODUCT_TEST_CASES_ROOT, path)
+		
+	url = "%s/%s?path=/%s&root=%s" % (context.get_URL(ctx), settings.PRODUCT_TESTS_URL, path, root)
+		
 	log.info("Run test %s" % path)
 	return HttpResponseRedirect(url)
 

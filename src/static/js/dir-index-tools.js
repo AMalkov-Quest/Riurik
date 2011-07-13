@@ -1,3 +1,10 @@
+$(document).ready(function () {
+	$('#context-preview-ctrl').simpleDialog({
+	  width: 800,
+	  height: 700
+	});
+});
+
 function relocate(new_location){
 	console.log(window.location.toString());
 	len = window.location.toString().length;

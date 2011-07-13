@@ -178,6 +178,7 @@
 	<ul class="horizontal-menu">
 		<li><a id="run" href="javascript:void(0);">{% trans "Run" %}</a>
 		at <select name="context">{% for item in contexts %}<option value='{{item}}'{% if forloop.first %} selected="selected"{% endif %}>{{item}}</option>{% endfor %}</select></li>
+		<li><a id="context-preview-ctrl" href=".context.ini" rel='context-preview'>{% trans "Context" %}</a></li>
 		<li><a id="save" href="javascript:void(0);">{% trans "Save" %}</a></li>
 		<li><a id="discard" href="javascript: void(0);">{% trans "Discard" %}</a></li>
 		<li class="disabled"><a id="history" href="javascript: void(0);">{% trans "History" %}</a></li>
@@ -193,7 +194,7 @@
 	{% endif %}
 {% endblock controls %}
 
-{% block title %}<p class="breadcrumbs">{{ request.path }}</p>{% endblock title %}
+{% block title %}<p class="breadcrumbs">{{ request.path|breadcrumbs }}</p>{% endblock title %}
 
 {% block content %}
 		<form id='apply-test' method='POST'{% if is_stubbed %} style="display:none;"{% endif %} >

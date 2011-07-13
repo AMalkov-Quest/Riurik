@@ -399,18 +399,29 @@ var riurik = {
 	},
 	
 	load_js: function(jsfile_src) {
+		var scr = jsfile_src;
+		QUnit.log('Adding script '+jsfile_src+' to queue to load');
 		var dfd = new $.Deferred();
+		
 		
 		var script = document.createElement( 'script' );
 		script.type = 'text/javascript';
 		script.src = jsfile_src;
 		
 		var onload = function() {
+			QUnit.log(scr +' is loaded.');
 			dfd.resolve(dfd);
 		};
 		
 		if( $.browser.msie ) {
-			script.onreadystatechange = onload;
+			script.onreadystatechange = function() {
+				QUnit.log('IE readyState is ' + script.readyState)
+				if (script.readyState == 'loaded' ||
+					script.readyState == 'complete') {
+					script.onreadystatechange = null;
+					onload();
+				};
+			}
 		}else{
 			script.onload = onload;
 		}
@@ -634,13 +645,20 @@ QUnit.log('QUnit console: initialized');
 QUnit.config.reorder = false;
 
 QUnit.setup = function(callback) {
+	QUnit.test('setup', 0, callback, false);
+}
+
+QUnit.asyncSetup = function(callback) {
 	QUnit.test('setup', 0, callback, true);
 }
 
 QUnit.teardown = function(callback) {
-	QUnit.test('teardown', 0, callback, true);
+	QUnit.test('teardown', 0, callback, false);
 }
 
+QUnit.asyncTeardown = function(callback) {
+	QUnit.test('teardown', 0, callback, true);
+}
 
 jQExtend($);
 

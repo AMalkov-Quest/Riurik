@@ -1,6 +1,6 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
-
+{% load i18n %}
 {% load dir_index_tags %}
 
 <head>
@@ -18,11 +18,13 @@
 	<script type="text/javascript" src="/static/jquery-ui/js/jquery-ui-1.8.9.custom.min.js"></script>
     
     <link rel="stylesheet" href="/static/css/base.css" type="text/css">
-    <script type="text/javascript" src="/static/js/dir-index-tools.js"></script>
     
     <link rel="stylesheet" href="/static/css/jquery.contextMenu.css" type="text/css">
     <script type="text/javascript" src="/static/js/jquery.contextMenu.js"></script>
+    <link rel="stylesheet" href="/static/css/jquery.simpledialog.0.1.css" type="text/css">
+    <script type="text/javascript" src="/static/js/jquery.simpledialog.0.1.js"></script>
     <script type="text/javascript" src="/static/js/dir-index-ctxmenu.js"></script>
+    <script type="text/javascript" src="/static/js/dir-index-tools.js"></script>
     
     <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
     <meta http-equiv="Content-Language" content="en-us" />
@@ -62,6 +64,7 @@
 								{% endfor %}
 							</select>
 						</li>
+						<li><a id="context-preview-ctrl" href=".context.ini" rel='context-preview'>{% trans "Context" %}</a></li>
 						<li><a id="new-test" href="javascript:void(0);" onClick="javascript:createTest();">Create Test</a></li>
 					{% else %}
 						<li><a id="new-suite" href="javascript:void(0);" onClick="javascript:createFolder();">Create Suite</a></li>

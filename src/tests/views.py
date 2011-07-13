@@ -35,17 +35,18 @@ def index(request):
 		return response
 	else:
 		rand = random.random()
-		root = '/testsrc'
-		loader = root +'/loader'
-		cases = root +'/cases'
+		root = request.REQUEST.get('root', '')
+		if root:
+			loader = root + '/../loader'
+		else:
+			loader = '/testsrc/loader'
 		if 'suite' in request.REQUEST:
-			jspath = request.REQUEST.get('suite', '')
+			jspath = request.REQUEST.get('suite', '').strip('/')
 			title = os.path.basename(jspath)
 			suite = True
 		else:
-			jsfile = request.REQUEST.get('path', '')
-			jspath = os.path.dirname(jsfile)
+			jsfile = request.REQUEST.get('path', '').strip('/')
+			jspath = os.path.dirname(jsfile).strip('/')
 			title = os.path.basename(jsfile)
-			jsfile = root + jsfile
-		jspath = root + '/' + jspath.strip('/')
+
 		return render_to_response('testLoader.html', locals())
