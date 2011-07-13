@@ -1,18 +1,16 @@
-module('create test', {
+module('test create and edit', {
   setup: function() {
-    context.test_name = 'first-example';
-    var path = 'tests/run-test/example1.js?editor';
-    context.url = contexter.URL(context, path);
+    context.test_path = 'tests/test-editor';
+    context.test_name = 'first-example.js';
   }
 });
 
-asyncTest('create test', function(){
+asyncTest('post to create', function(){
   
   $.post(
     contexter.URL(context, 'actions/test/create/'),
-    { 'object-name': context.test_name, 'path': 'tests/test-editor' },
+    { 'object-name': context.test_name, 'path': context.test_path },
     function(data) {
-      QUnit.log(data);
       start();
     })
     .error(function() {
@@ -20,11 +18,15 @@ asyncTest('create test', function(){
       start();
     });
   
-  $.when( frame.go( contexter.URL(context, 'tests/test-editor/' + context.test_name + '.js?editor') ) ).then(function(_$){
+  $.when( frame.go( contexter.URL(context, 'tests/test-editor/' + context.test_name + '?editor') ) ).then(function(_$){
     //ok(_$('#run').length == 1, 'run button exists');
     //ok(_$('select[name=context]').length == 1, 'context select exists');
     //ok(_$('select[name=context] option[value=test-context]').length == 1, 'test context option exists');
     start();
   });
   
+});
+
+QUnit.teardown(function() {
+  delete_test( context.test_path + '/' + context.test_name);
 });
