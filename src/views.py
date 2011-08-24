@@ -222,7 +222,7 @@ def createSuite(request, fullpath):
 def editSuite(request, fullpath):
 	log.debug('edit context %s' % fullpath)
 	if not os.path.exists(os.path.join(fullpath, settings.TEST_CONTEXT_FILE_NAME)):
-		tools.mktest(fullpath, settings.TEST_CONTEXT_FILE_NAME)
+		tools.mkcontext(fullpath, settings.TEST_CONTEXT_FILE_NAME)
 	redirect = '/' + request.GET['path'] + '/' + settings.TEST_CONTEXT_FILE_NAME + '?editor'
 	return HttpResponseRedirect(redirect)
 	
