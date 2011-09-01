@@ -86,9 +86,8 @@ urlpatterns += patterns('',
 		'show_indexes': True
 		}
 	),
-	(r'^' + settings.STATIC_TESTS_URL + '(?P<path>.*)$', 'views.serve',
+	(r'^(?P<path>.*)$', 'views.serve',
 		{
-			'document_root': settings.STATIC_TESTS_ROOT,
 			'show_indexes': True
 		}
 	),

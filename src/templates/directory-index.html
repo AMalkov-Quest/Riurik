@@ -54,7 +54,7 @@
 			<input type="hidden" name="path" value="{{ directory }}">
 			<input type="hidden" name="url" value="{{ directory }}">
 			<ul class="horizontal-menu">
-				{% with directory|dir_index_type:'' as type %}
+				
 					{% ifequal type 'suite' %}
 						<li>
 							<a id="run-suite-btn" href="javascript:void(0);" onClick="javascript:$('#run-suite').submit();">Run Suite</a>
@@ -69,7 +69,7 @@
 					{% else %}
 						<li><a id="new-suite" href="javascript:void(0);" onClick="javascript:createFolder();">Create Suite</a></li>
 					{% endifequal %}
-				{% endwith %}
+				
 			</ul>
 			</form>
 			{% endblock controls %}
@@ -85,14 +85,14 @@
 	        	<ul>
 	        		<li></li>
 	        		{% for f in dir_list %}
-	        		<li id="{{ f|strip:'/' }}" class="{{ directory|dir_index_type:f }}" title="{{ f|strip:'/' }}">
-						<a href="{{ f }}">{{ f|strip:'/' }}</a>
+	        		<li id="{{ f.title|strip:'/' }}" class="{{ f.type }}" title="{{ f.title|strip:'/' }}">
+						<a href="{{ f.title }}">{{ f.title|strip:'/' }}</a>
 	    			</li>
 	    			{% endfor %}
 
 	        		{% for f in file_list %}
-	        		<li class="{{ directory|dir_index_type:f }}" title="{{ f|strip:'/' }}">
-						<a id="{{ f|strip:'/' }}" href="{{ f }}?editor">{{ f|strip:'/' }}</a>
+	        		<li class="{{ f.type }}" title="{{ f.title|strip:'/' }}">
+						<a id="{{ f.title|strip:'/' }}" href="{{ f.title }}?editor">{{ f.title|strip:'/' }}</a>
 	    			</li>
 	    			{% endfor %}
 	    		</ul>

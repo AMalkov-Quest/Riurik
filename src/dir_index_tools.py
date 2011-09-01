@@ -6,11 +6,27 @@ def getWorkingDir():
 	return settings.STATIC_TESTS_ROOT
 
 def get_type(path):
-	if os.path.isdir(path):
-		if os.path.exists( os.path.join(path, settings.TEST_CONTEXT_FILE_NAME) ):
-			return 'suite'
-		return 'folder'
-	return 'test'
+	"""
+	>>> get_type('C:\\\\none')
+	'none'
+	>>> get_type(os.path.dirname(__file__))
+	'folder'
+	>>> get_type(__file__)
+	'test'
+	>>> name = os.path.join(os.path.dirname(__file__), settings.TEST_CONTEXT_FILE_NAME)
+	>>> f = open(name, 'w')
+	>>> f.close()
+	>>> get_type(os.path.dirname(__file__))
+	'suite'
+	>>> os.remove(name)
+	"""
+	if os.path.exists(path):
+		if os.path.isdir(path):
+			if os.path.exists( os.path.join(path, settings.TEST_CONTEXT_FILE_NAME) ):
+				return 'suite'
+			return 'folder'
+		return 'test'
+	return 'none'
 
 def mkdir(path, name):
 	try:

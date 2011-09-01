@@ -13,13 +13,6 @@ def strip(s, chars):
 	return s.strip(chars)
 
 @register.filter
-def dir_index_type(path, fsobject):
-	log.debug(path + fsobject)
-	fullpath = contrib.get_fullpath(path + fsobject)
-	log.debug(fullpath)
-	return dir_index_tools.get_type(fullpath)
-
-@register.filter
 def make_url(val):
 	return '/'.join(val.split('\\'))
 
@@ -46,31 +39,36 @@ def current(path):
 
 @register.filter
 def breadcrumbs(path):
+	"""
+	>>> breadcrumbs('')
+	''
+	>>> breadcrumbs('/')
+	''
+	>>> breadcrumbs('/path1/')
+	'<a href="/">&#8226;</a>&nbsp;&nbsp;<a>path1</a>&nbsp;&nbsp;<a href="//"><img height="11" src="/static/img/up.png" /></a>'
+	"""
 	path = path.replace('\\','/')
 	
-	fullpath = contrib.get_fullpath(path)
+	document_root = contrib.get_document_root(path)
+	fullpath = contrib.get_full_path(document_root, path)
 	type = dir_index_tools.get_type(fullpath)
 	
-	html = '<a href="/">&#8226;</a>&nbsp;&nbsp;'
-	if settings.STATIC_TESTS_URL:
-		root = '/' + settings.STATIC_TESTS_URL + '/'
-	else:
+	if document_root and document_root != '/':
+		html = '<a href="/">&#8226;</a>&nbsp;&nbsp;'
 		root = '/'
-	
-	lastpath = root
-	i = 0
-	crumbs = path.rstrip('/').split('/')
-	for p in crumbs:
-		i += 1
-		if p:
-			lastpath += p 
-			lastpath += '/'
-			if i < len(crumbs):
-				html += '<a href="%s">%s</a>&nbsp;&nbsp;&#8227;&nbsp;&nbsp;' % ( lastpath, p )
-			else:
-				html += '<a>%s&nbsp;&nbsp;</a>' % ( p )
-			
-	if not path == '/':
+		lastpath = root
+		i = 0
+		crumbs = path.rstrip('/').split('/')
+		for p in crumbs:
+			i += 1
+			if p:
+				lastpath += p 
+				lastpath += '/'
+				if i < len(crumbs):
+					html += '<a href="%s">%s</a>&nbsp;&nbsp;&#8227;&nbsp;&nbsp;' % ( lastpath, p )
+				else:
+					html += '<a>%s</a>&nbsp;&nbsp;' % ( p )
+				
 		if type != 'test':
 			html += '<a href="%s%s"><img height="11" src="/static/img/up.png" /></a>' % (root, above(path))
 	else:

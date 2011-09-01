@@ -3,11 +3,12 @@ from logger import log
 import settings, config, contrib
 from django.template import Context, Template
 import socket
+from django.core.cache import cache
 		
 def host(instance, resolve=True):
 	key = 'host'
 	if resolve:
-		return contrib.resolveRemoteAddr(instance.get(key))
+		return contrib.resolveRemoteAddr(instance.get(key), cache)
 	return instance.get(key)
 		
 def get(name, section='default'):
