@@ -110,7 +110,7 @@ INSTALLED_APPS = (
 )
 
 VIRTUAL_PATHS = {
-    'riurik-inner-tests': os.path.join(os.path.dirname( __file__ ), 'tests\\cases'),
+    'riurik-inner-tests': os.path.join(os.path.dirname( __file__ ), 'tests', 'cases'),
 	'other-tests': os.path.join(os.path.dirname( __file__ ), 'tests-1'),
     #TESTS_ROOT2: os.path.join(os.path.dirname( __file__ ), TESTS_ROOT2),
 }
