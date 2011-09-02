@@ -49,10 +49,6 @@ def patch_fullpaths(fullpath, newpath=''):
 	
 	return fullpath
 
-def get_fullpath(path):
-	path = path.lstrip('/')
-	return patch_fullpaths(os.path.join(settings.STATIC_TESTS_ROOT, path), path)
-
 def getHostByName(host):
 	import socket
 	r = socket.gethostbyname(host)

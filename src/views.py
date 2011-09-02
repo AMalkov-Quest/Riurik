@@ -139,8 +139,9 @@ def add_fullpath(fn):
 	def patch(request):
 		path = get_path(request)
 		if path:
-			log.debug('add_fullpath: func (%s) arguments patched. path: %s , fullpath: %s' % (fn, path, contrib.get_fullpath(path)))
-			return fn(request, contrib.get_fullpath(path))
+			document_root = contrib.get_document_root(path)
+			log.debug('add_fullpath: func (%s) arguments patched. path: %s , fullpath: %s' % (fn, path, contrib.get_full_path(document_root, path)))
+			return fn(request, contrib.get_full_path(document_root, path))
 		return fn(request)
 	return patch
 
@@ -282,10 +283,8 @@ def runTest(request, fullpath):
 	context_name = request.REQUEST.get("context", None)
 	ctx = context.get(fullpath, section=context_name)
 	
-	log.debug('run test %s' % path)
-	log.debug('Fullpath %s' % fullpath)
-	log.debug('Context name %s' % str(context_name))
-	log.debug('Context items: '+ str(ctx.items()))
+	log.debug('run test %s(%s)' % (path, fullpath))
+	log.debug('context %s: %s' % (context_name, str(ctx.items())))
 	
 	host = ctx.get('host')
 	run = ctx.get('run')
@@ -306,7 +305,7 @@ def runTest(request, fullpath):
 		
 	url = "%s/%s?path=/%s&root=%s" % (context.get_URL(ctx), settings.PRODUCT_TESTS_URL, path, root)
 		
-	log.info("Run test %s" % path)
+	log.info("redirect to run test %s" % url)
 	return HttpResponseRedirect(url)
 
 def removeVirtualFolderFromPath(path):
