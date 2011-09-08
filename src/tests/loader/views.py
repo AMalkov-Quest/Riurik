@@ -23,6 +23,23 @@ def saveTestContent(path, content, test_root):
 	file.close()
 
 @never_cache
+def execute(request):
+	rand = random.random()
+	loader = 'loader'
+	cases = 'cases'
+	
+	if 'suite' in request.REQUEST:
+		jspath = request.REQUEST.get('suite', '').strip('/')
+		title = os.path.basename(jspath)
+		suite = True
+	else:
+		jsfile = request.REQUEST.get('path', '').strip('/')
+		jspath = os.path.dirname(jsfile).strip('/')
+		title = os.path.basename(jsfile)
+
+	return render_to_response('loader/testLoader.html', locals())
+
+@never_cache
 def index(request):
 	if request.method == "POST":
 		response = HttpResponse(mimetype='text/plain')

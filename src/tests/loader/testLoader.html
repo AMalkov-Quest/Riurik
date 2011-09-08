@@ -27,7 +27,7 @@
 		<link rel="stylesheet" type="text/css" href="{{ loader }}/testLoader.css" />
 		<script type="text/javascript" src="{{ loader }}/testLoader.js?_={{rand}}"></script>
 		
-		<script type="text/javascript" src="{{ root }}/{{ jspath }}/.context.js?_={{rand}}"></script>
+		<script type="text/javascript" src="{{ cases }}/{{ jspath }}/.context.js?_={{rand}}"></script>
 		<script type="text/javascript">
 			riurik.load = function() {
 				QUnit.config.autostart = false;
@@ -42,7 +42,7 @@
 				context.libraries = context.libraries || [];
 				for ( i in context.libraries ) {
 					var jsfile = context.libraries[i];
-					loading_complete.push( riurik.load_js( '{{ root }}/' + jsfile + '?_={{rand}}' ) );
+					loading_complete.push( riurik.load_js( '{{ cases }}/' + jsfile + '?_={{rand}}' ) );
 				};
 				
 				{% if suite %}
@@ -50,12 +50,12 @@
 				context.include = context.include || [];
 				for ( i in context.include ) {
 					var jsfile = context.include[i];
-					loading_complete.push( riurik.load_js( '{{ root }}/{{ jspath }}/' + jsfile + '?_={{rand}}' ) );
+					loading_complete.push( riurik.load_js( '{{ cases }}/{{ jspath }}/' + jsfile + '?_={{rand}}' ) );
 				};
 				
 				{% else %}
 				
-				loading_complete.push( riurik.load_js('{{ root }}/{{ jsfile }}?_={{rand}}') );
+				loading_complete.push( riurik.load_js('{{ cases }}/{{ jsfile }}?_={{rand}}') );
 				
 				{% endif %}
 				

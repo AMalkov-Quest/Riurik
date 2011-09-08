@@ -291,7 +291,7 @@ def runTest(request, fullpath):
 	contextjs = context.render(ctx)
 	log.debug('contextJS: '+ contextjs)
 	
-	path = removeVirtualFolderFromPath(path)
+	path = contrib.get_relative_clean_path(path)
 	root = get_root()
 	if (contrib.localhost(host) and not run == 'remote') or run == 'local':
 		saveLocalContext(fullpath, contextjs)
@@ -303,13 +303,12 @@ def runTest(request, fullpath):
 		sendContentToRemote(contextjs_path, contextjs, url, ctx)
 		saveRemoteScripts(path, url, request.REQUEST["content"], ctx, request)
 		
-	url = "%s/%s?path=/%s&root=%s" % (context.get_URL(ctx), settings.PRODUCT_TESTS_URL, path, root)
+	url = "%s/%s?path=/%s" % (context.get_URL(ctx), settings.EXEC_TESTS_CMD, path)
 		
 	log.info("redirect to run test %s" % url)
 	return HttpResponseRedirect(url)
 
 def removeVirtualFolderFromPath(path):
-	'''virtual folder is a folder that contains inner riurik tests'''
 	path = path.lstrip('/')
 	index = path.find(settings.INNER_TESTS_ROOT + '/')
 	if index == 0:

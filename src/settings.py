@@ -115,6 +115,8 @@ VIRTUAL_PATHS = {
     #TESTS_ROOT2: os.path.join(os.path.dirname( __file__ ), TESTS_ROOT2),
 }
 
+EXEC_TESTS_CMD='testsrc/execute'
+
 TEST_CONTEXT_FILE_NAME = '.context.ini'
 TEST_CONTEXT_JS_FILE_NAME = '.context.js'
 TEST_FILE_EXT = '.js'

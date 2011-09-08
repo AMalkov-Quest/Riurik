@@ -1,6 +1,6 @@
 *.pyc
 *.log
 *.swp
-context.js
+.context.js
 local_settings.py
 .ropeproject

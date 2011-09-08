@@ -64,7 +64,7 @@ urlpatterns = patterns('',
 )
 
 urlpatterns += patterns('',
-	(r'^tests/execute', include(settings.ROOT_TESTS + '.urls')),
+	(r'^testsrc', include('src.tests.urls')),
 )
 
 urlpatterns += patterns('',
@@ -74,15 +74,8 @@ urlpatterns += patterns('',
 		'show_indexes': True
 		}
 	),
-	(r'^testsrc/(?P<path>.*)$', 'django.views.static.serve',
+	(r'^ttttestsrc/(?P<path>.*)$', 'views.serve',
 		{
-		'document_root': os.path.join(os.path.dirname(__file__), settings.INNER_TESTS_ROOT),
-		'show_indexes': True
-		}
-	),
-	(r'^' + settings.TESTS_URL + '/(?P<path>.*)$', 'views.serve',
-		{
-		'document_root': settings.VIRTUAL_URLS[settings.INNER_TESTS_ROOT],
 		'show_indexes': True
 		}
 	),
