@@ -32,12 +32,7 @@ def get_full_path(document_root, path):
 	>>> get_full_path('C:/dir-1/tests-1', '\\\\tests-1/first\\\\test')
 	'C:/dir-1/tests-1/first/test'
 	"""
-	newpath = ''
-	if path:
-		parts = path.replace('\\', '/').strip('/').split('/', 1)
-		if parts[0] in settings.VIRTUAL_PATHS: 
-			if len(parts) > 1:
-				newpath = parts[1]
+	newpath = get_relative_clean_path(path)
 	return os.path.normpath(os.path.join(document_root, newpath))
 
 def get_relative_clean_path(path):
@@ -48,15 +43,17 @@ def get_relative_clean_path(path):
 	'main/case-1'
 	>>> get_relative_clean_path('')
 	''
+	>>> get_relative_clean_path('/')
+	''
 	>>> get_relative_clean_path('main/case-1')
-	'main/case-1'
+	''
 	"""
 	if path:
 		parts = path.replace('\\', '/').strip('/').split('/', 1)
 		if parts[0] in settings.VIRTUAL_PATHS: 
 			if len(parts) > 1:
 				return parts[1]
-	return path
+	return '' 
 
 def patch_fullpaths(fullpath, newpath=''):
 	for key in settings.VIRTUAL_URLS:
