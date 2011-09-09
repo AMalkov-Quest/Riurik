@@ -42,6 +42,8 @@ def get_relative_clean_path(path):
 	>>> settings.VIRTUAL_PATHS['tests-1'] = '/src/tests/cases'
 	>>> get_relative_clean_path('tests-1/main/case-1')
 	'main/case-1'
+	>>> get_relative_clean_path('tests-1/main/')
+	'main'
 	>>> get_relative_clean_path('')
 	''
 	>>> get_relative_clean_path('/')
