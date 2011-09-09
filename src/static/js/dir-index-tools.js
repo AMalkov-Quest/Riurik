@@ -1,7 +1,34 @@
-$(document).ready(function () {
-	$('#context-preview-ctrl').simpleDialog({
-	  width: 800,
-	  height: 700
+$(function () {
+	$('#context-preview-ctrl').click(function(){
+		$('#context-preview').dialog({
+			width: 800,
+			height: 700,
+			buttons: [
+				{
+					text: 'Edit',
+					click: function() { 
+						open('.context.ini?editor');
+						$(this).dialog('close'); 
+					}
+				},
+				{
+					text: 'Close',
+					click: function() { $(this).dialog('close'); }
+				}
+			],
+			model: true,
+			title: 'context.ini',
+			open: function(event, ui){
+				$.ajax({ 
+					url: '.context.ini', 
+					success: function(data){ 
+						$('#context-preview').html('<pre>'+data+'</pre>'); 
+					}, 
+					dataType: 'text'
+				});
+			}
+		});
+		return false;
 	});
 });
 
