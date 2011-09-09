@@ -19,7 +19,7 @@
 				$('select[name=context]').val(last_context);
 		  } catch (e) { console.log(e); }
 		  {% if not is_stubbed %}	
-          var source_value = draft_value = $('#code').val();
+		  var source_value = draft_value = $('#code').val();
   		  var editor = CodeMirror.fromTextArea("code", {
 		    height: "600px",
 		    content: source_value,
@@ -80,43 +80,35 @@
             var ticks = 0;
             var savingDraft = false;
             var saveDraft = function(){
+		console.log('saveDraft called')
                 if ( savingDraft === false ) {
                     var new_value = editor.getCode();
-                    $('#draft').attr('disabled', 'disabled');
+		    $('#save').addClass('disabled');
                     savingDraft = true;
                     ticks = 0;
-                    $('#draft').val('{% trans 'saving draft' %}');
                     $.post(
                         '/actions/test/save/draft/',
                         {'path':'{{ relative_file_path }}','url':'{{ request.path }}', 'content':new_value},
                         function(data){
-                            try {
-                                var data = $.parseJSON(data);
-                                if ( data['success'] != false ) {
-                                    $('#draft').removeAttr('disabled');
-                                    $('#draft').val('{% trans 'save draft' %}');
-                                    draft_value = new_value;
-                                } else { console.log(data); }
-                            } catch (ex) { console.log(ex); }
+                            draft_value = new_value;
                             ticks = 0;
                             savingDraft = false;
                         }    
                     );
                 }
             };
-            $('#draft').click(saveDraft);
             setInterval(function(){
+		console.log('save draft check', savingDraft, ticks)
                 var new_value = editor.getCode();
                 if ( new_value == draft_value ) { return; }
                 ticks = ticks + 1;
                 if ( savingDraft === false ) {
-                    $('#draft').removeAttr('disabled');
+		    $('#save').removeClass('disabled');
                 }
                 if ( savingDraft === false && ticks > 5 ) {
                     saveDraft();
                 }
             },1000);
-            $.ctrl('S', function(){ $('#draft').trigger('click'); });
 			{% endif %}
             $.ctrl('R', function(){ $('#run').trigger('click'); });
 			$('#unstub').click(function(){
@@ -202,7 +194,6 @@
 		<input type="hidden" name="url" value="{{ request.path }}" />
 		<input type="hidden" name="context" value="default" />
 		<textarea id='code' name='content'>{{ content|default:"" }}</textarea>
-		<input id='draft' type='button' value='{% trans 'save draft' %}'>
 		</form>
 	{% if is_stubbed %}
 		<pre>{{ content }}</pre>

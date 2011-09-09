@@ -229,12 +229,8 @@ def saveTest(request, fullpath):
 
 @add_fullpath	
 def saveDraftTest(request, fullpath):
-	result = tools.savetmptest(request.POST["content"], fullpath)
-	if result:
-		result = { 'success': result }
-	else:
-		result = { 'success': 'false' }
-	return HttpResponse(simplejson.dumps(result))
+	saveTest(request)
+	return HttpResponse()
 
 def submitTest(request):
 	testname = request.POST["path"]
