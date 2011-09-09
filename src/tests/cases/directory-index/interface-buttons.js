@@ -1,9 +1,10 @@
-var url = 'http://spb0281:8000/'; 
+module('breadcrumbs');
 
 asyncTest('check button for directory listing', function() {
-  $.when( frame.go(url) ).then(function(_$) {
+  var URL = contexter.URL(context, '/');
+  
+  $.when( frame.go(URL) ).then(function(_$) {
     
-    equal(_$('#new-folder').is(":visible"), true, 'Create folder button exists');
     equal(_$('#new-suite').is(":visible"), true, 'Create suite button exists');
     equal(_$('#new-test').is(":visible"), true, 'Create test button exists');
     

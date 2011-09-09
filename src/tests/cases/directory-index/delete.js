@@ -1,10 +1,10 @@
 module('delete');
 
 QUnit.setup(function() {
-  context.current_folder = '/';
+  context.current_folder = context.root;
   context.folder_name = 'first-folder';
   context.suite_name = 'first-suite';
-  context.folder_path = context.current_folder + context.folder_name;
+  context.folder_path = context.current_folder.concat('/', context.folder_name);
   
 });
 
@@ -58,4 +58,3 @@ asyncTest('test', function() {
     
   });
 });
-
