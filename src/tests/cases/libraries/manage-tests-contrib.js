@@ -51,6 +51,8 @@ function create_folder(name, path) {
     }
   });
   
+  return path + '/' + name;
+  
 };
 
 function create_test(test_name, suite_path) {
