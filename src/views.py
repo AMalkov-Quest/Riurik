@@ -95,12 +95,14 @@ def get_dir_index(document_root, path, fullpath):
 		fullpath = os.path.join(path, title)
 		return { 'title': title, 'type': tools.get_type(contrib.get_full_path(document_root, fullpath)) }
 
-	if not document_root: 
+	if not document_root:
+		pagetype = 'front-page' 
 		for key in settings.VIRTUAL_PATHS:
 			dir = get_descriptor(key)
 			dirs.append(dir)
 	else:
-		for f in os.listdir(fullpath):
+		pagetype = tools.get_type(fullpath) 
+		for f in sorted(os.listdir(fullpath)):
 			if not f.startswith('.'):
 				if os.path.isfile(os.path.join(fullpath, f)):
 					files.append(get_descriptor(f))
@@ -115,10 +117,10 @@ def get_dir_index(document_root, path, fullpath):
 		contexts = []
 		
 	favicon = 'dir-index-%s.gif' % tools.get_type(fullpath)
-
+	
 	return Context({
 		'directory' : path + '/',
-		'type'		: tools.get_type(fullpath),
+		'type'		: pagetype,
 		'file_list' : files,
 		'dir_list'  : dirs,
 		'contexts'  : contexts,

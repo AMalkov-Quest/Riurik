@@ -52,7 +52,7 @@
 			<input type="hidden" name="path" value="{{ directory }}">
 			<input type="hidden" name="url" value="{{ directory }}">
 			<ul class="horizontal-menu">
-				
+				{% if type != 'front-page' %}
 					{% ifequal type 'suite' %}
 						<li>
 							<a id="run-suite-btn" href="javascript:void(0);" onClick="javascript:$('#run-suite').submit();">Run Suite</a>
@@ -67,7 +67,9 @@
 					{% else %}
 						<li><a id="new-suite" href="javascript:void(0);" onClick="javascript:createFolder();">Create Suite</a></li>
 					{% endifequal %}
-				
+				{% else %}
+					<li><a id="configure" href="javascript:void(0);" >Configure</a></li>
+				{% endif %}
 			</ul>
 			</form>
 			{% endblock controls %}
