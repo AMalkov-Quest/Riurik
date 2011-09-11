@@ -2,10 +2,11 @@ module('create folder');
 
 QUnit.setup(function() {
   context.folder_name = 'first-test-dir';
+  context.full_folder_path = context.root.concat('/', context.folder_name);
 });
 
 asyncTest('check created', function() {
-  $.when( frame.go(contexter.URL(context, '/')) ).then(function(_$) {
+  $.when( frame.go(contexter.URL(context, context.root)) ).then(function(_$) {
     
     $.when( _$('a#new-suite').click() ).then(function() {
       
@@ -19,7 +20,24 @@ asyncTest('check created', function() {
         equal(_$('li#'+ context.folder_name + '.folder').length, 1, 'new folder has been created');
         var folder_link = _$('li#'+ context.folder_name + ' > a');
         ok(folder_link.is(":visible"), 'link to the folder is visible');
-        equal(folder_link.attr('href'), context.folder_name+"/", 'link to the folder has right href');
+        equal(folder_link.attr('href'), context.folder_name + '/', 'link to the folder has right href');
+        
+        start();
+      });
+    });
+  });
+});
+
+asyncTest('error reporting', function() {
+  $.when( frame.go(contexter.URL(context, context.root)) ).then(function(_$) {
+    $.when( _$('a#new-suite').click() ).then(function() {
+      
+      _$('#object-name').val(context.folder_name);
+      _$('#create-folder-btn').click();
+      
+      $.wait( function() { return _$('#operationResult').is(":visible") }, 1000 ).then(function() {
+        QUnit.substring( _$('#operationResult').text(), 'File exists', 'dialog with error is visible');
+        _$('.ui-button-text', _$('#operationResult').parent()).first().click();
         
         start();
       });
@@ -28,5 +46,5 @@ asyncTest('check created', function() {
 });
 
 QUnit.teardown(function() {
-  frame.window().dirIndexActions.remove(context.folder_name);
+  delete_folder( context.full_folder_path );
 });
