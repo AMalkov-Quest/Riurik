@@ -43,7 +43,6 @@ def remove(path):
 		else:
 			os.remove(fullpath)
 	except Exception, e:
-		print e
 		return str(e)
 	
 	return resources.ok
