@@ -263,7 +263,7 @@ def runSuite(request, fullpath):
 	
 	contextjs = context.render(ctx)
 	
-	path = removeVirtualFolderFromPath(path)
+	path = contrib.get_relative_clean_path(path)
 	if contrib.localhost(host) and not run == 'remote':
 		saveLocalContext(fullpath, contextjs)
 	else:
@@ -271,7 +271,7 @@ def runSuite(request, fullpath):
 		contextjs_path = os.path.join(path, settings.TEST_CONTEXT_JS_FILE_NAME)
 		sendContentToRemote(contextjs_path, contextjs, url, ctx)
 	
-	url = "%s/%s?suite=/%s&root=%s" % ( context.get_URL(ctx), settings.PRODUCT_TESTS_URL, path, get_root()  )
+	url = "%s/%s?suite=/%s" % ( context.get_URL(ctx), settings.EXEC_TESTS_CMD, path )
 	url = contrib.normpath(urllib.unquote(url))
 	log.info("Run suite %s" % path)
 	return HttpResponseRedirect( url )
