@@ -2,9 +2,6 @@ import os, shutil
 import settings, resources
 from logger import log
 
-def getWorkingDir():
-	return settings.STATIC_TESTS_ROOT
-
 def get_type(path):
 	"""
 	>>> get_type('C:\\\\none')
@@ -30,7 +27,7 @@ def get_type(path):
 
 def mkdir(path, name):
 	try:
-		fullpath = os.path.join(getWorkingDir(), path.strip('/'), name)
+		fullpath = os.path.join(path, name)
 		os.mkdir(fullpath)
 	except Exception, e:
 		return str(e)
@@ -39,7 +36,7 @@ def mkdir(path, name):
 
 def remove(path):
 	try:
-		fullpath = os.path.join(getWorkingDir(), path.strip('/'))
+		fullpath = os.path.join(path)
 		if os.path.isdir(fullpath):
 			import shutil
 			shutil.rmtree(fullpath)
@@ -53,7 +50,7 @@ def remove(path):
 
 def mksuite(path, name):
 	try:
-		fullpath = os.path.join(getWorkingDir(), path.strip('/'), name)
+		fullpath = os.path.join(path, name)
 		os.mkdir(fullpath)
 		filename = os.path.join(fullpath, settings.TEST_CONTEXT_FILE_NAME)
 		f = open(filename, 'w')
@@ -83,7 +80,7 @@ def mkcontext(path, name):
 
 def mkscript(path, name, template_name=None):
 	try:
-		fullpath = os.path.join(getWorkingDir(), path.strip('/'), name)
+		fullpath = os.path.join(path, name)
 		f = open(fullpath, 'w')
 		if template:
 			f.write(template(template_name))
