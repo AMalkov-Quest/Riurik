@@ -1,31 +1,20 @@
-module('', {
-  setup: function() {
-    var path = 'tests/run-test/example1.js?editor';
-    context.url = contexter.URL(context, path);
-  }
-});
+module('run button');
 
 asyncTest('run interface', function(){
-  $.when( frame.go( context.url ) ).then(function(_$){
+  var URL = contexter.URL(context, context.root.concat('/run-test/example1.js?editor'));
+  $.when( frame.go( URL ) ).then(function(_$){
     ok(_$('#run').length == 1, 'run button exists');
     ok(_$('select[name=context]').length == 1, 'context select exists');
-    ok(_$('select[name=context] option[value=test-context]').length == 1, 'test context option exists');
-    start();
-  });
-});
-
-/*asyncTest('running', function(){
-  var url = context.url + '/run-test/example.js?editor'
-  $.when( frame.go( url ) ).then(function(_$){
+    ok(_$('select[name=context] option[value=context-1]').length == 1, 'first context option exists');
+    ok(_$('select[name=context] option[value=context-2]').length == 1, 'second context option exists');
     
-    _$('select[name=context]').val('test-context');
-    
-    var runButton = frame.document().getElementById('close');
+    _$('select[name=context]').val('context-2');
+    var runButton = frame.document().getElementById('run');
     var evObj = frame.document().createEvent('MouseEvents');
     evObj.initEvent( 'click', true, true );
     runButton.dispatchEvent(evObj);
-    console.log(runButton);
-    ok( runButton, 'runButton' )
+    ok(false, 'TODO ...');
+    
     start();
   });
-});*/
+});
