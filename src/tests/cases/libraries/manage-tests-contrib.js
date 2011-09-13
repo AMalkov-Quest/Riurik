@@ -19,21 +19,9 @@ function stubFile(path) {
   
 };
 
-function create_suite(name, path) {
-  
-  $.ajax({
-    type: 'POST',
-    async: false,
-    url: contexter.URL(context, 'actions/suite/create/'),
-    data: { 'object-name': name, 'path': path },
-    success: function(data) {
-      QUnit.log('suite "' + name + '" at "' + path + '" is created');
-    },
-    error: function() {
-      QUnit.log('suite "' + name + '" at "' + path + '" is failed');
-    }
-  });
-  
+function create_suite(name, path, content) {
+  create_folder(name, path);
+  set_context(path.concat('/', name), content); 
 };
 
 function create_folder(name, path) {

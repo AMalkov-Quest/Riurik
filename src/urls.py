@@ -15,38 +15,7 @@ from django.conf.urls.defaults import *
 from django.views.static import serve
 import os
 import settings
-
-def enumerate_suites(request):
-	"""
-		Return a list of suite names.
-		Arguments:
-			context	(optional)	- filter suites containing supplied context name
-			json 	(optional)	- return result in JSON format
-	"""
-	from django.http import HttpResponse
-	from context import get as context_get
-	import contrib
-	
-	context = request.REQUEST.get('context', None)
-	json = request.REQUEST.get('json', False)
-	target = request.REQUEST.get('target', False)
-	
-	suites = []
-	_root = contrib.get_document_root(target)
-	contextini = '.context.ini'
-	for dirpath, dirnames, filenames in os.walk(_root, followlinks=True):
-		if not ( contextini in filenames ): continue
-		if context:
-			contextfile = os.path.join(dirpath, contextini)
-			ctx = context_get(contextfile)
-			ctx_sections = ctx.sections()
-			if not context in ctx_sections: continue
-		suites += [ dirpath.replace(_root, '').replace('\\','/').lstrip('/') ]
-	
-	if json:
-		import simplejson
-		return HttpResponse(simplejson.dumps(suites))
-	return HttpResponse(str(suites).replace('[','').replace(']','').rstrip(',').replace('\'',''))
+import views
 
 urlpatterns = patterns('',
 	(r'^favicon\.ico$', 'django.views.generic.simple.redirect_to', {'url': '/static/img/favicon.gif'}),
@@ -65,7 +34,7 @@ urlpatterns = patterns('',
 	(r'^actions/test/control/$', 'views.getControl'),
 	(r'^logger/records/recv/$', 'views.recvLogRecords'),
 	(r'^actions/remove/$', 'views.removeObject'),
-	(r'^actions/suite/enumerate/$', enumerate_suites),
+	(r'^actions/suite/enumerate/$', 'views.enumerate_suites'),
 )
 
 urlpatterns += patterns('',

@@ -18,9 +18,40 @@ from email.Utils import parsedate_tz, mktime_tz
 import contrib
 import urllib, urllib2
 import codecs, time
+import os
 
-__all__ = ('handler','serve',)
-_isolate_imports = False
+def enumerate_suites(request):
+	"""
+		Return a list of suite names.
+		Arguments:
+			context	(optional)	- filter suites containing supplied context name
+			json 	(optional)	- return result in JSON format
+	"""
+	from django.http import HttpResponse
+	from context import get as context_get
+	import contrib
+	
+	context = request.REQUEST.get('context', None)
+	json = request.REQUEST.get('json', False)
+	target = request.REQUEST.get('target', False)
+	
+	suites = []
+	root = contrib.get_document_root(target)
+	contextini = settings.TEST_CONTEXT_FILE_NAME
+
+	for dirpath, dirnames, filenames in os.walk(root, followlinks=True):
+		if not ( contextini in filenames ): continue
+		if context:
+			contextfile = os.path.join(dirpath, contextini)
+			ctx = context_get(contextfile)
+			ctx_sections = ctx.sections()
+			if not context in ctx_sections: continue
+		suites += [ dirpath.replace(root, '').replace('\\','/').lstrip('/') ]
+	
+	if json:
+		import simplejson
+		return HttpResponse(simplejson.dumps(suites))
+	return HttpResponse(str(suites).replace('[','').replace(']','').rstrip(',').replace('\'',''))
 
 def serve(request, path, show_indexes=False):
 	cache.add('asfasf', datetime.datetime.now())
@@ -289,7 +320,7 @@ def runTest(request, fullpath):
 	run = ctx.get('run')
 	contextjs = context.render(ctx)
 	log.debug('contextJS: '+ contextjs)
- 	
+	
 	path = contrib.get_relative_clean_path(path)
 	root = get_root()
 	if (contrib.localhost(host) and not run == 'remote') or run == 'local':
