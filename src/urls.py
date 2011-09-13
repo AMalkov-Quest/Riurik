@@ -23,12 +23,16 @@ def enumerate_suites(request):
 			context	(optional)	- filter suites containing supplied context name
 			json 	(optional)	- return result in JSON format
 	"""
-	context = request.REQUEST.get('context', None)
-	json = request.REQUEST.get('json', False)
 	from django.http import HttpResponse
 	from context import get as context_get
+	import contrib
+	
+	context = request.REQUEST.get('context', None)
+	json = request.REQUEST.get('json', False)
+	target = request.REQUEST.get('target', False)
+	
 	suites = []
-	_root = settings.STATIC_TESTS_ROOT
+	_root = contrib.get_document_root(target)
 	contextini = '.context.ini'
 	for dirpath, dirnames, filenames in os.walk(_root, followlinks=True):
 		if not ( contextini in filenames ): continue
@@ -38,6 +42,7 @@ def enumerate_suites(request):
 			ctx_sections = ctx.sections()
 			if not context in ctx_sections: continue
 		suites += [ dirpath.replace(_root, '').replace('\\','/').lstrip('/') ]
+	
 	if json:
 		import simplejson
 		return HttpResponse(simplejson.dumps(suites))

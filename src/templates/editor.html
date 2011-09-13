@@ -27,11 +27,21 @@
 		    stylesheet: "/static/codemirroreditor/css/jscolors.css",
 		    path: "/static/codemirroreditor/js/",
 		    autoMatchParens: true,
+		    lineNumbers: true,
 		    basefiles: ["util.js", "stringstream.js", "select.js", "undo.js", "editor.js", "tokenize.js", "jquery.js", "ctrl.js"],
 		    onLoad: function(){
                 window.frames[0].$(document).ready(function(){
                     window.frames[0].$.ctrl('S', function(){ $('#save').trigger('click'); });
                     window.frames[0].$.ctrl('R', function(){ $('#run').trigger('click'); });
+                    window.frames[0].$(window.frames[0].document).scroll(function(){
+                    	var last_pos = window.frames[0].$('body').scrollTop();
+				  		$.cookie('last_pos', last_pos);
+				  	});
+				  	try { 
+				  	  var last_pos = $.cookie('last_pos');
+					  if ( typeof last_pos == 'string' ) 
+						window.frames[0].$('body').scrollTop(last_pos);
+				 	} catch (e) { console.log(e); }
                 });
 		    }
 		  });
