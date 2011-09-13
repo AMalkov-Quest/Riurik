@@ -267,7 +267,7 @@ def runSuite(request, fullpath):
 	if contrib.localhost(host) and not run == 'remote':
 		saveLocalContext(fullpath, contextjs)
 	else:
-		url = "%s/%s" % (context.get_URL(ctx, False), settings.PRODUCT_TESTS_URL)
+		url = "%s/%s" % (context.get_URL(ctx, True), settings.UPLOAD_TESTS_CMD)
 		contextjs_path = os.path.join(path, settings.TEST_CONTEXT_JS_FILE_NAME)
 		sendContentToRemote(contextjs_path, contextjs, url, ctx)
 	
@@ -289,7 +289,7 @@ def runTest(request, fullpath):
 	run = ctx.get('run')
 	contextjs = context.render(ctx)
 	log.debug('contextJS: '+ contextjs)
-	
+ 	
 	path = contrib.get_relative_clean_path(path)
 	root = get_root()
 	if (contrib.localhost(host) and not run == 'remote') or run == 'local':
@@ -297,7 +297,7 @@ def runTest(request, fullpath):
 		if run == 'local':
 			root = ''
 	else:
-		url = "%s/%s" % (context.get_URL(ctx, True), settings.PRODUCT_TESTS_URL)
+		url = "%s/%s" % (context.get_URL(ctx, True), settings.UPLOAD_TESTS_CMD)
 		contextjs_path = os.path.join(os.path.dirname(path), settings.TEST_CONTEXT_JS_FILE_NAME)
 		sendContentToRemote(contextjs_path, contextjs, url, ctx)
 		saveRemoteScripts(path, url, request.REQUEST["content"], ctx, request)
@@ -327,8 +327,7 @@ def saveLocalContext(fullpath, contextjs):
 def makeSaveContentPost(content, path):
 	return {
 		'content': content,
-		'path': path,
-		'tests_root': settings.PRODUCT_TEST_CASES_ROOT 
+		'path': path 
 	}
 	
 def saveTestSatelliteScripts(url, test, request, libs):
@@ -359,15 +358,16 @@ def saveRemoteScripts(path, url, content, ctx, request):
 def auth(url, ctx):
 	login = ctx.get('login')
 	password = ctx.get('password')
+	empty_proxy_handler = urllib2.ProxyHandler({})
 	if login and password:
 		from ntlm import HTTPNtlmAuthHandler
 	
 		passman = urllib2.HTTPPasswordMgrWithDefaultRealm()
 		passman.add_password(None, url, login, password)
 		auth_NTLM = HTTPNtlmAuthHandler.HTTPNtlmAuthHandler(passman)
-		opener = urllib2.build_opener(auth_NTLM)
+		opener = urllib2.build_opener(auth_NTLM, empty_proxy_handler)
 	else:
-		opener = urllib2.build_opener()
+		opener = urllib2.build_opener(empty_proxy_handler)
 	
 	urllib2.install_opener(opener)
 	

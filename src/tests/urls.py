@@ -8,6 +8,11 @@ sys.path.append(cwd)
 
 urlpatterns = patterns('',
 	(r'^/execute$', 'tests.loader.views.execute'),
+	(r'^/upload$', 'tests.loader.views.upload',
+		{
+		'document_root': cwd
+		}
+	),
 	(r'^/(?P<path>.*)$', 'django.views.static.serve',
 		{
 		'document_root': cwd,
