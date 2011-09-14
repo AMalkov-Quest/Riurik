@@ -4,7 +4,7 @@ from django.views.decorators.cache import never_cache
 from django.conf import settings
 from django.utils.translation import ugettext as _
 import os, random
-from logger import log
+
 try:
     from django.contrib import messages
     _USE_MESSAGES = True
@@ -15,9 +15,7 @@ loader_dir = 'loader'
 cases_dir = 'cases'
 	
 def saveTestContent(document_root, path, content):
-	log.Debug('save %s' % path)
 	path = os.path.join(document_root, cases_dir, path)
-	log.Debug('	to %s' % path)
 	if not os.path.exists(os.path.dirname(path)):
 		os.makedirs(os.path.dirname(path))
 	
@@ -50,6 +48,5 @@ def upload(request, document_root):
 		response.write('OK')
 	except Exception, e:
 		response.write('FAILED')
-		log.Except(e)
 	
 	return response
