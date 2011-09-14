@@ -10,7 +10,11 @@ var frame = {
 			$('#frame').attr('src', url);
 			$('#frame-url').html('<a href="'+url+'">'+url+'</a>');
 			$('#frame').load(function() {
-				jQExtend(window.frames[0].window.jQuery);
+				if( window.frames[0].window.jQuery) {
+					jQExtend(window.frames[0].window.jQuery);
+				}else{
+					QUnit.ok(false, 'there is no JQuery');
+				}
 				dfd.resolve(window.frames[0].window.jQuery);
 			});
 
