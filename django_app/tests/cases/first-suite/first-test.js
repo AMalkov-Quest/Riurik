@@ -1,10 +1,7 @@
-module('...', {
-  
-  setup: function() {},
-  
-  teardown: function() {}
+module('first');
 
-});
-
-asyncTest('...', function() {
+asyncTest('test', function() {
+  $.when( frame.go( contexter.URL(context, 'hello') )).then(function(_$) {
+    start();
+  });
 });

@@ -48,11 +48,6 @@ urlpatterns += patterns('',
 		'show_indexes': True
 		}
 	),
-	(r'^ttttestsrc/(?P<path>.*)$', 'views.serve',
-		{
-		'show_indexes': True
-		}
-	),
 	(r'^(?P<path>.*)$', 'views.serve',
 		{
 			'show_indexes': True
