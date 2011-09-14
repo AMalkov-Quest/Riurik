@@ -77,20 +77,18 @@ def patch(ctx):
 
 	return vars
 
-class context():
-	
-	def __init__(self, test, section='default'):
-		test = os.path.join(settings.STATIC_TESTS_ROOT, test)
-		if os.path.isdir(test):
-			self.inifile = os.path.join(test, settings.TEST_CONTEXT_FILE_NAME)
-		else:
-			self.inifile = os.path.join(os.path.dirname(test), settings.TEST_CONTEXT_FILE_NAME)
+class global_settings(object):
+	def __init__(self, path, section='default'):
+		log.debug('initing global_settings by from %s, section:%s' % (path, section))
+		self.inifile = None
+		for virtpath in settings.VIRTUAL_PATHS.values():
+			if virtpath in path:
+				self.inifile = os.path.join(virtpath, '.settings.ini')
 		self.section = section
-		log.debug('context: %s, section: %s, test: %s' % (self.inifile, self.section, test))
-		
+	
 	def get(self, option, default=None):
 		value = config.get(self.inifile, self.section, option)
-		log.debug('get context option: %s=%s' % (option, value))
+		log.debug('get context option: %s=%s from %s' % (option, value, self.inifile))
 		if not value:
 			value = default
 		
@@ -101,11 +99,38 @@ class context():
 		log.debug('set context option: %s=%s' % (option, value))
 
 	def items(self):
-		log.debug('context get items(): %s, section: %s' % (self.inifile, self.section))
-		return config.items(self.inifile, self.section)
-	
+		log.debug('context get items(): %s, section: %s\nresult:\n%s' % (self.inifile, self.section, config.items(self.inifile, self.section)))
+		return config.items(self.inifile, self.section) 
+			
 	def sections(self):
+		log.debug('reading sections: %s' % config.sections(self.inifile))
 		return config.sections(self.inifile)
 	
 	def get_folder(self):
 		return os.path.dirname(self.inifile)
+
+class context(global_settings):
+	def __init__(self, test, section='default'):
+		if os.path.isdir(test):
+			self.inifile = os.path.join(test, settings.TEST_CONTEXT_FILE_NAME)
+		else:
+			self.inifile = os.path.join(os.path.dirname(test), settings.TEST_CONTEXT_FILE_NAME)
+		self.section = section
+		log.debug('context: %s, section: %s, test: %s' % (self.inifile, self.section, test))
+
+	def	get(self, option, default=None):
+		value = super(context, self).get(option, default=None)
+		if not value:
+			value = global_settings(self.inifile, self.section).get(option, default=None)
+		if not value:
+			value = global_settings(self.inifile).get(option, default=None)
+		if not value:
+			value = default
+		return value
+	
+	def items(self):
+		values = {}
+		values.update( global_settings(self.inifile).items() or {} )
+		values.update( global_settings(self.inifile, self.section).items() or {} )
+		values.update( super(context, self).items() )
+		return values.items()

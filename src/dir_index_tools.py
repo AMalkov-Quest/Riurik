@@ -21,6 +21,8 @@ def get_type(path):
 		if os.path.isdir(path):
 			if os.path.exists( os.path.join(path, settings.TEST_CONTEXT_FILE_NAME) ):
 				return 'suite'
+			if path.rstrip('/').rstrip('\\') in settings.VIRTUAL_PATHS.values():
+				return 'virtual'
 			return 'folder'
 		return 'test'
 	return 'none'
