@@ -1,7 +1,0 @@
-#powershell-console hr, #javascript-console hr {
-	color: #EEE;
-}
-#powershell-console, #javascript-console,
-#powershell-console *, #javascript-console * {
-	font-size: 1em;
-}
