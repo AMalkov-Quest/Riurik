@@ -1,6 +1,6 @@
 module('suite runner', {
   setup: function() {
-    var path = 'actions/suite/run/?path=/tests/suite-for-testing&context=localhost';
+    var path = 'actions/suite/run/?path=/' + context.root +'/suite-for-testing&context=localhost';
     context.url = contexter.URL(context, path);
   }
 });

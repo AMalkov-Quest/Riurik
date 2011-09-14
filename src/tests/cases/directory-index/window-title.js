@@ -1,7 +1,7 @@
 module('window title');
 
 QUnit.setup(function() {
-  context.current_folder = 'tests';
+  context.current_folder = 'other-tests';
   context.suite_name = 'first-suite';
   context.suite_path = context.current_folder + '/' + context.suite_name;
   context.test_name = 'first-test.js';

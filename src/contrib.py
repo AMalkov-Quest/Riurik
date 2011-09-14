@@ -6,6 +6,8 @@ def get_document_root(path):
 	>>> settings.VIRTUAL_PATHS['some-key'] = 'some-value'
 	>>> get_document_root('/some-key/test-1')
 	'some-value'
+	>>> get_document_root('some-key')
+	'some-value'
 	>>> get_document_root('')
 	''
 	>>> get_document_root('/')
@@ -13,7 +15,7 @@ def get_document_root(path):
 	"""
 	if path:
 		key = path.strip('/').split('/')[0]
-		if key and key in settings.VIRTUAL_PATHS: 
+		if key and key in settings.VIRTUAL_PATHS:
 			return settings.VIRTUAL_PATHS[key]
 	
 	return path

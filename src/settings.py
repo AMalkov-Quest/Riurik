@@ -116,6 +116,7 @@ VIRTUAL_PATHS = {
 }
 
 EXEC_TESTS_CMD='testsrc/execute'
+UPLOAD_TESTS_CMD='testsrc/upload'
 
 TEST_CONTEXT_FILE_NAME = '.context.ini'
 TEST_CONTEXT_JS_FILE_NAME = '.context.js'

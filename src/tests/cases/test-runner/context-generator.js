@@ -3,7 +3,7 @@ module('context generator');
 QUnit.setup(function() {
   context.setup_value = 10;
   context.hidden_file = '.hidden-file.js';
-  context.suite_path = 'tests/suite-for-testing';
+  context.suite_path = context.root.concat('/suite-for-testing');
   context.hidden_path = context.suite_path + '/' + context.hidden_file;
   var path = 'actions/suite/run/?path=/' + context.suite_path + '&context=localhost';
   context.url = contexter.URL(context, path);

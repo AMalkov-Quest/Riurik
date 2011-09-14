@@ -1,6 +1,6 @@
 module('test runner', {
   setup: function() {
-    var path = 'actions/test/run/?path=tests/suite-for-testing/first-test.js&context=localhost';
+    var path = 'actions/test/run/?path=' + context.root +'/suite-for-testing/first-test.js&context=localhost';
     context.url = contexter.URL(context, path);
   }
 });

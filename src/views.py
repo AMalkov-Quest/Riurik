@@ -18,9 +18,40 @@ from email.Utils import parsedate_tz, mktime_tz
 import contrib
 import urllib, urllib2
 import codecs, time
+import os
 
-__all__ = ('handler','serve',)
-_isolate_imports = False
+def enumerate_suites(request):
+	"""
+		Return a list of suite names.
+		Arguments:
+			context	(optional)	- filter suites containing supplied context name
+			json 	(optional)	- return result in JSON format
+	"""
+	from django.http import HttpResponse
+	from context import get as context_get
+	import contrib
+	
+	context = request.REQUEST.get('context', None)
+	json = request.REQUEST.get('json', False)
+	target = request.REQUEST.get('target', False)
+	
+	suites = []
+	root = contrib.get_document_root(target)
+	contextini = settings.TEST_CONTEXT_FILE_NAME
+
+	for dirpath, dirnames, filenames in os.walk(root, followlinks=True):
+		if not ( contextini in filenames ): continue
+		if context:
+			contextfile = os.path.join(dirpath, contextini)
+			ctx = context_get(contextfile)
+			ctx_sections = ctx.sections()
+			if not context in ctx_sections: continue
+		suites += [ dirpath.replace(root, '').replace('\\','/').lstrip('/') ]
+	
+	if json:
+		import simplejson
+		return HttpResponse(simplejson.dumps(suites))
+	return HttpResponse(str(suites).replace('[','').replace(']','').rstrip(',').replace('\'',''))
 
 def serve(request, path, show_indexes=False):
 	cache.add('asfasf', datetime.datetime.now())
@@ -95,12 +126,14 @@ def get_dir_index(document_root, path, fullpath):
 		fullpath = os.path.join(path, title)
 		return { 'title': title, 'type': tools.get_type(contrib.get_full_path(document_root, fullpath)) }
 
-	if not document_root: 
+	if not document_root:
+		pagetype = 'front-page' 
 		for key in settings.VIRTUAL_PATHS:
 			dir = get_descriptor(key)
 			dirs.append(dir)
 	else:
-		for f in os.listdir(fullpath):
+		pagetype = tools.get_type(fullpath) 
+		for f in sorted(os.listdir(fullpath)):
 			if not f.startswith('.'):
 				if os.path.isfile(os.path.join(fullpath, f)):
 					files.append(get_descriptor(f))
@@ -115,10 +148,10 @@ def get_dir_index(document_root, path, fullpath):
 		contexts = []
 		
 	favicon = 'dir-index-%s.gif' % tools.get_type(fullpath)
-
+	
 	return Context({
 		'directory' : path + '/',
-		'type'		: tools.get_type(fullpath),
+		'type'		: pagetype,
 		'file_list' : files,
 		'dir_list'  : dirs,
 		'contexts'  : contexts,
@@ -140,7 +173,8 @@ def add_fullpath(fn):
 		path = get_path(request)
 		if path:
 			document_root = contrib.get_document_root(path)
-			log.debug('add_fullpath: func (%s) arguments patched. path: %s , fullpath: %s' % (fn, path, contrib.get_full_path(document_root, path)))
+			full_path = contrib.get_full_path(document_root, path)
+			log.debug('add full path for %s path: %s , fullpath: %s' % (fn, path, full_path))
 			return fn(request, contrib.get_full_path(document_root, path))
 		return fn(request)
 	return patch
@@ -228,12 +262,8 @@ def saveTest(request, fullpath):
 
 @add_fullpath	
 def saveDraftTest(request, fullpath):
-	result = tools.savetmptest(request.POST["content"], fullpath)
-	if result:
-		result = { 'success': result }
-	else:
-		result = { 'success': 'false' }
-	return HttpResponse(simplejson.dumps(result))
+	saveTest(request)
+	return HttpResponse()
 
 def submitTest(request):
 	testname = request.POST["path"]
@@ -264,15 +294,15 @@ def runSuite(request, fullpath):
 	
 	contextjs = context.render(ctx)
 	
-	path = removeVirtualFolderFromPath(path)
+	path = contrib.get_relative_clean_path(path)
 	if contrib.localhost(host) and not run == 'remote':
 		saveLocalContext(fullpath, contextjs)
 	else:
-		url = "%s/%s" % (context.get_URL(ctx, False), settings.PRODUCT_TESTS_URL)
+		url = "%s/%s" % (context.get_URL(ctx, True), settings.UPLOAD_TESTS_CMD)
 		contextjs_path = os.path.join(path, settings.TEST_CONTEXT_JS_FILE_NAME)
 		sendContentToRemote(contextjs_path, contextjs, url, ctx)
 	
-	url = "%s/%s?suite=/%s&root=%s" % ( context.get_URL(ctx), settings.PRODUCT_TESTS_URL, path, get_root()  )
+	url = "%s/%s?suite=/%s" % ( context.get_URL(ctx), settings.EXEC_TESTS_CMD, path )
 	url = contrib.normpath(urllib.unquote(url))
 	log.info("Run suite %s" % path)
 	return HttpResponseRedirect( url )
@@ -298,7 +328,7 @@ def runTest(request, fullpath):
 		if run == 'local':
 			root = ''
 	else:
-		url = "%s/%s" % (context.get_URL(ctx, True), settings.PRODUCT_TESTS_URL)
+		url = "%s/%s" % (context.get_URL(ctx, True), settings.UPLOAD_TESTS_CMD)
 		contextjs_path = os.path.join(os.path.dirname(path), settings.TEST_CONTEXT_JS_FILE_NAME)
 		sendContentToRemote(contextjs_path, contextjs, url, ctx)
 		saveRemoteScripts(path, url, request.REQUEST["content"], ctx, request)
@@ -328,8 +358,7 @@ def saveLocalContext(fullpath, contextjs):
 def makeSaveContentPost(content, path):
 	return {
 		'content': content,
-		'path': path,
-		'tests_root': settings.PRODUCT_TEST_CASES_ROOT 
+		'path': path 
 	}
 	
 def saveTestSatelliteScripts(url, test, request, libs):
@@ -360,15 +389,16 @@ def saveRemoteScripts(path, url, content, ctx, request):
 def auth(url, ctx):
 	login = ctx.get('login')
 	password = ctx.get('password')
+	empty_proxy_handler = urllib2.ProxyHandler({})
 	if login and password:
 		from ntlm import HTTPNtlmAuthHandler
 	
 		passman = urllib2.HTTPPasswordMgrWithDefaultRealm()
 		passman.add_password(None, url, login, password)
 		auth_NTLM = HTTPNtlmAuthHandler.HTTPNtlmAuthHandler(passman)
-		opener = urllib2.build_opener(auth_NTLM)
+		opener = urllib2.build_opener(auth_NTLM, empty_proxy_handler)
 	else:
-		opener = urllib2.build_opener()
+		opener = urllib2.build_opener(empty_proxy_handler)
 	
 	urllib2.install_opener(opener)
 	

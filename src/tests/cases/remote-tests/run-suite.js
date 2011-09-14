@@ -6,7 +6,7 @@ module('run suite remote');
 
 QUnit.setup(function() {
   context.suite_name = 'first-suite';
-  context.suite_path = 'tests/' + context.suite_name;
+  context.suite_path = context.root.concat('/', context.suite_name);
   context.test1_name = 'first-test.js';
   context.test2_name = 'second-test.js';
   var context_name = 'remote-suite';
