@@ -25,6 +25,14 @@ test('context is generated', function() {
   
 });
 
+test('context is generated including global settings', function() {
+  QUnit.log(context);
+  equal( context.global_var, 'GLOBAL', 'GLOBAL_VAR is from .settings.ini default section' );
+  equal( context.localhost_var, 'LOCALHOST', 'LOCALHOST_VAR is from .settings.ini localhost section' );
+  equal( context.localhost_var_rewrite, 'LOCALHOST', 'LOCALHOST_VAR_REWITE is from .settings.ini is rewritten by .context.ini localhost section' );
+});
+
+
 asyncTest('hidden file is not included into suite', function() {
   $.when( frame.go( context.url ) ).then(function(_$) {
 

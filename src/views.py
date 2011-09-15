@@ -70,7 +70,10 @@ def serve(request, path, show_indexes=False):
 			return HttpResponse(template.render(descriptor))
 
 	if not os.path.exists(fullpath):
-		raise Http404('"%s" does not exist' % fullpath)
+		if 'editor' in request.REQUEST:
+			open(fullpath, 'w').close() # creating file if not exists by editor opening it first time
+		else:
+			raise Http404('"%s" does not exist' % fullpath)
 	
 	if 'editor' in request.REQUEST:
 		descriptor = get_file_content_to_edit(path, fullpath, is_stubbed(path, request))
