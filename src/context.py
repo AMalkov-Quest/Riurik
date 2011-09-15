@@ -40,6 +40,19 @@ def render(ctx):
 		c['options'] += [ (name, value,), ]
 	return t.render(c)
 
+def render_ini(ctx, section_name='default'):
+	vars = patch(ctx)
+	t = Template("""{% load json_tags %}
+[{{ section }}]
+{% for option in options %}{{ option.0 }} = {{ option.1|json }}{% if option.2 %} ; {{ option.2 }}{% endif %}
+{% endfor %}""")
+	c = Context();
+	c['section'] = section_name
+	c['options'] = []
+	for name, value in vars:
+		c['options'] += [ (name, value, hasattr(value, 'comment')), ]
+	return t.render(c)
+
 def patch(ctx):
 	vars = ctx.items()
 	hasInclude = False
@@ -78,7 +91,9 @@ def patch(ctx):
 	return vars
 
 class global_settings(object):
-	def __init__(self, path, section='default'):
+	comment = 'from global settings'
+
+	def __init__(self, path, section='DEFAULT'):
 		log.debug('initing global_settings by from %s, section:%s' % (path, section))
 		self.inifile = None
 		for virtpath in settings.VIRTUAL_PATHS.values():
@@ -100,8 +115,13 @@ class global_settings(object):
 
 	def items(self):
 		log.debug('context get items(): %s, section: %s\nresult:\n%s' % (self.inifile, self.section, config.items(self.inifile, self.section)))
-		return config.items(self.inifile, self.section) 
-			
+		return config.items(self.inifile, self.section)
+	
+	def __patch_values(self, vals):
+		if not vals: return 
+		for k, v in vals:
+			yield k,v, self.comment
+
 	def sections(self):
 		log.debug('reading sections: %s' % config.sections(self.inifile))
 		return config.sections(self.inifile)
@@ -110,7 +130,9 @@ class global_settings(object):
 		return os.path.dirname(self.inifile)
 
 class context(global_settings):
-	def __init__(self, test, section='default'):
+	comment = 'context.ini'
+
+	def __init__(self, test, section='DEFAULT'):
 		if os.path.isdir(test):
 			self.inifile = os.path.join(test, settings.TEST_CONTEXT_FILE_NAME)
 		else:

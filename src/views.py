@@ -11,7 +11,7 @@ import simplejson
 import django.conf
 import settings
 from logger import log
-import context
+import context, config
 import mimetypes, os, random, posixpath, re, datetime
 import stat
 from email.Utils import parsedate_tz, mktime_tz
@@ -53,10 +53,23 @@ def enumerate_suites(request):
 		return HttpResponse(simplejson.dumps(suites))
 	return HttpResponse(str(suites).replace('[','').replace(']','').rstrip(',').replace('\'',''))
 
-def serve(request, path, show_indexes=False):
-	cache.add('asfasf', datetime.datetime.now())
-	request.session['nnn'] = 'awgawg'
+def show_context(request, path):
+	document_root = contrib.get_document_root(path)
+	fullpath = contrib.get_full_path(document_root, path)
+	log.debug('show context of %s (%s %s)' % (fullpath, document_root, path))
+	
+	result = ""
 
+	sections = config.sections(context.get(fullpath).inifile)
+	for section_name in sections:
+		ctx = context.get(fullpath, section=section_name)
+		context_ini = context.render_ini(ctx, section_name)
+		result += context_ini
+	
+	return HttpResponse(result)
+
+
+def serve(request, path, show_indexes=False):
 	document_root = contrib.get_document_root(path)
 	fullpath = contrib.get_full_path(document_root, path)
 	log.debug('show index of %s(%s %s)' % (fullpath, document_root, path))

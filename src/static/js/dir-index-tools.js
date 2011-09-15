@@ -20,7 +20,7 @@ $(function () {
 			title: 'context.ini',
 			open: function(event, ui){
 				$.ajax({ 
-					url: '.context.ini', 
+					url: 'show_context', 
 					success: function(data){ 
 						$('#context-preview').html('<pre>'+data+'</pre>'); 
 					}, 
