@@ -320,7 +320,25 @@ def runTest(request, fullpath):
 	run = ctx.get('run')
 	contextjs = context.render(ctx)
 	log.debug('contextJS: '+ contextjs)
+
+	path = contrib.get_relative_clean_path(path)
+	target = context.get_host(ctx)
+	log.debug('target of test %s is %s' % (path, target))
+	if target and request.get_host() != target:
+		url = "http://%s/%s" % (target, settings.UPLOAD_TESTS_CMD)
+		contextjs_path = os.path.join(os.path.dirname(path), settings.TEST_CONTEXT_JS_FILE_NAME)
+		sendContentToRemote(contextjs_path, contextjs, url, ctx)
+		saveRemoteScripts(path, url, request.REQUEST["content"], ctx, request)
+		url = "http://%s/%s?path=/%s" % (target, settings.EXEC_TESTS_CMD, path)
+	else:
+		saveLocalContext(fullpath, contextjs)
+		url = "http://%s/%s?path=/%s" % (request.get_host(), settings.EXEC_TESTS_CMD, path)
 	
+	log.info("redirect to run test %s" % url)
+	return HttpResponseRedirect(url)
+
+
+def runTestOld(request, fullpath):
 	path = contrib.get_relative_clean_path(path)
 	root = get_root()
 	if (contrib.localhost(host) and not run == 'remote') or run == 'local':

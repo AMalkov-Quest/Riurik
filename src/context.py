@@ -25,6 +25,21 @@ def get_URL(instance, resolve=False):
 		url =  'http://%s:%s' % (host, instance.get('port'))
 	return url
 
+def get_host(instance):
+	"""
+	returns http url of target lab to run tests on by host and port values in a context
+	if these values in the context are empry it returns None
+	>>> get_targetURL({})
+		
+	"""
+	host = instance.get('host')
+	port = instance.get('port')
+	if host and port:
+		if host == 'localhost':
+			host = socket.gethostname()
+ 
+		return '%s:%s' % (host, port)
+
 def render(ctx):
 	vars = patch(ctx)
 	t = Template("""{% load json_tags %}
