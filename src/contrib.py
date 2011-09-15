@@ -69,7 +69,7 @@ def patch_fullpaths(fullpath, newpath=''):
 	
 	return fullpath
 
-def getHostByName(host):
+def getHostByName(host, cache):
 	import socket
 	r = socket.gethostbyname(host)
 	cache.set(host, r)

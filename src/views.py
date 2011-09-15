@@ -328,7 +328,7 @@ def runTest(request, fullpath):
 		if run == 'local':
 			root = ''
 	else:
-		url = "%s/%s" % (context.get_URL(ctx, True), settings.UPLOAD_TESTS_CMD)
+		url = "%s/%s" % (context.get_URL(ctx), settings.UPLOAD_TESTS_CMD)
 		contextjs_path = os.path.join(os.path.dirname(path), settings.TEST_CONTEXT_JS_FILE_NAME)
 		sendContentToRemote(contextjs_path, contextjs, url, ctx)
 		saveRemoteScripts(path, url, request.REQUEST["content"], ctx, request)
@@ -411,7 +411,9 @@ def sendContentToRemote(path, content, url, ctx):
 		return obj
 	auth(url, ctx)
 	post = urllib.urlencode(_patch_strings(data))
-	result = urllib2.urlopen(url, post).read()
+	log.info('send content to %s' % url)
+	req = urllib2.Request(url, post)
+	result = urllib2.urlopen(req).read()
 	log.info("remote script %s saving result: %s" % (path, result))
 	return result
 

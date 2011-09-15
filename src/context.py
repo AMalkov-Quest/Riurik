@@ -21,7 +21,7 @@ def get_URL(instance, resolve=False):
 		if host == 'localhost':
 			host = socket.gethostname()
 		if resolve:
-			host = contrib.resolveRemoteAddr(host)
+			host = contrib.resolveRemoteAddr(host, cache)
 		url =  'http://%s:%s' % (host, instance.get('port'))
 	return url
 
