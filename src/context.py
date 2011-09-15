@@ -154,5 +154,5 @@ class context(global_settings):
 		values = {}
 		values.update( global_settings(self.inifile).items() or {} )
 		values.update( global_settings(self.inifile, self.section).items() or {} )
-		values.update( super(context, self).items() )
+		values.update( super(context, self).items() or {} )
 		return values.items()
