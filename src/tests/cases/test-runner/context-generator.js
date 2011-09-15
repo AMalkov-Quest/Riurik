@@ -10,11 +10,10 @@ QUnit.setup(function() {
   
   delete_test( context.hidden_path );
   create_test( context.hidden_file, context.suite_path );
+  QUnit.log(context);
 });
 
 test('context is generated', function() {
-  QUnit.log(context);
-  
   ok( typeof context != 'undefined', 'context is generated' );
   ok( context.host != 'localhost', 'localhost is translated into local machine name' );
   equal( context.var1, 'value2', 'variable value corresponds to context' );
@@ -24,6 +23,13 @@ test('context is generated', function() {
   equal( library3.method3(60), 60, 'method from library 3 is available' );
   
 });
+
+test('context is generated including global settings', function() {
+  equal( context.global_var, 'GLOBAL', 'GLOBAL_VAR is from .settings.ini default section' );
+  equal( context.localhost_var, 'LOCALHOST', 'LOCALHOST_VAR is from .settings.ini localhost section' );
+  equal( context.localhost_var_rewrite, 'LOCALHOST', 'LOCALHOST_VAR_REWITE is from .settings.ini is rewritten by .context.ini localhost section' );
+});
+
 
 asyncTest('hidden file is not included into suite', function() {
   $.when( frame.go( context.url ) ).then(function(_$) {

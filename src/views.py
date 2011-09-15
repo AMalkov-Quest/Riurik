@@ -11,7 +11,7 @@ import simplejson
 import django.conf
 import settings
 from logger import log
-import context
+import context, config
 import mimetypes, os, random, posixpath, re, datetime
 import stat
 from email.Utils import parsedate_tz, mktime_tz
@@ -53,10 +53,23 @@ def enumerate_suites(request):
 		return HttpResponse(simplejson.dumps(suites))
 	return HttpResponse(str(suites).replace('[','').replace(']','').rstrip(',').replace('\'',''))
 
-def serve(request, path, show_indexes=False):
-	cache.add('asfasf', datetime.datetime.now())
-	request.session['nnn'] = 'awgawg'
+def show_context(request, path):
+	document_root = contrib.get_document_root(path)
+	fullpath = contrib.get_full_path(document_root, path)
+	log.debug('show context of %s (%s %s)' % (fullpath, document_root, path))
+	
+	result = ""
 
+	sections = config.sections(context.get(fullpath).inifile)
+	for section_name in sections:
+		ctx = context.get(fullpath, section=section_name)
+		context_ini = context.render_ini(ctx, section_name)
+		result += context_ini
+	
+	return HttpResponse(result)
+
+
+def serve(request, path, show_indexes=False):
 	document_root = contrib.get_document_root(path)
 	fullpath = contrib.get_full_path(document_root, path)
 	log.debug('show index of %s(%s %s)' % (fullpath, document_root, path))
@@ -70,7 +83,10 @@ def serve(request, path, show_indexes=False):
 			return HttpResponse(template.render(descriptor))
 
 	if not os.path.exists(fullpath):
-		raise Http404('"%s" does not exist' % fullpath)
+		if 'editor' in request.REQUEST:
+			open(fullpath, 'w').close() # creating file if not exists by editor opening it first time
+		else:
+			raise Http404('"%s" does not exist' % fullpath)
 	
 	if 'editor' in request.REQUEST:
 		descriptor = get_file_content_to_edit(path, fullpath, is_stubbed(path, request))
@@ -142,7 +158,11 @@ def get_dir_index(document_root, path, fullpath):
 					dirs.append(get_descriptor(f))
 
 	try:
-		contexts = context.get(fullpath).sections()
+		if tools.get_type(fullpath) == 'virtual':
+			contexts = context.global_settings(fullpath).sections()
+		else:
+			contexts = context.get(fullpath).sections()
+		log.debug(contexts)
 	except Exception, e:
 		log.error(e)
 		contexts = []

@@ -35,6 +35,7 @@ urlpatterns = patterns('',
 	(r'^logger/records/recv/$', 'views.recvLogRecords'),
 	(r'^actions/remove/$', 'views.removeObject'),
 	(r'^actions/suite/enumerate/$', 'views.enumerate_suites'),
+	(r'^(?P<path>.*)/show_context[/]?$', 'views.show_context'),
 )
 
 urlpatterns += patterns('',

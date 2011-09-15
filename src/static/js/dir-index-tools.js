@@ -20,7 +20,7 @@ $(function () {
 			title: 'context.ini',
 			open: function(event, ui){
 				$.ajax({ 
-					url: '.context.ini', 
+					url: 'show_context', 
 					success: function(data){ 
 						$('#context-preview').html('<pre>'+data+'</pre>'); 
 					}, 
@@ -29,6 +29,26 @@ $(function () {
 			}
 		});
 		return false;
+	});
+	$('#run-all-suites').click(function(){
+		var context = $('select#context').val();
+		var virt_path = $(this).attr('rel');
+		if (typeof context == 'undefined'){ alert('no context selected'); return; }
+		$.ajax({
+			url: '/actions/suite/enumerate/',
+			data: {
+				'context': context,
+				'json' : true,
+				'target' : virt_path
+			},
+			dataType: 'json',
+			success: function(data){
+				for ( i in data ){
+					var path = virt_path + '/' + data[i];
+					open('/actions/suite/run/?context='+context+'&path='+path+'&url='+path, path);	
+				}
+			}
+		})
 	});
 });
 
