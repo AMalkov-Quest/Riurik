@@ -65,6 +65,15 @@
 						<li><a id="context-preview-ctrl" href=".context.ini" rel='context-preview'>{% trans "Context" %}</a></li>
 						<li><a id="new-test" href="javascript:void(0);" onClick="javascript:createTest();">Create Test</a></li>
 					{% else %}
+						{% ifequal type 'virtual' %}
+							<li><a id="run-all-suites" href="javascript:void(0);">Run all suites</a>
+							<select id="context" name="context">
+								{% for item in contexts %}
+									<option value="{{ item }}">{{ item }}</option>
+								{% endfor %}
+							</select>
+							</li>
+						{% endifequal %}
 						<li><a id="new-suite" href="javascript:void(0);" onClick="javascript:createFolder();">Create Suite</a></li>
 					{% endifequal %}
 				{% else %}
