@@ -66,7 +66,7 @@
 						<li><a id="new-test" href="javascript:void(0);" onClick="javascript:createTest();">Create Test</a></li>
 					{% else %}
 						{% ifequal type 'virtual' %}
-							<li><a id="run-all-suites" href="javascript:void(0);">Run all suites</a>
+							<li><a id="run-all-suites" href="javascript:void(0);" rel="{{directory|current}}">Run all suites</a>
 							<select id="context" name="context">
 								{% for item in contexts %}
 									<option value="{{ item }}">{{ item }}</option>

@@ -145,7 +145,11 @@ def get_dir_index(document_root, path, fullpath):
 					dirs.append(get_descriptor(f))
 
 	try:
-		contexts = context.get(fullpath).sections()
+		if tools.get_type(fullpath) == 'virtual':
+			contexts = context.global_settings(fullpath).sections()
+		else:
+			contexts = context.get(fullpath).sections()
+		log.debug(contexts)
 	except Exception, e:
 		log.error(e)
 		contexts = []
