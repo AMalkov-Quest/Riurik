@@ -1,8 +1,9 @@
-import os, ConfigParser
+import os
+from ConfigParser import SafeConfigParser as ConfigParser
 from logger import log
 
 def read(file):
-	config = ConfigParser.RawConfigParser()
+	config = ConfigParser()
 	config.read(file)
 	return config
 
