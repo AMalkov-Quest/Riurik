@@ -1,5 +1,22 @@
 import os, re, settings
 from logger import log
+import socket
+
+
+def get_target_host(context):
+	"""
+	returns http url of target lab to run tests on by host and port values in a context
+	if these values in the context are empry it returns None
+	>>> get_target_host({})
+		
+	"""
+	host = context.get('host')
+	port = context.get('port')
+	if host and port:
+		if host == 'localhost':
+			host = socket.gethostname()
+ 
+		return '%s:%s' % (host, port)
 
 def get_document_root(path):
 	"""
@@ -69,7 +86,7 @@ def patch_fullpaths(fullpath, newpath=''):
 	
 	return fullpath
 
-def getHostByName(host):
+def getHostByName(host, cache):
 	import socket
 	r = socket.gethostbyname(host)
 	cache.set(host, r)

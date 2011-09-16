@@ -3,6 +3,7 @@ from django.shortcuts import render_to_response
 from django.views.decorators.cache import never_cache
 from django.conf import settings
 from django.utils.translation import ugettext as _
+from django.views.decorators.csrf import csrf_exempt
 import os, random
 
 try:
@@ -40,7 +41,7 @@ def execute(request):
 
 	return render_to_response('%s/testLoader.html' % loader_dir, locals())
 
-@never_cache
+@csrf_exempt
 def upload(request, document_root):
 	response = HttpResponse(mimetype='text/plain')
 	try:

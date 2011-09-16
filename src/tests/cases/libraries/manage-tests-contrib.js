@@ -1,7 +1,3 @@
-function delVirtualDir(path) {
-  return riurik.strip(path, 'tests/')
-};
-
 function stubFile(path) {
   var url = contexter.URL(context, 'actions/test/stub/?path=' + path);
   QUnit.log('stub file: ', url);

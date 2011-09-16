@@ -333,28 +333,24 @@ def runTest(request, fullpath):
 	context_name = request.REQUEST.get("context", None)
 	ctx = context.get(fullpath, section=context_name)
 	
-	log.debug('run test %s(%s)' % (path, fullpath))
-	log.debug('context %s: %s' % (context_name, str(ctx.items())))
+	log.info('run test %s with context %s' % (path, context_name))
 	
-	host = ctx.get('host')
-	run = ctx.get('run')
 	contextjs = context.render(ctx)
 	log.debug('contextJS: '+ contextjs)
+
+	clean_path = contrib.get_relative_clean_path(path)
+	target = contrib.get_target_host(ctx)
+	log.info('target of test %s is %s' % (clean_path, target))
 	
-	path = contrib.get_relative_clean_path(path)
-	root = get_root()
-	if (contrib.localhost(host) and not run == 'remote') or run == 'local':
-		saveLocalContext(fullpath, contextjs)
-		if run == 'local':
-			root = ''
+	if target and request.get_host() != target:
+		url = "http://%s/%s" % (target, settings.UPLOAD_TESTS_CMD)
+		saveRemoteContext(clean_path, contextjs, url, ctx)
+		saveRemoteScripts(clean_path, url, request.REQUEST["content"], ctx, request)
+		url = "http://%s/%s?path=/%s" % (target, settings.EXEC_TESTS_CMD, clean_path)
 	else:
-		url = "%s/%s" % (context.get_URL(ctx, True), settings.UPLOAD_TESTS_CMD)
-		contextjs_path = os.path.join(os.path.dirname(path), settings.TEST_CONTEXT_JS_FILE_NAME)
-		sendContentToRemote(contextjs_path, contextjs, url, ctx)
-		saveRemoteScripts(path, url, request.REQUEST["content"], ctx, request)
-		
-	url = "%s/%s?path=/%s" % (context.get_URL(ctx), settings.EXEC_TESTS_CMD, path)
-		
+		saveLocalContext(fullpath, contextjs)
+		url = "http://%s/%s?path=/%s" % (request.get_host(), settings.EXEC_TESTS_CMD, clean_path)
+	
 	log.info("redirect to run test %s" % url)
 	return HttpResponseRedirect(url)
 
@@ -422,6 +418,11 @@ def auth(url, ctx):
 	
 	urllib2.install_opener(opener)
 	
+def saveRemoteContext(path, content, url, ctx):
+	log.info('save remote context for %s' % path)
+	contextjs_path = os.path.join(os.path.dirname(path), settings.TEST_CONTEXT_JS_FILE_NAME)
+	sendContentToRemote(contextjs_path, content, url, ctx)
+
 def sendContentToRemote(path, content, url, ctx):
 	data = makeSaveContentPost(content, path)
 	def _patch_strings(obj):
@@ -431,7 +432,9 @@ def sendContentToRemote(path, content, url, ctx):
 		return obj
 	auth(url, ctx)
 	post = urllib.urlencode(_patch_strings(data))
-	result = urllib2.urlopen(url, post).read()
+	log.info('send content to %s' % url)
+	req = urllib2.Request(url, post)
+	result = urllib2.urlopen(req).read()
 	log.info("remote script %s saving result: %s" % (path, result))
 	return result
 
