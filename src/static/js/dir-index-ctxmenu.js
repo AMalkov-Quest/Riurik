@@ -48,12 +48,12 @@ $(document).ready(function() {
 			alert('No context selected');
 			return;	
 		}
-		var target_type = $('#'+target).attr('class');
+		var target_type = $('#dir-index-id li[title="'+target+'"]').attr('class');
 		$('#context-action > input[name=path]').val(fullPath);
 		$('#context-action > input[name=url]').val(fullPath);
 		$('#context-action > input[name=context]').val(context);
 		if ( target_type == 'test' ) {
-			$('#context-action').attr('action', '/actions/test/submit/').attr('target', '_blank'); 	
+			$('#context-action').attr('action', '/actions/test/run/').attr('target', '_blank'); 	
 			$('#context-action').submit();
 			return;
 		}

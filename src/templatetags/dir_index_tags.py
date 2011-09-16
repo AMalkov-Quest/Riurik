@@ -14,7 +14,7 @@ def strip(s, chars):
 
 @register.filter
 def make_url(val):
-	return '/'.join(val.split('\\'))
+	return re.sub('\/+', '/', '/'.join(val.split('\\')))
 
 @register.filter
 def above(path):
