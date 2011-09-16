@@ -43,21 +43,26 @@ $(document).ready(function() {
 	function run(target, context, context_names) {
 		var currentDir = $('#context-action > input[name=url]').val();
 		var fullPath = currentDir + target;
+		var context = $('#context').val();
+		if ( typeof context == 'undefined' ) {
+			alert('No context selected');
+			return;	
+		}
+		var target_type = $('#'+target).attr('class');
 		$('#context-action > input[name=path]').val(fullPath);
 		$('#context-action > input[name=url]').val(fullPath);
-		$('#context-action > input[name=context]').val(context_names.shift());
-		$('#context-action').attr('action', '/actions/test/submit/').attr('target', '_blank');
-		$('#context-action').submit();
+		$('#context-action > input[name=context]').val(context);
+		if ( target_type == 'test' ) {
+			$('#context-action').attr('action', '/actions/test/submit/').attr('target', '_blank'); 	
+			$('#context-action').submit();
+			return;
+		}
+		if ( target_type == 'suite' ) {
+			$('#context-action').attr('action', '/actions/suite/run/').attr('target', '_blank'); 	
+			$('#context-action').submit();
+			return;
+		}
+		alert('Unknown target type to run.');
+		return;
 	};
-	function runsuite(target, context, context_names) {
-		var currentDir = $('#context-action > input[name=url]').val();
-		var fullPath = currentDir;
-		console.log(target, context, arguments);
-		$('#context-action > input[name=path]').val(fullPath);
-		$('#context-action > input[name=url]').val(fullPath);
-		$('#context-action > input[name=context]').val(context_names.shift());
-		$('#context-action').attr('action', '/actions/suite/run/').attr('target', '_blank');
-		$('#context-action').submit();
-	};
-
 });
