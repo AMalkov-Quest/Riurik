@@ -56,7 +56,7 @@ $(document).ready(function() {
 		$('#context-action > input[name=path]').val(fullPath);
 		$('#context-action > input[name=url]').val(fullPath);
 		$('#context-action > input[name=context]').val(context_names.shift());
-		$('#context-action').attr('action', '/actions/suite/submit/').attr('target', '_blank');
+		$('#context-action').attr('action', '/actions/suite/run/').attr('target', '_blank');
 		$('#context-action').submit();
 	};
 
