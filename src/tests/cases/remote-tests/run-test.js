@@ -27,7 +27,7 @@ QUnit.setup(function() {
   }
 });
 
-asyncTest('check if runnig', function() {
+asyncTest('test is pushed to run on remote server', function() {
   $('#frame').attr('src', context.URL);
   $('#frame').unbind('load');
   $('#frame').load(function() {
@@ -41,6 +41,23 @@ asyncTest('check if runnig', function() {
     
     start();
   });
+});
+
+asyncTest('test is executed on remote server', function() {
+  riurik.sleep(100).then(function() {
+    var logs = getLogs(context.start, 'django-app');
+    
+    regex = new RegExp('save script '.concat(context.suite_path.strip(context.root).strip('/').concat('/.context.js')));
+    ok(regex.test(logs), regex);
+    
+    regex = new RegExp('save script '.concat(context.test_path.strip(context.root).strip('/')));
+    ok(regex.test(logs), regex);
+    
+    regex = new RegExp('execute test '.concat(context.test_path.strip(context.root).strip('/')));
+    ok(regex.test(logs), regex);
+    
+    start();
+  })
 });
 
 QUnit.teardown(function() {

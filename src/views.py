@@ -439,8 +439,12 @@ def sendContentToRemote(path, content, url, ctx):
 	return result
 
 def recvLogRecords(request):
-	from logger import FILENAME, timeFormat
-	f = codecs.open(FILENAME, 'r', 'utf-8')
+	from logger import FILENAME, DJANGO_APP, timeFormat
+	log_file = FILENAME
+	if request.REQUEST.get('source', None):
+		log.debug('recv logs for django app')
+		log_file = DJANGO_APP
+	f = codecs.open(log_file, 'r', 'utf-8')
 	records = f.read()
 	f.close()
 	
@@ -469,11 +473,11 @@ def getLastLogRecordTime(records, format):
 	result = None
 	lines = records.split('\n')
 	regex = re.compile("\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d")
-	for i in reversed(range(len(lines))):		
+	for i in reversed(range(len(lines))):
 		line = lines[i]
 		m = regex.match(line)
 		if m:
-			result = time.mktime(time.strptime(m.group(), format))				
+			result = time.mktime(time.strptime(m.group(), format))
 			break
 	return result
 
@@ -483,12 +487,13 @@ def getLogRecordsSinceGivenTime(records, format, sinse_time):
 	lines = records.split('\n')
 	regex = re.compile("\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d")
 	log.debug('since time %d' % sinse_time)
-	for i in reversed(range(len(lines))):		
-		line = lines[i]						
+	for i in reversed(range(len(lines))):
+		line = lines[i]
+		log.debug(line)
 		m = regex.match(line)
 		if m:
 			t = time.mktime(time.strptime(m.group(), format))
-			if float( t ) < sinse_time:				
+			if float( t ) < sinse_time:
 				break
 			result.append(line)
 	
@@ -568,6 +573,3 @@ def getOpenedFiles(request, clean=False):
 			except:
 				pass
 	return files
-
-
-	

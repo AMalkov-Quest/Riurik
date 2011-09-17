@@ -5,6 +5,11 @@ from django.conf import settings
 from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import csrf_exempt
 import os, random
+try:
+	from logger import log
+except:
+	import logging
+	log = logging.getLogger('default')
 
 try:
     from django.contrib import messages
@@ -16,6 +21,7 @@ loader_dir = 'loader'
 cases_dir = 'cases'
 	
 def saveTestContent(document_root, path, content):
+	log.info('save script %s' % path)
 	path = os.path.join(document_root, cases_dir, path)
 	if not os.path.exists(os.path.dirname(path)):
 		os.makedirs(os.path.dirname(path))
@@ -32,13 +38,15 @@ def execute(request):
 	
 	if 'suite' in request.REQUEST:
 		jspath = request.REQUEST.get('suite', '').strip('/')
+		log.info('execute suite %s' % jspath)
 		title = os.path.basename(jspath)
 		suite = True
 	else:
 		jsfile = request.REQUEST.get('path', '').strip('/')
+		log.info('execute test %s' % jsfile)
 		jspath = os.path.dirname(jsfile).strip('/')
 		title = os.path.basename(jsfile)
-
+		
 	return render_to_response('%s/testLoader.html' % loader_dir, locals())
 
 @csrf_exempt
