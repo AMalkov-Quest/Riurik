@@ -7,8 +7,17 @@ def get_target_host(context):
 	"""
 	returns http url of target lab to run tests on by host and port values in a context
 	if these values in the context are empry it returns None
+	if host is localhost it returns resolved name
 	>>> get_target_host({})
-		
+	
+	>>> get_target_host({'host': 'host-1'})	
+
+	>>> get_target_host({'port': 'port-1'})	
+
+	>>> get_target_host({'host': 'google.com', 'port': '22'})	
+	'google.com:22'
+	>>> get_target_host({'host': 'localhost', 'port': '22'})	
+	'localhost:22'	
 	"""
 	host = context.get('host')
 	port = context.get('port')
