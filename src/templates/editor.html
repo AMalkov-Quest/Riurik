@@ -178,9 +178,11 @@
 {% block controls %}
 	{% if not is_stubbed %}
 	<ul class="horizontal-menu">
+		{% ifequal filetype 'test'  %}
 		<li><a id="run" href="javascript:void(0);">{% trans "Run" %}</a>
 		at <select name="context">{% for item in contexts %}<option value='{{item}}'{% if forloop.first %} selected="selected"{% endif %}>{{item}}</option>{% endfor %}</select></li>
 		<li><a id="context-preview-ctrl" href=".context.ini" rel='context-preview'>{% trans "Context" %}</a></li>
+		{% endifequal %}
 		<li><a id="save" href="javascript:void(0);">{% trans "Save" %}</a></li>
 		<li><a id="discard" href="javascript: void(0);">{% trans "Discard" %}</a></li>
 		<li class="disabled"><a id="history" href="javascript: void(0);">{% trans "History" %}</a></li>

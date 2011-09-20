@@ -104,13 +104,14 @@ def get_file_content_to_edit(path, fullpath, is_stubbed):
 		
 	content = open(fullpath, 'rb').read()
 		
-	return {	
+	return {
 		'directory': path,
 		'content': content,
 		'contexts': contexts,
 		'relative_file_path': path,
 		'is_stubbed': is_stubbed,
 		'favicon'   : 'dir-index-test.gif',
+		'filetype':  tools.get_type(fullpath),
 	}
 
 def get_file_content(fullpath):

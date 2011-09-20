@@ -24,6 +24,8 @@ def get_type(path):
 			if path.rstrip('/').rstrip('\\') in settings.VIRTUAL_PATHS.values():
 				return 'virtual'
 			return 'folder'
+		if '.ini' in path:
+			return 'configfile'
 		return 'test'
 	return 'none'
 
