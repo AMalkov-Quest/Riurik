@@ -35,5 +35,4 @@ asyncTest('title for test', function() {
 
 QUnit.teardown(function() {
   delete_folder(context.suite_path);
-  start();
 });
