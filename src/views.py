@@ -345,7 +345,8 @@ def runTest(request, fullpath):
 	target = contrib.get_target_host(ctx)
 	log.info('target of test %s is %s' % (clean_path, target))
 	
-	if target and request.get_host() != target:
+	if target and request.get_host().lower() != target.lower():
+		log.debug('TARGET: %s, %s' % ( target, request.get_host() ))
 		url = "http://%s/%s" % (target, settings.UPLOAD_TESTS_CMD)
 		saveRemoteContext(os.path.dirname(clean_path), contextjs, url, ctx)
 		saveTestSatelliteScripts(url, path, ctx)
@@ -429,14 +430,8 @@ def saveRemoteContext(path, content, url, ctx):
 
 def sendContentToRemote(path, content, url, ctx):
 	data = makeSaveContentPost(content, path)
-	#TODO: for what?
-	def _patch_strings(obj):
-		for key, val in obj.iteritems():
-			if val.__class__.__name__ == 'unicode':
-				obj[key] = val.encode('utf-8')
-		return obj
 	auth(url, ctx)
-	post = urllib.urlencode(_patch_strings(data))
+	post = urllib.urlencode(contrib.convert_dict_values_strings_to_unicode(data))
 	log.info('send content to %s' % url)
 	req = urllib2.Request(url, post)
 	result = urllib2.urlopen(req).read()

@@ -1,6 +1,17 @@
+# coding: utf-8
 import os, re, settings
 from logger import log
 import socket
+
+def convert_dict_values_strings_to_unicode(obj):
+	"""
+		>>> convert_dict_values_strings_to_unicode({'key1': u'Ё'})
+		{'key1': '\\xc3\\x90\\xc2\\x81'}
+	"""
+	for key, val in obj.iteritems():
+		if val.__class__.__name__ == 'unicode':
+			obj[key] = val.encode('utf-8')
+	return obj
 
 
 def get_target_host(context):
