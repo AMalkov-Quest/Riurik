@@ -345,7 +345,9 @@ def runTest(request, fullpath):
 	if target and request.get_host() != target:
 		url = "http://%s/%s" % (target, settings.UPLOAD_TESTS_CMD)
 		saveRemoteContext(clean_path, contextjs, url, ctx)
-		saveRemoteScripts(clean_path, url, request.REQUEST["content"], ctx, request)
+		saveTestSatelliteScripts(url, path, ctx)
+		sendContentToRemote(clean_path, request.REQUEST["content"], url, ctx)
+		#saveRemoteScripts(clean_path, url, request.REQUEST["content"], ctx, request)
 		url = "http://%s/%s?path=/%s" % (target, settings.EXEC_TESTS_CMD, clean_path)
 	else:
 		saveLocalContext(fullpath, contextjs)
@@ -377,7 +379,24 @@ def makeSaveContentPost(content, path):
 		'path': path 
 	}
 	
-def saveTestSatelliteScripts(url, test, request, libs):
+def saveTestSatelliteScripts(url, path, ctx):
+	"""	
+	uploads scripts those the test depends on
+	"""
+	document_root = contrib.get_document_root(path) 
+	libs = ctx.get('libraries', [])
+	log.info('save satellite scripts for: %s' % path)
+	log.debug('libraries: %s' % libs)
+	for lib in simplejson.loads(libs):
+		fullpath = contrib.get_full_path(document_root, lib)
+		content = tools.gettest(fullpath)
+		clean_path = contrib.get_relative_clean_path(lib)
+		data = makeSaveContentPost(content, lib)
+		post = urllib.urlencode(data)
+		result = urllib2.urlopen(url, post).read()
+		log.info("library %s is saved: %s" % (lib, result))
+
+def __saveTestSatelliteScripts(url, test, request, libs):
 	'''
 	saves all documents opened in the same browser(in other tabs)
 	as a test that is about to run 
@@ -399,7 +418,7 @@ def saveTestSatelliteScripts(url, test, request, libs):
 
 def saveRemoteScripts(path, url, content, ctx, request):
 	libs = ctx.get('libraries', [])
-	saveTestSatelliteScripts(url, path, request, libs)
+	saveTestSatelliteScripts(url, path, ctx)
 	return sendContentToRemote(path, content, url, ctx)
 
 def auth(url, ctx):

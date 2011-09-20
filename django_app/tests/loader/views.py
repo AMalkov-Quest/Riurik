@@ -17,19 +17,10 @@ try:
 except ImportError: 
     _USE_MESSAGES = False
 
+#TODO: loader_dir = os.path.dirname(__file__)
 loader_dir = 'loader'
 cases_dir = 'cases'
 	
-def saveTestContent(document_root, path, content):
-	log.info('save script %s' % path)
-	path = os.path.join(document_root, cases_dir, path)
-	if not os.path.exists(os.path.dirname(path)):
-		os.makedirs(os.path.dirname(path))
-	
-	file = open(path, 'wb')
-	file.write(content.encode('utf-8'))
-	file.close()
-
 @never_cache
 def execute(request):
 	rand = random.random()
@@ -52,10 +43,25 @@ def execute(request):
 @csrf_exempt
 def upload(request, document_root):
 	response = HttpResponse(mimetype='text/plain')
+	path = request.REQUEST['path']
+	content = request.REQUEST['content']
+	fullpath = os.path.join(document_root, cases_dir, path)
+	log.debug('upload file %s to %s' % (path, fullpath))
 	try:
-		saveTestContent(document_root, request.REQUEST['path'], request.REQUEST['content'])
+		dirname = os.path.dirname(fullpath)
+		#TODO: test that this work on deeper levels
+		if not os.path.exists(dirname):
+			os.makedirs(dirname)
+	
+		file = open(fullpath, 'wb')
+		file.write(content.encode('utf-8'))
+		file.close()
+		
+		log.info('save script %s' % path)
+
 		response.write('OK')
 	except Exception, e:
+		log.debug(e)
 		response.write('FAILED')
 	
 	return response
