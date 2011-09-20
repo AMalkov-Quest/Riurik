@@ -307,24 +307,28 @@ def get_root():
 def runSuite(request, fullpath):
 	path = contrib.normpath(request.REQUEST["path"])
 	context_name = request.REQUEST["context"]
-
 	ctx = context.get(fullpath, section=context_name)
-	host = ctx.get('host' )
-	run = ctx.get('run' )
 	
+	log.info('run suite %s with context %s' % (path, context_name))
+
 	contextjs = context.render(ctx)
 	
-	path = contrib.get_relative_clean_path(path)
-	if contrib.localhost(host) and not run == 'remote':
-		saveLocalContext(fullpath, contextjs)
+	clean_path = contrib.get_relative_clean_path(path)
+	target = contrib.get_target_host(ctx)
+	log.info('target of suite %s is %s' % (clean_path, target))
+
+	if target and request.get_host() != target:
+		url = "http://%s/%s" % (target, settings.UPLOAD_TESTS_CMD)
+		saveRemoteContext(clean_path, contextjs, url, ctx)
+		saveSuiteAllTests(url, path, ctx)
+		url = "http://%s/%s?suite=/%s" % ( target, settings.EXEC_TESTS_CMD, clean_path )
 	else:
-		url = "%s/%s" % (context.get_URL(ctx, True), settings.UPLOAD_TESTS_CMD)
-		contextjs_path = os.path.join(path, settings.TEST_CONTEXT_JS_FILE_NAME)
-		sendContentToRemote(contextjs_path, contextjs, url, ctx)
+		saveLocalContext(fullpath, contextjs)
+		url = "http://%s/%s?suite=/%s" % ( request.get_host(), settings.EXEC_TESTS_CMD, clean_path )
+
+	#rl = contrib.normpath(urllib.unquote(url))
 	
-	url = "%s/%s?suite=/%s" % ( context.get_URL(ctx), settings.EXEC_TESTS_CMD, path )
-	url = contrib.normpath(urllib.unquote(url))
-	log.info("Run suite %s" % path)
+	log.info("redirect to run suite %s" % url)
 	return HttpResponseRedirect( url )
 
 @add_fullpath
@@ -344,10 +348,9 @@ def runTest(request, fullpath):
 	
 	if target and request.get_host() != target:
 		url = "http://%s/%s" % (target, settings.UPLOAD_TESTS_CMD)
-		saveRemoteContext(clean_path, contextjs, url, ctx)
+		saveRemoteContext(os.path.dirname(clean_path), contextjs, url, ctx)
 		saveTestSatelliteScripts(url, path, ctx)
 		sendContentToRemote(clean_path, request.REQUEST["content"], url, ctx)
-		#saveRemoteScripts(clean_path, url, request.REQUEST["content"], ctx, request)
 		url = "http://%s/%s?path=/%s" % (target, settings.EXEC_TESTS_CMD, clean_path)
 	else:
 		saveLocalContext(fullpath, contextjs)
@@ -379,6 +382,22 @@ def makeSaveContentPost(content, path):
 		'path': path 
 	}
 	
+def saveSuiteAllTests(url, path, ctx):
+	document_root = contrib.get_document_root(path) 
+	tests = contrib.enum_suite_tests( contrib.get_full_path(document_root, path) ) 
+	log.info('save suite tests for: %s' % path)
+
+	for test in tests:
+		test_path = os.path.join(path, test)
+		fullpath = contrib.get_full_path(document_root, test_path)
+		content = tools.gettest(fullpath)
+		clean_path = contrib.get_relative_clean_path(test_path)
+		data = makeSaveContentPost(content, clean_path)
+		post = urllib.urlencode(data)
+		result = urllib2.urlopen(url, post).read()
+		log.info("test %s is saved: %s" % (test_path, result))
+
+
 def saveTestSatelliteScripts(url, path, ctx):
 	"""	
 	uploads scripts those the test depends on
@@ -395,26 +414,6 @@ def saveTestSatelliteScripts(url, path, ctx):
 		post = urllib.urlencode(data)
 		result = urllib2.urlopen(url, post).read()
 		log.info("library %s is saved: %s" % (lib, result))
-
-def __saveTestSatelliteScripts(url, test, request, libs):
-	'''
-	saves all documents opened in the same browser(in other tabs)
-	as a test that is about to run 
-	'''
-	scripts = getOpenedFiles(request, clean=True)
-	log.debug('save satellite scripts for: %s' % test)
-	log.debug('libraries: %s' % str(libs))
-	log.debug('opened scripts: %s' % str(scripts))
-	if scripts.count(test) > 0: scripts.remove(test)
-	for path in scripts:
-		if path in libs:
-			fullpath = contrib.get_fullpath(path)
-			content = tools.gettest(fullpath)
-			path = removeVirtualFolderFromPath(path)
-			data = makeSaveContentPost(content, path)
-			post = urllib.urlencode(data)
-			result = urllib2.urlopen(url, post).read()
-			log.info("Save satellite script %s is done: %s" % (path, result))
 
 def saveRemoteScripts(path, url, content, ctx, request):
 	libs = ctx.get('libraries', [])
@@ -438,8 +437,8 @@ def auth(url, ctx):
 	urllib2.install_opener(opener)
 	
 def saveRemoteContext(path, content, url, ctx):
-	log.info('save remote context for %s' % path)
-	contextjs_path = os.path.join(os.path.dirname(path), settings.TEST_CONTEXT_JS_FILE_NAME)
+	contextjs_path = os.path.join(path, settings.TEST_CONTEXT_JS_FILE_NAME)
+	log.info('save %s context' % path)
 	sendContentToRemote(contextjs_path, content, url, ctx)
 
 def sendContentToRemote(path, content, url, ctx):

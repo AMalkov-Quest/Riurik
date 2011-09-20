@@ -13,7 +13,8 @@ asyncTest('test', function() { \
 QUnit.setup(function() {
   with(context) {
     context.test_name = 'first-example.js';
-    context.suite_path = root.concat('/remote-tests');
+    context.suite_name = 'remote-tests';
+    context.suite_path = root.concat('/', suite_name);
     context.test_path = suite_path.concat('/',  test_name);
     context.test_context = 'django-app';
     context.test_content = test_content;
@@ -35,7 +36,7 @@ asyncTest('test is pushed to run on remote server', function() {
     var regex = new RegExp('run test '.concat(context.test_path, ' with context ', context.test_context));    
     ok(regex.test(logs), regex);
     
-    regex = new RegExp('save remote context for '.concat(context.test_path.strip(context.root).strip('/')));
+    regex = new RegExp('save '.concat(context.suite_name, ' context'));
     ok(regex.test(logs), regex);
     
     regex = new RegExp('library '.concat(context.libraries[0], ' is saved'));
@@ -52,7 +53,7 @@ asyncTest('test is executed on remote server', function() {
   riurik.sleep(100).then(function() {
     var logs = getLogs(context.start, 'django-app');
     
-    regex = new RegExp('save script '.concat(context.suite_path.strip(context.root).strip('/').concat('/.context.js')));
+    var regex = new RegExp('save script '.concat(context.suite_path.strip(context.root).strip('/'), '/.context.js'));
     ok(regex.test(logs), regex);
     
     regex = new RegExp('save script '.concat(context.test_path.strip(context.root).strip('/')));

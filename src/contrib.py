@@ -86,6 +86,19 @@ def get_relative_clean_path(path):
 				return parts[1].strip('/')
 	return '' 
 
+def enum_suite_tests(target):
+	tests = []
+	for root, dirs, files in os.walk(target):
+		for file in files:
+			if re.match('^.*\.js$', file) and not file.startswith('.'):
+				#if file in exclude:
+				#	continue
+				file_abspath = os.path.abspath(os.path.join(root, file))
+				file_relpath = file_abspath.replace(os.path.abspath(target), '').lstrip('/').lstrip('\\')
+				tests += [ str(file_relpath) ]
+
+	return tests
+
 def patch_fullpaths(fullpath, newpath=''):
 	for key in settings.VIRTUAL_URLS:
 		m = re.search('^%s(.*)$' % key, newpath)
