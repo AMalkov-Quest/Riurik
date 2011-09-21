@@ -26,6 +26,16 @@ def error_handler(fn):
 			response = fn(*args, **kwargs)
 		except urllib2.HTTPError, ex:
 			response = HttpResponse(ex.read(), status=500)
+		except urllib2.URLError, ex:
+			response = HttpResponse(status=500)
+			response.write(render_to_string('error.html', {
+				'type': ex.__class__.__name__,
+				'msg': ex,
+				'stacktrace': '',
+				'issue':  ex.issue if hasattr(ex, 'issue') else '',
+				'request': args[0].REQUEST
+			}))
+
 		return response
 	return _f
 
@@ -412,20 +422,34 @@ def saveTestSatelliteScripts(url, path, ctx):
 	for lib in simplejson.loads(libs):
 		lib_path = os.path.join(virtual_root, lib)
 		fullpath = contrib.get_full_path(document_root, lib_path)
-		result = uploadContentToRemote(url, fullpath, lib)
+		result = uploadContentToRemote(url, fullpath, lib, ctx)
 		log.info("library %s is saved: %s" % (lib, result))
 
-def uploadContentToRemote(url, fullpath, path):
+def uploadContentToRemote(url, fullpath, path, ctx):
 	log.debug('upload content %s', fullpath)
 	content = tools.gettest(fullpath)
 	data = makeSaveContentPost(content, path)
 	post = urllib.urlencode(data)
-	return urllib2.urlopen(url, post).read()
+	#try:
+	#	return urllib2.urlopen(url, post).read()
+	#except urllib2.URLError, e:
+	#	raise urllib2.URLError('%s %s' % (e.reason, url))
+	return __sendContentToRemote(path, content, url, ctx)
 
 def saveRemoteContext(path, content, url, ctx):
 	contextjs_path = os.path.join(path, settings.TEST_CONTEXT_JS_FILE_NAME)
 	log.info('save %s context' % path)
-	sendContentToRemote(contextjs_path, content, url, ctx)
+	__sendContentToRemote(contextjs_path, content, url, ctx)
+
+def __sendContentToRemote(path, content, url, ctx):
+	data = makeSaveContentPost(content, path)
+	auth(url, ctx)
+	post = urllib.urlencode(data)
+	req = urllib2.Request(url, post)
+	try:
+		return  urllib2.urlopen(req).read()
+	except urllib2.URLError, e:
+		raise urllib2.URLError('%s %s' % (e.reason, url))
 
 def sendContentToRemote(path, content, url, ctx):
 	data = makeSaveContentPost(content, path)

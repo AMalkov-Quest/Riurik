@@ -1,8 +1,7 @@
 <html>
 	<head>
 		<title>Error occured</title>
-		<script type="text/javascript" src="{{ loader }}/jquery-1.5.1.js"></script>
-		<link rel="stylesheet" type="text/css" href="{{ loader }}/testLoader.css" />
+		<script type="text/javascript" src="/static/jquery-ui/js/jquery-1.4.4.min.js"></script>
 	</head>
 	<body>
 		<h1>Error occured</h1>
@@ -14,5 +13,8 @@
 		<p class="issue">{{ issue }}</p>
 		<p class="stack header">Exception stacktrace:</p>
 		<p class="stack">{{ stacktrace }}</p>
+		<p >Request:</p>
+		<p class="request">{{ request }}</p>
+
 	</body>
 </html>
