@@ -327,8 +327,6 @@ def runSuite(request, fullpath):
 		saveLocalContext(fullpath, contextjs)
 		url = "http://%s/%s?suite=/%s" % ( request.get_host(), settings.EXEC_TESTS_CMD, clean_path )
 
-	#rl = contrib.normpath(urllib.unquote(url))
-	
 	log.info("redirect to run suite %s" % url)
 	return HttpResponseRedirect( url )
 
@@ -359,14 +357,6 @@ def runTest(request, fullpath):
 	
 	log.info("redirect to run test %s" % url)
 	return HttpResponseRedirect(url)
-
-def removeVirtualFolderFromPath(path):
-	path = path.lstrip('/')
-	index = path.find(settings.INNER_TESTS_ROOT + '/')
-	if index == 0:
-		log.debug('remove virtual folder %s from path %s' % (settings.INNER_TESTS_ROOT, path))
-		return path.replace(settings.INNER_TESTS_ROOT + '/', '', 1)
-	return path
 
 def saveLocalContext(fullpath, contextjs):
 	if os.path.isdir(fullpath):
@@ -416,11 +406,6 @@ def saveTestSatelliteScripts(url, path, ctx):
 		result = urllib2.urlopen(url, post).read()
 		log.info("library %s is saved: %s" % (lib, result))
 
-def saveRemoteScripts(path, url, content, ctx, request):
-	libs = ctx.get('libraries', [])
-	saveTestSatelliteScripts(url, path, ctx)
-	return sendContentToRemote(path, content, url, ctx)
-
 def auth(url, ctx):
 	login = ctx.get('login')
 	password = ctx.get('password')
@@ -444,6 +429,7 @@ def saveRemoteContext(path, content, url, ctx):
 
 def sendContentToRemote(path, content, url, ctx):
 	data = makeSaveContentPost(content, path)
+	#TODO: for what?
 	def _patch_strings(obj):
 		for key, val in obj.iteritems():
 			if val.__class__.__name__ == 'unicode':
