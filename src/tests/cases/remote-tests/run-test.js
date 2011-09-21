@@ -1,5 +1,3 @@
-/* this test require django app running
-*/
 module('run test');
 
 var test_content = " \

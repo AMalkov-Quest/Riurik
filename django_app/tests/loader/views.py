@@ -26,24 +26,25 @@ _cases_dir_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), cases
 from errors import *
 
 def error_handler(fn):
-		def _f(*args, **kwargs):
-			try:
-				if not os.path.exists(_loader_dir_path):
-					raise InvalidLoaderFolder(_loader_dir_path)
-				if not os.path.exists(_cases_dir_path):
-					raise InvalidCasesFolder(_cases_dir_path)
-				response = fn(*args, **kwargs)
-			except Exception, ex:
-				response = HttpResponse(status=500)
-				response.write(render_to_string('%s/error.html' % loader_dir, {
-					'type': ex.__class__.__name__,
-					'msg': ex.message,
-					'stacktrace': '',
-					'issue':  ex.issue if hasattr(ex, 'issue') else '',
-					'loader': loader_dir,
-				}))
-			return response
-		return _f
+	def _f(*args, **kwargs):
+		try:
+			if not os.path.exists(_loader_dir_path):
+				raise InvalidLoaderFolder(_loader_dir_path)
+			if not os.path.exists(_cases_dir_path):
+				raise InvalidCasesFolder(_cases_dir_path)
+			response = fn(*args, **kwargs)
+		except Exception, ex:
+			response = HttpResponse(status=500)
+			response.write(render_to_string('%s/error.html' % loader_dir, {
+				'type': ex.__class__.__name__,
+				'msg': ex.message,
+				'stacktrace': '',
+				'issue':  ex.issue if hasattr(ex, 'issue') else '',
+				'loader': loader_dir,
+				'request': args[0].REQUEST
+			}))
+		return response
+	return _f
 
 @never_cache
 @error_handler
@@ -98,7 +99,6 @@ def upload(request, document_root):
 
 	log.debug('upload file %s to %s' % (path, fullpath))
 	dirname = os.path.dirname(fullpath)
-	#TODO: test that this work on deeper levels
 	try:
 		if not os.path.exists(dirname):
 			os.makedirs(dirname)

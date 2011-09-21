@@ -16,8 +16,12 @@ def get_target_host(context):
 
 	>>> get_target_host({'host': 'google.com', 'port': '22'})	
 	'google.com:22'
+	>>> from minimock import mock
+	>>> import os
+	>>> mock('socket.gethostname', returns='google.com')
 	>>> get_target_host({'host': 'localhost', 'port': '22'})	
-	'localhost:22'	
+	Called socket.gethostname()
+	'google.com:22'
 	"""
 	host = context.get('host')
 	port = context.get('port')
@@ -26,6 +30,17 @@ def get_target_host(context):
 			host = socket.gethostname()
  
 		return '%s:%s' % (host, port)
+
+def get_virtual_root(path):
+	"""
+	>>> settings.VIRTUAL_PATHS['some-key'] = 'some-value'
+	>>> get_virtual_root('/some-key/test-1')
+	'some-key'
+	"""
+	if path:
+		key = path.strip('/').split('/')[0]
+		if key and key in settings.VIRTUAL_PATHS:
+			return key
 
 def get_document_root(path):
 	"""

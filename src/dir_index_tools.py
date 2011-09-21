@@ -151,11 +151,8 @@ def savetest(content, fullpath):
 	return resources.ok
 
 def gettest(path):
-	try:
-		f = open(path, 'r')
-		content = f.read()
-		f.close()
-	except Exception, e:
-		return str(e)
+	f = open(path, 'r')
+	content = f.read()
+	f.close()
 	
 	return content
