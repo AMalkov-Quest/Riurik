@@ -369,7 +369,8 @@ def runTest(request, fullpath):
 	target = contrib.get_target_host(ctx)
 	log.info('target of test %s is %s' % (clean_path, target))
 	
-	if target and request.get_host() != target:
+	if target and request.get_host().lower() != target.lower():
+		log.debug('TARGET: %s, %s' % ( target, request.get_host() ))
 		url = "http://%s/%s" % (target, settings.UPLOAD_TESTS_CMD)
 		saveRemoteContext(os.path.dirname(clean_path), contextjs, url, ctx)
 		saveTestSatelliteScripts(url, path, ctx)
@@ -406,7 +407,7 @@ def saveSuiteAllTests(url, path, ctx):
 		test_path = os.path.join(path, test)
 		fullpath = contrib.get_full_path(document_root, test_path)
 		clean_path = contrib.get_relative_clean_path(test_path)
-		result = uploadContentToRemote(url, fullpath, clean_path)
+		result = uploadContentToRemote(url, fullpath, clean_path, ctx)
 		log.info("test %s is saved: %s" % (test_path, result))
 
 
@@ -430,18 +431,14 @@ def uploadContentToRemote(url, fullpath, path, ctx):
 	content = tools.gettest(fullpath)
 	data = makeSaveContentPost(content, path)
 	post = urllib.urlencode(data)
-	#try:
-	#	return urllib2.urlopen(url, post).read()
-	#except urllib2.URLError, e:
-	#	raise urllib2.URLError('%s %s' % (e.reason, url))
-	return __sendContentToRemote(path, content, url, ctx)
+	return sendContentToRemote(path, content, url, ctx)
 
 def saveRemoteContext(path, content, url, ctx):
 	contextjs_path = os.path.join(path, settings.TEST_CONTEXT_JS_FILE_NAME)
 	log.info('save %s context' % path)
-	__sendContentToRemote(contextjs_path, content, url, ctx)
+	sendContentToRemote(contextjs_path, content, url, ctx)
 
-def __sendContentToRemote(path, content, url, ctx):
+def sendContentToRemote(path, content, url, ctx):
 	data = makeSaveContentPost(content, path)
 	auth(url, ctx)
 	post = urllib.urlencode(data)
@@ -450,21 +447,6 @@ def __sendContentToRemote(path, content, url, ctx):
 		return  urllib2.urlopen(req).read()
 	except urllib2.URLError, e:
 		raise urllib2.URLError('%s %s' % (e.reason, url))
-
-def sendContentToRemote(path, content, url, ctx):
-	data = makeSaveContentPost(content, path)
-	def _patch_strings(obj):
-		for key, val in obj.iteritems():
-			if val.__class__.__name__ == 'unicode':
-				obj[key] = val.encode('utf-8')
-		return obj
-	auth(url, ctx)
-	post = urllib.urlencode(_patch_strings(data))
-	log.info('send content to %s' % url)
-	req = urllib2.Request(url, post)
-	result = urllib2.urlopen(req).read()
-	log.info("remote script %s saving result: %s" % (path, result))
-	return result
 
 def auth(url, ctx):
 	login = ctx.get('login')
