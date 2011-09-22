@@ -393,10 +393,11 @@ def saveLocalContext(fullpath, contextjs):
 	f.close()
 
 def makeSaveContentPost(content, path):
-	return {
+	data = {
 		'content': content,
 		'path': path 
 	}
+	return contrib.convert_dict_values_strings_to_unicode(data)
 	
 def saveSuiteAllTests(url, path, ctx):
 	document_root = contrib.get_document_root(path) 
