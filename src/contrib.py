@@ -1,7 +1,17 @@
 # coding: utf-8
 import os, re, settings
 from logger import log
-import socket
+import socket, simplejson
+
+def get_libraries(context):
+	"""
+	>>> get_libraries({})
+	[]
+	>>> get_libraries({'libraries': '["lib1", "lib2"]'})
+	['lib1', 'lib2']
+	"""
+	libs = context.get('libraries', '[]')
+	return simplejson.loads(libs)
 
 def convert_dict_values_strings_to_unicode(obj):
 	"""

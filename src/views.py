@@ -417,10 +417,9 @@ def saveTestSatelliteScripts(url, path, ctx):
 	"""
 	document_root = contrib.get_document_root(path) 
 	virtual_root = contrib.get_virtual_root(path) 
-	libs = ctx.get('libraries', [])
 	log.info('save satellite scripts for: %s' % path)
 
-	for lib in simplejson.loads(libs):
+	for lib in contrib.get_libraries(ctx):
 		lib_path = os.path.join(virtual_root, lib)
 		fullpath = contrib.get_full_path(document_root, lib_path)
 		result = uploadContentToRemote(url, fullpath, lib, ctx)
@@ -429,8 +428,6 @@ def saveTestSatelliteScripts(url, path, ctx):
 def uploadContentToRemote(url, fullpath, path, ctx):
 	log.debug('upload content %s', fullpath)
 	content = tools.gettest(fullpath)
-	data = makeSaveContentPost(content, path)
-	post = urllib.urlencode(data)
 	return sendContentToRemote(path, content, url, ctx)
 
 def saveRemoteContext(path, content, url, ctx):
