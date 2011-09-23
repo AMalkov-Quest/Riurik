@@ -143,6 +143,7 @@ def savetest(content, fullpath):
 					dest.write(source.read())
 					dest.close()
 				source.close()
+			os.remove(swpname)
 		else:
 			raise Exception('Can\'t presave')
 	except Exception, e:
