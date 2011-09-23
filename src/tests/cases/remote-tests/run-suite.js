@@ -1,7 +1,3 @@
-/* this test require one more riurik instance on the 8001 port
-*  that will allow to test of saving test content in the editor
-*  to remote file system where test will be loaded
-*/
 module('run suite remote');
 
 QUnit.setup(function() {

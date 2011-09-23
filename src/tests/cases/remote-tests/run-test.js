@@ -1,5 +1,3 @@
-/* this test require django app running
-*/
 module('run test');
 
 var test_content = " \
@@ -39,12 +37,6 @@ asyncTest('test is pushed to run on remote server', function() {
     regex = new RegExp('save '.concat(context.suite_name, ' context'));
     ok(regex.test(logs), regex);
     
-    regex = new RegExp('library '.concat(context.libraries[0], ' is saved'));
-    ok(regex.test(logs), regex);
-    
-    regex = new RegExp('library '.concat(context.libraries[1], ' is saved'));
-    ok(regex.test(logs), regex);
-    
     start();
   });
 });
@@ -57,12 +49,6 @@ asyncTest('test is executed on remote server', function() {
     ok(regex.test(logs), regex);
     
     regex = new RegExp('save script '.concat(context.test_path.strip(context.root).strip('/')));
-    ok(regex.test(logs), regex);
-    
-    regex = new RegExp('save script '.concat(context.libraries[0]));
-    ok(regex.test(logs), regex);
-    
-    regex = new RegExp('save script '.concat(context.libraries[1]));
     ok(regex.test(logs), regex);
     
     regex = new RegExp('execute test '.concat(context.test_path.strip(context.root).strip('/')));

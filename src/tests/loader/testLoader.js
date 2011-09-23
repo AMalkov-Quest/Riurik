@@ -94,11 +94,10 @@ function jQExtend( $ ) {
 		var resolved = false;
 
 		target.bind(event_name, function() {
-			var args = arguments;
 			resolved = true;
 			setTimeout(function(){
 				QUnit.log('resolve the ' + event_name + ' event wait');
-				dfd.resolve.apply(null, args); 
+				dfd.resolve(true); 
 			}, 1);
 		});
 
@@ -111,7 +110,7 @@ function jQExtend( $ ) {
 				setTimeout(f, 100)
 			} else {
 				QUnit.log('the ' + event_name + ' event wait timeout');
-				dfd.resolve();
+				dfd.resolve(false);
 				return;
 			}
 		})();

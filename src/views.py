@@ -20,6 +20,25 @@ import urllib, urllib2
 import codecs, time
 import os
 
+def error_handler(fn):
+	def _f(*args, **kwargs):
+		try:
+			response = fn(*args, **kwargs)
+		except urllib2.HTTPError, ex:
+			response = HttpResponse(ex.read(), status=500)
+		except urllib2.URLError, ex:
+			response = HttpResponse(status=500)
+			response.write(render_to_string('error.html', {
+				'type': ex.__class__.__name__,
+				'msg': ex,
+				'stacktrace': '',
+				'issue':  ex.issue if hasattr(ex, 'issue') else '',
+				'request': args[0].REQUEST
+			}))
+
+		return response
+	return _f
+
 def enumerate_suites(request):
 	"""
 		Return a list of suite names.
@@ -290,7 +309,10 @@ def submitTest(request):
 	testname = request.POST["path"]
 	url = request.POST["url"]
 	context = request.POST["context"]
-	content = request.POST.get("content", tools.gettest(testname))
+	#TODO: for what gettest call
+	#content = request.POST.get("content", tools.gettest(testname))
+	content = request.POST.get("content", '')
+
 	log.debug('submitTest POST')
 	return _render_to_response( "runtest.html", locals() )
 
@@ -305,6 +327,7 @@ def get_root():
 	return '/testsrc/' + settings.PRODUCT_TEST_CASES_ROOT
 
 @add_fullpath
+@error_handler
 def runSuite(request, fullpath):
 	path = contrib.normpath(request.REQUEST["path"])
 	context_name = request.REQUEST["context"]
@@ -331,6 +354,7 @@ def runSuite(request, fullpath):
 	return HttpResponseRedirect( url )
 
 @add_fullpath
+@error_handler
 def runTest(request, fullpath):
 	path = contrib.normpath(request.REQUEST["path"])
 	context_name = request.REQUEST.get("context", None)
@@ -369,10 +393,11 @@ def saveLocalContext(fullpath, contextjs):
 	f.close()
 
 def makeSaveContentPost(content, path):
-	return {
+	data = {
 		'content': content,
 		'path': path 
 	}
+	return contrib.convert_dict_values_strings_to_unicode(data)
 	
 def saveSuiteAllTests(url, path, ctx):
 	document_root = contrib.get_document_root(path) 
@@ -382,11 +407,8 @@ def saveSuiteAllTests(url, path, ctx):
 	for test in tests:
 		test_path = os.path.join(path, test)
 		fullpath = contrib.get_full_path(document_root, test_path)
-		content = tools.gettest(fullpath)
 		clean_path = contrib.get_relative_clean_path(test_path)
-		data = makeSaveContentPost(content, clean_path)
-		post = urllib.urlencode(data)
-		result = urllib2.urlopen(url, post).read()
+		result = uploadContentToRemote(url, fullpath, clean_path, ctx)
 		log.info("test %s is saved: %s" % (test_path, result))
 
 
@@ -395,17 +417,34 @@ def saveTestSatelliteScripts(url, path, ctx):
 	uploads scripts those the test depends on
 	"""
 	document_root = contrib.get_document_root(path) 
-	libs = ctx.get('libraries', [])
+	virtual_root = contrib.get_virtual_root(path) 
 	log.info('save satellite scripts for: %s' % path)
-	log.debug('libraries: %s' % libs)
-	for lib in simplejson.loads(libs):
-		fullpath = contrib.get_full_path(document_root, lib)
-		content = tools.gettest(fullpath)
-		clean_path = contrib.get_relative_clean_path(lib)
-		data = makeSaveContentPost(content, lib)
-		post = urllib.urlencode(data)
-		result = urllib2.urlopen(url, post).read()
+
+	for lib in contrib.get_libraries(ctx):
+		lib_path = os.path.join(virtual_root, lib)
+		fullpath = contrib.get_full_path(document_root, lib_path)
+		result = uploadContentToRemote(url, fullpath, lib, ctx)
 		log.info("library %s is saved: %s" % (lib, result))
+
+def uploadContentToRemote(url, fullpath, path, ctx):
+	log.debug('upload content %s', fullpath)
+	content = tools.gettest(fullpath)
+	return sendContentToRemote(path, content, url, ctx)
+
+def saveRemoteContext(path, content, url, ctx):
+	contextjs_path = os.path.join(path, settings.TEST_CONTEXT_JS_FILE_NAME)
+	log.info('save %s context' % path)
+	sendContentToRemote(contextjs_path, content, url, ctx)
+
+def sendContentToRemote(path, content, url, ctx):
+	data = makeSaveContentPost(content, path)
+	auth(url, ctx)
+	post = urllib.urlencode(data)
+	req = urllib2.Request(url, post)
+	try:
+		return  urllib2.urlopen(req).read()
+	except urllib2.URLError, e:
+		raise urllib2.URLError('%s %s' % (e.reason, url))
 
 def auth(url, ctx):
 	login = ctx.get('login')
@@ -423,21 +462,6 @@ def auth(url, ctx):
 	
 	urllib2.install_opener(opener)
 	
-def saveRemoteContext(path, content, url, ctx):
-	contextjs_path = os.path.join(path, settings.TEST_CONTEXT_JS_FILE_NAME)
-	log.info('save %s context' % path)
-	sendContentToRemote(contextjs_path, content, url, ctx)
-
-def sendContentToRemote(path, content, url, ctx):
-	data = makeSaveContentPost(content, path)
-	auth(url, ctx)
-	post = urllib.urlencode(contrib.convert_dict_values_strings_to_unicode(data))
-	log.info('send content to %s' % url)
-	req = urllib2.Request(url, post)
-	result = urllib2.urlopen(req).read()
-	log.info("remote script %s saving result: %s" % (path, result))
-	return result
-
 def recvLogRecords(request):
 	from logger import FILENAME, DJANGO_APP, timeFormat
 	log_file = FILENAME
