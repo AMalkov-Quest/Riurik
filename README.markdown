@@ -16,5 +16,8 @@ From my perspective organising a specification workshop much more viable approac
 
 Like so you can eliminate first complexity layer and start to write acceptence tests using usual programming language. But not any language can help here. Acceptence tests for me are a live specification, i.e. a source of information on what goes on in my system. So they should be easy to read and understand in such a way as to help with handing over and taking over a code when issues happen or change requests come in later.
 So this programming language should be expressive enough to write the tests in an easy-to-read and succinct way.
+<<<<<<< HEAD
 
 ##
+=======
+>>>>>>> 82f1606958bbe218881624a1fe7363619bfaf8d0
