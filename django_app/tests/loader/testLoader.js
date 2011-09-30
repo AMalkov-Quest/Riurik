@@ -190,6 +190,56 @@ function jQExtend( $ ) {
 	String.prototype.strip = function(c) {
 		return this.replace(new RegExp('^' + c + '+'), '').replace(new RegExp(c + '+$'), '');
 	};
+	String.prototype.format = function(__silent) { 
+		/*
+			Extending string usage as a template with local variables
+
+			Arguments:
+				silent - If true, then no errors throws when variable is undefined
+
+			Example:
+				var name = 'Anton', 
+				answer = 'fine'; 
+
+				"-Hi, ${name}! How are you?\n-${answer}".format()
+
+			Result is:
+				"-Hi, Anton! How are you?
+				-fine"
+		*/
+
+		var __reg = new RegExp('\\$\\{([^\}]*?)\\}', 'g'); 
+		var __match = true, 
+			__vars = {}; 
+		while ( __match != null ) { 
+			__match = __reg.exec(this); 
+			if ( __match != null ) {
+				__vars[__match[1]] = null; 
+			}
+		}; 
+		for (__name in __vars) { 
+			try { 
+				__vars[__name] = eval(__name); 
+			} catch (e) { 
+				if ( __silent !== true ) {
+					throw __name+' variable not found in context while  formatting'; 
+				} else {
+					__vars[__name] = '';	
+				} 
+			} 
+		} 
+		var result = this; 
+		for ( __name in __vars ) { 
+			var old_str = '', 
+				new_str = result; 
+			while ( old_str != new_str ) { 
+				old_str = new_str; 
+				new_str = new_str.replace('${'+__name+'}', __vars[__name].toString());
+			} 
+			result = new_str; 
+		} 
+		return result.toString(); 
+	}
 };
 
 jQuery.extend(QUnit, {
