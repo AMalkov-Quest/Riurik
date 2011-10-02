@@ -1,7 +1,8 @@
+<a name="README">[Riurik](https://github.com/andrew-malkov/Riurik)</a>
 =======
-**Riurik is a web-based development framework for acceptance testing your web applications.**
+**A web-based development framework for acceptance testing web applications.**
 
-There are some great acceptence testing frameworks out there already, so why did we write another? It's main goal is to help you get rid of the extra complexity in acceptence testing. It's written in Javascript and Python using jQuery, Qunit, Django, heavily influenced by, and borrows the best parts of Fitnesse.
+There are some great acceptence testing frameworks out there already, so why did we write another? Riurik aims to simplify the process of integration testing web applications. It's written in Javascript and Python using jQuery, Qunit, Django, heavily influenced by, and borrows the best parts of Fitnesse.
 
 My two-year experience with using Fitnesse for testing web applications is that acceptance tests cost too much, since:
 
@@ -16,8 +17,3 @@ From my perspective organising a specification workshop much more viable approac
 
 Like so you can eliminate first complexity layer and start to write acceptence tests using usual programming language. But not any language can help here. Acceptence tests for me are a live specification, i.e. a source of information on what goes on in my system. So they should be easy to read and understand in such a way as to help with handing over and taking over a code when issues happen or change requests come in later.
 So this programming language should be expressive enough to write the tests in an easy-to-read and succinct way.
-<<<<<<< HEAD
-
-##
-=======
->>>>>>> 82f1606958bbe218881624a1fe7363619bfaf8d0
