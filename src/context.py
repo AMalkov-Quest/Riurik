@@ -40,8 +40,8 @@ def render(path, ctx):
 		c['options'] += [ (name, value,), ]
 	return t.render(c)
 
-def render_ini(ctx, section_name='default'):
-	vars = patch(ctx)
+def render_ini(path, ctx, section_name='default'):
+	vars = patch(path, ctx)
 	t = Template("""{% load json_tags %}
 [{{ section }}]
 {% for option in options %}{{ option.0 }} = {{ option.1|json }}{% if option.2 %} ; {{ option.2 }}{% endif %}

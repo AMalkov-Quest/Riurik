@@ -82,7 +82,7 @@ def show_context(request, path):
 	sections = config.sections(context.get(fullpath).inifile)
 	for section_name in sections:
 		ctx = context.get(fullpath, section=section_name)
-		context_ini = context.render_ini(ctx, section_name)
+		context_ini = context.render_ini(path, ctx, section_name)
 		result += context_ini
 	
 	return HttpResponse(result)
