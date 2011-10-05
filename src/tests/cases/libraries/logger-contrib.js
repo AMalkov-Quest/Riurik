@@ -15,6 +15,9 @@ function getLogs(start, source) {
     async: false, 
     success: function(data) {
       QUnit.log(data);
+    },
+    error: function(data) {
+      QUnit.log('on getLogs an error is happend', data);
     }
   }).responseText;
   

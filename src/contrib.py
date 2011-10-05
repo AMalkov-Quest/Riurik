@@ -57,8 +57,8 @@ def get_target_host(context):
 	host = context.get('host')
 	port = context.get('port')
 	if host and port:
-		#if host == 'localhost':
-		#	host = socket.gethostname()
+		if host == 'localhost':
+			host = socket.gethostname()
  
 		return '%s:%s' % (host, port)
 

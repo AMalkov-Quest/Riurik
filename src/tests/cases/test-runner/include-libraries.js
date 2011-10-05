@@ -6,3 +6,9 @@ test('should be included', function() {
   equal( library3.method3(60), 60, 'method from library 3 is available' );
   equal( library4.method4(80), 80, 'method from library 4 is available' );
 });
+
+test('if is not found - log the error', function() {
+  var logs = getLogs();
+  var regex = new RegExp('not-found-library.js lib is not found in any available library paths');
+  ok(regex.test(logs), regex);
+});

@@ -328,7 +328,7 @@ def target_is_remote(target, host):
 		not 'localhost' in target 		\
 		and not 'localhost' in host and	\
 		host.lower() != target.lower():
-		return True
+			return True
 	
 	return False
 
@@ -354,7 +354,7 @@ def runSuite(request, fullpath):
 		url = "http://%s/%s?suite=/%s" % ( target, settings.EXEC_TESTS_CMD, clean_path )
 	else:
 		saveLocalContext(fullpath, contextjs)
-		url = "http://%s/%s?suite=/%s" % ( request.get_host(), settings.EXEC_TESTS_CMD, clean_path )
+		url = "http://%s/%s?suite=/%s" % ( target, settings.EXEC_TESTS_CMD, clean_path )
 
 	log.info("redirect to run suite %s" % url)
 	return HttpResponseRedirect( url )
@@ -374,8 +374,6 @@ def runTest(request, fullpath):
 	clean_path = contrib.get_relative_clean_path(path)
 	target = contrib.get_target_host(ctx)
 	log.info('target of test %s is %s' % (clean_path, target))
-	print 'target %s' % target
-	print 'host %s' % request.get_host()
 	if target_is_remote( target, request.get_host()):
 		log.debug('TARGET: %s, %s' % ( target, request.get_host() ))
 		url = "http://%s/%s" % (target, settings.UPLOAD_TESTS_CMD)
@@ -385,7 +383,7 @@ def runTest(request, fullpath):
 		url = "http://%s/%s?path=/%s" % (target, settings.EXEC_TESTS_CMD, clean_path)
 	else:
 		saveLocalContext(fullpath, contextjs)
-		url = "http://%s/%s?path=/%s" % (request.get_host(), settings.EXEC_TESTS_CMD, clean_path)
+		url = "http://%s/%s?path=/%s" % (target, settings.EXEC_TESTS_CMD, clean_path)
 	
 	log.info("redirect to run test %s" % url)
 	return HttpResponseRedirect(url)
@@ -473,7 +471,6 @@ def recvLogRecords(request):
 	from logger import FILENAME, DJANGO_APP, timeFormat
 	log_file = FILENAME
 	if request.REQUEST.get('source', None):
-		log.debug('recv logs for django app')
 		log_file = DJANGO_APP
 	f = codecs.open(log_file, 'r', 'utf-8')
 	records = f.read()
