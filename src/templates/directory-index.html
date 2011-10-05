@@ -54,6 +54,7 @@
 			<ul class="horizontal-menu">
 				{% if type != 'front-page' %}
 					{% ifequal type 'suite' %}
+						{% if contexts %}
 						<li>
 							<a id="run-suite-btn" href="javascript:void(0);" onClick="javascript:$('#run-suite').submit();">Run Suite</a>
 							<select id="context" name="context">
@@ -62,17 +63,11 @@
 								{% endfor %}
 							</select>
 						</li>
+						{% endif %}
 						<li><a id="context-preview-ctrl" href=".context.ini" rel='context-preview'>{% trans "Context" %}</a></li>
 						<li><a id="new-test" href="javascript:void(0);" onClick="javascript:createTest();">Create Test</a></li>
 					{% else %}
 						{% ifequal type 'virtual' %}
-							<li><a id="run-all-suites" href="javascript:void(0);" rel="{{directory|current}}">Run all suites</a>
-							<select id="context" name="context">
-								{% for item in contexts %}
-									<option value="{{ item }}">{{ item }}</option>
-								{% endfor %}
-							</select>
-							</li>
 							<li><a id="virtual-settings" href=".settings.ini?editor">Global settings</a></li>
 						{% endifequal %}
 						<li><a id="new-suite" href="javascript:void(0);" onClick="javascript:createFolder();">Create Suite</a></li>

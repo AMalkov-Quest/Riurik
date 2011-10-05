@@ -374,7 +374,7 @@ def runTest(request, fullpath):
 		url = "http://%s/%s" % (target, settings.UPLOAD_TESTS_CMD)
 		saveRemoteContext(os.path.dirname(clean_path), contextjs, url, ctx)
 		saveTestSatelliteScripts(url, path, ctx)
-		sendContentToRemote(clean_path, request.REQUEST["content"], url, ctx)
+		sendContentToRemote(clean_path, request.REQUEST.get("content", open(fullpath, 'r').read()), url, ctx)
 		url = "http://%s/%s?path=/%s" % (target, settings.EXEC_TESTS_CMD, clean_path)
 	else:
 		saveLocalContext(fullpath, contextjs)

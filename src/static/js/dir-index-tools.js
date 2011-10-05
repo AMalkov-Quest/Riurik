@@ -30,26 +30,6 @@ $(function () {
 		});
 		return false;
 	});
-	$('#run-all-suites').click(function(){
-		var context = $('select#context').val();
-		var virt_path = $(this).attr('rel');
-		if (typeof context == 'undefined'){ alert('no context selected'); return; }
-		$.ajax({
-			url: '/actions/suite/enumerate/',
-			data: {
-				'context': context,
-				'json' : true,
-				'target' : virt_path
-			},
-			dataType: 'json',
-			success: function(data){
-				for ( i in data ){
-					var path = virt_path + '/' + data[i];
-					open('/actions/suite/run/?context='+context+'&path='+path+'&url='+path, path);	
-				}
-			}
-		})
-	});
 });
 
 function relocate(new_location){
@@ -63,7 +43,6 @@ function relocate(new_location){
 }
 
 function createFolderClick() {
-	$(this).dialog("close");
 	$.post(
 		"/actions/folder/create/", 
 		$("#create-fsobject").serialize(), 
@@ -76,28 +55,36 @@ function createFolderClick() {
 		},
 		"text"
 	);
+	$(this).dialog("close");
 }
 
 function createFolder() {
 	$("#create-dir-index-dialog span").text($("#suite-tip").text())
-	$("#create-dir-index-dialog").dialog({
-		title: $('#new-suite').text(),
-		resizable: false,
-		buttons: [
-			{
-				id: "create-folder-btn",
-				text: "create", 
-				click: createFolderClick
-			},
-		    {
-				id: "cancel-folder-btn",
-		    	text: "cancel", 
-		    	click: function() {
-					$(this).dialog("close");
+	$("#create-dir-index-dialog")
+		.dialog({
+			title: $('#new-suite').text(),
+			resizable: false,
+			buttons: [
+				{
+					id: "create-folder-btn",
+					text: "create", 
+					click: createFolderClick
+				},
+			    {
+					id: "cancel-folder-btn",
+					text: "cancel", 
+			    	click: function() {
+						$(this).dialog("close");
+					}
 				}
-		    }
-	   ]
-	});
+		   ]
+		});
+	$("#create-dir-index-dialog input")
+		.bind('keydown', function(l){
+			if ( l.keyCode == 13 ) { 
+				createFolderClick.call($('#create-dir-index-dialog'));
+			}
+		})
 }
 
 function createSuite() {
@@ -115,13 +102,6 @@ function createAndEdit(srcObject, url) {
 	$("#create-dir-index-dialog").dialog({
 		title: srcObject.text(),
 		resizable: false,
-		open: function(event, ui) {
-			$('input[type=text]', this).keyup(function(e) {
-					if(e.keyCode == 13) {
-						console.log($(this).dialog( "option", "buttons" ))
-					};
-			});
-		},
 		buttons: {
 			"create": function() {
 				$(this).dialog("close");
@@ -143,6 +123,12 @@ function createAndEdit(srcObject, url) {
 			}
 		}
 	});
+	$("#create-dir-index-dialog input")
+		.bind('keydown', function(l){
+			if ( l.keyCode == 13 ) { 
+				$('button:contains("create")', $('#create-dir-index-dialog').parent()).click();
+			}
+		});
 }
 
 function showError( msg) {
