@@ -4,14 +4,24 @@ from logger import log
 import socket, simplejson
 
 def get_libraries(context):
+	try:
+		libs = context.get('libraries', '[]')
+		return simplejson.loads(libs)
+	except:
+		return get_libraries_new(context)
+
+def get_libraries_new(context):
 	"""
 	>>> get_libraries({})
 	[]
-	>>> get_libraries({'libraries': '["lib1", "lib2"]'})
+	>>> get_libraries({'libraries': 'lib1, lib2'})
 	['lib1', 'lib2']
 	"""
-	libs = context.get('libraries', '[]')
-	return simplejson.loads(libs)
+	libs = context.get('libraries', '')
+	if libs:
+		return [lib.strip() for lib in libs.split(',')]
+	else:
+		return []
 
 def convert_dict_values_strings_to_unicode(obj):
 	"""

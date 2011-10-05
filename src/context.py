@@ -25,8 +25,8 @@ def get_URL(instance, resolve=False):
 		url =  'http://%s:%s' % (host, instance.get('port'))
 	return url
 
-def render(ctx):
-	vars = patch(ctx)
+def render(path, ctx):
+	vars = patch(path, ctx)
 	t = Template("""{% load json_tags %}
 		var context = {
 			{% for option in options %}
@@ -53,7 +53,33 @@ def render_ini(ctx, section_name='default'):
 		c['options'] += [ (name, value, hasattr(value, 'comment')), ]
 	return t.render(c)
 
-def patch(ctx):
+def libraries(path, vars, ctx):
+	libraries = []
+	libs = contrib.get_libraries(ctx)
+	root = contrib.get_document_root(path)
+	for lib in libs:
+		full_path = os.path.abspath(os.path.join(root, lib))
+		if not os.path.exists(full_path):
+			current_suite_path = os.path.abspath(os.path.join(ctx.get_folder(), lib))
+			if os.path.exists(current_suite_path):
+				#lib is located in current suite folder
+				lib_relpath = current_suite_path.replace(root, '').lstrip('/') 
+				libraries.append(str(lib_relpath))
+			else:
+				for path in ctx.get( option='LIBRARY_PATH' ).split(','):
+					global_libs_path = os.path.abspath(os.path.join(root, path.strip(), lib))
+					print "search in global %s" % global_libs_path
+					if os.path.exists(global_libs_path):
+						#lib is located in one of the global libs path
+						lib_relpath = global_libs_path.replace(root, '').lstrip('/') 
+						libraries.append(str(lib_relpath))
+
+		else:
+			libraries.append((lib))
+	
+	return tuple(list(vars) + [ ('libraries', str(libraries).replace('\'','\"')) ])
+
+def patch(path, ctx):
 	vars = ctx.items()
 	hasInclude = False
 	hasExclude = False
@@ -83,6 +109,7 @@ def patch(ctx):
 					include += [ str(file_relpath) ]
 		vars = tuple(list(vars) + [ ('include', str(include).replace('\'','\"')) ])
 		
+	vars = libraries(path, vars, ctx)
 	if localhost:
 		vars = list(vars)
 		vars.remove(('host', 'localhost'))
