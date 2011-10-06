@@ -53,33 +53,40 @@ def convert_dict_values_strings_to_unicode(obj):
 	return obj
 
 
-def get_target_host(context):
+def get_target_host(context, riurik_url):
 	"""
 	returns http url of target lab to run tests on by host and port values in a context
 	if these values in the context are empry it returns None
 	if host is localhost it returns resolved name
-	>>> get_target_host({})
-	
-	>>> get_target_host({'host': 'host-1'})	
-
-	>>> get_target_host({'port': 'port-1'})	
-
-	>>> get_target_host({'host': 'google.com', 'port': '22'})	
+	>>> get_target_host({}, 'spb123:8000')
+	'spb123:8000'
+	>>> get_target_host({'host': 'host-1'}, 'spb123:8000')	
+	'spb123:8000'
+	>>> get_target_host({'port': 'port-1'}, 'spb123:8000')	
+	'spb123:8000'
+	>>> get_target_host({'host': 'google.com', 'port': '22'}, 'localhost:8000')	
 	'google.com:22'
 	>>> from minimock import mock
 	>>> import os
 	>>> mock('socket.gethostname', returns='google.com')
-	>>> get_target_host({'host': 'localhost', 'port': '22'})	
+	>>> get_target_host({'host': 'localhost', 'port': '22'}, 'localhost:8000')	
+	Called socket.gethostname()
+	'google.com:22'
+	>>> get_target_host({'port': '22'}, 'localhost:22')
 	Called socket.gethostname()
 	'google.com:22'
 	"""
+	def replace_localhost(url):
+		return url.replace('localhost', socket.gethostname())
+
 	host = context.get('host')
 	port = context.get('port')
 	if host and port:
-		if host == 'localhost':
-			host = socket.gethostname()
- 
-		return '%s:%s' % (host, port)
+		target = '%s:%s' % (host, port)
+	else:
+		target = riurik_url
+
+	return replace_localhost(target)
 
 def get_virtual_root(path):
 	"""
