@@ -323,15 +323,6 @@ def submitSuite(request):
 
 	return _render_to_response( "runsuite.html", locals() )
 
-def target_is_remote(target, host):
-	if target and 						\
-		not 'localhost' in target 		\
-		and not 'localhost' in host and	\
-		host.lower() != target.lower():
-			return True
-	
-	return False
-
 @add_fullpath
 @error_handler
 def runSuite(request, fullpath):
@@ -347,7 +338,7 @@ def runSuite(request, fullpath):
 	target = contrib.get_target_host(ctx)
 	log.info('target of suite %s is %s' % (clean_path, target))
 
-	if target_is_remote( target, request.get_host()):
+	if contrib.target_is_remote( target, request.get_host()):
 		url = "http://%s/%s" % (target, settings.UPLOAD_TESTS_CMD)
 		saveRemoteContext(clean_path, contextjs, url, ctx)
 		saveSuiteAllTests(url, path, ctx)
@@ -374,7 +365,7 @@ def runTest(request, fullpath):
 	clean_path = contrib.get_relative_clean_path(path)
 	target = contrib.get_target_host(ctx)
 	log.info('target of test %s is %s' % (clean_path, target))
-	if target_is_remote( target, request.get_host()):
+	if contrib.target_is_remote( target, request.get_host()):
 		log.debug('TARGET: %s, %s' % ( target, request.get_host() ))
 		url = "http://%s/%s" % (target, settings.UPLOAD_TESTS_CMD)
 		saveRemoteContext(os.path.dirname(clean_path), contextjs, url, ctx)

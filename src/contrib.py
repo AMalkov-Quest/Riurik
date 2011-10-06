@@ -3,6 +3,25 @@ import os, re, settings
 from logger import log
 import socket, simplejson
 
+
+def target_is_remote(target, host):
+	"""
+	>>> target_is_remote('localhost:8080', 'spb:8080')
+	False
+	>>> target_is_remote('spb8080', 'localhost:8080')
+	False
+	>>> target_is_remote('spb123:8080', 'spb456:8080')
+	True
+	>>> target_is_remote('spb8080', 'spb:8080')
+	True
+	"""
+	if not 'localhost' in target		\
+		and not 'localhost' in host and	\
+		host.lower() != target.lower():
+			return True
+	
+	return False
+
 def get_libraries(context):
 	try:
 		libs = context.get('libraries', '[]')
