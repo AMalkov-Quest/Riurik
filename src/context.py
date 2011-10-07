@@ -82,6 +82,13 @@ def libraries(path, vars, ctx):
 	
 	return tuple(list(vars) + [ ('libraries', str(libraries).replace('\'','\"')) ])
 
+def start_time(vars):
+	vars = list(vars)
+	import time
+	now = time.localtime(time.time())
+	vars.append(('test_start_time', time.mktime(now)))
+	return tuple(vars)
+
 def patch(path, ctx):
 	vars = ctx.items()
 	hasInclude = False
@@ -113,6 +120,7 @@ def patch(path, ctx):
 		vars = tuple(list(vars) + [ ('include', str(include).replace('\'','\"')) ])
 		
 	vars = libraries(path, vars, ctx)
+	vars = start_time(vars)
 	if localhost:
 		vars = list(vars)
 		vars.remove(('host', 'localhost'))

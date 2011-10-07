@@ -335,7 +335,7 @@ def runSuite(request, fullpath):
 	contextjs = context.render(path, ctx)
 	
 	clean_path = contrib.get_relative_clean_path(path)
-	target = contrib.get_target_host(ctx)
+	target = contrib.get_target_host(ctx, request.get_host())
 	log.info('target of suite %s is %s' % (clean_path, target))
 
 	if contrib.target_is_remote( target, request.get_host()):
@@ -363,7 +363,7 @@ def runTest(request, fullpath):
 	log.debug('contextJS: '+ contextjs)
 
 	clean_path = contrib.get_relative_clean_path(path)
-	target = contrib.get_target_host(ctx)
+	target = contrib.get_target_host(ctx, request.get_host())
 	log.info('target of test %s is %s' % (clean_path, target))
 	if contrib.target_is_remote( target, request.get_host()):
 		log.debug('TARGET: %s, %s' % ( target, request.get_host() ))
@@ -479,8 +479,8 @@ def recvLogRecords(request):
 			result = getLastLogRecordTime(records, timeFormat);
 			log.debug('find last log record time: %s' % result)
 	else:
-		log.debug('find all log records')
-		result = records
+		log.debug('find last 100 log records')
+		result = records.split('\n')[-100:]
 	
 	response = HttpResponse(mimetype='text/plain')
 	response.write(result)
