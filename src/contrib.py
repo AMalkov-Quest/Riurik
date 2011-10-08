@@ -158,6 +158,29 @@ def get_relative_clean_path(path):
 				return parts[1].strip('/')
 	return '' 
 
+def get_lib_path_by_name(root, lib, ctx):
+	full_path = os.path.abspath(os.path.join(root, lib))
+	lib_relpath = ''
+	if not os.path.exists(full_path):
+		current_suite_path = os.path.abspath(os.path.join(ctx.get_folder(), lib))
+		if os.path.exists(current_suite_path):
+			log.info('%s lib is located in current suite folder' % lib)
+			lib_relpath = current_suite_path.replace(root, '').lstrip('/') 
+		else:
+			for path in ctx.get( option='LIBRARY_PATH' ).split(','):
+				global_libs_path = os.path.abspath(os.path.join(root, path.strip(), lib))
+				if os.path.exists(global_libs_path):
+					log.info('%s lib is located in the %s global library path' % (lib, path))
+					lib_relpath = global_libs_path.replace(root, '').lstrip('/') 
+					break
+			
+			if not lib_relpath:
+				log.error('%s lib is not found in any available library paths' % lib)
+	else:
+		lib_relpath = lib
+	
+	return str(lib_relpath)
+
 def enum_suite_tests(target):
 	tests = []
 	for root, dirs, files in os.walk(target):

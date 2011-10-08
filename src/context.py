@@ -58,28 +58,29 @@ def libraries(path, vars, ctx):
 	libs = contrib.get_libraries(ctx)
 	root = contrib.get_document_root(path)
 	for lib in libs:
-		full_path = os.path.abspath(os.path.join(root, lib))
-		if not os.path.exists(full_path):
-			current_suite_path = os.path.abspath(os.path.join(ctx.get_folder(), lib))
-			if os.path.exists(current_suite_path):
-				log.info('%s lib is located in current suite folder' % lib)
-				lib_relpath = current_suite_path.replace(root, '').lstrip('/') 
-				libraries.append(str(lib_relpath))
-			else:
-				for path in ctx.get( option='LIBRARY_PATH' ).split(','):
-					global_libs_path = os.path.abspath(os.path.join(root, path.strip(), lib))
-					if os.path.exists(global_libs_path):
-						log.info('%s lib is located in the %s global library path' % (lib, path))
-						lib_relpath = global_libs_path.replace(root, '').lstrip('/') 
-						libraries.append(str(lib_relpath))
-						break
-				
-				if not lib in str(libraries):
-					log.error('%s lib is not found in any available library paths' % lib)
-
-		else:
-			libraries.append((lib))
-	
+		#full_path = os.path.abspath(os.path.join(root, lib))
+		#if not os.path.exists(full_path):
+		#	current_suite_path = os.path.abspath(os.path.join(ctx.get_folder(), lib))
+		#	if os.path.exists(current_suite_path):
+		#		log.info('%s lib is located in current suite folder' % lib)
+		#		lib_relpath = current_suite_path.replace(root, '').lstrip('/') 
+		#		libraries.append(str(lib_relpath))
+		#	else:
+		#		for path in ctx.get( option='LIBRARY_PATH' ).split(','):
+		#			global_libs_path = os.path.abspath(os.path.join(root, path.strip(), lib))
+		#			if os.path.exists(global_libs_path):
+		#				log.info('%s lib is located in the %s global library path' % (lib, path))
+		#				lib_relpath = global_libs_path.replace(root, '').lstrip('/') 
+		#				libraries.append(str(lib_relpath))
+		#				break
+		#		
+		#		if not lib in str(libraries):
+		#			log.error('%s lib is not found in any available library paths' % lib)
+		#else:
+		#	libraries.append((lib))
+		lib_path = contrib.get_lib_path_by_name(root, lib, ctx)
+		if lib_path:
+			libraries.append(lib_path)
 	return tuple(list(vars) + [ ('libraries', str(libraries).replace('\'','\"')) ])
 
 def start_time(vars):

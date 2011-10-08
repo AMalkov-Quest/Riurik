@@ -417,10 +417,13 @@ def saveTestSatelliteScripts(url, path, ctx):
 	log.info('save satellite scripts for: %s' % path)
 
 	for lib in contrib.get_libraries(ctx):
-		lib_path = os.path.join(virtual_root, lib)
-		fullpath = contrib.get_full_path(document_root, lib_path)
-		result = uploadContentToRemote(url, fullpath, lib, ctx)
-		log.info("library %s is saved: %s" % (lib, result))
+		lib_relpath = contrib.get_lib_path_by_name(document_root, lib, ctx)
+		if lib_relpath:
+			lib_path = os.path.join(virtual_root, lib_relpath)
+			fullpath = contrib.get_full_path(document_root, lib_path)
+			result = uploadContentToRemote(url, fullpath, lib_relpath, ctx)
+			log.info("library %s is saved: %s" % (lib_relpath, result))
+			print "library %s is saved: %s" % (lib_relpath, result)
 
 def uploadContentToRemote(url, fullpath, path, ctx):
 	log.debug('upload content %s', fullpath)
