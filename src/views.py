@@ -365,6 +365,10 @@ def runTest(request, fullpath):
 	clean_path = contrib.get_relative_clean_path(path)
 	target = contrib.get_target_host(ctx, request.get_host())
 	log.info('target of test %s is %s' % (clean_path, target))
+	
+	test_content = request.REQUEST.get('content', None)
+	tools.savetest(test_content, fullpath)
+	
 	if contrib.target_is_remote( target, request.get_host()):
 		log.debug('TARGET: %s, %s' % ( target, request.get_host() ))
 		url = "http://%s/%s" % (target, settings.UPLOAD_TESTS_CMD)
