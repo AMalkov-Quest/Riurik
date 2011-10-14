@@ -82,7 +82,7 @@ def show_context(request, path):
 	sections = config.sections(context.get(fullpath).inifile)
 	for section_name in sections:
 		ctx = context.get(fullpath, section=section_name)
-		context_ini = context.render_ini(ctx, section_name)
+		context_ini = context.render_ini(path, ctx, section_name)
 		result += context_ini
 	
 	return HttpResponse(result)
@@ -323,9 +323,6 @@ def submitSuite(request):
 
 	return _render_to_response( "runsuite.html", locals() )
 
-def get_root():
-	return '/testsrc/' + settings.PRODUCT_TEST_CASES_ROOT
-
 @add_fullpath
 @error_handler
 def runSuite(request, fullpath):
@@ -335,20 +332,20 @@ def runSuite(request, fullpath):
 	
 	log.info('run suite %s with context %s' % (path, context_name))
 
-	contextjs = context.render(ctx)
+	contextjs = context.render(path, ctx)
 	
 	clean_path = contrib.get_relative_clean_path(path)
-	target = contrib.get_target_host(ctx)
+	target = contrib.get_target_host(ctx, request.get_host())
 	log.info('target of suite %s is %s' % (clean_path, target))
 
-	if target and request.get_host() != target:
+	if contrib.target_is_remote( target, request.get_host()):
 		url = "http://%s/%s" % (target, settings.UPLOAD_TESTS_CMD)
 		saveRemoteContext(clean_path, contextjs, url, ctx)
 		saveSuiteAllTests(url, path, ctx)
 		url = "http://%s/%s?suite=/%s" % ( target, settings.EXEC_TESTS_CMD, clean_path )
 	else:
 		saveLocalContext(fullpath, contextjs)
-		url = "http://%s/%s?suite=/%s" % ( request.get_host(), settings.EXEC_TESTS_CMD, clean_path )
+		url = "http://%s/%s?suite=/%s" % ( target, settings.EXEC_TESTS_CMD, clean_path )
 
 	log.info("redirect to run suite %s" % url)
 	return HttpResponseRedirect( url )
@@ -362,11 +359,11 @@ def runTest(request, fullpath):
 	
 	log.info('run test %s with context %s' % (path, context_name))
 	
-	contextjs = context.render(ctx)
+	contextjs = context.render(path, ctx)
 	log.debug('contextJS: '+ contextjs)
 
 	clean_path = contrib.get_relative_clean_path(path)
-	target = contrib.get_target_host(ctx)
+	target = contrib.get_target_host(ctx, request.get_host())
 	log.info('target of test %s is %s' % (clean_path, target))
 	
 	test_content = request.REQUEST.get('content', None)
@@ -377,12 +374,12 @@ def runTest(request, fullpath):
 		url = "http://%s/%s" % (target, settings.UPLOAD_TESTS_CMD)
 		saveRemoteContext(os.path.dirname(clean_path), contextjs, url, ctx)
 		saveTestSatelliteScripts(url, path, ctx)
-		sendContentToRemote(clean_path, request.REQUEST["content"], url, ctx)
+		sendContentToRemote(clean_path, request.REQUEST.get("content", open(fullpath, 'r').read()), url, ctx)
 		url = "http://%s/%s?path=/%s" % (target, settings.EXEC_TESTS_CMD, clean_path)
 	else:
 		saveLocalContext(fullpath, contextjs)
-		url = "http://%s/%s?path=/%s" % (request.get_host(), settings.EXEC_TESTS_CMD, clean_path)
-
+		url = "http://%s/%s?path=/%s" % (target, settings.EXEC_TESTS_CMD, clean_path)
+	
 	log.info("redirect to run test %s" % url)
 	return HttpResponseRedirect(url)
 
@@ -424,10 +421,13 @@ def saveTestSatelliteScripts(url, path, ctx):
 	log.info('save satellite scripts for: %s' % path)
 
 	for lib in contrib.get_libraries(ctx):
-		lib_path = os.path.join(virtual_root, lib)
-		fullpath = contrib.get_full_path(document_root, lib_path)
-		result = uploadContentToRemote(url, fullpath, lib, ctx)
-		log.info("library %s is saved: %s" % (lib, result))
+		lib_relpath = contrib.get_lib_path_by_name(document_root, lib, ctx)
+		if lib_relpath:
+			lib_path = os.path.join(virtual_root, lib_relpath)
+			fullpath = contrib.get_full_path(document_root, lib_path)
+			result = uploadContentToRemote(url, fullpath, lib_relpath, ctx)
+			log.info("library %s is saved: %s" % (lib_relpath, result))
+			print "library %s is saved: %s" % (lib_relpath, result)
 
 def uploadContentToRemote(url, fullpath, path, ctx):
 	log.debug('upload content %s', fullpath)
@@ -471,7 +471,6 @@ def recvLogRecords(request):
 	from logger import FILENAME, DJANGO_APP, timeFormat
 	log_file = FILENAME
 	if request.REQUEST.get('source', None):
-		log.debug('recv logs for django app')
 		log_file = DJANGO_APP
 	f = codecs.open(log_file, 'r', 'utf-8')
 	records = f.read()
@@ -489,8 +488,8 @@ def recvLogRecords(request):
 			result = getLastLogRecordTime(records, timeFormat);
 			log.debug('find last log record time: %s' % result)
 	else:
-		log.debug('find all log records')
-		result = records
+		log.debug('find last 100 log records')
+		result = records.split('\n')[-100:]
 	
 	response = HttpResponse(mimetype='text/plain')
 	response.write(result)
