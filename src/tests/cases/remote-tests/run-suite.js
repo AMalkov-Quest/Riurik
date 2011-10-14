@@ -10,7 +10,6 @@ QUnit.setup(function() {
   context.url = contexter.URL(context, path);
   
   delete_folder(context.suite_path);
-  create_folder(context.suite_name, 'tests');
   set_context(context.suite_path, '[' + context.suite_context + ']\nrun=remote\nhost=localhost\nport=' + context.django_port);
   write_test(context.suite_path + '/' + context.test1_name, "test('first test', function(){ok(true, 'is run')});");
   write_test(context.suite_path + '/' + context.test2_name, "test('second test', function(){ok(true, 'is run')});");
@@ -56,26 +55,6 @@ asyncTest('suite is executed on remote server', function() {
     start();
   })
 });
-
-/*asyncTest('context is saved', function() {
-  //context will be rewrited here, so preserve it
-  var ctx = context;
-  $.ajax('/' + ctx.suite_path + '/' + '.context.js', 
-  { 
-    async: false, 
-    success: function(data) {
-      QUnit.log(context);
-      equals(context.include[0], ctx.test1_name, 'fists test is included');
-      equals(context.include[1], ctx.test2_name, 'second test is included');
-      context = ctx;
-      start();
-    } 
-  }).error(function(){
-    ok(false, 'something wrong with suite context');
-    start();
-  });
-});
-*/
 
 QUnit.teardown(function() {
   delete_folder(context.suite_path);

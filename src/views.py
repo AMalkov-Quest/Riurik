@@ -369,7 +369,10 @@ def runTest(request, fullpath):
 	target = contrib.get_target_host(ctx)
 	log.info('target of test %s is %s' % (clean_path, target))
 	
-	if target and request.get_host().lower() != target.lower():
+	test_content = request.REQUEST.get('content', None)
+	tools.savetest(test_content, fullpath)
+	
+	if contrib.target_is_remote( target, request.get_host()):
 		log.debug('TARGET: %s, %s' % ( target, request.get_host() ))
 		url = "http://%s/%s" % (target, settings.UPLOAD_TESTS_CMD)
 		saveRemoteContext(os.path.dirname(clean_path), contextjs, url, ctx)
