@@ -22,10 +22,10 @@ def get(file, section, option):
 		log.error(e)
 		return None
 
-def items(file, section):
+def items(file, section, vars=None):
 	try:
 		config = read(file)
-		return config.items(section)
+		return config.items(section=section, vars=vars)
 	except Exception, e:
 		log.error(e)
 		return None
