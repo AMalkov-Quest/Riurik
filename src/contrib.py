@@ -158,6 +158,21 @@ def get_relative_clean_path(path):
 				return parts[1].strip('/')
 	return '' 
 
+def get_global_context_lib_path(ctx):
+	"""
+	>>> ctx = {}
+	>>> get_global_context_lib_path(ctx)
+	[]
+	>>> ctx = {'LIBRARY_PATH': 'path1, path2, path3'}
+	>>> get_global_context_lib_path(ctx)
+	['path1', 'path2', 'path3']
+	"""
+	path = ctx.get( 'LIBRARY_PATH' )
+	if path:
+		return [path.strip() for path in path.split(',')]
+	
+	return []
+
 def get_lib_path_by_name(root, lib, ctx):
 	full_path = os.path.abspath(os.path.join(root, lib))
 	lib_relpath = ''
@@ -165,13 +180,13 @@ def get_lib_path_by_name(root, lib, ctx):
 		current_suite_path = os.path.abspath(os.path.join(ctx.get_folder(), lib))
 		if os.path.exists(current_suite_path):
 			log.info('%s lib is located in current suite folder' % lib)
-			lib_relpath = current_suite_path.replace(root, '').lstrip('/') 
+			lib_relpath = current_suite_path.replace(root, '') 
 		else:
-			for path in ctx.get( option='LIBRARY_PATH' ).split(','):
+			for path in get_global_context_lib_path(ctx):
 				global_libs_path = os.path.abspath(os.path.join(root, path.strip(), lib))
 				if os.path.exists(global_libs_path):
 					log.info('%s lib is located in the %s global library path' % (lib, path))
-					lib_relpath = global_libs_path.replace(root, '').lstrip('/') 
+					lib_relpath = global_libs_path.replace(root, '')
 					break
 			
 			if not lib_relpath:
@@ -179,7 +194,7 @@ def get_lib_path_by_name(root, lib, ctx):
 	else:
 		lib_relpath = lib
 	
-	return str(lib_relpath)
+	return str(lib_relpath.lstrip('\\').lstrip('/'))
 
 def enum_suite_tests(target):
 	tests = []
