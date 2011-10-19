@@ -2,8 +2,8 @@ import os
 from ConfigParser import SafeConfigParser as ConfigParser
 from logger import log
 
-def read(file):
-	config = ConfigParser()
+def read(file, defaults=None):
+	config = ConfigParser(defaults)
 	config.read(file)
 	return config
 
@@ -24,8 +24,8 @@ def get(file, section, option):
 
 def items(file, section, vars=None):
 	try:
-		config = read(file)
-		return config.items(section=section, vars=vars)
+		config = read(file, vars)
+		return config.items(section=section)
 	except Exception, e:
 		log.error(e)
 		return None

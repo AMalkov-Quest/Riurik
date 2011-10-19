@@ -173,5 +173,6 @@ class context(global_settings):
 		values = {}
 		values.update( global_settings(self.inifile).items() or {} )
 		values.update( global_settings(self.inifile, self.section).items() or {} )
+		print super(context, self).items(values)
 		values.update( super(context, self).items(values) or {} )
 		return values.items()
