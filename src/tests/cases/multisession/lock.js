@@ -40,3 +40,7 @@ asyncTest('open file second time ', function() {
     start();
   });
 });
+
+QUnit.teardown(function() {
+  delete_test( context.test_path );
+});
