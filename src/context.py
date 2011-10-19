@@ -53,6 +53,18 @@ def render_ini(path, ctx, section_name='default'):
 		c['options'] += [ (name, value, hasattr(value, 'comment')), ]
 	return t.render(c)
 
+def libraries_by_LIBRARY_PATH(root, ctx):
+	libraries = []
+	lib_paths = contrib.get_global_context_lib_path(ctx)
+	for path in lib_paths:
+		full_path = os.path.abspath(os.path.join(root, path.strip()))
+		for name in os.listdir(full_path):
+			lib_path = os.path.abspath(os.path.join(full_path, name))
+			lib_relpath = lib_path.replace(root, '').lstrip('/') 
+			libraries.append(str(lib_relpath))
+
+	return libraries
+
 def libraries(path, vars, ctx):
 	libraries = []
 	libs = contrib.get_libraries(ctx)
@@ -61,6 +73,8 @@ def libraries(path, vars, ctx):
 		lib_path = contrib.get_lib_path_by_name(root, lib, ctx)
 		if lib_path:
 			libraries.append(lib_path)
+	if not libraries:
+		libraries = libraries_by_LIBRARY_PATH(root, ctx)
 	return tuple(list(vars) + [ ('libraries', str(libraries).replace('\'','\"')) ])
 
 def start_time(vars):
@@ -173,6 +187,5 @@ class context(global_settings):
 		values = {}
 		values.update( global_settings(self.inifile).items() or {} )
 		values.update( global_settings(self.inifile, self.section).items() or {} )
-		print super(context, self).items(values)
 		values.update( super(context, self).items(values) or {} )
 		return values.items()

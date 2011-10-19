@@ -31,9 +31,9 @@ def get_libraries(context):
 
 def get_libraries_new(context):
 	"""
-	>>> get_libraries({})
+	>>> get_libraries_new({})
 	[]
-	>>> get_libraries({'libraries': 'lib1, lib2'})
+	>>> get_libraries_new({'libraries': 'lib1, lib2'})
 	['lib1', 'lib2']
 	"""
 	libs = context.get('libraries', '')
