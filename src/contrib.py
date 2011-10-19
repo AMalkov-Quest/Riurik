@@ -180,13 +180,13 @@ def get_lib_path_by_name(root, lib, ctx):
 		current_suite_path = os.path.abspath(os.path.join(ctx.get_folder(), lib))
 		if os.path.exists(current_suite_path):
 			log.info('%s lib is located in current suite folder' % lib)
-			lib_relpath = current_suite_path.replace(root, '').lstrip('/') 
+			lib_relpath = current_suite_path.replace(root, '') 
 		else:
 			for path in get_global_context_lib_path(ctx):
 				global_libs_path = os.path.abspath(os.path.join(root, path.strip(), lib))
 				if os.path.exists(global_libs_path):
 					log.info('%s lib is located in the %s global library path' % (lib, path))
-					lib_relpath = global_libs_path.replace(root, '').lstrip('/') 
+					lib_relpath = global_libs_path.replace(root, '') 
 					break
 			
 			if not lib_relpath:
@@ -194,7 +194,7 @@ def get_lib_path_by_name(root, lib, ctx):
 	else:
 		lib_relpath = lib
 	
-	return str(lib_relpath)
+	return str(lib_relpath.lstrip('\\').lstrip('/'))
 
 def enum_suite_tests(target):
 	tests = []
