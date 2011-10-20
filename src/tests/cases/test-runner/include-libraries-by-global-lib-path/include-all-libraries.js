@@ -6,6 +6,6 @@ test('include all if context does not contain the libraries option', function() 
   equal( library4.method4(80), 80, 'method from library 4 is available' );
 });
 
-/*test('include local if context does not contain the libraries option', function() {
+test('include local if context does not contain the libraries option', function() {
   equal( library3.method3(60), 60, 'method from library 3 is available' );
-});*/
+});

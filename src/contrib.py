@@ -22,21 +22,25 @@ def target_is_remote(target, host):
 	
 	return False
 
-def get_libraries(context):
+def get_libraries__(context):
 	try:
 		libs = context.get('libraries', '[]')
 		return simplejson.loads(libs)
 	except:
 		return get_libraries_new(context)
 
-def get_libraries_new(context):
+def get_libraries(context):
 	"""
-	>>> get_libraries_new({})
+	>>> get_libraries({})
 	[]
-	>>> get_libraries_new({'libraries': 'lib1, lib2'})
+	>>> get_libraries({'libraries': 'lib1, lib2'})
 	['lib1', 'lib2']
+	>>> get_libraries({'libraries': '[]'})
 	"""
-	libs = context.get('libraries', '')
+	libs = context.get('libraries', None)
+	if libs and libs == '[]':
+		return None
+	
 	if libs:
 		return [lib.strip() for lib in libs.split(',')]
 	else:
@@ -44,8 +48,8 @@ def get_libraries_new(context):
 
 def convert_dict_values_strings_to_unicode(obj):
 	"""
-		>>> convert_dict_values_strings_to_unicode({'key1': u'Ё'})
-		{'key1': '\\xc3\\x90\\xc2\\x81'}
+	>>> convert_dict_values_strings_to_unicode({'key1': u'Ё'})
+	{'key1': '\\xc3\\x90\\xc2\\x81'}
 	"""
 	for key, val in obj.iteritems():
 		if val.__class__.__name__ == 'unicode':
@@ -173,20 +177,30 @@ def get_global_context_lib_path(ctx):
 	
 	return []
 
+def get_local_lib_path(root, lib, ctx):
+	current_suite_path = os.path.abspath(os.path.join(ctx.get_folder(), lib))
+	if os.path.exists(current_suite_path):
+		log.info('%s lib is located in current suite folder' % lib)
+		return str(current_suite_path.replace(root, '').lstrip('/'))
+
+	return ''
+	
 def get_lib_path_by_name(root, lib, ctx):
 	full_path = os.path.abspath(os.path.join(root, lib))
 	lib_relpath = ''
 	if not os.path.exists(full_path):
-		current_suite_path = os.path.abspath(os.path.join(ctx.get_folder(), lib))
-		if os.path.exists(current_suite_path):
-			log.info('%s lib is located in current suite folder' % lib)
-			lib_relpath = current_suite_path.replace(root, '') 
-		else:
+		#current_suite_path = os.path.abspath(os.path.join(ctx.get_folder(), lib))
+		#if os.path.exists(current_suite_path):
+		#	log.info('%s lib is located in current suite folder' % lib)
+		#	lib_relpath = current_suite_path.replace(root, '')
+		lib_relpath = get_local_lib_path(root, lib, ctx)
+		#else:
+		if not lib_relpath:
 			for path in get_global_context_lib_path(ctx):
 				global_libs_path = os.path.abspath(os.path.join(root, path.strip(), lib))
 				if os.path.exists(global_libs_path):
 					log.info('%s lib is located in the %s global library path' % (lib, path))
-					lib_relpath = global_libs_path.replace(root, '') 
+					lib_relpath = global_libs_path.replace(root, '')
 					break
 			
 			if not lib_relpath:
