@@ -12,3 +12,8 @@ test('if is not found - log the error', function() {
   var regex = new RegExp('not-found-library.js lib is not found in any available library paths');
   ok(regex.test(logs), regex);
 });
+
+test('from global context should be included', function() {
+  QUnit.log(context.libraries)
+  equal( globalLibrary.method(20), 20, 'method from global library is available' );
+});

@@ -72,7 +72,14 @@ def libraries_default(root, ctx):
 
 def libraries(path, vars, ctx):
 	libraries = []
-	libs = contrib.get_libraries(ctx)
+
+	def get_libraries():
+		for item in vars:
+			if item[0] == settings.LIB_KEY_NAME:
+				return [lib.strip() for lib in item[1].split(',')]
+
+ 
+	libs = get_libraries()
 	root = contrib.get_document_root(path)
 	if libs != None:
 		for lib in libs:
@@ -81,7 +88,7 @@ def libraries(path, vars, ctx):
 				libraries.append(lib_path)
 		if not libraries:
 			libraries = libraries_default(root, ctx)
-		return tuple(list(vars) + [ ('libraries', str(libraries).replace('\'','\"')) ])
+		return tuple(list(vars) + [ (settings.LIB_KEY_NAME, str(libraries).replace('\'','\"')) ])
 
 	return vars 
 
@@ -191,9 +198,19 @@ class context(global_settings):
 			value = default
 		return value
 	
+	def libraries(self, values):
+		gs = global_settings(self.inifile).items() or {}
+		for item in gs:
+			if item[0] == settings.LIB_KEY_NAME:
+				glibs = item[1]
+				llibs = values[settings.LIB_KEY_NAME]
+				libs = { settings.LIB_KEY_NAME: ','.join([glibs, llibs]) }
+				values.update(libs)
+
 	def items(self):
 		values = {}
 		values.update( global_settings(self.inifile).items() or {} )
 		values.update( global_settings(self.inifile, self.section).items() or {} )
 		values.update( super(context, self).items(values) or {} )
+		self.libraries(values)
 		return values.items()
