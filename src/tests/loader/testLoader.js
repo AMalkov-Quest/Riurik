@@ -80,7 +80,7 @@ function jQExtend( $ ) {
 				setTimeout(f, 100)
 			} else {
 				QUnit.log('wait timeout');
-				dfd.resolve();
+				dfd.reject();
 			}
 		})();
 
