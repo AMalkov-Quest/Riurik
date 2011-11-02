@@ -1,7 +1,7 @@
 $(function () {
 	$('#context-preview-ctrl').click(function(){
 		$('#context-preview').dialog({
-			width: 800,
+			width: 1200,
 			height: 700,
 			buttons: [
 				{
