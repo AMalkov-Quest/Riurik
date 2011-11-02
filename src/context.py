@@ -174,8 +174,9 @@ class context(global_settings):
 			if item[0] == settings.LIB_KEY_NAME:
 				glibs = item[1]
 				llibs = values[settings.LIB_KEY_NAME]
-				libs = { settings.LIB_KEY_NAME: ','.join([glibs, llibs]) }
-				values.update(libs)
+				if glibs != llibs:
+					libs = { settings.LIB_KEY_NAME: ','.join([glibs, llibs]) }
+					values.update(libs)
 
 	def items(self):
 		values = {}

@@ -31,11 +31,11 @@ def get_libraries__(context):
 
 def get_libraries___(context):
 	"""
-	>>> get_libraries({})
+	>>> get_libraries___({})
 	[]
-	>>> get_libraries({'libraries': 'lib1, lib2'})
+	>>> get_libraries___({'libraries': 'lib1, lib2'})
 	['lib1', 'lib2']
-	>>> get_libraries({'libraries': '[]'})
+	>>> get_libraries___({'libraries': '[]'})
 	"""
 	libs = context.get('libraries', None)
 	if libs and libs == '[]':
@@ -52,16 +52,7 @@ def get_libraries(path, context):
 def get_libraries_impl(path, vars, ctx):
 	libraries = []
 	
-	def get_libraries_raw():
-		for item in vars:
-			if item[0] == settings.LIB_KEY_NAME:
-				if not '[]' in item[1]:
-					return [lib.strip() for lib in item[1].split(',')]
-				else:
-					return None
-		return []
- 
-	libs = get_libraries_raw()
+	libs = get_libraries_raw(vars)
 	root = get_document_root(path)
 	log.info('libs are %s' % libs)
 	if libs != None:
@@ -74,6 +65,24 @@ def get_libraries_impl(path, vars, ctx):
 			libraries = libraries_default(root, ctx)
 
 	return libraries 
+
+def get_libraries_raw(vars):
+	"""
+	>>> get_libraries_raw([])
+	[]
+	>>> get_libraries_raw([('libraries', '[]')])
+	>>> get_libraries_raw([('key', 'value')])
+	[]
+	>>> get_libraries_raw([('libraries', 'lib1, lib2')])
+	['lib1', 'lib2']
+	"""
+	for item in vars:
+		if item[0] == settings.LIB_KEY_NAME:
+			if not '[]' in item[1]:
+				return [lib.strip() for lib in item[1].split(',')]
+			else:
+				return None
+	return []
 
 def libraries_default(root, ctx):
 	libraries = []
