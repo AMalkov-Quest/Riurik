@@ -29,7 +29,7 @@ def get_libraries__(context):
 	except:
 		return get_libraries_new(context)
 
-def get_libraries(context):
+def get_libraries___(context):
 	"""
 	>>> get_libraries({})
 	[]
@@ -45,6 +45,52 @@ def get_libraries(context):
 		return [lib.strip() for lib in libs.split(',')]
 	else:
 		return []
+
+def get_libraries(path, context):
+	return get_libraries_impl(path, context.items(), context)
+
+def get_libraries_impl(path, vars, ctx):
+	libraries = []
+	
+	def get_libraries_raw():
+		for item in vars:
+			if item[0] == settings.LIB_KEY_NAME:
+				if not '[]' in item[1]:
+					return [lib.strip() for lib in item[1].split(',')]
+				else:
+					return None
+		return []
+ 
+	libs = get_libraries_raw()
+	root = get_document_root(path)
+	log.info('libs are %s' % libs)
+	if libs != None:
+		for lib in libs:
+			lib_path = get_lib_path_by_name(root, lib, ctx)
+			if lib_path:
+				libraries.append(lib_path)
+		if not libraries:
+			log.info('there are no precofigured libs to include, try defaults ...')
+			libraries = libraries_default(root, ctx)
+
+	return libraries 
+
+def libraries_default(root, ctx):
+	libraries = []
+
+	lib_paths = get_global_context_lib_path(ctx)
+	for path in lib_paths:
+		full_path = os.path.abspath(os.path.join(root, path.strip()))
+		for name in os.listdir(full_path):
+			lib_path = os.path.abspath(os.path.join(full_path, name))
+			lib_relpath = lib_path.replace(root, '').lstrip('/') 
+			libraries.append(str(lib_relpath))
+	
+	lib_relpath = get_local_lib_path(root, 'library.js', ctx)
+	if lib_relpath:
+		libraries.append(lib_relpath)
+	
+	return libraries
 
 def convert_dict_values_strings_to_unicode(obj):
 	"""

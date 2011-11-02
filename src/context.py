@@ -53,44 +53,14 @@ def render_ini(path, ctx, section_name='default'):
 		c['options'] += [ (name, value, hasattr(value, 'comment')), ]
 	return t.render(c)
 
-def libraries_default(root, ctx):
-	libraries = []
+def patch_libraries(path, vars, ctx):
+	libraries = contrib.get_libraries_impl(path, vars, ctx)
+	log.info('libs are %s' % libraries)
+	if libraries != None:
+		vars_as_list = [var for var in list(vars) if var[0] != settings.LIB_KEY_NAME]
+		return tuple(vars_as_list + [ (settings.LIB_KEY_NAME, str(libraries).replace('\'','\"')) ])
 
-	lib_paths = contrib.get_global_context_lib_path(ctx)
-	for path in lib_paths:
-		full_path = os.path.abspath(os.path.join(root, path.strip()))
-		for name in os.listdir(full_path):
-			lib_path = os.path.abspath(os.path.join(full_path, name))
-			lib_relpath = lib_path.replace(root, '').lstrip('/') 
-			libraries.append(str(lib_relpath))
-	
-	lib_relpath = contrib.get_local_lib_path(root, 'library.js', ctx)
-	if lib_relpath:
-		libraries.append(lib_relpath)
-	
-	return libraries
-
-def libraries(path, vars, ctx):
-	libraries = []
-
-	def get_libraries():
-		for item in vars:
-			if item[0] == settings.LIB_KEY_NAME:
-				return [lib.strip() for lib in item[1].split(',')]
-
- 
-	libs = get_libraries()
-	root = contrib.get_document_root(path)
-	if libs != None:
-		for lib in libs:
-			lib_path = contrib.get_lib_path_by_name(root, lib, ctx)
-			if lib_path:
-				libraries.append(lib_path)
-		if not libraries:
-			libraries = libraries_default(root, ctx)
-		return tuple(list(vars) + [ (settings.LIB_KEY_NAME, str(libraries).replace('\'','\"')) ])
-
-	return vars 
+	return vars
 
 def start_time(vars):
 	vars = list(vars)
@@ -129,7 +99,7 @@ def patch(path, ctx):
 					include += [ str(file_relpath) ]
 		vars = tuple(list(vars) + [ ('include', str(include).replace('\'','\"')) ])
 		
-	vars = libraries(path, vars, ctx)
+	vars = patch_libraries(path, vars, ctx)
 	vars = start_time(vars)
 	if localhost:
 		vars = list(vars)

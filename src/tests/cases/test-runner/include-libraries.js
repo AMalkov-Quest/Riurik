@@ -14,6 +14,5 @@ test('if is not found - log the error', function() {
 });
 
 test('from global context should be included', function() {
-  QUnit.log(context.libraries)
   equal( globalLibrary.method(20), 20, 'method from global library is available' );
 });

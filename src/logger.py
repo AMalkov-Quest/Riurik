@@ -14,5 +14,5 @@ try:
 	log.handlers.append(handler)
 except:
 	import logging
-	logging.basicConfig(filename=FILENAME, level=logging.DEBUG, format="%(asctime)s - %(message)s")
+	logging.basicConfig(filename=FILENAME, level=logging.INFO, format="%(asctime)s - %(message)s")
 	log = logging.getLogger('default')

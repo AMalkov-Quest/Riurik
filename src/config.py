@@ -19,7 +19,7 @@ def get(file, section, option):
 		config = read(file)
 		return config.get(section, option)
 	except Exception, e:
-		log.error(e)
+		log.debug(e)
 		return None
 
 def items(file, section, vars=None):
@@ -27,7 +27,7 @@ def items(file, section, vars=None):
 		config = read(file, vars)
 		return config.items(section=section)
 	except Exception, e:
-		log.error(e)
+		log.debug(e)
 		return None
 
 def set(file, section, option, value):

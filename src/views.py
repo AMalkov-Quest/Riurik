@@ -309,11 +309,8 @@ def submitTest(request):
 	testname = request.POST["path"]
 	url = request.POST["url"]
 	context = request.POST["context"]
-	#TODO: for what gettest call
-	#content = request.POST.get("content", tools.gettest(testname))
 	content = request.POST.get("content", '')
 
-	log.debug('submitTest POST')
 	return _render_to_response( "runtest.html", locals() )
 
 def submitSuite(request):
@@ -420,7 +417,7 @@ def saveTestSatelliteScripts(url, path, ctx):
 	virtual_root = contrib.get_virtual_root(path) 
 	log.info('save satellite scripts for: %s' % path)
 
-	for lib in contrib.get_libraries(ctx):
+	for lib in contrib.get_libraries(path, ctx):
 		lib_relpath = contrib.get_lib_path_by_name(document_root, lib, ctx)
 		if lib_relpath:
 			lib_path = os.path.join(virtual_root, lib_relpath)
