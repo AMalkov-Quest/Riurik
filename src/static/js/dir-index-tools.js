@@ -1,8 +1,8 @@
 $(function () {
 	$('#context-preview-ctrl').click(function(){
 		$('#context-preview').dialog({
-			width: 1200,
-			height: 700,
+			width: $(document).width()*0.9,
+			height: 600,
 			buttons: [
 				{
 					text: 'Edit',
