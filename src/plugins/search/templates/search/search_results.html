@@ -1,0 +1,16 @@
+{% load highlight %}
+
+{% block styles %}
+	<style>
+		.highlight { font-weight: bold; }
+	</style>
+{% endblock %}
+
+{% block content %}
+	{% for search in searches %}
+		<br>
+		{% for line in search %}
+			{{ line.lineno }}: {% if line.hightlight %}{{ line.line|highlight:line.hightlight }}{% else %}{{ line.line }}{% endif %}<br>
+		{% endfor %}
+	{% endfor %}
+{% endblock %}
