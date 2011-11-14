@@ -68,9 +68,10 @@
 						<li><a id="new-test" href="javascript:void(0);" onClick="javascript:createTest();">Create Test</a></li>
 					{% else %}
 						{% ifequal type 'virtual' %}
-							<li><a id="virtual-settings" href=".settings.ini?editor">Global settings</a></li>
+							<li><a id="virtual-settings" href=".settings.ini?editor">Settings</a></li>
 						{% endifequal %}
 						<li><a id="new-suite" href="javascript:void(0);" onClick="javascript:createFolder();">Create Suite</a></li>
+						<li><a id="new-test" href="javascript:void(0);" onClick="javascript:createTest();">Create Script</a></li>
 					{% endifequal %}
 				{% else %}
 					<li><a id="configure" href="javascript:void(0);" >Configure</a></li>

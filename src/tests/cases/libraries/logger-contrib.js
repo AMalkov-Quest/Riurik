@@ -9,13 +9,17 @@ function getLogs(start, source) {
     url += '&source=' + source;
   }
   QUnit.log('get logs: ', url);
-  
-  return $.ajax({
+  var responseText = "";
+  $.ajax({
     url: url,
     async: false, 
     success: function(data) {
       QUnit.log(data);
+      responseText = data;
+    },
+    error: function(data) {
+      QUnit.log('on getLogs an error is happend', data);
     }
-  }).responseText;
-  
+  });
+  return responseText;
 };

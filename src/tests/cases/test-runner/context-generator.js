@@ -21,13 +21,16 @@ test('context is generated', function() {
   equal( library1.method1(20), 20, 'method from library 1 is available' );
   equal( library2.method2(40), 40, 'method from library 2 is available' );
   equal( library3.method3(60), 60, 'method from library 3 is available' );
-  
+  notEqual( context.test_start_time, 'undefined', 'context include test start time');
 });
 
 test('context is generated including global settings', function() {
-  equal( context.global_var, 'GLOBAL', 'GLOBAL_VAR is from .settings.ini default section' );
-  equal( context.localhost_var, 'LOCALHOST', 'LOCALHOST_VAR is from .settings.ini localhost section' );
-  equal( context.localhost_var_rewrite, 'LOCALHOST', 'LOCALHOST_VAR_REWITE is from .settings.ini is rewritten by .context.ini localhost section' );
+  with(context) {
+    equal( global_var, 'GLOBAL', 'GLOBAL_VAR is from .settings.ini default section' );
+    equal( localhost_var, 'LOCALHOST', 'LOCALHOST_VAR is from .settings.ini localhost section' );
+    equal( localhost_var_rewrite, 'REWRITTEN', 'var from global context should be rewritten by value from local context' );
+    equal( compound_var, global_var1 + '-' + global_var2, 'global vars can be used to interpolate local compound var' );
+  }
 });
 
 

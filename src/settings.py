@@ -111,7 +111,7 @@ INSTALLED_APPS = (
 
 VIRTUAL_PATHS = {
     'riurik-inner-tests': os.path.join(os.path.dirname( __file__ ), 'tests', 'cases'),
-	'other-tests': os.path.join(os.path.dirname( __file__ ), 'tests-1'),
+	'other-tests': os.path.join(os.path.dirname( __file__ ), 'tests-1', 'cases'),
     #'django-app-tests': os.path.join(os.path.dirname( __file__ ), '../django_app', 'tests', 'cases'),
 	'django-app-tests': os.path.join(os.path.dirname( __file__ ), 'tests-2', 'cases'),
 }
@@ -123,7 +123,7 @@ TEST_CONTEXT_FILE_NAME = '.context.ini'
 TEST_CONTEXT_JS_FILE_NAME = '.context.js'
 TEST_FILE_EXT = '.js'
 TEST_SWAP_FILE_NAME = '.%s.swp'
-
+LIB_KEY_NAME = 'libraries'
 APPEND_SLASH = False
 CODEMIRROR_CALL_EDITOR_FOR = '^.*\.(?:js|ini|html|py)$'
 
