@@ -30,10 +30,12 @@ def search_in_file(filepath, search_pattern):
 
 	return all_results
 
-def iter_files(folder):
-	for root,dirs,files in os.walk(folder):
-		for fname in files:
-			yield os.path.join(root,fname)
+def iter_files(folders):
+	if not isinstance( folders, list ): folders = [ folders ]
+	for folder in folders:
+		for root,dirs,files in os.walk(folder):
+			for fname in files:
+				yield os.path.join(root,fname)
 
 if __name__ == '__main__':
 

@@ -17,13 +17,14 @@
 	<div class="search">
 	{% if searches %}
 		<h1>Search results for '{{ search_pattern }}'</h1>
+		Search scope: {{ search_folder }} 
 		<ul>
 		{% for filepath in searches %} 
 			<li><a href="#{{filepath}}">{{filepath}}</a></li>
 		{% endfor %}
 		</ul>
 	{% else %}
-		<p>Nothing found for '{{ search_pattern|highlight:search_pattern }}'</p>
+		<p>Nothing found for '{{ search_pattern|highlight:search_pattern }}' in '{{search_folder}}'</p>
 	{% endif  %}
 	<br/>
 	{% for filepath in searches %}
