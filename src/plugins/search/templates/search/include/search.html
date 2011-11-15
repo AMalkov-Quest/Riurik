@@ -1,0 +1,9 @@
+{% load dir_index_tags %}
+<div style="float:right;">
+	<form action="/search" method="GET" target="search">
+	<input type="text" name="search_pattern" value=""/>
+	<input type="submit" name="search_do" value="Search"/>
+	<input type="hidden" name="path" value="/{{ directory|strip:'/' }}" />
+	</form>
+</div>
+

@@ -26,7 +26,7 @@ def search_in_file(filepath, search_pattern):
 
 			match_result += [ (lineno, line, highlight,) ]
 			lineno += 1
-		all_results += [ match_result ]
+		all_results +=  [ match_result ]
 
 	return all_results
 

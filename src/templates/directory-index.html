@@ -79,6 +79,7 @@
 			</ul>
 			</form>
 			{% endblock controls %}
+			{% block search %}{% include 'search/include/search.html' %}{% endblock search %}
 		</div>
 		{% block title %}
 		<p class="breadcrumbs">{{ directory|breadcrumbs }}</p>
