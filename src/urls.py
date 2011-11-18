@@ -26,7 +26,7 @@ urlpatterns = patterns('',
 	(r'^(?P<path>.*)/show_context[/]?$', 'views.show_context'),
 )
 
-urlpatterns = patterns('',
+urlpatterns += patterns('',
 	(r'search', include('plugins.search.urls')),
 )
 
