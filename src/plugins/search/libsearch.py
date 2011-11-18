@@ -3,7 +3,7 @@
 import re, os
 
 def make_regexp(search_pattern):
-	return re.compile(r'((?:[^\n]*)(?:\n?)(?:[^\n]*)(?:\n?)(?:[^\n]*?)'+ search_pattern +r'(?:[^\n]*)(?:\n?)(?:[^\n]*)(?:\n?)(?:[^\n]*))');
+	return re.compile(r'('+ search_pattern +r')');
 
 def search_in_file(filepath, search_pattern):
 	regexp = make_regexp( search_pattern )
@@ -15,11 +15,12 @@ def search_in_file(filepath, search_pattern):
 	all_results = []
 
 	for match in matches:
-		lines = ''.join(match.group(0))
 		start = match.start()
-		lineno = filecontent.count('\n', 0, start) + 1
+		lineno = filecontent.count('\n', 0, start)
+		if lineno > 0: lineno -= 1
+		lines = filecontent.replace('\r','').split('\n')[lineno: lineno+3]
 		match_result = []
-		for line in lines.replace('\r','').split('\n'):
+		for line in lines:
 
 			highlight = re.search( search_pattern, line )
 			if highlight: highlight = highlight.group(0)
