@@ -24,6 +24,7 @@ urlpatterns = patterns('',
 	(r'^actions/remove/$', 'views.removeObject'),
 	(r'^actions/suite/enumerate/$', 'views.enumerate_suites'),
 	(r'^(?P<path>.*)/show_context[/]?$', 'views.show_context'),
+	(r'^settings[/]?$', 'views.live_settings_view'),
 )
 
 urlpatterns += patterns('',

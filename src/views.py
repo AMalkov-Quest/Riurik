@@ -19,6 +19,7 @@ import contrib
 import urllib, urllib2
 import codecs, time
 import os
+import live_settings
 
 def error_handler(fn):
 	def _f(*args, **kwargs):
@@ -164,7 +165,8 @@ def get_dir_index(document_root, path, fullpath):
 
 	if not document_root:
 		pagetype = 'front-page' 
-		for key in settings.VIRTUAL_PATHS:
+		reload(live_settings)
+		for key in live_settings.VIRTUAL_PATHS:
 			dir = get_descriptor(key)
 			dirs.append(dir)
 	else:
@@ -295,6 +297,9 @@ def createTest(request, fullpath):
 	
 @add_fullpath
 def saveTest(request, fullpath):
+	print 'saving', fullpath
+	if fullpath == 'settings':
+		fullpath = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'live_settings.py')
 	url = request.POST["url"].lstrip('/')
 	stub(url, request)
 	result = tools.savetest(request.POST["content"], fullpath)
@@ -598,3 +603,27 @@ def getOpenedFiles(request, clean=False):
 			except:
 				pass
 	return files
+
+def live_settings_view(request):
+	settings_fullpath = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'live_settings.py')
+	content = open(settings_fullpath, 'r').read()
+	print content
+	descriptor = {
+		'directory': '/settings',
+		'content': content,
+		'contexts': [],
+		'relative_file_path': 'settings',
+		'is_stubbed': False,
+		'favicon'   : 'dir-index-test.gif',
+		'filetype':  tools.get_type(settings_fullpath),
+	}
+	return _render_to_response('editor.html', descriptor, context_instance=RequestContext(request))
+
+
+
+
+
+
+
+
+
