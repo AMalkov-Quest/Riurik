@@ -8,8 +8,7 @@
 	</style>
 	<script type="text/javascript">
 		$(function(){
-			$('#search .button').click(function(){ $('#search form').submit(); });
-			var defaultText = 'Search', inp = $('#search input');
+			var defaultText = 'Search', inp = $("#search input.text");
 			inp.val(defaultText).addClass('default')
 				.focus(function(){
 					if ( inp.val() == defaultText ) inp.val('').removeClass('default');
@@ -21,7 +20,7 @@
 	</script>
 	<form action="/search" method="GET" target="search">
 	<div class="button">&#9660;</div>
-	<input type="text" name="search_pattern" value=""/>
+	<input type="text" class="text" name="search_pattern" value=""/>
 	<input type="hidden" name="path" value="/{{ directory|strip:'/' }}" />
 	</form>
 </div>
