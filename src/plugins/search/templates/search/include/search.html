@@ -1,8 +1,27 @@
 {% load dir_index_tags %}
-<div style="float:right;">
+<div id="search" style="position: absolute; top: 50px; right: 20px;">
+	<style>
+		#search form { position: relative; }
+		#search input { width: 170px; height: 20px; background-color: white; padding: 2px 15px 2px 5px; border: 1px solid #CCC; border-radius: 3px; }
+		#search input.default { color: #ccc; }
+		#search .button { position: absolute; left: 175px; top: 1px; cursor: pointer; width: 10px; height: 10px; text-align: 0 auto; padding: 5px 2px; display: none; }
+	</style>
+	<script type="text/javascript">
+		$(function(){
+			$('#search .button').click(function(){ $('#search form').submit(); });
+			var defaultText = 'Search', inp = $('#search input');
+			inp.val(defaultText).addClass('default')
+				.focus(function(){
+					if ( inp.val() == defaultText ) inp.val('').removeClass('default');
+				})
+				.focusout(function(){
+					if ( inp.val().length == 0 ) inp.val(defaultText).addClass('default');
+				});
+		});
+	</script>
 	<form action="/search" method="GET" target="search">
+	<div class="button">&#9660;</div>
 	<input type="text" name="search_pattern" value=""/>
-	<input type="submit" name="search_do" value="Search"/>
 	<input type="hidden" name="path" value="/{{ directory|strip:'/' }}" />
 	</form>
 </div>
