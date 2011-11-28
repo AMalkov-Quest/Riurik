@@ -93,7 +93,6 @@ def serve(request, path, show_indexes=False):
 	document_root = contrib.get_document_root(path)
 	fullpath = contrib.get_full_path(document_root, path)
 	log.debug('show index of %s(%s %s)' % (fullpath, document_root, path))
-	
 	if os.path.isdir(fullpath):
 		if request.path and request.path[-1:] != '/':
 			return HttpResponseRedirect(request.path + '/')
