@@ -1,0 +1,63 @@
+{% extends 'directory-index.html' %}
+{% load highlight dict  %}
+
+{% block styles %}
+	<style>
+		.search div, .search-file span { background: none; margin: 0; padding: 0; color: black; text-decoration: none; }
+		.search .highlight { font-weight: bold; }
+		.search .lineno { color: grey; }
+		.search .delim { color: grey }
+		.search .line { color: black; white-space: nowrap;}
+	</style>
+{% endblock %}
+
+{% block search %}{% endblock %}
+
+{% block content %}
+	<div class="search">
+	{% if searches %}
+		<h1>Search results for '{{ search_pattern }}'</h1>
+		Search scope: {{ search_folder }} 
+		<ul>
+		{% for filepath in searches %} 
+			<li><a href="#{{filepath}}">{{filepath}}</a></li>
+		{% endfor %}
+		</ul>
+	{% else %}
+		<p>Nothing found for '{{ search_pattern|highlight:search_pattern }}' in '{{search_folder}}'</p>
+	{% endif  %}
+	<br/>
+	{% for filepath in searches %}
+		<br>
+		<div class="search-file">
+			<div class="filepath">
+				<a name="{{filepath}}" href="{{filepath}}" target="{{filepath}}">{{filepath}}</a>
+				&nbsp;
+				(<a href="{{filepath}}?editor" target="{{filepath}}">edit</a>)
+			</div>
+			<table>
+				<tbody>
+					{% for search in searches|dict_get:filepath %}
+					{% for line in search %}
+						<tr>
+							<td><span class="lineno">{{ line.lineno }}</span></td>
+							<td><span class="delim">:</span></td>
+							<td>
+								<span class="line">
+								{% if line.hightlight %}
+									{{ line.line|highlight:line.hightlight }}
+								{% else %}
+									{{ line.line }}
+								{% endif %}
+								</span>
+							</td>
+						</tr>
+					{% endfor %}
+					{% if not forloop.last %}<tr><td colspan="3">&nbsp;</td></tr>{% endif %}
+					{% endfor %}
+				</tbody>
+			</table>
+		</div>
+	{% endfor %}
+	</div>
+{% endblock %}

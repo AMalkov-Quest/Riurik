@@ -107,6 +107,7 @@ INSTALLED_APPS = (
 	'django.contrib.sites',
 	'django.contrib.messages',
 	'src',
+	'src.plugins.search',
 )
 
 VIRTUAL_PATHS = {
