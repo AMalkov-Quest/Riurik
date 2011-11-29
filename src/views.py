@@ -19,7 +19,7 @@ import contrib
 import urllib, urllib2
 import codecs, time
 import os
-import live_settings
+import virtual_paths 
 
 def error_handler(fn):
 	def _f(*args, **kwargs):
@@ -164,8 +164,8 @@ def get_dir_index(document_root, path, fullpath):
 
 	if not document_root:
 		pagetype = 'front-page' 
-		reload(live_settings)
-		for key in live_settings.VIRTUAL_PATHS:
+		reload(virtual_paths)
+		for key in virtual_paths.VIRTUAL_PATHS:
 			dir = get_descriptor(key)
 			dirs.append(dir)
 	else:
@@ -298,7 +298,7 @@ def createTest(request, fullpath):
 def saveTest(request, fullpath):
 	print 'saving', fullpath
 	if fullpath == 'settings':
-		fullpath = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'live_settings.py')
+		fullpath = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'virtual_paths.py')
 	url = request.POST["url"].lstrip('/')
 	stub(url, request)
 	result = tools.savetest(request.POST["content"], fullpath)
@@ -604,7 +604,7 @@ def getOpenedFiles(request, clean=False):
 	return files
 
 def live_settings_view(request):
-	settings_fullpath = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'live_settings.py')
+	settings_fullpath = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'virtual_paths.py')
 	content = open(settings_fullpath, 'r').read()
 	print content
 	descriptor = {

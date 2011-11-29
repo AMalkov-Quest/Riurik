@@ -1,5 +1,5 @@
 # coding: utf-8
-import os, re, settings, live_settings
+import os, re, settings, virtual_paths
 from logger import log
 import socket, simplejson
 
@@ -154,9 +154,9 @@ def get_virtual_root(path):
 	'some-key'
 	"""
 	if path:
-		reload(live_settings)
+		reload(virtual_paths)
 		key = path.strip('/').split('/')[0]
-		if key and key in live_settings.VIRTUAL_PATHS:
+		if key and key in virtual_paths.VIRTUAL_PATHS:
 			return key
 
 def get_document_root(path):
@@ -172,10 +172,10 @@ def get_document_root(path):
 	'/'
 	"""
 	if path:
-		reload(live_settings)
+		reload(virtual_paths)
 		key = path.strip('/').split('/')[0]
-		if key and key in live_settings.VIRTUAL_PATHS:
-			return live_settings.VIRTUAL_PATHS[key]
+		if key and key in virtual_paths.VIRTUAL_PATHS:
+			return virtual_paths.VIRTUAL_PATHS[key]
 	
 	return path
 
@@ -214,10 +214,10 @@ def get_relative_clean_path(path):
 	''
 	"""
 	if path:
-		reload(live_settings)
+		reload(virtual_paths)
 		parts = path.replace('\\', '/').strip('/').split('/', 1)
-		print parts, live_settings.VIRTUAL_PATHS
-		if parts[0] in live_settings.VIRTUAL_PATHS:
+		print parts, virtual_paths.VIRTUAL_PATHS
+		if parts[0] in virtual_paths.VIRTUAL_PATHS:
 			if len(parts) > 1:
 				return parts[1].strip('/')
 	return '' 
@@ -284,11 +284,11 @@ def enum_suite_tests(target):
 	return tests
 
 def patch_fullpaths(fullpath, newpath=''):
-	reload(live_settings)
-	for key in live_settings.VIRTUAL_URLS:
+	reload(virtual_paths)
+	for key in virtual_paths.VIRTUAL_URLS:
 		m = re.search('^%s(.*)$' % key, newpath)
 		if m:
-			fullpath = live_settings.VIRTUAL_URLS[key] + m.group(1)
+			fullpath = virtual_paths.VIRTUAL_URLS[key] + m.group(1)
 			return fullpath
 	
 	return fullpath
