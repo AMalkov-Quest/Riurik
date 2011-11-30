@@ -616,7 +616,7 @@ def live_settings_view(request):
 		'favicon'   : 'dir-index-test.gif',
 		'filetype':  tools.get_type(settings_fullpath),
 	}
-	return _render_to_response('editor.html', descriptor, context_instance=RequestContext(request))
+	return _render_to_response('configure.html', descriptor, context_instance=RequestContext(request))
 
 
 
