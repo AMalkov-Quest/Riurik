@@ -17,6 +17,7 @@ working_dir = os.path.dirname(os.path.abspath(__file__))
 root = os.path.normpath(os.path.dirname(working_dir))
 
 from oldsettings import *
+from virtual_paths import *
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
@@ -109,13 +110,6 @@ INSTALLED_APPS = (
 	'src',
 	'src.plugins.search',
 )
-
-VIRTUAL_PATHS = {
-    'riurik-inner-tests': os.path.join(os.path.dirname( __file__ ), 'tests', 'cases'),
-	'other-tests': os.path.join(os.path.dirname( __file__ ), 'tests-1', 'cases'),
-    #'django-app-tests': os.path.join(os.path.dirname( __file__ ), '../django_app', 'tests', 'cases'),
-	'django-app-tests': os.path.join(os.path.dirname( __file__ ), 'tests-2', 'cases'),
-}
 
 EXEC_TESTS_CMD='testsrc/execute'
 UPLOAD_TESTS_CMD='testsrc/upload'

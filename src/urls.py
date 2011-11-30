@@ -32,7 +32,7 @@ urlpatterns += patterns('',
 )
 
 urlpatterns += patterns('',
-	(r'^testsrc', include('src.tests.urls')),
+	(r'^testsrc', include(settings.tests_loader_path)),
 )
 
 urlpatterns += patterns('',

@@ -5,3 +5,5 @@ VIRTUAL_PATHS = {
   'other-tests': os.path.join(os.path.dirname( __file__ ), 'tests-1', 'cases'),
   'django-app-tests': os.path.join(os.path.dirname( __file__ ), 'tests-2', 'cases'),
 }
+
+tests_loader_path = 'src.tests.urls'
