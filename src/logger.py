@@ -1,7 +1,7 @@
 import os
 
 FILENAME = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'riurik-server.log')
-DJANGO_APP = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'django-app.log')
+DJANGO_APP = os.path.join(os.path.dirname(os.path.abspath(__file__)), '../../', 'Riurik-Django-App/django-app.log')
 timeFormat = "%Y-%m-%d %H:%M:%S"
 
 try:
