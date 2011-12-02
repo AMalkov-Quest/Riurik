@@ -5,8 +5,13 @@ import socket, simplejson
 
 def get_virtual_paths():
 	"""
+	>>> from minimock import mock
+	>>> mock('reload')
+	>>> virtual_paths.VIRTUAL_PATHS = {'key': 'value'}
+	>>> get_virtual_paths() #doctest: +ELLIPSIS
 	Called reload...
-	...virtual_paths...
+	...<module 'src.virtual_paths'...
+	{'key': 'value'}
 	"""
 	reload(virtual_paths)
 	return virtual_paths.VIRTUAL_PATHS
