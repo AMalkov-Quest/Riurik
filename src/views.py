@@ -336,7 +336,7 @@ def runSuite(request, fullpath):
 	contextjs = context.render(path, ctx)
 	
 	clean_path = contrib.get_relative_clean_path(path)
-	target = contrib.get_target_host(ctx, request.get_host())
+	target = contrib.get_runner_url(ctx, request.get_host())
 	log.info('target of suite %s is %s' % (clean_path, target))
 
 	if contrib.target_is_remote( target, request.get_host()):
@@ -364,7 +364,7 @@ def runTest(request, fullpath):
 	log.debug('contextJS: '+ contextjs)
 
 	clean_path = contrib.get_relative_clean_path(path)
-	target = contrib.get_target_host(ctx, request.get_host())
+	target = contrib.get_runner_url(ctx, request.get_host())
 	log.info('target of test %s is %s' % (clean_path, target))
 	
 	test_content = request.REQUEST.get('content', None)

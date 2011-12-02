@@ -32,21 +32,7 @@ asyncTest('No test content specified for upload', function() {
   });
 });
 
-/*
-// I DON'T KNOW HOW TO TEST, NEED TO SET DJANGO VARIABLE
-asyncTest('Invalid document_root', function() {
-  var path = 'document_root_test.js', content = 'document_root';
-  $.when( frame.go( contexter.URL(context, context.upload+'?path='+path+'&content='+content) ) ).then(function(_$) {
-    equal(_$('h1').text(), 'Error occured', 'Title is "Error occured"');
-    equal(_$('.type').not('.header').text(), 'InvalidDocumentRoot', 'Error type is "InvalidDocumentRoot"');
-    equal(_$('.message').not('.header').text(), '', 'Message argument is empty');
-    QUnit.substring(_$('.issue').not('.header').text(), 'Folder document_root "', 'Folder document_root "');
-    QUnit.substring(_$('.issue').not('.header').text(), '" does not exists or invalid', '" does not exists or invalid');
-    equal(_$('.stack').not('.header').text(), '', 'Stack is empty');
-    start();
-  });
-});
-*/
+
 asyncTest('Error while creating folders while uploading', function() {
   var folder = '/1234/567';
   var path = folder+'/1.js', content = 'abcd';

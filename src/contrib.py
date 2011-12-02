@@ -3,6 +3,13 @@ import os, re, settings, virtual_paths
 from logger import log
 import socket, simplejson
 
+def get_virtual_paths():
+	"""
+	Called reload...
+	...virtual_paths...
+	"""
+	reload(virtual_paths)
+	return virtual_paths.VIRTUAL_PATHS
 
 def target_is_remote(target, host):
 	"""
@@ -111,30 +118,32 @@ def convert_dict_values_strings_to_unicode(obj):
 			obj[key] = val.encode('utf-8')
 	return obj
 
-
-def get_target_host(context, riurik_url):
+def get_runner_url(context, riurik_url):
 	"""
-	returns http url of target lab to run tests on by host and port values in a context
-	if these values in the context are empry it returns None
-	if host is localhost it returns resolved name
-	>>> get_target_host({}, 'spb123:8000')
+	returns url of the riurik runner to execute tests by host and port values in a context
+	if these values in the context are empty it returns default value: url of the riurik server
+	if host value is localhost it is replaced by resolved name
+	>>> get_runner_url({}, 'spb123:8000')
 	'spb123:8000'
-	>>> get_target_host({'host': 'host-1'}, 'spb123:8000')	
+	>>> get_runner_url({'host': 'host-1'}, 'spb123:8000')	
 	'spb123:8000'
-	>>> get_target_host({'port': 'port-1'}, 'spb123:8000')	
+	>>> get_runner_url({'port': 'port-1'}, 'spb123:8000')	
 	'spb123:8000'
-	>>> get_target_host({'host': 'google.com', 'port': '22'}, 'localhost:8000')	
+	>>> get_runner_url({'host': 'google.com', 'port': '22'}, 'localhost:8000')	
 	'google.com:22'
 	>>> from minimock import mock
 	>>> import os
 	>>> mock('socket.gethostname', returns='google.com')
-	>>> get_target_host({'host': 'localhost', 'port': '22'}, 'localhost:8000')	
+	>>> get_runner_url({'host': 'localhost', 'port': '22'}, 'localhost:8000')	
 	Called socket.gethostname()
 	'google.com:22'
-	>>> get_target_host({'port': '22'}, 'localhost:22')
+	>>> get_runner_url({'port': '22'}, 'localhost:22')
 	Called socket.gethostname()
 	'google.com:22'
 	"""
+	return get_target_host_impl(context, riurik_url)
+
+def get_target_host_impl(context, riurik_url):
 	def replace_localhost(url):
 		return url.replace('localhost', socket.gethostname())
 
@@ -149,19 +158,20 @@ def get_target_host(context, riurik_url):
 
 def get_virtual_root(path):
 	"""
-	>>> settings.VIRTUAL_PATHS['some-key'] = 'some-value'
+	>>> import test 
+	>>> test.stub('get_virtual_paths', returns={'some-key': 'some-value'})
 	>>> get_virtual_root('/some-key/test-1')
 	'some-key'
 	"""
 	if path:
-		reload(virtual_paths)
 		key = path.strip('/').split('/')[0]
-		if key and key in virtual_paths.VIRTUAL_PATHS:
+		if key and key in get_virtual_paths():
 			return key
 
 def get_document_root(path):
 	"""
-	>>> settings.VIRTUAL_PATHS['some-key'] = 'some-value'
+	>>> import test
+	>>> test.stub('get_virtual_paths', returns={'some-key': 'some-value'})
 	>>> get_document_root('/some-key/test-1')
 	'some-value'
 	>>> get_document_root('some-key')
@@ -174,13 +184,16 @@ def get_document_root(path):
 	if path:
 		reload(virtual_paths)
 		key = path.strip('/').split('/')[0]
-		if key and key in virtual_paths.VIRTUAL_PATHS:
-			return virtual_paths.VIRTUAL_PATHS[key]
+		vpaths = get_virtual_paths()
+		if key and key in vpaths:
+			return vpaths[key]
 	
 	return path
 
 def get_full_path(document_root, path):
 	"""
+	>>> import test
+	>>> test.stub('get_virtual_paths', returns={'tests-1': 'C:\\dir-1'})
 	>>> settings.VIRTUAL_PATHS['tests-1'] = 'C:\\dir-1'
 	>>> get_full_path('/dir/dir-1', '')
 	'/dir/dir-1'
@@ -195,29 +208,27 @@ def get_full_path(document_root, path):
 	"""
 	log.debug('get full path %s %s' % (document_root, path))
 	newpath = get_relative_clean_path(path)
-	print newpath
 	return os.path.normpath(os.path.join(document_root, newpath))
 
 def get_relative_clean_path(path):
 	"""
 	removes virtal folder from path
-	>>> settings.VIRTUAL_PATHS['tests-1'] = '/src/tests/cases'
-	>>> get_relative_clean_path('tests-1/main/case-1')
+	>>> import test 
+	>>> test.stub('get_virtual_paths', returns={'tests-1': '/src/tests/cases'})
+	>>> get_relative_clean_path('tests-1/main/case-1') 
 	'main/case-1'
 	>>> get_relative_clean_path('tests-1/main/')
 	'main'
-	>>> get_relative_clean_path('')
-	''
 	>>> get_relative_clean_path('/')
 	''
-	>>> get_relative_clean_path('main/case-1')
+	>>> get_relative_clean_path('')
+	''
+	>>> get_relative_clean_path('main/case-1') 
 	''
 	"""
 	if path:
-		reload(virtual_paths)
 		parts = path.replace('\\', '/').strip('/').split('/', 1)
-		print parts, virtual_paths.VIRTUAL_PATHS
-		if parts[0] in virtual_paths.VIRTUAL_PATHS:
+		if parts[0] in get_virtual_paths():
 			if len(parts) > 1:
 				return parts[1].strip('/')
 	return '' 
