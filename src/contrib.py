@@ -1,7 +1,7 @@
 # coding: utf-8
 import os, re, settings, virtual_paths
 from logger import log
-import socket, simplejson
+import socket
 
 def get_virtual_paths():
 	"""
@@ -33,30 +33,6 @@ def target_is_remote(target, host):
 			return True
 	
 	return False
-
-def get_libraries__(context):
-	try:
-		libs = context.get('libraries', '[]')
-		return simplejson.loads(libs)
-	except:
-		return get_libraries_new(context)
-
-def get_libraries___(context):
-	"""
-	>>> get_libraries___({})
-	[]
-	>>> get_libraries___({'libraries': 'lib1, lib2'})
-	['lib1', 'lib2']
-	>>> get_libraries___({'libraries': '[]'})
-	"""
-	libs = context.get('libraries', None)
-	if libs and libs == '[]':
-		return None
-	
-	if libs:
-		return [lib.strip() for lib in libs.split(',')]
-	else:
-		return []
 
 def get_libraries(path, context):
 	return get_libraries_impl(path, context.items(), context)
