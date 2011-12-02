@@ -1,0 +1,11 @@
+{% extends 'editor.html' %}
+
+{% block context-btn %}{% endblock %}
+{% block title %}<p class="breadcrumbs">configure <a href="/"><img height="11" src="/static/img/up.png"></a></p>{% endblock title %}
+{% block content %}
+	{% if error %}
+		<style>p.error { color: red; font-weight: bold; }</style>
+		<p class="error">{{ error|upper }}</p>
+	{% endif %}
+	{{ block.super }}
+{% endblock content %}

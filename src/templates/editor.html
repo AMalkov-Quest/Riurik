@@ -81,19 +81,23 @@
 	     });
 
 		 {% if not is_stubbed %}
-         $('#save').click(function(){ 
-			var context = $('select[name=context]').val();
-			try { $.cookie('last_context', context); } catch (e) { console.log(e); }
-		    	$('#apply-test').attr('action', '/actions/test/save/').removeAttr('target');
-			$('#apply-test').submit(); 
-		    });
+			$('#save').click(function(){ 
+				var context = $('select[name=context]').val();
+				try { $.cookie('last_context', context); } catch (e) { console.log(e); }
+				if ( $('#apply-test input[name=url]').val().indexOf('/settings') == 0 ) {
+					$('#apply-test').attr('action', '/settings/save/').removeAttr('target');
+				} else {
+				    $('#apply-test').attr('action', '/actions/test/save/').removeAttr('target');
+				}
+				$('#apply-test').submit(); 
+			});
             var ticks = 0;
             var savingDraft = false;
             var saveDraft = function(){
-		console.log('saveDraft called')
+				console.log('saveDraft called')
                 if ( savingDraft === false ) {
                     var new_value = editor.getCode();
-		    $('#save').addClass('disabled');
+					$('#save').addClass('disabled');
                     savingDraft = true;
                     ticks = 0;
                     $.post(
@@ -183,7 +187,9 @@
 		<li><a id="run" href="javascript:void(0);">{% trans "Run" %}</a>
 		at <select name="context">{% for item in contexts %}<option value='{{item}}'{% if forloop.first %} selected="selected"{% endif %}>{{item}}</option>{% endfor %}</select></li>
 		{% endif %}
+		{% block context-btn %}
 		<li><a id="context-preview-ctrl" href=".context.ini" rel='context-preview'>{% trans "Context" %}</a></li>
+		{% endblock context-btn %}
 		{% endifequal %}
 		<li><a id="save" href="javascript:void(0);">{% trans "Save" %}</a></li>
 		<li><a id="discard" href="javascript: void(0);">{% trans "Discard" %}</a></li>
