@@ -104,14 +104,13 @@ def get_runner_url(context, riurik_url):
 	returns url of the riurik runner to execute tests by host and port values in a context
 	if these values in the context are empty it returns default value: url of the riurik server
 	if host value is localhost it is replaced by resolved name
+	if the use_local_runner option is defined in the context it returns url of the riurik server
 	>>> get_runner_url({}, 'spb123:8000')
-	'spb123:8000'
-	>>> get_runner_url({'host': 'host-1'}, 'spb123:8000')	
-	'spb123:8000'
-	>>> get_runner_url({'port': 'port-1'}, 'spb123:8000')	
 	'spb123:8000'
 	>>> get_runner_url({'host': 'google.com', 'port': '22'}, 'localhost:8000')	
 	'google.com:22'
+	>>> get_runner_url({'host': 'google.com', 'port': '22', 'use_local_runner': True}, 'spb123:8010')	
+	'spb123:8010'
 	>>> from minimock import mock
 	>>> import os
 	>>> mock('socket.gethostname', returns='google.com')
@@ -122,20 +121,37 @@ def get_runner_url(context, riurik_url):
 	Called socket.gethostname()
 	'google.com:22'
 	"""
-	return get_target_host_impl(context, riurik_url)
-
-def get_target_host_impl(context, riurik_url):
 	def replace_localhost(url):
 		return url.replace('localhost', socket.gethostname())
+	
+	use_local_runner = context.get('use_local_runner')
+	remote_runner_url = get_runner_from_context(context)
+	if use_local_runner or not remote_runner_url:
+		target = riurik_url
+	else:
+		target = remote_runner_url
 
+	return replace_localhost(target)
+
+def get_runner_from_context(context):
+	"""
+	>>> get_runner_from_context({})
+	
+	>>> get_runner_from_context({'host': 'host-1'})	
+	
+	>>> get_runner_from_context({'port': 'port-1'})	
+	
+	>>> get_runner_from_context({'host': 'google.com', 'port': '22'})	
+	'google.com:22'
+	"""
 	host = context.get('host')
 	port = context.get('port')
 	if host and port:
 		target = '%s:%s' % (host, port)
 	else:
-		target = riurik_url
+		target = None
 
-	return replace_localhost(target)
+	return target
 
 def get_virtual_root(path):
 	"""
