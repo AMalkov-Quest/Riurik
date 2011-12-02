@@ -1,4 +1,5 @@
 {% load dir_index_tags %}
+{% ifnotequal directory '/' %}
 <div id="search" style="position: absolute; top: 50px; right: 20px;">
 	<style>
 		#search form { position: relative; }
@@ -24,4 +25,4 @@
 	<input type="hidden" name="path" value="/{{ directory|strip:'/' }}" />
 	</form>
 </div>
-
+{% endifnotequal %}
