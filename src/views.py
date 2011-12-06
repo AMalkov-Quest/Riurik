@@ -604,8 +604,12 @@ def getOpenedFiles(request, clean=False):
 	return files
 
 def live_settings_view(request):
+	return _render_to_response('configure.html', live_settings_json(request), context_instance=RequestContext(request))
+
+def live_settings_json(request, content=None):
 	settings_fullpath = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'virtual_paths.py')
-	content = open(settings_fullpath, 'r').read()
+	if not content:
+		content = open(settings_fullpath, 'r').read()
 	print content
 	descriptor = {
 		'directory': '/settings',
@@ -616,7 +620,43 @@ def live_settings_view(request):
 		'favicon'   : 'dir-index-test.gif',
 		'filetype':  tools.get_type(settings_fullpath),
 	}
-	return _render_to_response('editor.html', descriptor, context_instance=RequestContext(request))
+	return descriptor
+
+def live_settings_save(request):
+	fullpath = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'virtual_paths.py')
+	url = request.POST["url"].lstrip('/')
+	stub(url, request)
+
+	content = request.POST["content"]
+	
+	def saveTemp(content):
+		import tempfile
+		handle, path = tempfile.mkstemp(suffix='.py', text=True)
+		f = open(path, 'w')
+		f.write(content)
+		f.close()
+		return path
+
+	def checkSyntax(content):
+		import os, py_compile
+		path = saveTemp(content)
+		try:
+			py_compile.compile(path, path+'c', path+'d', True)
+			return True
+		except:
+			return False
+		finally:
+			if os.path.exists(path): os.remove(path)
+			if os.path.exists(path+'c'): os.remove(path+'c')
+			if os.path.exists(path+'d'): os.remove(path+'d')
+
+	if not checkSyntax( content ):
+		descriptor = live_settings_json(request, content)
+		descriptor.update({ 'error': 'File got a syntax error' })
+		return _render_to_response('configure.html', descriptor, context_instance=RequestContext(request))
+
+	result = tools.savetest(request.POST["content"], fullpath)
+	return HttpResponseRedirect('/settings')
 
 
 
