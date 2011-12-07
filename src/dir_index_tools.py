@@ -135,7 +135,6 @@ def savetmptest(content, fullpath):
 	return False
 	
 def savetest(content, fullpath):
-	print content, fullpath
 	try:
 		swpname = savetmptest(content, fullpath)
 		if swpname:
