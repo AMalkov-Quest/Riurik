@@ -91,7 +91,6 @@ ROOT_URLCONF = 'urls'
 TEMPLATE_DIRS = (
 
     os.path.join(os.path.dirname( __file__ ), 'templates'),
-    os.path.join(os.path.dirname( __file__ ), 'tests'),
 )
 
 TEMPLATE_CONTEXT_PROCESSORS = (
