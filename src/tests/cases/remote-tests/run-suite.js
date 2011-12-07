@@ -51,6 +51,9 @@ asyncTest('suite is executed on remote server', function() {
     
     regex = new RegExp('save script '.concat(clean_suite_path, '/', context.test2_name));
     ok(regex.test(logs), regex);
+    
+    regex = new RegExp('execute suite ' + clean_suite_path);
+    ok(regex.test(logs), regex);
 
     start();
   })
