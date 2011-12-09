@@ -343,6 +343,7 @@ def runSuite(request, fullpath):
 		url = "http://%s/%s" % (target, settings.UPLOAD_TESTS_CMD)
 		saveRemoteContext(clean_path, contextjs, url, ctx)
 		saveSuiteAllTests(url, path, ctx)
+		saveTestSatelliteScripts(url, path, ctx)
 		url = "http://%s/%s?suite=/%s" % ( target, settings.EXEC_TESTS_CMD, clean_path )
 	else:
 		saveLocalContext(fullpath, contextjs)
