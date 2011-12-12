@@ -29,7 +29,7 @@ urlpatterns = patterns('',
 )
 
 urlpatterns += patterns('',
-	(r'search', include('plugins.search.urls')),
+	(r'^search', include('plugins.search.urls')),
 )
 
 urlpatterns += patterns('',
