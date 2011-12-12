@@ -1,11 +1,6 @@
-module( 'Search UI test' );
+module( 'search UI' );
 
-QUnit.setup( function() {
-
-    context.start = getLogs('last');
-});
-
-asyncTest( 'Test root page', function() {
+asyncTest( 'root page should not have search', function() {
 
   context.url = contexter.URL( context, '' );
   QUnit.log( 'Root URL: ' + context.url );
@@ -19,7 +14,7 @@ asyncTest( 'Test root page', function() {
   });
 });
 
-asyncTest( 'Test virtual folder', function() {
+asyncTest( 'search is available inside virtual folder', function() {
 
   context.url = contexter.URL( context, context.virtual_root );
   QUnit.log( 'Virtual folder URL: ' + context.url );

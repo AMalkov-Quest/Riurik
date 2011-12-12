@@ -1,16 +1,15 @@
-module( 'Search Test' );
+module( 'search in tests' );
 
-QUnit.asyncSetup( function() {
-
-  create_test( context.test_name, context.suite_path );
-  context.test_path = context.suite_path + '/' + context.test_name;
-
-  write_test( context.test_path, context.test_content );
-
-  start();
+QUnit.setup( function() {
+  with(context) {
+    context.suite_path = root.concat('/', suite_name);
+    context.test_path = suite_path + '/' + test_name;
+    create_test( test_name, suite_path );
+    write_test( test_path, test_content );
+  }
 });
                  
-asyncTest( 'Test regular search pattern', function() {
+asyncTest( 'using just string search pattern', function() {
 
   context.url_tail = 'search?search_pattern=' + encodeURIComponent( context.search_pattern ) + '&path=' + escape( context.suite_path );
   context.url = contexter.URL( context, context.url_tail );
@@ -27,7 +26,7 @@ asyncTest( 'Test regular search pattern', function() {
   });
 });
 
-asyncTest( 'Test RegExp search pattern', function() {
+asyncTest( 'using RegExp search pattern', function() {
 
   context.url_tail = 'search?search_pattern=' + encodeURIComponent( context.search_regexp_pattern ) + '&path=' + escape( context.suite_path );
   context.url = contexter.URL( context, context.url_tail );
@@ -46,7 +45,5 @@ asyncTest( 'Test RegExp search pattern', function() {
 });
 
 QUnit.teardown( function() {
-
   delete_test( context.test_path );
 });
-
