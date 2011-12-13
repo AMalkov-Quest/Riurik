@@ -34,7 +34,7 @@ def render(path, ctx):
 			{% endfor %}
 		};
 	""")
-	c = Context();
+	c = Context()
 	c['options'] = []
 	for name, value in vars:
 		c['options'] += [ (name, value,), ]
@@ -53,40 +53,26 @@ def render_ini(path, ctx, section_name='default'):
 		c['options'] += [ (name, value, hasattr(value, 'comment')), ]
 	return t.render(c)
 
-def patch_libraries(path, vars, ctx):
-	libraries = contrib.get_libraries_impl(path, vars, ctx)
+def patch_libraries(path, ctximpl, ctx):
+	libraries = contrib.get_libraries_impl(path, ctximpl.as_items(), ctx)
 	log.info('libs are %s' % libraries)
 	if libraries != None:
-		vars_as_list = [var for var in list(vars) if var[0] != settings.LIB_KEY_NAME]
-		return tuple(vars_as_list + [ (settings.LIB_KEY_NAME, str(libraries).replace('\'','\"')) ])
+		ctximpl.remove(settings.LIB_KEY_NAME)
+		ctximpl.add(settings.LIB_KEY_NAME, str(libraries).replace('\'','\"'))
 
-	return vars
+	return ctximpl
 
-def start_time(vars):
-	vars = list(vars)
+def start_time(ctximpl):
 	import time
 	now = time.localtime(time.time())
-	vars.append(('test_start_time', time.mktime(now)))
-	return tuple(vars)
+	ctximpl.append(('test_start_time', time.mktime(now)))
+	return ctximpl
 
 def patch(path, ctx):
-	vars = ctx.items()
-	hasInclude = False
-	hasExclude = False
-	localhost = False
-	for i,v in vars:
-		if i == 'include':
-			hasInclude = True
-
-		if i == 'exclude':
-			hasExclude = True
-
-		if i == 'host' and v == 'localhost':
-			localhost = True
-
-	if not hasInclude:
+	ctximpl = contrib.context_impl(ctx.items())
+	if not ctximpl.hasInclude:
 		exclude = []
-		if hasExclude:
+		if ctximpl.hasExclude:
 			exclude = contrib.loadListFromString(ctx.get( option='exclude' ))
 		include = []
 		for root, dirs, files in os.walk(ctx.get_folder()):
@@ -97,19 +83,18 @@ def patch(path, ctx):
 					file_abspath = os.path.abspath(os.path.join(root, file))
 					file_relpath = file_abspath.replace(os.path.abspath(ctx.get_folder()), '').lstrip('/').lstrip('\\')
 					include += [ str(file_relpath) ]
-		vars = tuple(list(vars) + [ (settings.INCLUDE_KEY, str(include).replace('\'','\"')) ])
 	else:
 		include = contrib.loadListFromString(ctx.get( option=settings.INCLUDE_KEY ))
-		vars = tuple(list(vars) + [ (settings.INCLUDE_KEY, str(include).replace('\'','\"')) ])
 
-	vars = patch_libraries(path, vars, ctx)
-	vars = start_time(vars)
-	if localhost:
-		vars = list(vars)
-		vars.remove(('host', 'localhost'))
-		vars = tuple( vars + [ ('host', socket.gethostname()) ] )
+	ctximpl.add(settings.INCLUDE_KEY, str(include).replace('\'','\"'))
 
-	return vars
+	ctximpl = patch_libraries(path, ctximpl, ctx)
+	ctximpl = start_time(ctximpl)
+	if ctximpl.localhost:
+		ctximpl.rm(('host', 'localhost'))
+		ctximpl.add('host', socket.gethostname())
+
+	return ctximpl.as_tuple()
 
 class global_settings(object):
 	comment = 'from global settings'

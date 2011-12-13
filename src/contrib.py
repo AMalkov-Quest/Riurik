@@ -5,11 +5,15 @@ import socket
 
 class context_impl(object):
 
+	hasInclude = False
+	localhost = False
+	hasExclude = False
+
 	def __init__(self, items):
 		self.items = items
-
+		self.items_as_list = list(self.items)
 		for i, v in self.items:
-			if i == 'include':
+			if i == settings.INCLUDE_KEY:
 				self.hasInclude = True
 
 			if i == 'exclude':
@@ -19,8 +23,27 @@ class context_impl(object):
 				self.localhost = True
 
 
-	def add(self, new_items):
-		pass
+	def add(self, key, new_items):
+		new_items_as_list = [ (key, new_items) ]
+		self.items_as_list += new_items_as_list
+
+	def append(self, kv_pair):
+		self.items_as_list.append(kv_pair)
+
+	def remove(self, key):
+		self.items_as_list = [item for item in self.items_as_list if item[0] != key]
+
+	def rm(self, kv_pair):
+		self.items_as_list.remove(kv_pair)
+
+	def as_items(self):
+		return self.items
+
+	def as_list(self):
+		return self.items_as_list
+
+	def as_tuple(self):
+		return tuple(self.items_as_list)
 
 def get_virtual_paths():
 	"""
