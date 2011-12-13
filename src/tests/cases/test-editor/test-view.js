@@ -89,18 +89,3 @@ asyncTest('Save button sends a valid request', function(){
     simulateClick('save', 'click');
   });
 });
-
-asyncTest('editor with .context.ini file', function(){
-  $.when( frame.go(contexter.URL(context, context.ini_path))).then(function(_$){
-    ok( ! _$('a#run').is(':visible'), 'Run button is NOT visible' );
-    ok( ! _$('a#context-preview-ctrl').is(':visible'), 'Context button is NOT visible' );
-    ok(_$('select[name=context]').length == 1, 'context select exists');
-    ok(_$('select[name=context] option[value=context-1]').length == 1, 'first context option exists');
-    ok(_$('select[name=context] option[value=context-2]').length == 1, 'second context option exists');
-    
-    ok( _$('a#save').is(':visible'), 'Save button is visible' );
-    ok( _$('a#discard').is(':visible'), 'Discard button is visible' );
-    ok( _$('a#close').is(':visible'), 'Close button is visible' );
-    start();
-  });
-});
