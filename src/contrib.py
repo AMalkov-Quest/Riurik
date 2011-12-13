@@ -3,6 +3,25 @@ import os, re, settings, virtual_paths
 from logger import log
 import socket
 
+class context_impl(object):
+
+	def __init__(self, items):
+		self.items = items
+
+		for i, v in self.items:
+			if i == 'include':
+				self.hasInclude = True
+
+			if i == 'exclude':
+				self.hasExclude = True
+
+			if i == 'host' and v == 'localhost':
+				self.localhost = True
+
+
+	def add(self, new_items):
+		pass
+
 def get_virtual_paths():
 	"""
 	>>> from minimock import mock
@@ -31,7 +50,7 @@ def target_is_remote(target, host):
 		and not 'localhost' in host and	\
 		host.lower() != target.lower():
 			return True
-	
+
 	return False
 
 def get_libraries(path, context):
@@ -39,7 +58,7 @@ def get_libraries(path, context):
 
 def get_libraries_impl(path, vars, ctx):
 	libraries = []
-	
+
 	libs = get_libraries_raw(vars)
 	root = get_document_root(path)
 	log.info('libs are %s' % libs)
@@ -52,7 +71,10 @@ def get_libraries_impl(path, vars, ctx):
 			log.info('there are no precofigured libs to include, try defaults ...')
 			libraries = libraries_default(root, ctx)
 
-	return libraries 
+	return libraries
+
+def loadListFromString(source):
+	return [item.strip() for item in source.split(',')]
 
 def get_libraries_raw(vars):
 	"""
@@ -80,13 +102,13 @@ def libraries_default(root, ctx):
 		full_path = os.path.abspath(os.path.join(root, path.strip()))
 		for name in os.listdir(full_path):
 			lib_path = os.path.abspath(os.path.join(full_path, name))
-			lib_relpath = lib_path.replace(root, '').lstrip('/') 
+			lib_relpath = lib_path.replace(root, '').lstrip('/')
 			libraries.append(str(lib_relpath))
-	
+
 	lib_relpath = get_local_lib_path(root, 'library.js', ctx)
 	if lib_relpath:
 		libraries.append(lib_relpath)
-	
+
 	return libraries
 
 def convert_dict_values_strings_to_unicode(obj):
@@ -107,14 +129,14 @@ def get_runner_url(context, riurik_url):
 	if the use_local_runner option is defined in the context it returns url of the riurik server
 	>>> get_runner_url({}, 'spb123:8000')
 	'spb123:8000'
-	>>> get_runner_url({'host': 'google.com', 'port': '22'}, 'localhost:8000')	
+	>>> get_runner_url({'host': 'google.com', 'port': '22'}, 'localhost:8000')
 	'google.com:22'
-	>>> get_runner_url({'host': 'google.com', 'port': '22', 'use_local_runner': True}, 'spb123:8010')	
+	>>> get_runner_url({'host': 'google.com', 'port': '22', 'use_local_runner': True}, 'spb123:8010')
 	'spb123:8010'
 	>>> from minimock import mock
 	>>> import os
 	>>> mock('socket.gethostname', returns='google.com')
-	>>> get_runner_url({'host': 'localhost', 'port': '22'}, 'localhost:8000')	
+	>>> get_runner_url({'host': 'localhost', 'port': '22'}, 'localhost:8000')
 	Called socket.gethostname()
 	'google.com:22'
 	>>> get_runner_url({'port': '22'}, 'localhost:22')
@@ -123,7 +145,7 @@ def get_runner_url(context, riurik_url):
 	"""
 	def replace_localhost(url):
 		return url.replace('localhost', socket.gethostname())
-	
+
 	use_local_runner = context.get('use_local_runner')
 	remote_runner_url = get_runner_from_context(context)
 	if use_local_runner or not remote_runner_url:
@@ -136,12 +158,12 @@ def get_runner_url(context, riurik_url):
 def get_runner_from_context(context):
 	"""
 	>>> get_runner_from_context({})
-	
-	>>> get_runner_from_context({'host': 'host-1'})	
-	
-	>>> get_runner_from_context({'port': 'port-1'})	
-	
-	>>> get_runner_from_context({'host': 'google.com', 'port': '22'})	
+
+	>>> get_runner_from_context({'host': 'host-1'})
+
+	>>> get_runner_from_context({'port': 'port-1'})
+
+	>>> get_runner_from_context({'host': 'google.com', 'port': '22'})
 	'google.com:22'
 	"""
 	host = context.get('host')
@@ -155,7 +177,7 @@ def get_runner_from_context(context):
 
 def get_virtual_root(path):
 	"""
-	>>> import test 
+	>>> import test
 	>>> test.stub('get_virtual_paths', returns={'some-key': 'some-value'})
 	>>> get_virtual_root('/some-key/test-1')
 	'some-key'
@@ -184,7 +206,7 @@ def get_document_root(path):
 		vpaths = get_virtual_paths()
 		if key and key in vpaths:
 			return vpaths[key]
-	
+
 	return path
 
 def get_full_path(document_root, path):
@@ -210,9 +232,9 @@ def get_full_path(document_root, path):
 def get_relative_clean_path(path):
 	"""
 	removes virtal folder from path
-	>>> import test 
+	>>> import test
 	>>> test.stub('get_virtual_paths', returns={'tests-1': '/src/tests/cases'})
-	>>> get_relative_clean_path('tests-1/main/case-1') 
+	>>> get_relative_clean_path('tests-1/main/case-1')
 	'main/case-1'
 	>>> get_relative_clean_path('tests-1/main/')
 	'main'
@@ -220,7 +242,7 @@ def get_relative_clean_path(path):
 	''
 	>>> get_relative_clean_path('')
 	''
-	>>> get_relative_clean_path('main/case-1') 
+	>>> get_relative_clean_path('main/case-1')
 	''
 	"""
 	if path:
@@ -228,7 +250,7 @@ def get_relative_clean_path(path):
 		if parts[0] in get_virtual_paths():
 			if len(parts) > 1:
 				return parts[1].strip('/')
-	return '' 
+	return ''
 
 def get_global_context_lib_path(ctx):
 	"""
@@ -242,7 +264,7 @@ def get_global_context_lib_path(ctx):
 	path = ctx.get( 'LIBRARY_PATH' )
 	if path:
 		return [path.strip() for path in path.split(',')]
-	
+
 	return []
 
 def get_local_lib_path(root, lib, ctx):
@@ -252,7 +274,7 @@ def get_local_lib_path(root, lib, ctx):
 		return str(current_suite_path.replace(root, '').lstrip('/'))
 
 	return ''
-	
+
 def get_lib_path_by_name(root, lib, ctx):
 	full_path = os.path.abspath(os.path.join(root, lib))
 	lib_relpath = ''
@@ -270,12 +292,12 @@ def get_lib_path_by_name(root, lib, ctx):
 					log.info('%s lib is located in the %s global library path' % (lib, path))
 					lib_relpath = global_libs_path.replace(root, '')
 					break
-			
+
 			if not lib_relpath:
 				log.error('%s lib is not found in any available library paths' % lib)
 	else:
 		lib_relpath = lib
-	
+
 	return str(lib_relpath.lstrip('\\').lstrip('/'))
 
 def enum_suite_tests(target):
@@ -298,7 +320,7 @@ def patch_fullpaths(fullpath, newpath=''):
 		if m:
 			fullpath = virtual_paths.VIRTUAL_URLS[key] + m.group(1)
 			return fullpath
-	
+
 	return fullpath
 
 def getHostByName(host, cache):
@@ -314,7 +336,7 @@ def resolveRemoteAddr(host, cache):
 		log.info('%s addr is resolved: %s' % (str(host), str(addr)))
 	else:
 		log.info('%s addr is got from cach: %s' % (str(host), str(addr)))
-		
+
 	return addr
 
 def normpath(path):

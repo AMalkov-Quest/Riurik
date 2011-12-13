@@ -4,13 +4,13 @@ import settings, config, contrib
 from django.template import Context, Template
 import socket
 from django.core.cache import cache
-		
+
 def host(instance, resolve=True):
 	key = 'host'
 	if resolve:
 		return contrib.resolveRemoteAddr(instance.get(key), cache)
 	return instance.get(key)
-		
+
 def get(name, section='default'):
 	return context(name, section)
 
@@ -46,7 +46,7 @@ def render_ini(path, ctx, section_name='default'):
 [{{ section }}]
 {% for option in options %}{{ option.0 }} = {{ option.1|json }}{% if option.2 %} ; {{ option.2 }}{% endif %}
 {% endfor %}""")
-	c = Context();
+	c = Context()
 	c['section'] = section_name
 	c['options'] = []
 	for name, value in vars:
@@ -77,17 +77,17 @@ def patch(path, ctx):
 	for i,v in vars:
 		if i == 'include':
 			hasInclude = True
-		
+
 		if i == 'exclude':
 			hasExclude = True
-			
+
 		if i == 'host' and v == 'localhost':
 			localhost = True
-			
+
 	if not hasInclude:
 		exclude = []
 		if hasExclude:
-			exclude = simplejson.loads(ctx.get( option='exclude' ))
+			exclude = contrib.loadListFromString(ctx.get( option='exclude' ))
 		include = []
 		for root, dirs, files in os.walk(ctx.get_folder()):
 			for file in files:
@@ -97,8 +97,11 @@ def patch(path, ctx):
 					file_abspath = os.path.abspath(os.path.join(root, file))
 					file_relpath = file_abspath.replace(os.path.abspath(ctx.get_folder()), '').lstrip('/').lstrip('\\')
 					include += [ str(file_relpath) ]
-		vars = tuple(list(vars) + [ ('include', str(include).replace('\'','\"')) ])
-		
+		vars = tuple(list(vars) + [ (settings.INCLUDE_KEY, str(include).replace('\'','\"')) ])
+	else:
+		include = contrib.loadListFromString(ctx.get( option=settings.INCLUDE_KEY ))
+		vars = tuple(list(vars) + [ (settings.INCLUDE_KEY, str(include).replace('\'','\"')) ])
+
 	vars = patch_libraries(path, vars, ctx)
 	vars = start_time(vars)
 	if localhost:
@@ -118,15 +121,15 @@ class global_settings(object):
 			if virtpath in path:
 				self.inifile = os.path.join(virtpath, '.settings.ini')
 		self.section = section
-	
+
 	def get(self, option, default=None):
 		value = config.get(self.inifile, self.section, option)
 		log.debug('get context option: %s=%s from %s' % (option, value, self.inifile))
 		if not value:
 			value = default
-		
+
 		return value
-	
+
 	def set(self, option, value):
 		config.set(self.inifile, self.section, option, value)
 		log.debug('set context option: %s=%s' % (option, value))
@@ -134,16 +137,16 @@ class global_settings(object):
 	def items(self, vars=None):
 		log.debug('context get items: %s, section: %s' % (self.inifile, self.section))
 		return config.items(self.inifile, self.section, vars)
-	
+
 	def __patch_values(self, vals):
-		if not vals: return 
+		if not vals: return
 		for k, v in vals:
 			yield k,v, self.comment
 
 	def sections(self):
 		log.debug('reading sections: %s' % config.sections(self.inifile))
 		return config.sections(self.inifile)
-	
+
 	def get_folder(self):
 		return os.path.dirname(self.inifile)
 
@@ -167,7 +170,7 @@ class context(global_settings):
 		if not value:
 			value = default
 		return value
-	
+
 	def libraries(self, values):
 		gs = global_settings(self.inifile).items() or {}
 		for item in gs:
