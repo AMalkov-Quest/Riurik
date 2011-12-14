@@ -321,7 +321,7 @@ def get_lib_path_by_name(root, lib, ctx):
 	else:
 		lib_relpath = lib
 
-	return str(lib_relpath.lstrip('\\').lstrip('/'))
+	return str(lib_relpath.lstrip('\\').lstrip('/').replace('\\','/'))
 
 def enum_suite_tests(target):
 	tests = []
