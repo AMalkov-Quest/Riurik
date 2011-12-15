@@ -12,14 +12,12 @@ import django.conf
 import settings
 from logger import log
 import context, config
-import mimetypes, os, random, posixpath, re, datetime
+import mimetypes, random, posixpath, datetime
 import stat
-from email.Utils import parsedate_tz, mktime_tz
 import contrib
 import urllib, urllib2
 import codecs, time
-import os
-import virtual_paths 
+import virtual_paths
 
 def error_handler(fn):
 	def _f(*args, **kwargs):
@@ -50,11 +48,11 @@ def enumerate_suites(request):
 	from django.http import HttpResponse
 	from context import get as context_get
 	import contrib
-	
+
 	context = request.REQUEST.get('context', None)
 	json = request.REQUEST.get('json', False)
 	target = request.REQUEST.get('target', False)
-	
+
 	suites = []
 	root = contrib.get_document_root(target)
 	contextini = settings.TEST_CONTEXT_FILE_NAME
@@ -67,7 +65,7 @@ def enumerate_suites(request):
 			ctx_sections = ctx.sections()
 			if not context in ctx_sections: continue
 		suites += [ dirpath.replace(root, '').replace('\\','/').lstrip('/') ]
-	
+
 	if json:
 		import simplejson
 		return HttpResponse(simplejson.dumps(suites))
@@ -77,7 +75,7 @@ def show_context(request, path):
 	document_root = contrib.get_document_root(path)
 	fullpath = contrib.get_full_path(document_root, path)
 	log.debug('show context of %s (%s %s)' % (fullpath, document_root, path))
-	
+
 	result = ""
 
 	sections = config.sections(context.get(fullpath).inifile)
@@ -85,7 +83,7 @@ def show_context(request, path):
 		ctx = context.get(fullpath, section=section_name)
 		context_ini = context.render_ini(path, ctx, section_name)
 		result += context_ini
-	
+
 	return HttpResponse(result)
 
 
@@ -106,12 +104,12 @@ def serve(request, path, show_indexes=False):
 			open(fullpath, 'w').close() # creating file if not exists by editor opening it first time
 		else:
 			raise Http404('"%s" does not exist' % fullpath)
-	
+
 	if 'editor' in request.REQUEST:
 		descriptor = get_file_content_to_edit(path, fullpath, is_stubbed(path, request))
 		stub(path, request)
 		return _render_to_response('editor.html', descriptor, context_instance=RequestContext(request))
-	
+
 	return get_file_content(fullpath)
 
 def get_file_content_to_edit(path, fullpath, is_stubbed):
@@ -120,9 +118,9 @@ def get_file_content_to_edit(path, fullpath, is_stubbed):
 	except Exception, e:
 		log.exception(e)
 		contexts = []
-		
+
 	content = open(fullpath, 'rb').read()
-		
+
 	return {
 		'directory': path,
 		'content': content,
@@ -143,7 +141,7 @@ def get_file_content(fullpath):
 	response["Content-Length"] = len(content)
 	if encoding:
 		response["Content-Encoding"] = encoding
-	
+
 	return response
 
 def load_index_template():
@@ -151,25 +149,25 @@ def load_index_template():
 		t = loader.select_template(['directory-index.html', 'directory-index'])
 	except TemplateDoesNotExist:
 		t = Template(django.views.static.DEFAULT_DIRECTORY_INDEX_TEMPLATE, name='Default directory index template')
-		
+
 	return t
-	
+
 def get_dir_index(document_root, path, fullpath):
 	files = []
 	dirs = []
-	
+
 	def get_descriptor(title):
 		fullpath = os.path.join(path, title)
 		return { 'title': title, 'type': tools.get_type(contrib.get_full_path(document_root, fullpath)) }
 
 	if not document_root:
-		pagetype = 'front-page' 
+		pagetype = 'front-page'
 		reload(virtual_paths)
 		for key in virtual_paths.VIRTUAL_PATHS:
 			dir = get_descriptor(key)
 			dirs.append(dir)
 	else:
-		pagetype = tools.get_type(fullpath) 
+		pagetype = tools.get_type(fullpath)
 		for f in sorted(os.listdir(fullpath)):
 			if not f.startswith('.'):
 				if os.path.isfile(os.path.join(fullpath, f)):
@@ -187,9 +185,9 @@ def get_dir_index(document_root, path, fullpath):
 	except Exception, e:
 		log.error(e)
 		contexts = []
-		
+
 	favicon = 'dir-index-%s.gif' % tools.get_type(fullpath)
-	
+
 	return Context({
 		'directory' : path + '/',
 		'type'		: pagetype,
@@ -237,7 +235,7 @@ def log_errors(fn):
 		Traceback (most recent call last):
 			...
 		Exception: 10
-		
+
 	"""
 	def log_it(*args, **kwargs):
 		try:
@@ -251,10 +249,10 @@ def log_errors(fn):
 @add_fullpath
 def createFolder(request, fullpath):
 	result = tools.mkdir(fullpath, request.POST["object-name"])
-	
+
 	response = HttpResponse(mimetype='text/plain')
 	response.write(result)
-	
+
 	return response
 
 @add_fullpath
@@ -271,17 +269,17 @@ def createSuite(request, fullpath):
 	result['result'] += '?editor'
 	response = HttpResponse(mimetype='text/json')
 	response.write(simplejson.dumps(result))
-	
+
 	return response
 
-@add_fullpath	
+@add_fullpath
 def editSuite(request, fullpath):
 	log.debug('edit context %s' % fullpath)
 	if not os.path.exists(os.path.join(fullpath, settings.TEST_CONTEXT_FILE_NAME)):
 		tools.mkcontext(fullpath, settings.TEST_CONTEXT_FILE_NAME)
 	redirect = '/' + request.GET['path'] + '/' + settings.TEST_CONTEXT_FILE_NAME + '?editor'
 	return HttpResponseRedirect(redirect)
-	
+
 @add_fullpath
 def createTest(request, fullpath):
 	log.debug('createTest: '+ request.POST["object-name"])
@@ -291,9 +289,9 @@ def createTest(request, fullpath):
 	log.debug('createTest results: %s' % result)
 	response = HttpResponse(mimetype='text/json')
 	response.write(simplejson.dumps(result))
-	
+
 	return response
-	
+
 @add_fullpath
 def saveTest(request, fullpath):
 	print 'saving', fullpath
@@ -304,7 +302,7 @@ def saveTest(request, fullpath):
 	result = tools.savetest(request.POST["content"], fullpath)
 	return HttpResponseRedirect('/' + url + '?editor')
 
-@add_fullpath	
+@add_fullpath
 def saveDraftTest(request, fullpath):
 	saveTest(request)
 	return HttpResponse()
@@ -330,11 +328,11 @@ def runSuite(request, fullpath):
 	path = contrib.normpath(request.REQUEST["path"])
 	context_name = request.REQUEST["context"]
 	ctx = context.get(fullpath, section=context_name)
-	
+
 	log.info('run suite %s with context %s' % (path, context_name))
 
 	contextjs = context.render(path, ctx)
-	
+
 	clean_path = contrib.get_relative_clean_path(path)
 	target = contrib.get_runner_url(ctx, request.get_host())
 	log.info('target of suite %s is %s' % (clean_path, target))
@@ -358,19 +356,19 @@ def runTest(request, fullpath):
 	path = contrib.normpath(request.REQUEST["path"])
 	context_name = request.REQUEST.get("context", None)
 	ctx = context.get(fullpath, section=context_name)
-	
+
 	log.info('run test %s with context %s' % (path, context_name))
-	
+
 	contextjs = context.render(path, ctx)
 	log.debug('contextJS: '+ contextjs)
 
 	clean_path = contrib.get_relative_clean_path(path)
 	target = contrib.get_runner_url(ctx, request.get_host())
 	log.info('target of test %s is %s' % (clean_path, target))
-	
+
 	test_content = request.REQUEST.get('content', None)
 	tools.savetest(test_content, fullpath)
-	
+
 	if contrib.target_is_remote( target, request.get_host()):
 		log.debug('TARGET: %s, %s' % ( target, request.get_host() ))
 		url = "http://%s/%s" % (target, settings.UPLOAD_TESTS_CMD)
@@ -381,7 +379,7 @@ def runTest(request, fullpath):
 	else:
 		saveLocalContext(fullpath, contextjs)
 		url = "http://%s/%s?path=/%s" % (target, settings.EXEC_TESTS_CMD, clean_path)
-	
+
 	log.info("redirect to run test %s" % url)
 	return HttpResponseRedirect(url)
 
@@ -397,13 +395,13 @@ def saveLocalContext(fullpath, contextjs):
 def makeSaveContentPost(content, path):
 	data = {
 		'content': content,
-		'path': path 
+		'path': path
 	}
 	return contrib.convert_dict_values_strings_to_unicode(data)
-	
+
 def saveSuiteAllTests(url, path, ctx):
-	document_root = contrib.get_document_root(path) 
-	tests = contrib.enum_suite_tests( contrib.get_full_path(document_root, path) ) 
+	document_root = contrib.get_document_root(path)
+	tests = contrib.enum_suite_tests( contrib.get_full_path(document_root, path) )
 	log.info('save suite tests for: %s' % path)
 
 	for test in tests:
@@ -413,13 +411,24 @@ def saveSuiteAllTests(url, path, ctx):
 		result = uploadContentToRemote(url, fullpath, clean_path, ctx)
 		log.info("test %s is saved: %s" % (test_path, result))
 
+def saveToolsAllScripts(url, document_root, virtual_root, ctx):
+	for tools_dir in contrib.get_context_tools_folders(ctx):
+		log.info('save tools folder: %s' % tools_dir)
+		virtual_path = os.path.join(virtual_root, tools_dir)
+		tools_dir_fullpath = contrib.get_full_path(document_root, virtual_path)
+		for file_ in contrib.enum_files_in_folders(tools_dir_fullpath):
+			file_path = os.path.join(virtual_path, file_)
+			fullpath = contrib.get_full_path(document_root, file_path)
+			clean_path = contrib.get_relative_clean_path(file_path)
+			result = uploadContentToRemote(url, fullpath, clean_path, ctx)
+			log.info("tools script %s is saved: %s" % (file_path, result))
 
 def saveTestSatelliteScripts(url, path, ctx):
-	"""	
+	"""
 	uploads scripts those the test depends on
 	"""
-	document_root = contrib.get_document_root(path) 
-	virtual_root = contrib.get_virtual_root(path) 
+	document_root = contrib.get_document_root(path)
+	virtual_root = contrib.get_virtual_root(path)
 	log.info('save satellite scripts for: %s' % path)
 
 	for lib in contrib.get_libraries(path, ctx):
@@ -429,7 +438,8 @@ def saveTestSatelliteScripts(url, path, ctx):
 			fullpath = contrib.get_full_path(document_root, lib_path)
 			result = uploadContentToRemote(url, fullpath, lib_relpath, ctx)
 			log.info("library %s is saved: %s" % (lib_relpath, result))
-			print "library %s is saved: %s" % (lib_relpath, result)
+
+	saveToolsAllScripts(url, document_root, virtual_root, ctx)
 
 def uploadContentToRemote(url, fullpath, path, ctx):
 	log.debug('upload content %s', fullpath)
@@ -459,16 +469,16 @@ def auth(url, ctx):
 	empty_proxy_handler = urllib2.ProxyHandler({})
 	if login and password:
 		from ntlm import HTTPNtlmAuthHandler
-	
+
 		passman = urllib2.HTTPPasswordMgrWithDefaultRealm()
 		passman.add_password(None, url, login, password)
 		auth_NTLM = HTTPNtlmAuthHandler.HTTPNtlmAuthHandler(passman)
 		opener = urllib2.build_opener(auth_NTLM, empty_proxy_handler)
 	else:
 		opener = urllib2.build_opener(empty_proxy_handler)
-	
+
 	urllib2.install_opener(opener)
-	
+
 def recvLogRecords(request):
 	from logger import FILENAME, DJANGO_APP, timeFormat
 	log_file = FILENAME
@@ -477,7 +487,7 @@ def recvLogRecords(request):
 	f = codecs.open(log_file, 'r', 'utf-8')
 	records = f.read()
 	f.close()
-	
+
 	result = []
 	start = request.REQUEST.get('start', '')
 	if start != 'undefined':
@@ -492,7 +502,7 @@ def recvLogRecords(request):
 	else:
 		log.debug('find last 100 log records')
 		result = records.split('\n')[-100:]
-	
+
 	response = HttpResponse(mimetype='text/plain')
 	response.write(result)
 
@@ -526,7 +536,7 @@ def getLogRecordsSinceGivenTime(records, format, sinse_time):
 			if float( t ) < sinse_time:
 				break
 			result.append(line)
-	
+
 	return result
 
 def is_stubbed(path, request):
@@ -629,7 +639,7 @@ def live_settings_save(request):
 	stub(url, request)
 
 	content = request.POST["content"]
-	
+
 	def saveTemp(content):
 		import tempfile
 		handle, path = tempfile.mkstemp(suffix='.py', text=True)

@@ -307,16 +307,30 @@ def get_relative_clean_path(path):
 
 def get_global_context_lib_path(ctx):
 	"""
-	>>> ctx = {}
-	>>> get_global_context_lib_path(ctx)
-	[]
 	>>> ctx = {'LIBRARY_PATH': 'path1, path2, path3'}
 	>>> get_global_context_lib_path(ctx)
 	['path1', 'path2', 'path3']
 	"""
 	path = ctx.get( 'LIBRARY_PATH' )
-	if path:
-		return [path.strip() for path in path.split(',')]
+	return get_list_value_from_context(path)
+
+def get_context_tools_folders(ctx):
+	"""
+	>>> ctx = {'TOOLS_FOLDERS': 'path1, path2, path3'}
+	>>> get_context_tools_folders(ctx)
+	['path1', 'path2', 'path3']
+	"""
+	folders = ctx.get( 'TOOLS_FOLDERS' )
+	return get_list_value_from_context(folders)
+
+def get_list_value_from_context(value):
+	"""
+	>>> ctx = {}
+	>>> get_list_value_from_context(ctx)
+	[]
+	"""
+	if value:
+		return [value.strip() for value in value.split(',')]
 
 	return []
 
@@ -332,12 +346,7 @@ def get_lib_path_by_name(root, lib, ctx):
 	full_path = os.path.abspath(os.path.join(root, lib))
 	lib_relpath = ''
 	if not os.path.exists(full_path):
-		#current_suite_path = os.path.abspath(os.path.join(ctx.get_folder(), lib))
-		#if os.path.exists(current_suite_path):
-		#	log.info('%s lib is located in current suite folder' % lib)
-		#	lib_relpath = current_suite_path.replace(root, '')
 		lib_relpath = get_local_lib_path(root, lib, ctx)
-		#else:
 		if not lib_relpath:
 			for path in get_global_context_lib_path(ctx):
 				global_libs_path = os.path.abspath(os.path.join(root, path.strip(), lib))
@@ -358,13 +367,23 @@ def enum_suite_tests(target):
 	for root, dirs, files in os.walk(target):
 		for file_ in files:
 			if re.match('^.*\.js$', file_) and not file_.startswith('.'):
-				#if file_ in exclude:
-				#	continue
 				file_abspath = os.path.abspath(os.path.join(root, file_))
 				file_relpath = file_abspath.replace(os.path.abspath(target), '').lstrip('/').lstrip('\\')
 				tests += [ str(file_relpath) ]
 
 	return tests
+
+def enum_files_in_folders(target, filter=(lambda file_: file_.startswith('.'))):
+	all_files = []
+	for root, dirs, files in os.walk(target):
+		for file_ in files:
+			#if re.match('^.*\.js$', file_) and not file_.startswith('.'):
+			if not filter(file_):
+				file_abspath = os.path.abspath(os.path.join(root, file_))
+				file_relpath = file_abspath.replace(os.path.abspath(target), '').lstrip('/').lstrip('\\')
+				all_files += [ str(file_relpath) ]
+
+	return all_files
 
 def patch_fullpaths(fullpath, newpath=''):
 	reload(virtual_paths)
