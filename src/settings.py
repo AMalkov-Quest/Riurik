@@ -121,8 +121,9 @@ LIB_KEY_NAME = 'libraries'
 APPEND_SLASH = False
 CODEMIRROR_CALL_EDITOR_FOR = '^.*\.(?:js|ini|html|py)$'
 INCLUDE_KEY = 'include'
+EXCLUDE_KEY = 'exclude'
 
-try:
-	from local_settings import *
-except Exception, ex: print ex
+#try:
+#	from local_settings import *
+#except Exception, ex: print ex
 #pass

@@ -1,4 +1,4 @@
-import os, re, simplejson
+import os, re
 from logger import log
 import settings, config, contrib
 from django.template import Context, Template
@@ -26,7 +26,7 @@ def get_URL(instance, resolve=False):
 	return url
 
 def render(path, ctx):
-	vars = patch(path, ctx)
+	ctxitems = patch(path, ctx)
 	t = Template("""{% load json_tags %}
 		var context = {
 			{% for option in options %}
@@ -36,12 +36,12 @@ def render(path, ctx):
 	""")
 	c = Context()
 	c['options'] = []
-	for name, value in vars:
+	for name, value in ctxitems:
 		c['options'] += [ (name, value,), ]
 	return t.render(c)
 
 def render_ini(path, ctx, section_name='default'):
-	vars = patch(path, ctx)
+	ctxitems = patch(path, ctx)
 	t = Template("""{% load json_tags %}
 [{{ section }}]
 {% for option in options %}{{ option.0 }} = {{ option.1|json }}{% if option.2 %} ; {{ option.2 }}{% endif %}
@@ -49,7 +49,7 @@ def render_ini(path, ctx, section_name='default'):
 	c = Context()
 	c['section'] = section_name
 	c['options'] = []
-	for name, value in vars:
+	for name, value in ctxitems:
 		c['options'] += [ (name, value, hasattr(value, 'comment')), ]
 	return t.render(c)
 
@@ -57,42 +57,36 @@ def patch_libraries(path, ctximpl, ctx):
 	libraries = contrib.get_libraries_impl(path, ctximpl.as_items(), ctx)
 	log.info('libs are %s' % libraries)
 	if libraries != None:
-		ctximpl.remove(settings.LIB_KEY_NAME)
-		ctximpl.add(settings.LIB_KEY_NAME, str(libraries).replace('\'','\"'))
+		ctximpl.replace(settings.LIB_KEY_NAME, str(libraries).replace('\'','\"'))
 
-	return ctximpl
-
-def start_time(ctximpl):
+def add_start_time(ctximpl):
 	import time
 	now = time.localtime(time.time())
-	ctximpl.append(('test_start_time', time.mktime(now)))
-	return ctximpl
+	ctximpl.add('test_start_time', time.mktime(now))
 
 def patch(path, ctx):
 	ctximpl = contrib.context_impl(ctx.items())
-	if not ctximpl.hasInclude:
+	if not ctximpl.has(settings.INCLUDE_KEY):
 		exclude = []
-		if ctximpl.hasExclude:
-			exclude = contrib.loadListFromString(ctx.get( option='exclude' ))
+		if ctximpl.has(settings.EXCLUDE_KEY):
+			exclude = contrib.loadListFromString(ctx.get( option=settings.EXCLUDE_KEY ))
 		include = []
 		for root, dirs, files in os.walk(ctx.get_folder()):
-			for file in files:
-				if re.match('^.*\.js$', file) and not file.startswith('.'):
-					if file in exclude:
+			for file_ in files:
+				if re.match('^.*\.js$', file_) and not file_.startswith('.'):
+					if file_ in exclude:
 						continue
-					file_abspath = os.path.abspath(os.path.join(root, file))
+					file_abspath = os.path.abspath(os.path.join(root, file_))
 					file_relpath = file_abspath.replace(os.path.abspath(ctx.get_folder()), '').lstrip('/').lstrip('\\')
 					include += [ str(file_relpath) ]
 	else:
 		include = contrib.loadListFromString(ctx.get( option=settings.INCLUDE_KEY ))
 
-	ctximpl.add(settings.INCLUDE_KEY, str(include).replace('\'','\"'))
+	ctximpl.replace(settings.INCLUDE_KEY, str(include).replace('\'','\"'))
 
-	ctximpl = patch_libraries(path, ctximpl, ctx)
-	ctximpl = start_time(ctximpl)
-	if ctximpl.localhost:
-		ctximpl.rm(('host', 'localhost'))
-		ctximpl.add('host', socket.gethostname())
+	patch_libraries(path, ctximpl, ctx)
+	add_start_time(ctximpl)
+	ctximpl.replace_if('host', socket.gethostname(), 'localhost')
 
 	return ctximpl.as_tuple()
 
@@ -119,14 +113,14 @@ class global_settings(object):
 		config.set(self.inifile, self.section, option, value)
 		log.debug('set context option: %s=%s' % (option, value))
 
-	def items(self, vars=None):
+	def items(self, vars_=None):
 		log.debug('context get items: %s, section: %s' % (self.inifile, self.section))
-		return config.items(self.inifile, self.section, vars)
+		return config.items(self.inifile, self.section, vars_)
 
 	def __patch_values(self, vals):
-		if not vals: return
-		for k, v in vals:
-			yield k,v, self.comment
+		if vals:
+			for k, v in vals:
+				yield k, v, self.comment
 
 	def sections(self):
 		log.debug('reading sections: %s' % config.sections(self.inifile))

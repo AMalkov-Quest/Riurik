@@ -3,44 +3,74 @@ import os, re, settings, virtual_paths
 from logger import log
 import socket
 
-class context_impl(object):
-
-	hasInclude = False
-	localhost = False
-	hasExclude = False
+class context_impl():
 
 	def __init__(self, items):
 		self.items = items
 		self.items_as_list = list(self.items)
+
+	def has(self, key):
+		"""
+		>>> ci = context_impl([('host', 'host-1')])
+		>>> ci.has('host')
+		True
+		>>> ci.has('port')
+		False
+		"""
 		for i, v in self.items:
-			if i == settings.INCLUDE_KEY:
-				self.hasInclude = True
+			if i == key:
+				return True
 
-			if i == 'exclude':
-				self.hasExclude = True
+		return False
 
-			if i == 'host' and v == 'localhost':
-				self.localhost = True
+	def check(self, key, value):
+		"""
+		>>> ci = context_impl([('host', 'host-1')])
+		>>> ci.check('host', 'host-1')
+		True
+		>>> ci.check('host', 'host-2')
+		False
+		>>> ci.check('port', '8000')
+		False
+		"""
+		for i, v in self.items:
+			if i == key and v == value:
+				return True
 
+		return False
 
-	def add(self, key, new_items):
-		new_items_as_list = [ (key, new_items) ]
-		self.items_as_list += new_items_as_list
+	def replace(self, key, value):
+		self.remove(key)
+		self.add(key, value)
 
-	def append(self, kv_pair):
-		self.items_as_list.append(kv_pair)
+	def replace_if(self, key, new_value, old_value):
+		"""
+		>>> ci = context_impl([('host', 'host-1')])
+		>>> ci.replace_if('port', '8000', '8001')
+		>>> ci.as_tuple()
+		(('host', 'host-1'),)
+		>>> ci.replace_if('host', 'host-2', 'host-1')
+		>>> ci.as_tuple()
+		(('host', 'host-2'),)
 
-	def remove(self, key):
-		self.items_as_list = [item for item in self.items_as_list if item[0] != key]
+		"""
+		try:
+			self.remove(key, old_value)
+			self.add(key, new_value)
+		except ValueError, e:
+			log.error(e)
 
-	def rm(self, kv_pair):
-		self.items_as_list.remove(kv_pair)
+	def add(self, key, value):
+		self.items_as_list.append((key, value))
+
+	def remove(self, key, value=None):
+		if not value:
+			self.items_as_list = [item for item in self.items_as_list if item[0] != key]
+		else:
+			self.items_as_list.remove((key, value))
 
 	def as_items(self):
 		return self.items
-
-	def as_list(self):
-		return self.items_as_list
 
 	def as_tuple(self):
 		return tuple(self.items_as_list)
@@ -79,10 +109,10 @@ def target_is_remote(target, host):
 def get_libraries(path, context):
 	return get_libraries_impl(path, context.items(), context)
 
-def get_libraries_impl(path, vars, ctx):
+def get_libraries_impl(path, ctxitems, ctx):
 	libraries = []
 
-	libs = get_libraries_raw(vars)
+	libs = get_libraries_raw(ctxitems)
 	root = get_document_root(path)
 	log.info('libs are %s' % libs)
 	if libs != None:
@@ -99,7 +129,7 @@ def get_libraries_impl(path, vars, ctx):
 def loadListFromString(source):
 	return [item.strip() for item in source.split(',')]
 
-def get_libraries_raw(vars):
+def get_libraries_raw(ctxitems):
 	"""
 	>>> get_libraries_raw([])
 	[]
@@ -109,7 +139,7 @@ def get_libraries_raw(vars):
 	>>> get_libraries_raw([('libraries', 'lib1, lib2')])
 	['lib1', 'lib2']
 	"""
-	for item in vars:
+	for item in ctxitems:
 		if item[0] == settings.LIB_KEY_NAME:
 			if not '[]' in item[1]:
 				return [lib.strip() for lib in item[1].split(',')]
@@ -326,11 +356,11 @@ def get_lib_path_by_name(root, lib, ctx):
 def enum_suite_tests(target):
 	tests = []
 	for root, dirs, files in os.walk(target):
-		for file in files:
-			if re.match('^.*\.js$', file) and not file.startswith('.'):
-				#if file in exclude:
+		for file_ in files:
+			if re.match('^.*\.js$', file_) and not file_.startswith('.'):
+				#if file_ in exclude:
 				#	continue
-				file_abspath = os.path.abspath(os.path.join(root, file))
+				file_abspath = os.path.abspath(os.path.join(root, file_))
 				file_relpath = file_abspath.replace(os.path.abspath(target), '').lstrip('/').lstrip('\\')
 				tests += [ str(file_relpath) ]
 
@@ -347,7 +377,6 @@ def patch_fullpaths(fullpath, newpath=''):
 	return fullpath
 
 def getHostByName(host, cache):
-	import socket
 	r = socket.gethostbyname(host)
 	cache.set(host, r)
 	return r
@@ -366,5 +395,4 @@ def normpath(path):
 	return path.replace('\\', '/')
 
 def localhost(host):
-	import socket
 	return host == 'localhost' or host == socket.gethostname()
