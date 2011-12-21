@@ -1,4 +1,4 @@
-module('save satellite scripts');
+module('save test satellite scripts');
 
 var test_content = " \
 asyncTest('test', function() { \
@@ -25,17 +25,11 @@ QUnit.setup(function() {
   }
 });
 
-asyncTest('test is pushed to run on remote server', function() {
+asyncTest('satellite scripts are pushed to save on remote server', function() {
   $('#frame').attr('src', context.URL);
   $('#frame').unbind('load');
   $('#frame').load(function() {
     var logs = getLogs(context.start);
-    
-    var regex = new RegExp('run test '.concat(context.test_path, ' with context ', context.test_context));    
-    ok(regex.test(logs), regex);
-    
-    regex = new RegExp('save '.concat(context.suite_name, ' context'));
-    ok(regex.test(logs), regex);
     
     regex = new RegExp('library '.concat(context.libraries[0], ' is saved'));
     ok(regex.test(logs), regex);
@@ -43,16 +37,22 @@ asyncTest('test is pushed to run on remote server', function() {
     regex = new RegExp('library '.concat(context.libraries[1], ' is saved'));
     ok(regex.test(logs), regex);
     
+    regex = new RegExp('library '.concat(context.libraries[2], ' is saved'));
+    ok(regex.test(logs), regex);
+    
+    regex = new RegExp('tools script '.concat(context.root, '/', context.psscript_path, ' is saved'));
+    ok(regex.test(logs), regex);
+    
+    regex = new RegExp('tools script '.concat(context.root, '/', context.pyscript_path, ' is saved'));
+    ok(regex.test(logs), regex);
+    
     start();
   });
 });
 
-asyncTest('test is executed on remote server', function() {
+asyncTest('satellite scripts are saved on remote server', function() {
   riurik.sleep(100).then(function() {
     var logs = getLogs(context.start, 'django-app');
-    
-    var regex = new RegExp('save script '.concat(context.suite_path.strip(context.root).strip('/'), '/.context.js'));
-    ok(regex.test(logs), regex);
     
     regex = new RegExp('save script '.concat(context.test_path.strip(context.root).strip('/')));
     ok(regex.test(logs), regex);
@@ -63,7 +63,13 @@ asyncTest('test is executed on remote server', function() {
     regex = new RegExp('save script '.concat(context.libraries[1]));
     ok(regex.test(logs), regex);
     
-    regex = new RegExp('execute test '.concat(context.test_path.strip(context.root).strip('/')));
+    regex = new RegExp('save script '.concat(context.libraries[2]));
+    ok(regex.test(logs), regex);
+    
+    regex = new RegExp('save script '.concat(context.psscript_path));
+    ok(regex.test(logs), regex);
+    
+    regex = new RegExp('save script '.concat(context.pyscript_path));
     ok(regex.test(logs), regex);
     
     start();
