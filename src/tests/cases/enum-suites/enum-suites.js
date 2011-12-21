@@ -8,6 +8,9 @@ QUnit.setup(function() {
   $.each(context.suites, function(i, value) {
     create_suite(value, context.root, content);
   });
+  var suite_path = context.root.concat('/', context.suites[0]);
+  QUnit.log(suite_path);
+  set_context(suite_path, '[other-context]');
 });
 
 function enum_suites(URL, checker) {
@@ -27,7 +30,6 @@ function enum_suites(URL, checker) {
          
 asyncTest('should return suites as string', function() {
   enum_suites(context.URL, function(result){
-    QUnit.substring(result, context.suites[0], context.suites[0] + ' is in ' + result);
     QUnit.substring(result, context.suites[1], context.suites[1] + ' is in ' + result);
     QUnit.substring(result, context.suites[2], context.suites[2] + ' is in ' + result);
     start();
@@ -38,9 +40,18 @@ asyncTest('should return suites as json', function() {
   var URL = context.URL.concat('&json=true');
   enum_suites(URL, function(result){
     result = $.parseJSON(result);
-    ok($.inArray(context.suites[0], result ) != -1, context.suites[0] + ' is in ' + result);
+    ok($.inArray(context.suites[0], result ) == -1, context.suites[0] + ' is not in ' + result);
     ok($.inArray(context.suites[1], result ) != -1, context.suites[1] + ' is in ' + result);
     ok($.inArray(context.suites[2], result ) != -1, context.suites[2] + ' is in ' + result);
+    start();
+  });
+});
+
+asyncTest('should return only suites those match with given context', function() {
+  var URL = context.URL.concat('&json=true');
+  enum_suites(URL, function(result){
+    result = $.parseJSON(result);
+    ok($.inArray(context.suites[0], result ) == -1, context.suites[0] + ' is not in ' + result);
     start();
   });
 });
