@@ -45,7 +45,7 @@ def enumerate_suites(request):
 		ctx	(optional)	- filter suites containing supplied ctx name
 		json 	(optional)	- return result in JSON format
 	"""
-	ctx_name = request.REQUEST.get('ctx', None)
+	ctx_name = request.REQUEST.get('context', None)
 	json = request.REQUEST.get('json', False)
 	target = request.REQUEST.get('target', False)
 
@@ -60,9 +60,10 @@ def enumerate_suites(request):
 			contextfile = os.path.join(dirpath, contextini)
 			ctx = context.get(contextfile)
 			ctx_sections = ctx.sections()
-			if not ctx in ctx_sections:
+			if not ctx_name in ctx_sections:
 				continue
-		suites += [ dirpath.replace(root, '').replace('\\','/').lstrip('/') ]
+
+			suites += [ dirpath.replace(root, '').replace('\\','/').lstrip('/') ]
 
 	if json:
 		return HttpResponse(simplejson.dumps(suites))

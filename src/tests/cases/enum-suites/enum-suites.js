@@ -1,7 +1,7 @@
 module('enumirate suites');
 
 QUnit.setup(function() {
-  context.URL = contexter.URL(context, 'actions/suite/enumerate/?context=' + context.suite + '&target=' + context.root);
+  context.URL = contexter.URL(context, context.emum_url.concat(context.root, '&context=', context.suite));
   var content = '[' + context.suite + ']';
   context.suites_list = '';
   
@@ -16,10 +16,7 @@ function enum_suites(URL, checker) {
     async: true,
     url: URL,
     success: function(data) {
-      $.each(context.suites, function(i, suite) {
-        checker(data, suite);
-      });
-      start();
+      checker(data);
     },
     error: function() {
       ok(false, URL);
@@ -29,16 +26,31 @@ function enum_suites(URL, checker) {
 };
          
 asyncTest('should return suites as string', function() {
-  var URL = context.URL;
-  enum_suites(URL, function(actual, given){
-    QUnit.substring(actual, given, given + ' is in ' + actual);
+  enum_suites(context.URL, function(result){
+    QUnit.substring(result, context.suites[0], context.suites[0] + ' is in ' + result);
+    QUnit.substring(result, context.suites[1], context.suites[1] + ' is in ' + result);
+    QUnit.substring(result, context.suites[2], context.suites[2] + ' is in ' + result);
+    start();
   });
 });
 
 asyncTest('should return suites as json', function() {
   var URL = context.URL.concat('&json=true');
-  enum_suites(URL, function(actual, given){
-    ok($.inArray(given, actual != -1), given + ' is in ' + actual);
+  enum_suites(URL, function(result){
+    result = $.parseJSON(result);
+    ok($.inArray(context.suites[0], result ) != -1, context.suites[0] + ' is in ' + result);
+    ok($.inArray(context.suites[1], result ) != -1, context.suites[1] + ' is in ' + result);
+    ok($.inArray(context.suites[2], result ) != -1, context.suites[2] + ' is in ' + result);
+    start();
+  });
+});
+
+asyncTest('should not return suites if no context', function() {
+  var URL = contexter.URL(context, context.emum_url.concat(context.root, '&json=true'));
+  enum_suites(URL, function(result){
+    result = $.parseJSON(result);
+    equal(result.length, 0, 'result is empty');
+    start();
   });
 });
 
