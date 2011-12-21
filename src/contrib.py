@@ -1,5 +1,6 @@
 # coding: utf-8
-import os, re, settings, virtual_paths
+import os, re
+import settings, virtual_paths
 from logger import log
 import socket
 
@@ -40,6 +41,13 @@ class context_impl():
 		return False
 
 	def replace(self, key, value):
+		"""
+		>>> ci = context_impl([('host', 'host-1')])
+		>>> ci.replace('host', 'host-2')
+		>>> ci.as_tuple()
+		(('host', 'host-2'),)
+
+		"""
 		self.remove(key)
 		self.add(key, value)
 
@@ -373,12 +381,11 @@ def enum_suite_tests(target):
 
 	return tests
 
-def enum_files_in_folders(target, filter=(lambda file_: file_.startswith('.'))):
+def enum_files_in_folders(target, skip=(lambda file_: file_.startswith('.'))):
 	all_files = []
 	for root, dirs, files in os.walk(target):
 		for file_ in files:
-			#if re.match('^.*\.js$', file_) and not file_.startswith('.'):
-			if not filter(file_):
+			if not skip(file_):
 				file_abspath = os.path.abspath(os.path.join(root, file_))
 				file_relpath = file_abspath.replace(os.path.abspath(target), '').lstrip('/').lstrip('\\')
 				all_files += [ str(file_relpath) ]

@@ -11,10 +11,9 @@ import simplejson
 import django.conf
 import settings
 from logger import log
-import context, config
+import context, config, contrib
 import mimetypes, random, posixpath, datetime
 import stat
-import contrib
 import urllib, urllib2
 import codecs, time
 import virtual_paths
@@ -40,16 +39,12 @@ def error_handler(fn):
 
 def enumerate_suites(request):
 	"""
-		Return a list of suite names.
-		Arguments:
-			context	(optional)	- filter suites containing supplied context name
-			json 	(optional)	- return result in JSON format
+	Return a list of suite names.
+	Arguments:
+		ctx	(optional)	- filter suites containing supplied ctx name
+		json 	(optional)	- return result in JSON format
 	"""
-	from django.http import HttpResponse
-	from context import get as context_get
-	import contrib
-
-	context = request.REQUEST.get('context', None)
+	ctx_name = request.REQUEST.get('ctx', None)
 	json = request.REQUEST.get('json', False)
 	target = request.REQUEST.get('target', False)
 
@@ -58,16 +53,17 @@ def enumerate_suites(request):
 	contextini = settings.TEST_CONTEXT_FILE_NAME
 
 	for dirpath, dirnames, filenames in os.walk(root, followlinks=True):
-		if not ( contextini in filenames ): continue
-		if context:
+		if not ( contextini in filenames ):
+			continue
+		if ctx_name:
 			contextfile = os.path.join(dirpath, contextini)
-			ctx = context_get(contextfile)
+			ctx = context.get(contextfile)
 			ctx_sections = ctx.sections()
-			if not context in ctx_sections: continue
+			if not ctx in ctx_sections:
+				continue
 		suites += [ dirpath.replace(root, '').replace('\\','/').lstrip('/') ]
 
 	if json:
-		import simplejson
 		return HttpResponse(simplejson.dumps(suites))
 	return HttpResponse(str(suites).replace('[','').replace(']','').rstrip(',').replace('\'',''))
 
@@ -112,7 +108,7 @@ def serve(request, path, show_indexes=False):
 
 	return get_file_content(fullpath)
 
-def get_file_content_to_edit(path, fullpath, is_stubbed):
+def get_file_content_to_edit(path, fullpath, stubbed):
 	try:
 		contexts = context.get( fullpath ).sections()
 	except Exception, e:
@@ -126,7 +122,7 @@ def get_file_content_to_edit(path, fullpath, is_stubbed):
 		'content': content,
 		'contexts': contexts,
 		'relative_file_path': path,
-		'is_stubbed': is_stubbed,
+		'is_stubbed': stubbed,
 		'favicon'   : 'dir-index-test.gif',
 		'filetype':  tools.get_type(fullpath),
 	}
@@ -164,8 +160,8 @@ def get_dir_index(document_root, path, fullpath):
 		pagetype = 'front-page'
 		reload(virtual_paths)
 		for key in virtual_paths.VIRTUAL_PATHS:
-			dir = get_descriptor(key)
-			dirs.append(dir)
+			dir_descriptor = get_descriptor(key)
+			dirs.append(dir_descriptor)
 	else:
 		pagetype = tools.get_type(fullpath)
 		for f in sorted(os.listdir(fullpath)):
@@ -258,7 +254,7 @@ def createFolder(request, fullpath):
 @add_fullpath
 def removeObject(request, fullpath):
 	log.debug('removeObject: ' + fullpath)
-	result = tools.remove(fullpath)
+	tools.remove(fullpath)
 	redirect = '/' + request.POST["url"].lstrip('/')
 	return HttpResponseRedirect(redirect)
 
@@ -294,18 +290,12 @@ def createTest(request, fullpath):
 
 @add_fullpath
 def saveTest(request, fullpath):
-	print 'saving', fullpath
 	if fullpath == 'settings':
 		fullpath = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'virtual_paths.py')
 	url = request.POST["url"].lstrip('/')
 	stub(url, request)
-	result = tools.savetest(request.POST["content"], fullpath)
+	tools.savetest(request.POST["content"], fullpath)
 	return HttpResponseRedirect('/' + url + '?editor')
-
-@add_fullpath
-def saveDraftTest(request, fullpath):
-	saveTest(request)
-	return HttpResponse()
 
 def submitTest(request):
 	testname = request.POST["path"]
@@ -412,7 +402,8 @@ def saveSuiteAllTests(url, path, ctx):
 		log.info("test %s is saved: %s" % (test_path, result))
 
 def saveToolsAllScripts(url, document_root, virtual_root, ctx):
-	for tools_dir in contrib.get_context_tools_folders(ctx):
+	tools_dirs = contrib.get_context_tools_folders(ctx)
+	for tools_dir in tools_dirs:
 		log.info('save tools folder: %s' % tools_dir)
 		virtual_path = os.path.join(virtual_root, tools_dir)
 		tools_dir_fullpath = contrib.get_full_path(document_root, virtual_path)
@@ -497,7 +488,7 @@ def recvLogRecords(request):
 			log.debug('find log records those were made after %s' % since_time)
 			result = getLogRecordsSinceGivenTime(records, timeFormat, epoch_sec)
 		else:
-			result = getLastLogRecordTime(records, timeFormat);
+			result = getLastLogRecordTime(records, timeFormat)
 			log.debug('find last log record time: %s' % result)
 	else:
 		log.debug('find last 100 log records')
@@ -604,7 +595,6 @@ def getOpenedFiles(request, clean=False):
 	if not 'stub_key' in request.session:
 		return files
 	key = str(request.session['stub_key'])
-	print 'all session', request.session.items()
 	for i,v in request.session.items():
 		if i != 'stub_key' and str(v) == key:
 			files += [ i ]
@@ -621,7 +611,6 @@ def live_settings_json(request, content=None):
 	settings_fullpath = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'virtual_paths.py')
 	if not content:
 		content = open(settings_fullpath, 'r').read()
-	print content
 	descriptor = {
 		'directory': '/settings',
 		'content': content,

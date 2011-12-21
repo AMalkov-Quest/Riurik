@@ -1,1 +1,0 @@
-ok( true , 'OK qunit test' );
