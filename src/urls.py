@@ -4,6 +4,7 @@ from django.views.static import serve
 import os
 import settings
 import views
+from logger import log
 
 urlpatterns = patterns('',
 	(r'^favicon\.ico$', 'django.views.generic.simple.redirect_to', {'url': '/static/img/favicon.gif'}),
@@ -32,9 +33,12 @@ urlpatterns += patterns('',
 	(r'^search', include('plugins.search.urls')),
 )
 
-urlpatterns += patterns('',
-	(r'^testsrc', include(settings.tests_loader_path)),
-)
+try:
+	urlpatterns += patterns('',
+		(r'^testsrc', include('%s.urls' % settings.inner_testsloader_path)),
+	)
+except AttributeError, e:
+	log.info(e)
 
 urlpatterns += patterns('',
 	(r'^static/(?P<path>.*)$', 'django.views.static.serve',
