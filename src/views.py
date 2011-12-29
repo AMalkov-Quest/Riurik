@@ -79,7 +79,7 @@ def show_context(request, path):
 	sections = config.sections(context.get(fullpath).inifile)
 	for section_name in sections:
 		ctx = context.get(fullpath, section=section_name)
-		context_ini = context.render_ini(path, ctx, section_name)
+		context_ini = context.render_ini(path, ctx, request.get_host(), section_name)
 		result += context_ini
 
 	return HttpResponse(result)
@@ -314,7 +314,7 @@ def runSuite(request, fullpath):
 
 	log.info('run suite %s with context %s' % (path, context_name))
 
-	contextjs = context.render(path, ctx)
+	contextjs = context.render(path, ctx, request.get_host())
 
 	clean_path = contrib.get_relative_clean_path(path)
 	target = contrib.get_runner_url(ctx, request.get_host())
@@ -342,7 +342,7 @@ def runTest(request, fullpath):
 
 	log.info('run test %s with context %s' % (path, context_name))
 
-	contextjs = context.render(path, ctx)
+	contextjs = context.render(path, ctx, request.get_host())
 	log.debug('contextJS: '+ contextjs)
 
 	clean_path = contrib.get_relative_clean_path(path)

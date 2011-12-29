@@ -25,8 +25,8 @@ def get_URL(instance, resolve=False):
 		url =  'http://%s:%s' % (host, instance.get('port'))
 	return url
 
-def render(path, ctx):
-	ctxitems = patch(path, ctx)
+def render(path, ctx, riurik_url):
+	ctxitems = patch(path, ctx, riurik_url)
 	t = Template("""{% load json_tags %}
 		var context = {
 			{% for option in options %}
@@ -40,8 +40,8 @@ def render(path, ctx):
 		c['options'] += [ (name, value,), ]
 	return t.render(c)
 
-def render_ini(path, ctx, section_name='default'):
-	ctxitems = patch(path, ctx)
+def render_ini(path, ctx, riurik_url, section_name='default'):
+	ctxitems = patch(path, ctx, riurik_url)
 	t = Template("""{% load json_tags %}
 [{{ section }}]
 {% for option in options %}{{ option.0 }} = {{ option.1|json }}{% if option.2 %} ; {{ option.2 }}{% endif %}
@@ -64,7 +64,7 @@ def add_start_time(ctximpl):
 	now = time.localtime(time.time())
 	ctximpl.add('test_start_time', time.mktime(now))
 
-def patch(path, ctx):
+def patch(path, ctx, riurik_url):
 	ctximpl = contrib.context_impl(ctx.items())
 	if not ctximpl.has(settings.INCLUDE_KEY):
 		exclude = []
@@ -86,7 +86,7 @@ def patch(path, ctx):
 
 	patch_libraries(path, ctximpl, ctx)
 	add_start_time(ctximpl)
-	ctximpl.replace_if('host', socket.gethostname(), 'localhost')
+	contrib.patch_host_port(ctximpl, riurik_url)
 
 	return ctximpl.as_tuple()
 

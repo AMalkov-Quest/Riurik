@@ -4,6 +4,32 @@ import settings, virtual_paths
 from logger import log
 import socket
 
+def patch_host_port(ctximpl, riurik_url):
+	"""
+	>>> ci = context_impl([])
+	>>> patch_host_port(ci, 'spb9914:8000')
+	>>> ci.get('host')
+	'spb9914'
+	>>> ci.get('port')
+	'8000'
+	>>> ci = context_impl([])
+	>>> patch_host_port(ci, 'spb9914')
+	>>> ci.get('port')
+	'80'
+	>>> import os, test
+	>>> test.stub('socket.gethostname', returns='google.ru')
+	>>> ci = context_impl([('host', 'localhost'), ('port', '1')])
+	>>> patch_host_port(ci, 'spb9914')
+	>>> ci.get('host')
+	'google.ru'
+	"""
+	if ctximpl.has('host') and ctximpl.has('port'):
+		ctximpl.replace_if('host', socket.gethostname(), 'localhost')
+	else:
+		hostport = riurik_url.split(':')
+		ctximpl.add('host', hostport[0])
+		ctximpl.add('port', hostport[1] if len(hostport) > 1 else '80')
+
 class context_impl():
 
 	def __init__(self, items):
@@ -18,11 +44,7 @@ class context_impl():
 		>>> ci.has('port')
 		False
 		"""
-		for i, v in self.items:
-			if i == key:
-				return True
-
-		return False
+		return self.as_items().has_key(key)
 
 	def check(self, key, value):
 		"""
@@ -68,6 +90,9 @@ class context_impl():
 		except ValueError, e:
 			log.error(e)
 
+	def get(self, key):
+		return self.as_items()[key]
+
 	def add(self, key, value):
 		self.items_as_list.append((key, value))
 
@@ -78,7 +103,11 @@ class context_impl():
 			self.items_as_list.remove((key, value))
 
 	def as_items(self):
-		return self.items
+		items = {}
+		for item in self.items_as_list:
+			items[item[0]] = item[1]
+
+		return items
 
 	def as_tuple(self):
 		return tuple(self.items_as_list)
@@ -110,7 +139,7 @@ def target_is_remote(target, host):
 	if not 'localhost' in target		\
 		and not 'localhost' in host and	\
 		host.lower() != target.lower():
-			return True
+		return True
 
 	return False
 
