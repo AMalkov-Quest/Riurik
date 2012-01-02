@@ -1,4 +1,4 @@
-<a name="README">[Riurik](https://github.com/andrew-malkov/Riurik)</a>
+<a name="README">[Riurik](https://github.com/andrew-malkov/Riurik)</a> - **acceptance test framework for web applications**
 =======
 **A web-based development framework for acceptance testing web applications.**
 
