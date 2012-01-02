@@ -4,3 +4,5 @@
 
 Riurik aims to simplify the process of integration testing web applications. It's written in Javascript and Python using jQuery, Qunit, Django, heavily influenced by, and borrows the best parts of Fitnesse.
 
+https://github.com/mmonteleone/pavlov/blob/master/README.markdown
+https://github.com/jodosha/hanoi
