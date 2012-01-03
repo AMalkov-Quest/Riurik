@@ -4,10 +4,22 @@ Riurik is a wiki web server that allows to make, organize, and run test scripts.
 
 Using Riurik you can create pure javascript, selenium free acceptence tests for you web application. A web browser - the only thing that you need to do this.
 
+Credit
+------
+
+Credit of course goes to:
+
+[QUnit][1]: Copyright (c) 2008 John Resig, Jörn Zaefferer, used under the terms of the MIT LICENSE
+
+Changelog
+---------
+
+* 0.1 - Initial Release
+
 License
 -------
 
-Copyright (c) 2009-2011 Michael Monteleone, http://amalkov.blogspot.com
+Copyright (c) 2011-2012 Andrew Malkov, http://amalkov.blogspot.com
 
 The MIT License
 
