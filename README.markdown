@@ -13,6 +13,8 @@ Documentation:
 
 ### Quick start
 
+Download the [latest packaged release from Github][4]
+
 ### Example
 
     asyncTest('create suite button', function() {
@@ -77,3 +79,4 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 [1]: http://docs.jquery.com/QUnit "QUnit"
 [2]: http://python.org/ "Python 2"
 [3]: https://www.djangoproject.com "Django"
+[4]: https://github.com/andrew-malkov/Riurik/downloads "Riurik Download"
