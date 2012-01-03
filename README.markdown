@@ -23,6 +23,8 @@ for Linux and
 
 for Windows.
 
+Start up a web browser and go to http://localhost:8000. The main Riurik screen should come up. That's it. You're ready to start using Riurik.
+
 ### Example
 
     asyncTest('create suite button', function() {
