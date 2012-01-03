@@ -2,6 +2,13 @@
 =======
 Riurik is a wiki web server that allows to make, organize, and run selenium free, pure javascript test scripts. It aims to simplify the process of UI, functional and integration testing web applications. A web browser - the only thing that you need for this. Riurik is written in Javascript and Python using jQuery, Qunit, Django, heavily influenced by, and borrows the best parts of Fitnesse.
 
+Documentation:
+--------------
+
+### Usage Requirements
+
+* [QUnit][1] (qunit.js, qunit.css)
+
 ### Quick start
 
 ### Example
