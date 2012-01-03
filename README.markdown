@@ -13,7 +13,7 @@ Documentation:
 
 ### Quick start
 
-Being a Django web application, Riurik requires Python. It works with any Python version from 2.4 to 2.7, but we recommend installing current Python 2.7.2 version. Get Python at http://www.python.org. If you’re running Linux, you probably already have it installed. Download the [latest packaged release from Github][4]
+Being a Django web application, Riurik requires Python and Django. It works with any Python version from 2.4 to 2.7, but we recommend installing current Python 2.7.2 version. Get Python at http://www.python.org. If you’re running Linux, you probably already have it installed. To install the Django framework follow [this installation guid][5]. Download the [latest packaged release from Github][4]
 
 ### Example
 
@@ -87,5 +87,6 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 [2]: http://python.org/ "Python 2"
 [3]: https://www.djangoproject.com "Django"
 [4]: https://github.com/andrew-malkov/Riurik/downloads "Riurik Download"
+[5]: https://docs.djangoproject.com/en/1.3/topics/install
 [amalkov]: https://github.com/andrew-malkov
 [atimiskov]: https://github.com/AntonTimiskov
