@@ -7,7 +7,9 @@ Documentation:
 
 ### Usage Requirements
 
-* [QUnit][1] (qunit.js, qunit.css)
+* [jQuery][1]
+* [Python 2][2]
+* Django [3]
 
 ### Quick start
 
@@ -73,3 +75,5 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 [0]: http://jquery.com "jQuery"
 [1]: http://docs.jquery.com/QUnit "QUnit"
+[2]: http://python.org/ "Python 2"
+[3]: https://www.djangoproject.com "Django"
