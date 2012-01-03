@@ -1,12 +1,10 @@
 <a name="README">[Riurik](https://github.com/andrew-malkov/Riurik)</a> - acceptance testing framework for web applications
 =======
-Riurik is a wiki web server that allows to make, organize, and run test scripts. Riurik aims to simplify the process of integration testing web applications. It's written in Javascript and Python using jQuery, Qunit, Django, heavily influenced by, and borrows the best parts of Fitnesse.
+Riurik is a wiki web server that allows to make, organize, and run selenium free, pure javascript test scripts. Riurik aims to simplify the process of UI, functional and integration testing web applications. A web browser - the only thing that you need for this. It's written in Javascript and Python using jQuery, Qunit, Django, heavily influenced by, and borrows the best parts of Fitnesse.
 
-Using Riurik you can create pure javascript, selenium free acceptence tests for you web application. A web browser - the only thing that you need to do this.
+### Quick start
 
-### Example!
-
-module('demo');
+### Example
 
     asyncTest('create suite button', function() {
       $.when(frame.go('riurik-inner-tests')).then(function() {
