@@ -36,6 +36,12 @@ Download the [latest packaged release from Github][4]
       });
     });
 
+Author
+------
+Riurik is written by
+* [Andrew Malkov][amalkov]
+* [Anton Timiskov][atimiskov]
+
 Credit
 ------
 
@@ -80,3 +86,5 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 [2]: http://python.org/ "Python 2"
 [3]: https://www.djangoproject.com "Django"
 [4]: https://github.com/andrew-malkov/Riurik/downloads "Riurik Download"
+[amalkov]: https://github.com/andrew-malkov
+[atimiskov]: https://github.com/AntonTimiskov
