@@ -36,7 +36,7 @@ Download the [latest packaged release from Github][4]
       });
     });
 
-Author
+Authors
 ------
 Riurik is written by
 
