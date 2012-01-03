@@ -9,7 +9,7 @@ Documentation:
 
 * [jQuery][1]
 * [Python 2][2]
-* Django [3]
+* [Django] [3]
 
 ### Quick start
 
