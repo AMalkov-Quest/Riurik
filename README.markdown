@@ -39,6 +39,7 @@ Download the [latest packaged release from Github][4]
 Author
 ------
 Riurik is written by
+
 * [Andrew Malkov][amalkov]
 * [Anton Timiskov][atimiskov]
 
