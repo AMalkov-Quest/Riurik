@@ -59,6 +59,7 @@ Credit
 Credit of course goes to:
 
 [jQuery][0]: jQuery Copyright ©2010 by The jQuery Project
+
 [QUnit][1]: Copyright (c) 2008 John Resig, Jörn Zaefferer, used under the terms of the MIT LICENSE
 
 Changelog
