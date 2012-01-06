@@ -4,14 +4,14 @@ from django.utils.safestring import mark_safe
 import settings
 import contrib
 from logger import log
-import simplejson
+import json
 register = template.Library()
 
 @register.filter
-def json(input):
+def tojson(input):
 	log.debug(input)
 	try:
-		simplejson.loads(input)
+		json.loads(input)
 		return mark_safe("%s" % input)
 	except Exception, ex:
 		pass

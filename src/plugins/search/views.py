@@ -1,7 +1,7 @@
 from django.shortcuts import render_to_response
 from django.template import loader, RequestContext, Context, Template, TemplateDoesNotExist
 from django.http import Http404, HttpResponse, HttpResponseRedirect, HttpResponseNotModified, HttpRequest
-import os, simplejson as json
+import os, json
 import libsearch
 import contrib
 from logger import log

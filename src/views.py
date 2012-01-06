@@ -7,7 +7,7 @@ from django.core.cache import cache
 import django.views.static
 import os, re
 import dir_index_tools as tools
-import simplejson
+import json
 import django.conf
 import settings
 from logger import log
@@ -46,7 +46,7 @@ def enumerate_suites(request):
 		json 	(optional)	- return result in JSON format
 	"""
 	ctx_name = request.REQUEST.get('context', None)
-	json = request.REQUEST.get('json', False)
+	as_json = request.REQUEST.get('json', False)
 	target = request.REQUEST.get('target', False)
 
 	suites = []
@@ -65,8 +65,8 @@ def enumerate_suites(request):
 
 			suites += [ dirpath.replace(root, '').replace('\\','/').lstrip('/') ]
 
-	if json:
-		return HttpResponse(simplejson.dumps(suites))
+	if as_json:
+		return HttpResponse(json.dumps(suites))
 	return HttpResponse(str(suites).replace('[','').replace(']','').rstrip(',').replace('\'',''))
 
 def show_context(request, path):
@@ -266,7 +266,7 @@ def createSuite(request, fullpath):
 	result['success'], result['result'] = tools.mkcontext(fullpath, request.POST["object-name"])
 	result['result'] += '?editor'
 	response = HttpResponse(mimetype='text/json')
-	response.write(simplejson.dumps(result))
+	response.write(json.dumps(result))
 
 	return response
 
@@ -286,7 +286,7 @@ def createTest(request, fullpath):
 	result['result'] += '?editor'
 	log.debug('createTest results: %s' % result)
 	response = HttpResponse(mimetype='text/json')
-	response.write(simplejson.dumps(result))
+	response.write(json.dumps(result))
 
 	return response
 

@@ -30,7 +30,7 @@ def render(path, ctx, riurik_url):
 	t = Template("""{% load json_tags %}
 		var context = {
 			{% for option in options %}
-				{{ option.0 }}: {{ option.1|json }}{% if not forloop.last %},{% endif %}
+				{{ option.0 }}: {{ option.1|tojson }}{% if not forloop.last %},{% endif %}
 			{% endfor %}
 		};
 	""")
@@ -44,7 +44,7 @@ def render_ini(path, ctx, riurik_url, section_name='default'):
 	ctxitems = patch(path, ctx, riurik_url)
 	t = Template("""{% load json_tags %}
 [{{ section }}]
-{% for option in options %}{{ option.0 }} = {{ option.1|json }}{% if option.2 %} ; {{ option.2 }}{% endif %}
+{% for option in options %}{{ option.0 }} = {{ option.1|tojson }}{% if option.2 %} ; {{ option.2 }}{% endif %}
 {% endfor %}""")
 	c = Context()
 	c['section'] = section_name
