@@ -25,7 +25,7 @@ but first you have to [add the python path to Windows PATH][AddingPythonToWindow
 
 Start up a web browser and go to http://localhost:8000. The main Riurik screen should come up.
 
-To make you django application ready to work with Riurik download [Riurik Django bindings][DjangoBindings]. Unpack it into your django web application tests folder. In the same folder create your suites folder and __init__.py. For example
+To make you django application ready to work with Riurik download [Riurik Django bindings][DjangoBindings]. Unpack it into your django web application tests folder. It should be a package directory, i.e. contain \_\_init\_\_.py. Also create your test suites folder there. For example
 
        django web app
        | tests
