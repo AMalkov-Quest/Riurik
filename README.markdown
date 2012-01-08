@@ -17,11 +17,11 @@ Being a Django web application, Riurik requires Python and Django. It works with
 
         sh run.sh
 
-for Linux and
+for Linux. For Windows use
 
         run.bat
 
-for Windows.
+but first you have to add the python path to Windows PATH or just modify the run.bat script by adding full path to python.exe command.
 
 Start up a web browser and go to http://localhost:8000. The main Riurik screen should come up. That's it. You're ready to start using Riurik.
 
