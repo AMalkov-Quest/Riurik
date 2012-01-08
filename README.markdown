@@ -23,7 +23,16 @@ for Linux. For Windows use
 
 but first you have to [add the python path to Windows PATH][AddingPythonToWindowsPath] or just modify the run.bat script by adding full path to python.exe command.
 
-Start up a web browser and go to http://localhost:8000. The main Riurik screen should come up. That's it. You're ready to start using Riurik.
+Start up a web browser and go to http://localhost:8000. The main Riurik screen should come up.
+
+To make you django application ready to work with Riurik download [Riurik Django bindings][DjangoBindings]. Unpack it into your django web application tests folder. In the same folder create your suites folder. For example
+
+       django web app
+       | tests
+       | | cases
+       | | riurik
+       
+That's it. You're ready to start using Riurik.
 
 ### Example
 
@@ -101,6 +110,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 [4]: https://github.com/andrew-malkov/Riurik/downloads "Riurik Download"
 [5]: https://docs.djangoproject.com/en/1.3/topics/install
 [6]: http://www.python.org
+[DjangoBindings]: https://github.com/andrew-malkov/Riurik-Django/downloads
 [amalkov]: https://github.com/andrew-malkov
 [atimiskov]: https://github.com/AntonTimiskov
 [AddingPythonToWindowsPath]: http://code.google.com/p/tryton/wiki/AddingPythonToWindowsPath
