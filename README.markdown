@@ -21,7 +21,7 @@ for Linux. For Windows use
 
         run.bat
 
-but first you have to add the python path to Windows PATH or just modify the run.bat script by adding full path to python.exe command.
+but first you have to [add the python path to Windows PATH][AddingPythonToWindowsPath] or just modify the run.bat script by adding full path to python.exe command.
 
 Start up a web browser and go to http://localhost:8000. The main Riurik screen should come up. That's it. You're ready to start using Riurik.
 
@@ -103,3 +103,4 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 [6]: http://www.python.org
 [amalkov]: https://github.com/andrew-malkov
 [atimiskov]: https://github.com/AntonTimiskov
+[AddingPythonToWindowsPath]: http://code.google.com/p/tryton/wiki/AddingPythonToWindowsPath
