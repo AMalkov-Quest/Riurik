@@ -545,6 +545,12 @@ def live_settings_save(request):
 		f.close()
 		return path
 
+	def clean(path):
+		try:
+			if os.path.exists(path): os.remove(path)
+		except Exception, e:
+			log.debug(e)
+
 	def checkSyntax(content):
 		import py_compile
 		path = saveTemp(content)
@@ -554,9 +560,9 @@ def live_settings_save(request):
 		except:
 			return False
 		finally:
-			if os.path.exists(path): os.remove(path)
-			if os.path.exists(path+'c'): os.remove(path+'c')
-			if os.path.exists(path+'d'): os.remove(path+'d')
+			clean(path)
+			clean(path+'c')
+			clean(path+'d')
 
 	if not checkSyntax( content ):
 		descriptor = live_settings_json(request, content)
