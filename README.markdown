@@ -33,6 +33,12 @@ To make you django application ready to work with Riurik download [Riurik Django
        | | riurik
        | | __init__.py
        
+In your urls.py add urlpatterns to include('tests.riurik.urls')
+
+    urlpatterns += patterns('',
+      (r'^testsrc', include('tests.riurik.urls')),
+    )
+       
 That's it. You're ready to start using Riurik.
 
 ### Example
