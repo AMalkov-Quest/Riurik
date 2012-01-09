@@ -54,7 +54,7 @@ def render_ini(path, ctx, riurik_url, section_name='default'):
 	return t.render(c)
 
 def patch_libraries(path, ctximpl, ctx):
-	libraries = contrib.get_libraries_impl(path, ctximpl.as_items(), ctx)
+	libraries = contrib.get_libraries_impl(path, ctximpl.as_list(), ctx)
 	log.info('libs are %s' % libraries)
 	if libraries != None:
 		ctximpl.replace(settings.LIB_KEY_NAME, str(libraries).replace('\'','\"'))

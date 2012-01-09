@@ -91,7 +91,8 @@ class context_impl():
 			log.error(e)
 
 	def get(self, key):
-		return self.as_items()[key]
+		if self.has(key):
+			return self.as_items()[key]
 
 	def add(self, key, value):
 		self.items_as_list.append((key, value))
@@ -108,6 +109,9 @@ class context_impl():
 			items[item[0]] = item[1]
 
 		return items
+
+	def as_list(self):
+		return self.items_as_list
 
 	def as_tuple(self):
 		return tuple(self.items_as_list)
@@ -171,9 +175,10 @@ def get_libraries_raw(ctxitems):
 	>>> get_libraries_raw([])
 	[]
 	>>> get_libraries_raw([('libraries', '[]')])
+
 	>>> get_libraries_raw([('key', 'value')])
 	[]
-	>>> get_libraries_raw([('libraries', 'lib1, lib2')])
+	>>> get_libraries_raw([('key', 'value'), ('libraries', 'lib1, lib2')])
 	['lib1', 'lib2']
 	"""
 	for item in ctxitems:
