@@ -91,6 +91,7 @@
 				}
 				$('#apply-test').submit(); 
 			});
+			/* // AutoSave if turned off
             var ticks = 0;
             var savingDraft = false;
             var saveDraft = function(){
@@ -112,7 +113,7 @@
                 }
             };
             setInterval(function(){
-		console.log('save draft check', savingDraft, ticks)
+				console.log('save draft check', savingDraft, ticks)
                 var new_value = editor.getCode();
                 if ( new_value == draft_value ) { return; }
                 ticks = ticks + 1;
@@ -123,6 +124,7 @@
                     saveDraft();
                 }
             },1000);
+			*/
 			{% endif %}
             $.ctrl('R', function(){ $('#run').trigger('click'); });
 			$('#unstub').click(function(){
