@@ -361,6 +361,8 @@ def runTest(request, fullpath):
 		url = "http://%s/%s?path=/%s" % (target, settings.EXEC_TESTS_CMD, clean_path)
 	else:
 		saveLocalContext(fullpath, contextjs)
+		import coffeescript
+		clean_path = coffeescript.compile(test_content, clean_path, fullpath)
 		url = "http://%s/%s?path=/%s" % (target, settings.EXEC_TESTS_CMD, clean_path)
 
 	log.info("redirect to run test %s" % url)
