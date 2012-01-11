@@ -4,6 +4,19 @@ import settings, virtual_paths
 from logger import log
 import socket
 
+def parseURI(url):
+	"""
+	>>> parseURI('spb9914')
+	('spb9914', '80')
+	>>> import os, test
+	>>> test.stub('socket.gethostname', returns='spb9914')
+	>>> parseURI('localhost:8000')
+	('spb9914', '8000')
+	"""
+	hostport = url.split(':')
+	host = hostport[0] if hostport[0] != 'localhost' else socket.gethostname()
+	return host, hostport[1] if len(hostport) > 1 else '80'
+
 def patch_host_port(ctximpl, riurik_url):
 	"""
 	>>> ci = context_impl([])
@@ -12,10 +25,6 @@ def patch_host_port(ctximpl, riurik_url):
 	'spb9914'
 	>>> ci.get('port')
 	'8000'
-	>>> ci = context_impl([])
-	>>> patch_host_port(ci, 'spb9914')
-	>>> ci.get('port')
-	'80'
 	>>> import os, test
 	>>> test.stub('socket.gethostname', returns='google.ru')
 	>>> ci = context_impl([('host', 'localhost'), ('port', '1')])
@@ -26,9 +35,9 @@ def patch_host_port(ctximpl, riurik_url):
 	if ctximpl.has('host') and ctximpl.has('port'):
 		ctximpl.replace_if('host', socket.gethostname(), 'localhost')
 	else:
-		hostport = riurik_url.split(':')
-		ctximpl.add('host', hostport[0])
-		ctximpl.add('port', hostport[1] if len(hostport) > 1 else '80')
+		host, port = parseURI(riurik_url)
+		ctximpl.add('host', host)
+		ctximpl.add('port', port)
 
 class context_impl():
 

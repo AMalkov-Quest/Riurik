@@ -349,15 +349,15 @@ def runTest(request, fullpath):
 	target = contrib.get_runner_url(ctx, request.get_host())
 	log.info('target of test %s is %s' % (clean_path, target))
 
-	test_content = request.REQUEST.get('content', None)
-	tools.savetest(test_content, fullpath)
+	tools.savetest(request.REQUEST.get('content', None), fullpath)
+	test_content = request.REQUEST.get("content", open(fullpath, 'r').read())
 
 	if contrib.target_is_remote( target, request.get_host()):
 		log.debug('TARGET: %s, %s' % ( target, request.get_host() ))
 		url = "http://%s/%s" % (target, settings.UPLOAD_TESTS_CMD)
 		saveRemoteContext(os.path.dirname(clean_path), contextjs, url, ctx)
 		distributor.saveTestSatelliteScripts(url, path, ctx)
-		distributor.sendContentToRemote(clean_path, request.REQUEST.get("content", open(fullpath, 'r').read()), url, ctx)
+		distributor.sendContentToRemote(clean_path, test_content, url, ctx)
 		url = "http://%s/%s?path=/%s" % (target, settings.EXEC_TESTS_CMD, clean_path)
 	else:
 		saveLocalContext(fullpath, contextjs)
