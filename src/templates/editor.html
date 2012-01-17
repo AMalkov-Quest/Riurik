@@ -91,6 +91,7 @@
 				}
 				$('#apply-test').submit(); 
 			});
+			/* // AutoSave if turned off
             var ticks = 0;
             var savingDraft = false;
             var saveDraft = function(){
@@ -112,7 +113,7 @@
                 }
             };
             setInterval(function(){
-		console.log('save draft check', savingDraft, ticks)
+				console.log('save draft check', savingDraft, ticks)
                 var new_value = editor.getCode();
                 if ( new_value == draft_value ) { return; }
                 ticks = ticks + 1;
@@ -123,6 +124,7 @@
                     saveDraft();
                 }
             },1000);
+			*/
 			{% endif %}
             $.ctrl('R', function(){ $('#run').trigger('click'); });
 			$('#unstub').click(function(){
@@ -183,6 +185,7 @@
 	{% if not is_stubbed %}
 	<ul class="horizontal-menu">
 		{% ifequal filetype 'test'  %}
+		{% block context-controls %}
 		{% if contexts %}
 		<li><a id="run" href="javascript:void(0);">{% trans "Run" %}</a>
 		at <select name="context">{% for item in contexts %}<option value='{{item}}'{% if forloop.first %} selected="selected"{% endif %}>{{item}}</option>{% endfor %}</select></li>
@@ -193,10 +196,11 @@
 		{% endif %}
 		{% if not contexts %}
 		<li>
-			<a id="context-preview-ctrl" title="{% trans "To execute the test you have to define cotext" %}" href=".context.ini" rel='context-preview'>{% trans "Create context" %}
+			<a id="create-context" title="{% trans "To execute the test you have to define cotext" %}" href=".context.ini?editor" >{% trans "Create context" %}
 		</a>
 		</li>
 		{% endif %}
+		{% endblock context-controls %}
 		{% endifequal %}
 		<li><a id="save" href="javascript:void(0);">{% trans "Save" %}</a></li>
 		<li><a id="discard" href="javascript: void(0);">{% trans "Discard" %}</a></li>
