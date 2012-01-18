@@ -328,7 +328,8 @@ def runSuite(request, fullpath):
 		url = "http://%s/%s?suite=/%s" % ( target, settings.EXEC_TESTS_CMD, clean_path )
 	else:
 		saveLocalContext(fullpath, contextjs)
-		url = "http://%s/%s?suite=/%s" % ( target, settings.EXEC_TESTS_CMD, clean_path )
+		#url = "http://%s/%s?suite=/%s" % ( target, settings.EXEC_TESTS_CMD, clean_path )
+		url = "http://%s/%s?suite=/%s" % ( target, settings.EXEC_TESTS_CMD, path )
 
 	log.info("redirect to run suite %s" % url)
 	return HttpResponseRedirect( url )
