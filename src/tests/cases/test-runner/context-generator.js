@@ -36,12 +36,13 @@ test('context is generated including global settings', function() {
 
 asyncTest('hidden file is not included into suite', function() {
   $.when( frame.go( context.url ) ).then(function(_$) {
-
-    $.each( frame.window().context.include, function(index, value){ 
-      ok( value != context.hidden_file, value );
-    });
+    $.wait(function() { return typeof frame.window().context != 'undefined'}).then(function() {
+      $.each( frame.window().context.include, function(index, value){ 
+        ok( value != context.hidden_file, value );
+      });
     
-    start();
+      start();
+    });
   });
 });
 

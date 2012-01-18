@@ -118,6 +118,7 @@ TEST_CONTEXT_JS_FILE_NAME = '.context.js'
 TEST_FILE_EXT = '.js'
 TEST_SWAP_FILE_NAME = '.%s.swp'
 LIB_KEY_NAME = 'libraries'
+LIB_DEFAULT_NAME = 'library.js'
 APPEND_SLASH = False
 CODEMIRROR_CALL_EDITOR_FOR = '^.*\.(?:js|ini|html|py)$'
 INCLUDE_KEY = 'include'

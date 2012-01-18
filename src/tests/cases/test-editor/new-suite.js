@@ -14,8 +14,8 @@ QUnit.setup(function() {
 
 asyncTest('should propose creating context', function() {
   $.when(frame.go(context.test_path + '?editor')).then(function(_$) {
-    equal( _$('#context-preview-ctrl').text().trim(), 'Create context' );
-    equal( _$('#context-preview-ctrl').attr('title').trim(), 'To execute the test you have to define cotext' );
+    equal( _$('#create-context').text().trim(), 'Create context' );
+    equal( _$('#create-context').attr('title').trim(), 'To execute the test you have to define cotext' );
     
     start();
   });

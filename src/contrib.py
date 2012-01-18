@@ -167,12 +167,12 @@ def get_libraries_impl(path, ctxitems, ctx):
 	log.info('libs are %s' % libs)
 	if libs != None:
 		for lib in libs:
-			lib_path = get_lib_path_by_name(root, lib, ctx)
+			lib_path = get_lib_path_by_name(path, lib, ctx)
 			if lib_path:
 				libraries.append(lib_path)
 		if not libraries:
 			log.info('there are no precofigured libs to include, try defaults ...')
-			libraries = libraries_default(root, ctx)
+			libraries = libraries_default(path, ctx)
 
 	return libraries
 
@@ -198,18 +198,19 @@ def get_libraries_raw(ctxitems):
 				return None
 	return []
 
-def libraries_default(root, ctx):
+def libraries_default(path, ctx):
 	libraries = []
-
+	root = get_document_root(path)
+	virtual_root = get_virtual_root(path)
 	lib_paths = get_global_context_lib_path(ctx)
-	for path in lib_paths:
-		full_path = os.path.abspath(os.path.join(root, path.strip()))
+	for lib_path in lib_paths:
+		full_path = os.path.abspath(os.path.join(root, lib_path.strip()))
 		for name in os.listdir(full_path):
 			lib_path = os.path.abspath(os.path.join(full_path, name))
-			lib_relpath = lib_path.replace(root, '').lstrip('/')
+			lib_relpath = lib_path.replace(root, virtual_root).lstrip('/')
 			libraries.append(str(lib_relpath))
 
-	lib_relpath = get_local_lib_path(root, 'library.js', ctx)
+	lib_relpath = get_local_lib_path(path, settings.LIB_DEFAULT_NAME, ctx)
 	if lib_relpath:
 		libraries.append(lib_relpath)
 
@@ -385,25 +386,29 @@ def get_list_value_from_context(value):
 
 	return []
 
-def get_local_lib_path(root, lib, ctx):
-	current_suite_path = os.path.abspath(os.path.join(ctx.get_folder(), lib))
+def get_local_lib_path(path, lib_name, ctx):
+	root = get_document_root(path)
+	virtual_root = get_virtual_root(path)
+	current_suite_path = os.path.abspath(os.path.join(ctx.get_folder(), lib_name))
 	if os.path.exists(current_suite_path):
-		log.info('%s lib is located in current suite folder' % lib)
-		return str(current_suite_path.replace(root, '').lstrip('/'))
+		log.info('%s lib is located in current suite folder' % lib_name)
+		return str(current_suite_path.replace(root, virtual_root).lstrip('/'))
 
 	return ''
 
-def get_lib_path_by_name(root, lib, ctx):
+def get_lib_path_by_name(path, lib, ctx):
+	root = get_document_root(path)
+	virtual_root = get_virtual_root(path)
 	full_path = os.path.abspath(os.path.join(root, lib))
 	lib_relpath = ''
 	if not os.path.exists(full_path):
-		lib_relpath = get_local_lib_path(root, lib, ctx)
+		lib_relpath = get_local_lib_path(path, lib, ctx)
 		if not lib_relpath:
 			for path in get_global_context_lib_path(ctx):
 				global_libs_path = os.path.abspath(os.path.join(root, path.strip(), lib))
 				if os.path.exists(global_libs_path):
 					log.info('%s lib is located in the %s global library path' % (lib, path))
-					lib_relpath = global_libs_path.replace(root, '')
+					lib_relpath = global_libs_path.replace(root, virtual_root)
 					break
 
 			if not lib_relpath:

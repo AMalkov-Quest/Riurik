@@ -7,13 +7,14 @@ module('suite runner', {
 
 asyncTest('suite is executed', function() {
   $.when( frame.go( context.url ) ).then(function(_$) {
-    
-    ok( typeof frame.window().context != 'undefined', 'context is generated' );
-    frame.window().QUnit.done = function(module) {
-      ok( _$('#qunit-testresult').length == 1, 'test result is present');
-      equal( _$('.test-name').length, 5, 'all tests are ran' );
+    $.wait(function() { return typeof frame.window().context != 'undefined'}).then(function() {
+      ok( 'context is generated' );
+      frame.window().QUnit.done = function(module) {
+        ok( _$('#qunit-testresult').length == 1, 'test result is present');
+        equal( _$('.test-name').length, 5, 'all tests are ran' );
 
-      start();
-    }
+        start();
+      }
+    });
   });
 });
