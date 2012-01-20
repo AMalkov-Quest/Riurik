@@ -64,7 +64,11 @@ loader( load_remote_script )
 			QUnit.riurik.context = clone(context);
 						var l = loader( load_remote_script );
 			$.each(context.libraries || [],function(i,url){l.queue( '/' + url );});
-			$.each(context.include || [],function(i,url){l.queue( test_location+'/' + url );});
+			if ( /\.js$/.test(test_path) ) {
+				l.queue( test_path );
+			} else {
+				$.each(context.include || [],function(i,url){l.queue( test_location+'/'+url );});
+			};
 			l.then(function(){
 				QUnit.config.autostart = true;
 				QUnit.start();
