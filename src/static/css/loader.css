@@ -1,0 +1,13 @@
+iframe { width: 99%; height: 700px; }
+#tabs-2-loading {
+	background: url('../img/loading.gif') no-repeat scroll 0 0;
+	width: 15px;
+	height: 15px;
+}
+#powershell-console hr, #javascript-console hr {
+	color: #EEE;
+}
+#powershell-console, #javascript-console,
+#powershell-console *, #javascript-console * {
+	font-size: 1em;
+}
