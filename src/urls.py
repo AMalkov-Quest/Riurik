@@ -27,6 +27,7 @@ urlpatterns = patterns('',
 	(r'^(?P<path>.*)/show_context[/]?$', 'views.show_context'),
 	(r'^settings[/]?$', 'views.live_settings_view'),
 	(r'^settings/save[/]?$', 'views.live_settings_save'),
+	(r'^report_callback/$', 'views.report_callback'),
 )
 
 urlpatterns += patterns('',

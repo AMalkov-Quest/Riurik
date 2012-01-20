@@ -55,6 +55,7 @@ loader( load_remote_script )
 	.queue('/static/js/jquery.json.min.js')
 	.queue('/static/jquery-ui/js/jquery-ui.custom.min.js')
 	.queue('/static/js/qunit.js')
+	.queue('/static/js/dates.js')
 	.queue('/static/js/testLoader.js')
 	.queue(test_location+'/.context.js')
 	.then(function(){
