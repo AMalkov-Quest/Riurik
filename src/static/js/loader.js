@@ -9,16 +9,17 @@ var loader = function( load_script_fn ){
 			load_script_fn( 
 				task.url, 
 				function(){
+					console.log(task.url, task.callback);
 					if ( typeof task.callback == 'function' ) 
-						task.callback;
+						task.callback();
 					setTimeout( execute, 0 );
 				}
 			);
 			return;	
 		} 
 		if ( callbacks.length > 0 ) {
-			var callback = callback.shift();
-			callback();	
+			var callback = callbacks.shift();
+			callback();
 			setTimeout( execute, 0 );
 			return;
 		}
@@ -26,55 +27,59 @@ var loader = function( load_script_fn ){
 	};
 	this.queue = function( url, step_callback ){
 		if ( typeof step_callback != 'function' ) step_callback = function(){};
-		queue.push( { 'url': url, 'callback': step_callback );
+		queue.push({ 'url': url, 'callback': step_callback });
 		if ( ! running ) execute();
 		return this;
 	};
 
 	this.then = function( callback ) {
 		callbacks.push( callback );
-		if ( ! running ) execute();
+		if ( ! running ) { console.log('execute from THEN'); setTimeout( execute, 0 ); }
 		return this;
 	};
 
 	return this;
 };
 var load_remote_style = function(url){
-	var style = document.createElement( 'style' );
+	var style = document.createElement( 'link' );
 	style.type = 'text/css';
 	style.rel = 'stylesheet';
-	style.src = url+'?_='+Math.random().toString();
+	style.href = make_remote_url(url)+'?_='+Math.random().toString();
 	document.head.appendChild( style );
 };
 
 loader( load_remote_script )
-	.queue('/static/js/jquery.min.js')
-	.queue('/static/jqueryui/js/jquery-ui.custom.min.js',function(){$("#tabs").tabs();})
+	.queue('/static/js/jquery.min.js', function(){
+		$('head title').text(test_path);
+	})
+	.queue('/static/js/jquery.json.min.js')
+	.queue('/static/jquery-ui/js/jquery-ui.custom.min.js')
 	.queue('/static/js/qunit.js')
 	.queue('/static/js/testLoader.js')
-	.queue(context_path)
+	.queue(test_location+'/.context.js')
 	.then(function(){
-		QUnit.riurik.context = clone(context);
-		QUnit.config.autostart = false;
-		var l = loader( load_remote_script );
-		$.each( 
-			(context.libraries || []).concat(context.include || []), 
-			function(i, url){
-				l.queue( url );		
-			}
-		);
-		l.then(function(){
-			QUnit.config.autostart = true;
-			QUnit.start();
-		});
-		setTimeout(function force_qunit_to_start() {
-			if( QUnit.config.autostart != true ) {
-				QUnit.log('scripts load timeout, forcing tests to start ...');
-				QUnit.start();	
-			}	
-		}, 10000);
+		riurik.load = function(){
+			console.log(QUnit, context)
+			$("#tabs").tabs();
+			QUnit.riurik.context = clone(context);
+						var l = loader( load_remote_script );
+			$.each(context.libraries || [],function(i,url){l.queue( '/' + url );});
+			$.each(context.include || [],function(i,url){l.queue( test_location+'/' + url );});
+			l.then(function(){
+				QUnit.config.autostart = true;
+				QUnit.start();
+			});
+			setTimeout(function force_qunit_to_start() {
+				if( QUnit.config.autostart != true ) {
+					QUnit.log('scripts load timeout, forcing tests to start ...');
+					QUnit.start();	
+				}	
+			}, 10000);
+		};
+		QUnit.load();
+		console.log(QUnit)
 	});
-load_remote_style(make_remote_url('/static/css/loader.css'));
-load_remote_style(make_remote_url('/static/css/qunit.css'));
-load_remote_style(make_remote_url('/static/queryui/redmond/jquery-ui-custom.css'));
+load_remote_style('/static/css/loader.css');
+load_remote_style('/static/css/qunit.css');
+load_remote_style('/static/jquery-ui/css/redmond/jquery-ui.custom.css');
 

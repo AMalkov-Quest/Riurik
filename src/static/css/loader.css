@@ -3,6 +3,7 @@ iframe { width: 99%; height: 700px; }
 	background: url('../img/loading.gif') no-repeat scroll 0 0;
 	width: 15px;
 	height: 15px;
+	display: none;
 }
 #powershell-console hr, #javascript-console hr {
 	color: #EEE;

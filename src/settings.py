@@ -110,7 +110,7 @@ INSTALLED_APPS = (
 	'src.plugins.search',
 )
 
-EXEC_TESTS_CMD='testsrc/execute'
+EXEC_TESTS_CMD='static/tests/riurik.html'
 UPLOAD_TESTS_CMD='testsrc/upload'
 
 TEST_CONTEXT_FILE_NAME = '.context.ini'
