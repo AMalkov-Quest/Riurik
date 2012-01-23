@@ -637,19 +637,19 @@ QUnit.log('QUnit console: initialized');
 QUnit.config.reorder = false;
 
 QUnit.setup = function(callback) {
-	QUnit.test('setup', 0, callback, false);
+	QUnit.test('setup', null, callback, false);
 }
 
 QUnit.asyncSetup = function(callback) {
-	QUnit.test('setup', 0, callback, true);
+	QUnit.test('setup', null, callback, true);
 }
 
 QUnit.teardown = function(callback) {
-	QUnit.test('teardown', 0, callback, false);
+	QUnit.test('teardown', null, callback, false);
 }
 
 QUnit.asyncTeardown = function(callback) {
-	QUnit.test('teardown', 0, callback, true);
+	QUnit.test('teardown', null, callback, true);
 }
 
 jQExtend($);
