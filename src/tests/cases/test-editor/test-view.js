@@ -81,7 +81,7 @@ asyncTest('Save button sends a valid request', function(){
       equal(o.context, "default", 'Context is OK');
       ok(o.content.length > 0, 'Content is not empty');
       equal(_$('form#apply-test').attr('action'), "/actions/test/save/", 'form action');
-      equal(_$('form#apply-test').attr('target'), "", 'form target is null');
+      ok( !_$('form#apply-test').attr('target'), 'form target is null');
       _$('form#apply-test').get(0).submit = function(){ return false; };
       start();
       return false;
