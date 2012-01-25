@@ -1,10 +1,6 @@
-ctx = 'global'
 module 'coffee-script'
-
-#test 'test-1', ->
-#  alert "Hello CoffeeScript!"
     
-asyncTest 'test-2', ->
+asyncTest 'test', ->
   
   $.when( frame.go('') ).then(
     (_$) ->

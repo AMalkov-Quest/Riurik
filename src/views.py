@@ -18,6 +18,7 @@ import urllib, urllib2
 import codecs, time
 import virtual_paths
 import distributor
+import coffeescript
 
 def error_handler(fn):
 	def _f(*args, **kwargs):
@@ -314,6 +315,7 @@ def runSuite(request, fullpath):
 
 	log.info('run suite %s with context %s' % (path, context_name))
 	server = request.get_host();
+	compileSuiteCoffee(path, fullpath)
 	contextjs = context.render(path, ctx, server)
 
 	clean_path = contrib.get_relative_clean_path(path)
@@ -329,10 +331,19 @@ def runSuite(request, fullpath):
 	#else:
 	#	saveLocalContext(fullpath, contextjs)
 	#	url = "http://%s/%s?suite=/%s" % ( target, settings.EXEC_TESTS_CMD, clean_path )
+
 	saveLocalContext(fullpath, contextjs)
 	url = "http://%s/%s?server=%s&path=/%s" % ( target, settings.EXEC_TESTS_CMD, server, path )
 	log.info("redirect to run suite %s" % url)
 	return HttpResponseRedirect( url )
+
+def compileSuiteCoffee(path, fullpath):
+	#document_root = contrib.get_document_root(path)
+	#enumroot = contrib.get_full_path(document_root, path)
+	tests = contrib.enum_files_in_folders(fullpath, lambda file_: not file_.endswith(coffeescript.ext))
+	for test in tests:
+		path = coffeescript.compile(None, None, os.path.join(fullpath, test))
+		log.info(path)
 
 @add_fullpath
 @error_handler
@@ -365,7 +376,6 @@ def runTest(request, fullpath):
 	#	url = "http://%s/%s?path=/%s" % (target, settings.EXEC_TESTS_CMD, clean_path)
 	saveLocalContext(fullpath, contextjs)
 	if coffee(path):
-		import coffeescript
 		path = coffeescript.compile(test_content, path, fullpath)
 	url = "http://%s/%s?server=%s&path=/%s" % (target, settings.EXEC_TESTS_CMD, server, path)
 	log.info("redirect to run test %s" % url)

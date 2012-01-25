@@ -73,8 +73,8 @@ def patch(path, ctx, riurik_url):
 		include = []
 		for root, dirs, files in os.walk(ctx.get_folder()):
 			for file_ in files:
-				if re.match('^.*\.js$', file_) and not file_.startswith('.'):
-					if file_ in exclude:
+				if re.match('^.*\.js$', file_):
+					if file_ in exclude or settings.TEST_CONTEXT_JS_FILE_NAME in file_:
 						continue
 					file_abspath = os.path.abspath(os.path.join(root, file_))
 					file_relpath = file_abspath.replace(os.path.abspath(ctx.get_folder()), '').lstrip('/').lstrip('\\')
