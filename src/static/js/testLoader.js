@@ -21,7 +21,7 @@ var frame = {
 		go: function(path) {
 			var dfd = $.Deferred();
 			var url = path;
-			var regex = new RegExp('http://[a-zA-Z0-9]');
+			var regex = new RegExp('^http://[a-zA-Z0-9]');
 			if(!regex.test(url)) {
 				url = 'http://' + context.host + ':' + context.port + '/' + path;
 			}
@@ -30,7 +30,7 @@ var frame = {
 			$('#frame-url').html('<a href="'+url+'">'+url+'</a>');
 			$('#frame').load(function() {
 				var __frame = window.frames[0];
-				__frame.window.onerror = onerror;
+				//__frame.window.onerror = onerror;
 
 				if( ! __frame.window.jQuery ) {
 					// inject one
@@ -474,6 +474,8 @@ riurik.init = function() {
 }
 
 QUnit.begin = function() {
+	QUnit.config.autostart = false;
+	QUnit.config.reorder = false;
 	QUnit.log('tests are begun');
 	riurik.init();
 	riurik.load();
