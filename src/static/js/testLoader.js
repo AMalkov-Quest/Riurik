@@ -2,9 +2,8 @@ if ( typeof console == 'undefined' || typeof console.log == 'undefined' ) {
 	var console = { log: function(){} };
 }
 
-function onerror(msg, url, line) {
+function onErrorHandler(msg, url, line) {
 	QUnit.log("error(" + url + ": " +  line + "): " + msg);
-	QUnit.ok(false, msg);
 	QUnit.start();
 	return true;
 };
@@ -15,6 +14,17 @@ function ajaxError(event, jqXHR, ajaxSettings, exception) {
 	QUnit.ok(false, exception); 
 	QUnit.start();
 }
+
+function wrapErrorHandler(handler, func) {
+	var l = handler;
+	if ( typeof handler == 'function' ) {
+		return function() {
+			l.apply(l, arguments);
+			func.apply(func, arguments);	
+		};
+	}
+	return func;
+};
 
 var frame = {
 
@@ -30,7 +40,7 @@ var frame = {
 			$('#frame-url').html('<a href="'+url+'">'+url+'</a>');
 			$('#frame').load(function() {
 				var __frame = window.frames[0];
-				//__frame.window.onerror = onerror;
+				__frame.window.onerror = wrapErrorHandler( __frame.window.onerror, onErrorHandler );
 
 				if( ! __frame.window.jQuery ) {
 					// inject one
@@ -657,7 +667,6 @@ QUnit.asyncTeardown = function(callback) {
 jQExtend($);
 
 $(document).ready(function() {
-
-	window.onerror = onerror;
+	window.onerror = wrapErrorHandler(window.onerror, onErrorHandler);
 	$(document).ajaxError( ajaxError );
 });
