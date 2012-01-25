@@ -364,9 +364,15 @@ def runTest(request, fullpath):
 	#	saveLocalContext(fullpath, contextjs)
 	#	url = "http://%s/%s?path=/%s" % (target, settings.EXEC_TESTS_CMD, clean_path)
 	saveLocalContext(fullpath, contextjs)
+	if coffee(path):
+		import coffeescript
+		path = coffeescript.compile(test_content, path, fullpath)
 	url = "http://%s/%s?server=%s&path=/%s" % (target, settings.EXEC_TESTS_CMD, server, path)
 	log.info("redirect to run test %s" % url)
 	return HttpResponseRedirect(url)
+
+def coffee(path):
+	return path.endswith('.coffee')
 
 def saveLocalContext(fullpath, contextjs):
 	if os.path.isdir(fullpath):

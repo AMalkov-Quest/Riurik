@@ -2,15 +2,18 @@
 {% load i18n dir_index_tags %}
 {% block styles %}
 	{{ block.super }}
+	<link rel="stylesheet" type="text/css" href="/static/codemirroreditor/lib/codemirror.css" />
 	<link rel="stylesheet" type="text/css" href="/static/css/editor.css" />	
 {% endblock styles %}
 
 {% block javascripts %}
 	{{ block.super }}
 	{% if not is_stubbed %}
-	<script type="text/javascript" src="/static/codemirroreditor/js/codemirror.js"></script>
+	<script type="text/javascript" src="/static/codemirroreditor/lib/codemirror.js"></script>
+	<script type="text/javascript" src="/static/codemirroreditor/mode/javascript/javascript.js"></script>
+	<script type="text/javascript" src="/static/codemirroreditor/mode/coffeescript/coffeescript.js"></script>
 	{% endif %}
-	<script type="text/javascript" src="/static/codemirroreditor/js/ctrl.js"></script>
+	<script type="text/javascript" src="/static/codemirroreditor/lib/ctrl.js"></script>
 	<script type="text/javascript" src="/static/js/jquery.cookie.js"></script>
     <script type="text/javascript">
    	  $(document).ready(function() {
@@ -20,34 +23,22 @@
 		  } catch (e) { console.log(e); }
 		  {% if not is_stubbed %}	
 		  var source_value = draft_value = $('#code').val();
-  		  var editor = CodeMirror.fromTextArea("code", {
-		    height: "600px",
+		  var mode = ( /\.coffee\?/.test(window.location.href) ) ? "coffeescript" : "javascript";
+  		  var editor = CodeMirror.fromTextArea(document.getElementById("code"), {
+			mode: mode,
 		    content: source_value,
-		    parserfile: ["tokenizejavascript.js", "parsejavascript.js"],
-		    stylesheet: "/static/codemirroreditor/css/jscolors.css",
-		    path: "/static/codemirroreditor/js/",
+			lineWrapping: true,
 		    autoMatchParens: true,
 		    lineNumbers: true,
-		    basefiles: ["util.js", "stringstream.js", "select.js", "undo.js", "editor.js", "tokenize.js", "jquery.js", "ctrl.js"],
-		    onLoad: function(){
-                window.frames[0].$(document).ready(function(){
-                    window.frames[0].$.ctrl('S', function(){ $('#save').trigger('click'); });
-                    window.frames[0].$.ctrl('R', function(){ $('#run').trigger('click'); });
-                    window.frames[0].$(window.frames[0].document).scroll(function(){
-                    	var last_pos = window.frames[0].$('body').scrollTop();
-				  		$.cookie('last_pos', last_pos);
-				  	});
-				  	try { 
-				  	  var last_pos = $.cookie('last_pos');
-					  if ( typeof last_pos == 'string' ) 
-						window.frames[0].$('body').scrollTop(last_pos);
-				 	} catch (e) { console.log(e); }
-                });
-		    }
+			matchBrackets: true,
+			extraKeys: {
+				"Ctrl-S": function(){ $('#save').trigger('click'); },
+				"Ctrl-R": function(){ $('#run').trigger('click'); }
+			}
 		  });
 		  window.editor = editor;
 	        var ConfirmDiscardchanges = function(){
-                var new_value = editor.getCode();
+                var new_value = editor.getValue();
                 if ( new_value == source_value ) {
                     return true
                 }

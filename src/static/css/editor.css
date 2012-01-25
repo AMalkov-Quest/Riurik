@@ -8,3 +8,13 @@
 a.disabled {
 	color: grey;
 }
+
+.CodeMirror {
+	width: 100%;
+}
+
+.CodeMirror-scroll {
+	height: auto;
+	width: 100%;
+	overflow: visible;
+}
