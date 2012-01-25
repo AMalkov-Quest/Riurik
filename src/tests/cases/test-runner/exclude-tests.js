@@ -7,13 +7,14 @@ module('exclude tests', {
 
 asyncTest('runs tests those were not given', function() {
   $.when( frame.go( context.url ) ).then(function(_$) {
-    
-    frame.window().QUnit.done = function(module) {
-      equal( _$('.test-name').length, 2, 'given tests are not ran' );
-      equal( _$('.test-name').first().text(), 'first test');
-      equal( _$('.test-name').last().text(), 'second test');
+    $.wait(function() { return typeof(frame.window().QUnit.riurik) != 'undefined' }).then(function() {
+      frame.window().QUnit.done = function(module) {
+        equal( _$('.test-name').length, 2, 'given tests are not ran' );
+        equal( _$('.test-name').first().text(), 'first test');
+        equal( _$('.test-name').last().text(), 'second test');
 
-      start();
-    }
+        start();
+      };
+    });
   });
 });
