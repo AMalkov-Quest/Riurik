@@ -22,8 +22,12 @@ function wrapErrorHandler(handler, func) {
 			l.apply(l, arguments);
 			func.apply(func, arguments);	
 		};
+	}else{
+		return function() {
+			ok(false, arguments[0]);
+			func.apply(func, arguments);	
+		};
 	}
-	return func;
 };
 
 var frame = {
@@ -36,6 +40,14 @@ var frame = {
 				url = 'http://' + context.host + ':' + context.port + '/' + path;
 			}
 
+			if (url.indexOf('?') != -1) {
+				url += '&_=' + Math.random().toString();
+			}else{
+				url += '?_=' + Math.random().toString();
+			}
+			if( window.frames[0].window ) {
+				window.frames[0].window.onerror = function(){};
+			}
 			$('#frame').attr('src', url);
 			$('#frame-url').html('<a href="'+url+'">'+url+'</a>');
 			$('#frame').load(function() {
@@ -112,7 +124,7 @@ function jQExtend( $ ) {
 
 	$.defer = function( lambda, timeout ){
 		var dfd = $.Deferred();
-		var timeout = timeout || 10 * 1000; // 10 sec by default
+		var timeout = timeout || context.timeout || 10 * 1000; // 10 sec by default
 		var time = 0;
 		(function f(){
 			if ( lambda() === true ) {
@@ -134,7 +146,8 @@ function jQExtend( $ ) {
 	
 	$.wait = function( lambda, timeout ){
 		var dfd = $.Deferred();
-		var timeout = timeout || 10 * 1000; // 10 sec by default
+		var timeout = timeout || context.timeout || 10 * 1000; // 10 sec by default
+		console.log('timeout', timeout);
 		var time = 0;
 		(function f(){
 			if ( lambda() === true ) {
@@ -156,7 +169,7 @@ function jQExtend( $ ) {
 
 	$.wait_event = function( target, event_name, timeout ){
 		var dfd = $.Deferred();
-		var timeout = timeout || 10 * 1000; // 10 sec by default
+		var timeout = timeout || context.timeout || 10 * 1000; // 10 sec by default
 		var time = 0;
 		var resolved = false;
 
