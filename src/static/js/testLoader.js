@@ -122,6 +122,17 @@ var frame = {
 
 function jQExtend( $ ) {
 
+	$.sleep = function(msec) {
+		var dfd = new $.Deferred();
+		QUnit.log('sleeping for ' + msec + ' msec' );
+		setTimeout( function() {
+			QUnit.log('sleeping for ' + msec + ' msec is resolved');
+			dfd.resolve(dfd);
+		}, msec);
+		
+		return dfd.promise(dfd);
+	};
+	
 	$.defer = function( lambda, timeout ){
 		var dfd = $.Deferred();
 		var timeout = timeout || context.timeout || 10 * 1000; // 10 sec by default
@@ -146,12 +157,12 @@ function jQExtend( $ ) {
 	
 	$.wait = function( lambda, timeout ){
 		var dfd = $.Deferred();
-		var timeout = timeout || context.timeout || 10 * 1000; // 10 sec by default
-		console.log('timeout', timeout);
+		var timeout = timeout || context.timeout || 10 * 1000;
+		QUnit.log('waiting for ' + lambda + ' timeout: ' + timeout );
 		var time = 0;
 		(function f(){
 			if ( lambda() === true ) {
-				QUnit.log('resolve wait');
+				QUnit.log('waiting for ' + lambda + ' is resolved');
 				dfd.resolve();
 				return;
 			}
@@ -159,7 +170,7 @@ function jQExtend( $ ) {
 			if ( time < timeout ) {
 				setTimeout(f, 100)
 			} else {
-				QUnit.log('wait timeout');
+				QUnit.log('wait timeout for ' + lambda + 'exceeded');
 				dfd.resolve();
 			}
 		})();
