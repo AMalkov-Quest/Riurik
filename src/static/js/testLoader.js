@@ -516,9 +516,15 @@ QUnit.begin = function() {
 	riurik.load();
 }
 
-QUnit.done = function(module) {
+QUnit.done = function(result) {
 	QUnit.log('tests are done');
 	QUnit.riurik.status = 'done';
+	if( result.total == 0 ) {
+		document.title = [
+			("\u2716"),
+			document.title.replace(/^[\u2714\u2716] /i, "")
+		].join(" ");
+	}
 }
 
 QUnit.moduleStart = function(module) {
