@@ -50,6 +50,7 @@ var frame = {
 			}
 			$('#frame').attr('src', url);
 			$('#frame-url').html('<a href="'+url+'">'+url+'</a>');
+			$('#frame').unbind('load');
 			$('#frame').load(function() {
 				var __frame = window.frames[0];
 				__frame.window.onerror = wrapErrorHandler( __frame.window.onerror, onErrorHandler );
