@@ -32,7 +32,7 @@ asyncTest('error reporting', function() {
     _$('#create-folder-btn').click();
     
     $.wait( function() { return _$('#operationResult').is(":visible") }, 1000 ).then(function() {
-      QUnit.substring( _$('#operationResult').text(), 'File exists', 'dialog with error is visible');
+      QUnit.substring( _$('#operationResult').text(), 'file already exists', 'dialog with error is visible');
       start();
     });
   });

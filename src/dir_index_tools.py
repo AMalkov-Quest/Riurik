@@ -32,7 +32,7 @@ def get_type(path):
 def mkdir(path, name):
 	try:
 		fullpath = os.path.join(path, name)
-		os.mkdir(fullpath)
+		os.makedirs(fullpath)
 	except Exception, e:
 		return str(e)
 	
