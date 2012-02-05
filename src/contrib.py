@@ -174,6 +174,15 @@ def get_libraries_impl(path, ctxitems, ctx):
 			log.info('there are no precofigured libs to include, try defaults ...')
 			libraries = libraries_default(path, ctx)
 
+	import coffeescript
+	def patch_coffeescript_lib(lib):
+		if re.search(r'\.coffee$', lib):
+			root = get_document_root(lib)
+			fullpath = get_full_path(root, lib)
+			return coffeescript.compile(None, lib, fullpath)
+		return lib
+	libraries = map( patch_coffeescript_lib, libraries )
+	
 	return libraries
 
 def loadListFromString(source):
