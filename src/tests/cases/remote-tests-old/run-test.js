@@ -1,17 +1,9 @@
 module('run test');
 
-//window.parent.$(window.parent.document).trigger('complete');
-
-function triggerComplete(){
-  $(document).trigger('complete');
-}
-
 var test_content = " \
 asyncTest('test', function() { \
   $.when( frame.go( contexter.URL(context, 'hello') )).then(function(_$) { \
     equal($.trim(_$('body').text()), 'Hello world!'); \
-    $(document).trigger('complete'); \
-    console.log( window.parent ); \
     start(); \
   }); \
 });";
@@ -37,13 +29,35 @@ asyncTest('test is pushed to run on remote server', function() {
   $('#frame').attr('src', context.URL);
   $('#frame').unbind('load');
   $('#frame').load(function() {
-    $(document).bind('complete', function(){
-      alert('Complete');    
-      start();
-    });
+    var logs = getLogs(context.start);
+    
+    var regex = new RegExp('run test '.concat(context.test_path, ' with context ', context.test_context));    
+    ok(regex.test(logs), regex);
+    
+    regex = new RegExp('save '.concat(context.suite_name, ' context'));
+    ok(regex.test(logs), regex);
+    
+    start();
   });
 });
-/*
+
+asyncTest('test is executed on remote server', function() {
+  riurik.sleep(100).then(function() {
+    var logs = getLogs(context.start, 'django-app');
+    
+    var regex = new RegExp('save script '.concat(context.suite_path.strip(context.root).strip('/'), '/.context.js'));
+    ok(regex.test(logs), regex);
+    
+    regex = new RegExp('save script '.concat(context.test_path.strip(context.root).strip('/')));
+    ok(regex.test(logs), regex);
+    
+    regex = new RegExp('execute test '.concat(context.test_path.strip(context.root).strip('/')));
+    ok(regex.test(logs), regex);
+    
+    start();
+  })
+});
+
 QUnit.teardown(function() {
   delete_test( context.test_path );
-});*/
+});
