@@ -26,13 +26,17 @@ def get_type(path):
 			return 'folder'
 		if '.ini' in path:
 			return 'configfile'
+
+		if settings.SPEC_URL_FILE_NAME in path:
+			return 'specification'
+
 		return 'test'
 	return 'none'
 
 def mkdir(path, name):
 	try:
 		fullpath = os.path.join(path, name)
-		os.makedirs(fullpath)
+		os.mkdir(fullpath)
 	except Exception, e:
 		return str(e)
 	

@@ -113,6 +113,7 @@ INSTALLED_APPS = (
 EXEC_TESTS_CMD='static/loader/loader.html'
 UPLOAD_TESTS_CMD='testsrc/upload'
 
+SPEC_URL_FILE_NAME = '.specification.url'
 TEST_CONTEXT_FILE_NAME = '.context.ini'
 TEST_CONTEXT_JS_FILE_NAME = '.context.js'
 TEST_FILE_EXT = '.js'

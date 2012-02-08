@@ -19,6 +19,7 @@ import codecs, time
 import virtual_paths
 import distributor
 import coffeescript
+import spec
 
 def error_handler(fn):
 	def _f(*args, **kwargs):
@@ -186,7 +187,8 @@ def get_dir_index(document_root, path, fullpath):
 		contexts = []
 
 	favicon = 'dir-index-%s.gif' % tools.get_type(fullpath)
-
+	spec_url = spec.get_url(fullpath)
+	
 	return Context({
 		'directory' : path + '/',
 		'type'		: pagetype,
@@ -194,6 +196,8 @@ def get_dir_index(document_root, path, fullpath):
 		'dir_list'  : dirs,
 		'contexts'  : contexts,
 		'favicon'   : favicon,
+		'spec'		: spec_url,
+		'spec_name'	: settings.SPEC_URL_FILE_NAME
 	})
 
 def get_path(request):
@@ -380,6 +384,9 @@ def runTest(request, fullpath):
 	url = "http://%s/%s?server=%s&path=/%s" % (target, settings.EXEC_TESTS_CMD, server, path)
 	log.info("redirect to run test %s" % url)
 	return HttpResponseRedirect(url)
+	
+def coffee(path):
+	return path.endswith('.coffee')
 
 def coffee(path):
 	return path.endswith('.coffee')

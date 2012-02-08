@@ -65,16 +65,21 @@
 						</li>
 						{% endif %}
 						<li><a id="context-preview-ctrl" href=".context.ini" rel='context-preview'>{% trans "Context" %}</a></li>
-						<li><a id="new-test" href="javascript:void(0);" onClick="javascript:createTest();">Create Test</a></li>
+						<li><a id="new-test" href="javascript:void(0);" onClick="javascript:createTest();">{% trans "Create Test" %}</a></li>
+						{% if spec %}
+						<li><a id="open-spec" href="{{ spec }}" target="_blank" >{% trans "Open Spec" %}</a></li>
+						{% else %}
+						<li><a id="link-spec" href="{{ spec_name }}?editor" >{% trans "Link Spec" %}</a></li>
+						{% endif %}
 					{% else %}
 						{% ifequal type 'virtual' %}
-							<li><a id="virtual-settings" href=".settings.ini?editor">Settings</a></li>
+							<li><a id="virtual-settings" href=".settings.ini?editor">{% trans "Settings</a></li>
 						{% endifequal %}
-						<li><a id="new-suite" href="javascript:void(0);" onClick="javascript:createFolder();">Create Suite</a></li>
-						<li><a id="new-test" href="javascript:void(0);" onClick="javascript:createTest();">Create Script</a></li>
+						<li><a id="new-suite" href="javascript:void(0);" onClick="javascript:createFolder();">{% trans "Create Suite" %}</a></li>
+						<li><a id="new-test" href="javascript:void(0);" onClick="javascript:createTest();">{% trans "Create Script" %}</a></li>
 					{% endifequal %}
 				{% else %}
-					<li><a id="configure" href="/settings" >Configure</a></li>
+					<li><a id="configure" href="/settings" >{% trans "Configure" %}</a></li>
 				{% endif %}
 			</ul>
 			</form>
