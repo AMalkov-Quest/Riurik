@@ -456,6 +456,10 @@ var riurik = {
 		document.body.appendChild( script );
 		
 		return dfd.promise(dfd);
+	},
+
+	pass: function() {
+		ok(true)
 	}
 };
 
@@ -700,4 +704,6 @@ jQExtend($);
 $(document).ready(function() {
 	window.onerror = wrapErrorHandler(window.onerror, onErrorHandler);
 	$(document).ajaxError( ajaxError );
+
+	QUnit.extend(window, riurik);
 });
