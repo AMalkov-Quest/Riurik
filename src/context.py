@@ -64,8 +64,14 @@ def add_start_time(ctximpl):
 	now = time.localtime(time.time())
 	ctximpl.add('test_start_time', time.mktime(now))
 
-def patch(path, ctx, riurik_url):
-	ctximpl = contrib.context_impl(ctx.items())
+def include_tests(path, ctx, ctximpl):
+
+	def contextjs(path):
+		return settings.TEST_CONTEXT_JS_FILE_NAME in path
+
+	def suite_setup(path):
+		return settings.SUITE_SETUP_FILE_NAME in path
+
 	if not ctximpl.has(settings.INCLUDE_KEY):
 		exclude = []
 		if ctximpl.has(settings.EXCLUDE_KEY):
@@ -74,16 +80,27 @@ def patch(path, ctx, riurik_url):
 		for root, dirs, files in os.walk(ctx.get_folder()):
 			for file_ in files:
 				if re.match('^.*\.js$', file_):
-					if file_ in exclude or settings.TEST_CONTEXT_JS_FILE_NAME in file_:
+					if file_ in exclude or contextjs(file_):
 						continue
 					file_abspath = os.path.abspath(os.path.join(root, file_))
 					file_relpath = file_abspath.replace(os.path.abspath(ctx.get_folder()), '').lstrip('/').lstrip('\\')
+
+					if suite_setup(file_):
+						patch_suite_setup(ctximpl, file_relpath)
+						continue
+
 					include += [ str(file_relpath) ]
 	else:
 		include = contrib.loadListFromString(ctx.get( option=settings.INCLUDE_KEY ))
 
 	ctximpl.replace(settings.INCLUDE_KEY, str(include).replace('\'','\"'))
 
+def patch_suite_setup(ctximpl, path):
+	ctximpl.add(settings.SUITE_SETUP, path)
+
+def patch(path, ctx, riurik_url):
+	ctximpl = contrib.context_impl(ctx.items())
+	include_tests(path, ctx, ctximpl)
 	patch_libraries(path, ctximpl, ctx)
 	add_start_time(ctximpl)
 	contrib.patch_host_port(ctximpl, riurik_url)

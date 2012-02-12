@@ -113,6 +113,7 @@ INSTALLED_APPS = (
 EXEC_TESTS_CMD='static/loader/loader.html'
 UPLOAD_TESTS_CMD='testsrc/upload'
 
+SUITE_SETUP_FILE_NAME = 'suite-setup.js'
 SPEC_URL_FILE_NAME = '.specification.url'
 TEST_CONTEXT_FILE_NAME = '.context.ini'
 TEST_CONTEXT_JS_FILE_NAME = '.context.js'
@@ -124,8 +125,4 @@ APPEND_SLASH = False
 CODEMIRROR_CALL_EDITOR_FOR = '^.*\.(?:js|ini|html|py)$'
 INCLUDE_KEY = 'include'
 EXCLUDE_KEY = 'exclude'
-
-#try:
-#	from local_settings import *
-#except Exception, ex: print ex
-#pass
+SUITE_SETUP = 'suite_setup'

@@ -1,0 +1,1 @@
+ asyncTest('test', function() {   $.when( frame.go( contexter.URL(context, 'hello') )).then(function(_$) {     equal($.trim(_$('body').text()), 'Hello world!');     $(document).trigger('complete');     console.log( window.parent );     start();   }); });
