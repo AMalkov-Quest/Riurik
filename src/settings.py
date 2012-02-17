@@ -110,6 +110,9 @@ INSTALLED_APPS = (
 	'src.plugins.search',
 )
 
+WIN_COFFEE_COMPILER = r'C:\\CoffeeScript\\coffee.bat'
+POSIX_COFFEE_COMPILER = r'coffee'
+
 EXEC_TESTS_CMD='static/loader/loader.html'
 UPLOAD_TESTS_CMD='testsrc/upload'
 
