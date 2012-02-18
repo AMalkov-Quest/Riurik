@@ -4,6 +4,17 @@ import settings, virtual_paths
 from logger import log
 import socket
 
+def cleandir(path):
+    log.debug('clean dir %s' % path)
+    n = 0
+    for root, dirs, files in os.walk(path):
+        for file_ in files:
+            if file_.startswith('.') and file_.endswith('.js'):
+                n = n + 1
+                os.remove(os.path.join(path, file_))
+            
+    log.debug('%s is cleaned, removed %d files' % (path, n))
+
 def parseURI(url):
 	"""
 	>>> parseURI('spb9914')

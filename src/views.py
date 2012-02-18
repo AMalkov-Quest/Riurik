@@ -342,8 +342,7 @@ def runSuite(request, fullpath):
 	return HttpResponseRedirect( url )
 
 def compileSuiteCoffee(path, fullpath):
-	#document_root = contrib.get_document_root(path)
-	#enumroot = contrib.get_full_path(document_root, path)
+	contrib.cleandir(fullpath)
 	tests = contrib.enum_files_in_folders(fullpath, lambda file_: not file_.endswith(coffeescript.ext))
 	for test in tests:
 		path = coffeescript.compile(None, None, os.path.join(fullpath, test))

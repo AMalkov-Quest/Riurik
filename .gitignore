@@ -1,3 +1,5 @@
+.*.js
+*.pyo
 *.pyc
 *.log
 *.swp
