@@ -5,15 +5,15 @@ from logger import log
 import socket
 
 def cleandir(path):
-    log.debug('clean dir %s' % path)
-    n = 0
-    for root, dirs, files in os.walk(path):
-        for file_ in files:
-            if file_.startswith('.') and file_.endswith('.js'):
-                n = n + 1
-                os.remove(os.path.join(path, file_))
-            
-    log.debug('%s is cleaned, removed %d files' % (path, n))
+	n = 0
+	for root, dirs, files in os.walk(path):
+		for file_ in files:
+			log.info(file_)
+			if file_.startswith('.') and file_.endswith('.js'):
+				n = n + 1
+				os.remove(os.path.join(path, file_))
+
+	log.info('%s is cleaned, removed %d files' % (path, n))
 
 def parseURI(url):
 	"""
@@ -193,7 +193,7 @@ def get_libraries_impl(path, ctxitems, ctx):
 			return coffeescript.compile(None, lib, fullpath)
 		return lib
 	libraries = map( patch_coffeescript_lib, libraries )
-	
+
 	return libraries
 
 def loadListFromString(source):

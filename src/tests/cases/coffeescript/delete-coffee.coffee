@@ -2,19 +2,15 @@ module 'removing coffee script'
 
 QUnit.setup ->
   using context, ->
-    @suite_name = 'first-suite'
-    @suite_path = @root.concat('/coffeescript/', @suite_name)
-    @test1_name = 'first-test.coffee'
-    @test2_name = 'second-test.coffee'
-    @test2_path = "#{@suite_path}/#{@test2_path}"
-    @suite_context = 'coffee'
-    path = "actions/suite/run/?path=/#{@suite_path}&context=#{@suite_context}"
-    @url = contexter.URL(context, path)
+    @suite_path = "#{@root}/coffeescript/first-suite"
+    @test1_path = "#{@suite_path}/first-test.coffee"
+    @test2_path = "#{@suite_path}/second-test.coffee"
+    suite_context = 'coffee'
+    @url = contexter.URL(context, "actions/suite/run/?path=/#{@suite_path}&context=#{suite_context}")
     
-    delete_folder(@suite_path)
-    set_context(@suite_path, '[' + @suite_context + ']')
-    write_test(@suite_path + '/' + @test1_name, "test 'first test', -> ok true, 'ok'")
-    write_test(@suite_path + '/' + @test2_name, "test 'second test', -> ok true, 'ok'")
+    set_context(@suite_path, "[#{suite_context}]")
+    write_test(@test1_path, "test 'first test', -> ok true, 'ok'")
+    write_test(@test2_path, "test 'second test', -> ok true, 'ok'")
              
 asyncTest 'should delete compiled js file so it will not be executed next time', ->
   $.when( frame.go(context.url) ).then ->

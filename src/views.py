@@ -188,7 +188,7 @@ def get_dir_index(document_root, path, fullpath):
 
 	favicon = 'dir-index-%s.gif' % tools.get_type(fullpath)
 	spec_url = spec.get_url(fullpath)
-	
+
 	return Context({
 		'directory' : path + '/',
 		'type'		: pagetype,
@@ -383,7 +383,7 @@ def runTest(request, fullpath):
 	url = "http://%s/%s?server=%s&path=/%s" % (target, settings.EXEC_TESTS_CMD, server, path)
 	log.info("redirect to run test %s" % url)
 	return HttpResponseRedirect(url)
-	
+
 def coffee(path):
 	return path.endswith('.coffee')
 
