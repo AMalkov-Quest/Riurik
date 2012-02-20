@@ -1,7 +1,8 @@
 module('run test');
 
 var test_name = 'first remote test';
-var test_content = " \
+var test_content = "";
+var _test_content = " \
 asyncTest('" + test_name + "', function() { \
   $.when( frame.go( contexter.URL(context, 'hello') )).then(function(_$) { \
     equal($.trim(_$('body').text()), 'Hello world!'); \
