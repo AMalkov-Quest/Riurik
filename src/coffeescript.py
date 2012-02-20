@@ -36,8 +36,9 @@ def save(full_path, path, out):
 	return path.replace(coffee_name, js_name) if path else None
 
 def compile(source, path, full_path):
-	if not source:
-		source = dir_index_tools.gettest(full_path)
-	out, errors = execute(source, full_path)
-	return save(full_path, path, out)
-        
+    if not source:
+        source = dir_index_tools.gettest(full_path)
+    out, errors = execute(source, full_path)
+    if not out:
+        raise Exception('CoffeeScript compilation error ...')
+    return save(full_path, path, out)

@@ -4,6 +4,17 @@ import settings, virtual_paths
 from logger import log
 import socket
 
+def cleandir(path):
+	n = 0
+	for root, dirs, files in os.walk(path):
+		for file_ in files:
+			log.info(file_)
+			if file_.startswith('.') and file_.endswith('.js'):
+				n = n + 1
+				os.remove(os.path.join(path, file_))
+
+	log.info('%s is cleaned, removed %d files' % (path, n))
+
 def parseURI(url):
 	"""
 	>>> parseURI('spb9914')
@@ -182,7 +193,7 @@ def get_libraries_impl(path, ctxitems, ctx):
 			return coffeescript.compile(None, lib, fullpath)
 		return lib
 	libraries = map( patch_coffeescript_lib, libraries )
-	
+
 	return libraries
 
 def loadListFromString(source):
