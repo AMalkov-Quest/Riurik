@@ -56,13 +56,11 @@ $(document).ready(function() {
 	})
 	.queue('/static/js/jquery.json.min.js')
 	.queue('/static/jquery-ui/js/jquery-ui.custom.min.js')
-	//.queue('/static/js/qunit.js')
+	.queue('/static/js/qunit.js')
 	.queue('/static/js/testLoader.js')
 	.queue(test_location+'/.context.js')
 	.then(function(){
-		//riurik.load = function(){
 		$(document).ready(function() {
-			QUnit.config.autostart = false;
 			riurik.init();
 			$("#tabs").tabs();
 			QUnit.riurik.context = clone(context);
@@ -78,9 +76,8 @@ $(document).ready(function() {
 				$.each(context.include || [],function(i,url){l.queue( test_location+'/'+url );});
 			};
 			l.then(function(){
-				QUnit.config.autostart = true;
-				QUnit.start();
-				//QUnit.load();
+				QUnit.config.autorun = false;
+				QUnit.load();
 			});
 			setTimeout(function force_qunit_to_start() {
 				if( QUnit.config.autostart != true ) {
@@ -89,11 +86,10 @@ $(document).ready(function() {
 				}	
 			}, 10000);
 		});
-		//};
 	});
 
 	load_remote_style('/static/css/loader.css');
-	//load_remote_style('/static/css/qunit.css');
+	load_remote_style('/static/css/qunit.css');
 	load_remote_style('/static/jquery-ui/css/redmond/jquery-ui.custom.css');
 });
 

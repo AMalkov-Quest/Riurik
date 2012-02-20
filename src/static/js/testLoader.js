@@ -516,11 +516,8 @@ riurik.init = function() {
 }
 
 QUnit.begin = function() {
-	QUnit.config.autostart = false;
 	QUnit.config.reorder = false;
 	QUnit.log('tests are begun');
-	riurik.init();
-	riurik.load();
 }
 
 QUnit.done = function(result) {

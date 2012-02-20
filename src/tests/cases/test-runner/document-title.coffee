@@ -7,7 +7,8 @@ QUnit.asyncSetup ->
   context.url = contexter.URL(context, "actions/suite/run/?path=/#{context.suite_path}&context=#{suite_context}")
   set_context(context.suite_path, "[#{suite_context}]")
   $.when( frame.go(context.url) ).then ->
-    $.wait( -> frame.window().QUnit.riurik? and frame.window().QUnit.riurik.status == 'done' ).then ->
+    fwnd = frame.window()
+    $.wait( -> fwnd.QUnit? and fwnd.QUnit.riurik? and fwnd.QUnit.riurik.status == 'done' ).then ->
       start()
              
 test 'should show x for suite without any assert', ->
