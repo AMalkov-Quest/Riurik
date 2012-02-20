@@ -3,6 +3,9 @@ if ( typeof console == 'undefined' || typeof console.log == 'undefined' ) {
 }
 
 function onErrorHandler(msg, url, line) {
+	if( msg == 'Script error.') {
+		ok(false, 'See the browser console for details');
+	}
 	QUnit.log("error(" + url + ": " +  line + "): " + msg);
 	QUnit.start();
 	return true;

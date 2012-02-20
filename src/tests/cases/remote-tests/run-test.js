@@ -1,17 +1,10 @@
 module('run test');
 
-//window.parent.$(window.parent.document).trigger('complete');
-
-function triggerComplete(){
-  $(document).trigger('complete');
-}
-
+var test_name = 'first remote test';
 var test_content = " \
-asyncTest('test', function() { \
+asyncTest('" + test_name + "', function() { \
   $.when( frame.go( contexter.URL(context, 'hello') )).then(function(_$) { \
     equal($.trim(_$('body').text()), 'Hello world!'); \
-    $(document).trigger('complete'); \
-    console.log( window.parent ); \
     start(); \
   }); \
 });";
@@ -24,7 +17,6 @@ QUnit.setup(function() {
     context.test_path = suite_path.concat('/',  test_name);
     context.test_context = 'django-app';
     context.test_content = test_content;
-    context.start = getLogs('last');
     
     var path = 'actions/test/run/?path='.concat(test_path, '&context=', test_context);
     context.URL = contexter.URL(context, path.concat("&content=", escape(test_content)));
@@ -34,16 +26,17 @@ QUnit.setup(function() {
 });
 
 asyncTest('test is pushed to run on remote server', function() {
-  $('#frame').attr('src', context.URL);
-  $('#frame').unbind('load');
-  $('#frame').load(function() {
-    $(document).bind('complete', function(){
-      alert('Complete');    
-      start();
+  $.when( frame.go( context.URL ) ).then(function(_$) {
+    $.wait(function() { return typeof frame.window().riurik != 'undefined'}).then(function() {
+      frame.window().QUnit.done = function(module) {
+        ok( _$('#qunit-testresult').length == 1, 'test result is present');
+        equal( _$('.test-name:first').text(), test_name );
+        start();
+      }
     });
   });
 });
-/*
+
 QUnit.teardown(function() {
   delete_test( context.test_path );
-});*/
+});

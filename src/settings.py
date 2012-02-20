@@ -11,7 +11,7 @@
 #
 ########################################################################################
 # Django settings for web_reports project.
-import os, sys
+import os, sys, platform
 
 working_dir = os.path.dirname(os.path.abspath(__file__))
 root = os.path.normpath(os.path.dirname(working_dir))
@@ -110,8 +110,14 @@ INSTALLED_APPS = (
 	'src.plugins.search',
 )
 
-WIN_COFFEE_COMPILER = r'C:\\CoffeeScript\\coffee.bat'
-POSIX_COFFEE_COMPILER = r'coffee'
+if platform.system() == 'Windows':
+	nodejs = os.path.join(os.environ['ProgramFiles'], 'nodejs', 'node.exe')
+	coffee = os.path.join(r'C:\CoffeeScript', 'bin', 'coffee')
+	COFFEESCRIPT_EXECUTABLE = '"%s" "%s"' % (nodejs, coffee)
+elif platform.system() == 'Linux':
+	COFFEESCRIPT_EXECUTABLE = 'coffee'
+else:
+	COFFEESCRIPT_EXECUTABLE = None 
 
 EXEC_TESTS_CMD='static/loader/loader.html'
 UPLOAD_TESTS_CMD='testsrc/upload'
