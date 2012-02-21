@@ -94,7 +94,7 @@ function createSuite() {
 
 function createTest() {
 	$("#create-dir-index-dialog span").text($("#test-tip").text())
-	$("input#object-name").val('.js');
+	$("input#object-name").val();
 	createAndEdit($('#new-test'), "/actions/test/create/");
 }
 
