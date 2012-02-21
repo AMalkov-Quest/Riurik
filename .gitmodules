@@ -1,3 +1,0 @@
-[submodule "src/static/loader"]
-	path = src/static/loader
-	url = git@github.com:andrew-malkov/Riurik-Django.git

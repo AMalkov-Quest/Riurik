@@ -1,0 +1,97 @@
+<!doctype html>
+<html>
+	<head>
+		<title></title>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<script type="text/javascript">
+			if ( typeof console == 'undefined' || typeof console.log == 'undefined' ) {
+				var console = { log: function(){} };
+			}
+			var extract_param = function( param ){
+				var p = (new RegExp(param+'=([^&$]+)')).exec(window.location.href);
+				if ( p ) return p[1];
+			};
+			var server_name = extract_param( 'server' );
+			var test_path = extract_param( 'path' );
+			var test_location = (
+				function extract_context_path(path){
+					if ( ! /\.js$/.test(path) ) return path; // suite (as is)
+					return /(.*?)\/[^\/]*$/.exec(path)[1]; // test folder
+				}
+			)(test_path);
+			var make_remote_url = function(url_part){
+				return 'http://'+server_name+url_part;
+			};
+			var load_remote_script = function(url, callback){
+				var url = make_remote_url( url )+'?_='+Math.random().toString();
+				var script = document.createElement( 'script' );
+				script.type = 'text/javascript';
+				script.src = url;
+				var timeout = setTimeout(function(){
+					onload(true);
+				}, 10000);
+				var onload = function(failed) {
+					if ( typeof callback == 'function' ) callback();
+					callback = function(){};
+					clearTimeout(timeout);
+				};
+				if ((typeof jQuery != 'undefined' && jQuery.browser.msie)||(/msie/i.exec(navigator.userAgent))) {
+					script.onreadystatechange = function() {
+						if (script.readyState == 'loaded' || script.readyState == 'complete') {
+							script.onreadystatechange = null;
+							onload();
+						};
+					};
+				}else{
+					script.onload = onload;
+				}
+				document.body.appendChild( script );
+			};
+			window.onload = function(){
+				load_remote_script('/static/js/jquery.min.js', function(){
+					load_remote_script('/static/js/loader.js');
+				});
+			};
+		</script>
+	</head>
+	<body>
+		<h1 id="qunit-header">Riurik</h1>
+		<h2 id="qunit-banner"></h2>
+		<div id="qunit-testrunner-toolbar"></div>
+		<h2 id="qunit-userAgent"></h2>
+		<ol id="qunit-tests"></ol>
+		<div id="qunit-fixture">Please, wait until tests loading complete.</div>
+		<div id="results"></div>
+		<div id="tabs">
+			<ul>
+				<li><a href="#tabs-1">Frame</a></li>
+				<li>
+					<a href="#tabs-2">Tools console</a>
+					<div style="width:16px; height: 16px; float: left; padding: .5em 0;">
+						<div id="tabs-2-loading"></div>
+					</div>
+					</li>
+				<li><a href="#tabs-3">QUnit console</a></li>
+			</ul>
+			<div id="tabs-1">
+				<div id="frame-url"></div>
+				<iframe id="frame" name="frame">
+					<html>
+						<head>
+						</head>
+						<body>
+						</body>
+					</html>
+				</iframe>
+			</div>
+			<div id="tabs-2">
+				<div id="powershell-console">
+				</div>
+			</div>
+			<div id="tabs-3">
+				<div id="qunit-console">
+				</div>
+			</div>
+		</div>
+	</body>
+</html>
