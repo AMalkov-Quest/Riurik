@@ -463,7 +463,12 @@ var riurik = {
 
 	pass: function() {
 		ok(true)
+	},
+
+	fail: function() {
+		ok(false)
 	}
+
 };
 
 var contexter = {
