@@ -52,7 +52,7 @@ $(document).ready(function() {
 	loader( load_remote_script )
 	.queue('/static/js/jquery.min.js', function(){
 		//$('head title').text(test_path);
-		document.title = test_path;
+		document.title = /\/([^\/]*)\/*$/.exec(test_path)[1];
 	})
 	.queue('/static/js/jquery.json.min.js')
 	.queue('/static/jquery-ui/js/jquery-ui.custom.min.js')
