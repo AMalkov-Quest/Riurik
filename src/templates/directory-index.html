@@ -56,7 +56,7 @@
 					{% ifequal type 'suite' %}
 						{% if contexts %}
 						<li>
-							<a id="run-suite-btn" href="javascript:void(0);" onClick="javascript:$('#run-suite').submit();">Run Suite</a>
+							<a id="run-suite-btn" href="javascript:void(0);">Run Suite</a>
 							<select id="context" name="context">
 								{% for item in contexts %}
 									<option value="{{ item }}">{{ item }}</option>

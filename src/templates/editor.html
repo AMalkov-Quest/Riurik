@@ -67,7 +67,7 @@
 				.val(context); 
 			$('#apply-test')
 				.attr('action', '/actions/test/submit/')
-				.attr('target', '{{ request.path|current }}');
+				.attr('target', context + '{{ request.path|current }}');
 			$('#apply-test').submit();
 	     });
 
