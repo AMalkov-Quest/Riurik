@@ -3,13 +3,14 @@ import os, re
 import settings, virtual_paths
 from logger import log
 import socket
+import fnmatch
 
 def cleandir(path):
 	n = 0
 	for root, dirs, files in os.walk(path):
 		for file_ in files:
 			log.info(file_)
-			if file_.startswith('.') and file_.endswith('.js'):
+			if fnmatch.fnmatch(file_, '.*.js'):
 				n = n + 1
 				os.remove(os.path.join(path, file_))
 
