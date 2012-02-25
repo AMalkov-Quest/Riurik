@@ -470,6 +470,22 @@ riurik.init = function() {
 	QUnit.riurik = {};
 	QUnit.riurik.current = { 'module': {}, 'test': '' };
 	QUnit.riurik.status = 'started';
+	QUnit.riurik.server = server_name;
+	QUnit.riurik.report_url = 'http://'+QUnit.riurik.server + '/report_callback/';
+	QUnit.riurik.date = new Date();
+	QUnit.riurik.report = function(data) {
+		$(document).unbind('ajaxError');
+		data['date'] = formatDate(QUnit.riurik.date, 'yyyy-MM-dd-HH-mm-ss');
+		console.log(data);
+		$.ajax({
+			'url': QUnit.riurik.report_url,
+			'data': data,
+			'dataType': 'jsonp',
+			'complete': function(){
+				$(document).bind('ajaxError', ajaxError);	
+			}
+		});
+	};
 	//QUnit.riurik.context = clone(context)
 }
 
@@ -496,6 +512,8 @@ QUnit.moduleDone = function(module) {
 	QUnit.log('the "' + module.name + '" module is done');
 	QUnit.riurik.current.module.status = 'done';
 	QUnit.riurik.current.module.finished = new Date();
+	
+	// *************** for Jenkins reporting ************* //
 
 	function getTestResultDivs(moduleName) {
 		var html = '<html><head><link rel="stylesheet" type="text/css" href="qunit.css"></head><body>'
@@ -516,14 +534,23 @@ QUnit.moduleDone = function(module) {
 		time = 0;
 	}
 	var module_results = {
-			name: module.name,
-			failed: module.failed,
-			passed: module.passed,
-			total: module.total,
-			duration: time,
-			results: getTestResultDivs(module.name)
+			'name': module.name,
+			'failed': module.failed,
+			'passed': module.passed,
+			'total': module.total,
+			'duration': time,
+			'results': getTestResultDivs(module.name)
 	}
 	QUnit.__tests_result_storage.push($.toJSON(module_results));
+
+	// ********** for riurik reporting callback ************** //
+	QUnit.riurik.report({ 
+		'event': 'moduleDone', 
+		'name': module.name,
+		'failed': module.failed,
+		'passed': module.passed,
+		'total': module.total
+	});
 }
 
 QUnit.testStart = function(test) {
@@ -534,7 +561,15 @@ QUnit.testStart = function(test) {
 
 QUnit.testDone = function(test) {
 	QUnit.log('the "' + test.name + '" test is done');
-	console.log('Test done: ', test);
+	console.log('Test done: ', test.name);
+	// ********** for riurik reporting callback ************** //
+	QUnit.riurik.report({ 
+		'event': 'testDone',
+		'name': test.name,
+		'failed': test.failed,
+		'passed': test.passed,
+		'total': test.total
+	});
 }
 
 QUnit.get_results = function() {
