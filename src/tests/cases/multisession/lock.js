@@ -24,7 +24,7 @@ function restorePreviousSession(_$) {
 asyncTest('open file first time ', function(){
   $.when( frame.go( context.URL ) ).then(function(_$){
     $.wait( function(){ return typeof _$.cookie != 'undefined'; } ).then(function(){
-      ok(_$('.CodeMirror-wrapping').length === 1, 'CodeMirror frame editor exists');
+      ok(_$('.CodeMirror-lines').length === 1, 'CodeMirror frame editor exists');
       context._$ = _$;
       start();
     });

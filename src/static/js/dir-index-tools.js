@@ -1,4 +1,11 @@
 $(function () {
+	$('#run-suite-btn').click(function(){
+		var context = $('select[name=context]').val();
+		var target = $('#run-suite').attr('target');
+		$('#run-suite').attr('target', context + '-' + target);
+		$('#run-suite').submit();
+	});
+
 	$('#context-preview-ctrl').click(function(){
 		$('#context-preview').dialog({
 			width: $(document).width()*0.9,
@@ -94,7 +101,7 @@ function createSuite() {
 
 function createTest() {
 	$("#create-dir-index-dialog span").text($("#test-tip").text())
-	$("input#object-name").val('.js');
+	$("input#object-name").val();
 	createAndEdit($('#new-test'), "/actions/test/create/");
 }
 

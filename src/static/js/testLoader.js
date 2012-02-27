@@ -2,9 +2,11 @@ if ( typeof console == 'undefined' || typeof console.log == 'undefined' ) {
 	var console = { log: function(){} };
 }
 
-function onerror(msg, url, line) {
+function onErrorHandler(msg, url, line) {
+	if( msg == 'Script error.') {
+		ok(false, 'See the browser console for details');
+	}
 	QUnit.log("error(" + url + ": " +  line + "): " + msg);
-	QUnit.ok(false, msg);
 	QUnit.start();
 	return true;
 };
@@ -16,21 +18,45 @@ function ajaxError(event, jqXHR, ajaxSettings, exception) {
 	QUnit.start();
 }
 
+function wrapErrorHandler(handler, func) {
+	var l = handler;
+	if ( typeof handler == 'function' ) {
+		return function() {
+			l.apply(l, arguments);
+			func.apply(func, arguments);	
+		};
+	}else{
+		return function() {
+			ok(false, arguments[0]);
+			func.apply(func, arguments);	
+		};
+	}
+};
+
 var frame = {
 
 		go: function(path) {
 			var dfd = $.Deferred();
 			var url = path;
-			var regex = new RegExp('http://[a-zA-Z0-9]');
+			var regex = new RegExp('^http://[a-zA-Z0-9]');
 			if(!regex.test(url)) {
 				url = 'http://' + context.host + ':' + context.port + '/' + path;
 			}
 
+			if (url.indexOf('?') != -1) {
+				url += '&_=' + Math.random().toString();
+			}else{
+				url += '?_=' + Math.random().toString();
+			}
+			if( window.frames[0].window ) {
+				window.frames[0].window.onerror = function(){};
+			}
 			$('#frame').attr('src', url);
 			$('#frame-url').html('<a href="'+url+'">'+url+'</a>');
+			$('#frame').unbind('load');
 			$('#frame').load(function() {
 				var __frame = window.frames[0];
-				__frame.window.onerror = onerror;
+				__frame.window.onerror = wrapErrorHandler( __frame.window.onerror, onErrorHandler );
 
 				if( ! __frame.window.jQuery ) {
 					// inject one
@@ -100,9 +126,20 @@ var frame = {
 
 function jQExtend( $ ) {
 
+	$.sleep = function(msec) {
+		var dfd = new $.Deferred();
+		QUnit.log('sleeping for ' + msec + ' msec' );
+		setTimeout( function() {
+			QUnit.log('sleeping for ' + msec + ' msec is resolved');
+			dfd.resolve(dfd);
+		}, msec);
+		
+		return dfd.promise(dfd);
+	};
+	
 	$.defer = function( lambda, timeout ){
 		var dfd = $.Deferred();
-		var timeout = timeout || 10 * 1000; // 10 sec by default
+		var timeout = timeout || context.timeout || 10 * 1000; // 10 sec by default
 		var time = 0;
 		(function f(){
 			if ( lambda() === true ) {
@@ -124,11 +161,12 @@ function jQExtend( $ ) {
 	
 	$.wait = function( lambda, timeout ){
 		var dfd = $.Deferred();
-		var timeout = timeout || 10 * 1000; // 10 sec by default
+		var timeout = timeout || context.timeout || 10 * 1000;
+		QUnit.log('waiting for ' + lambda + ' timeout: ' + timeout );
 		var time = 0;
 		(function f(){
 			if ( lambda() === true ) {
-				QUnit.log('resolve wait');
+				QUnit.log('waiting for ' + lambda + ' is resolved');
 				dfd.resolve();
 				return;
 			}
@@ -136,7 +174,7 @@ function jQExtend( $ ) {
 			if ( time < timeout ) {
 				setTimeout(f, 100)
 			} else {
-				QUnit.log('wait timeout');
+				QUnit.log('wait timeout for ' + lambda + 'exceeded');
 				dfd.resolve();
 			}
 		})();
@@ -146,7 +184,7 @@ function jQExtend( $ ) {
 
 	$.wait_event = function( target, event_name, timeout ){
 		var dfd = $.Deferred();
-		var timeout = timeout || 10 * 1000; // 10 sec by default
+		var timeout = timeout || context.timeout || 10 * 1000; // 10 sec by default
 		var time = 0;
 		var resolved = false;
 
@@ -421,7 +459,16 @@ var riurik = {
 		document.body.appendChild( script );
 		
 		return dfd.promise(dfd);
+	},
+
+	pass: function() {
+		ok(true)
+	},
+
+	fail: function() {
+		ok(false)
 	}
+
 };
 
 var contexter = {
@@ -490,14 +537,19 @@ riurik.init = function() {
 }
 
 QUnit.begin = function() {
+	QUnit.config.reorder = false;
 	QUnit.log('tests are begun');
-	riurik.init();
-	riurik.load();
 }
 
-QUnit.done = function(module) {
+QUnit.done = function(result) {
 	QUnit.log('tests are done');
 	QUnit.riurik.status = 'done';
+	if( result.total == 0 ) {
+		document.title = [
+			("\u2716"),
+			document.title.replace(/^[\u2714\u2716] /i, "")
+		].join(" ");
+	}
 }
 
 QUnit.moduleStart = function(module) {
@@ -672,25 +724,26 @@ QUnit.log('QUnit console: initialized');
 QUnit.config.reorder = false;
 
 QUnit.setup = function(callback) {
-	QUnit.test('setup', 0, callback, false);
+	QUnit.test('setup', null, callback, false);
 }
 
 QUnit.asyncSetup = function(callback) {
-	QUnit.test('setup', 0, callback, true);
+	QUnit.test('setup', null, callback, true);
 }
 
 QUnit.teardown = function(callback) {
-	QUnit.test('teardown', 0, callback, false);
+	QUnit.test('teardown', null, callback, false);
 }
 
 QUnit.asyncTeardown = function(callback) {
-	QUnit.test('teardown', 0, callback, true);
+	QUnit.test('teardown', null, callback, true);
 }
 
 jQExtend($);
 
 $(document).ready(function() {
-
-	window.onerror = onerror;
+	window.onerror = wrapErrorHandler(window.onerror, onErrorHandler);
 	$(document).ajaxError( ajaxError );
+
+	QUnit.extend(window, riurik);
 });

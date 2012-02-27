@@ -3,6 +3,18 @@ import os, re
 import settings, virtual_paths
 from logger import log
 import socket
+import fnmatch
+
+def cleandir(path):
+	n = 0
+	for root, dirs, files in os.walk(path):
+		for file_ in files:
+			log.info(file_)
+			if fnmatch.fnmatch(file_, '.*.js'):
+				n = n + 1
+				os.remove(os.path.join(path, file_))
+
+	log.info('%s is cleaned, removed %d files' % (path, n))
 
 def parseURI(url):
 	"""
@@ -173,6 +185,15 @@ def get_libraries_impl(path, ctxitems, ctx):
 		if not libraries:
 			log.info('there are no precofigured libs to include, try defaults ...')
 			libraries = libraries_default(path, ctx)
+
+	import coffeescript
+	def patch_coffeescript_lib(lib):
+		if re.search(r'\.coffee$', lib):
+			root = get_document_root(lib)
+			fullpath = get_full_path(root, lib)
+			return coffeescript.compile(None, lib, fullpath)
+		return lib
+	libraries = map( patch_coffeescript_lib, libraries )
 
 	return libraries
 

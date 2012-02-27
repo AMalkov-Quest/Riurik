@@ -26,6 +26,10 @@ def get_type(path):
 			return 'folder'
 		if '.ini' in path:
 			return 'configfile'
+
+		if settings.SPEC_URL_FILE_NAME in path:
+			return 'specification'
+
 		return 'test'
 	return 'none'
 

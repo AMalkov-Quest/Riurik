@@ -26,9 +26,10 @@ asyncTest('setup context for the suite', function() {
     
     window.frames[0].dirIndexActions.edit(context.suite_name);
     $.when( frame.load() ).then(function(_$) {
-      console.log(_$("body", _$('iframe').get(0).contentDocument));
-      equal(_$('body', _$('.CodeMirror-wrapping iframe').get(0).contentDocument).length, 1, 'editor is opened');
+      
+      QUnit.substring( _$('.CodeMirror-lines').text(), '[DEFAULT]', 'editor is opened');
       start();
+      
     });
     
   });

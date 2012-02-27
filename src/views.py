@@ -18,6 +18,8 @@ import urllib, urllib2
 import codecs, time
 import virtual_paths
 import distributor
+import coffeescript
+import spec
 
 def error_handler(fn):
 	def _f(*args, **kwargs):
@@ -185,6 +187,7 @@ def get_dir_index(document_root, path, fullpath):
 		contexts = []
 
 	favicon = 'dir-index-%s.gif' % tools.get_type(fullpath)
+	spec_url = spec.get_url(fullpath)
 
 	return Context({
 		'directory' : path + '/',
@@ -193,6 +196,8 @@ def get_dir_index(document_root, path, fullpath):
 		'dir_list'  : dirs,
 		'contexts'  : contexts,
 		'favicon'   : favicon,
+		'spec'		: spec_url,
+		'spec_name'	: settings.SPEC_URL_FILE_NAME
 	})
 
 def get_path(request):
@@ -314,6 +319,7 @@ def runSuite(request, fullpath):
 
 	log.info('run suite %s with context %s' % (path, context_name))
 	server = request.get_host();
+	compileSuiteCoffee(path, fullpath)
 	contextjs = context.render(path, ctx, server)
 
 	clean_path = contrib.get_relative_clean_path(path)
@@ -329,10 +335,18 @@ def runSuite(request, fullpath):
 	#else:
 	#	saveLocalContext(fullpath, contextjs)
 	#	url = "http://%s/%s?suite=/%s" % ( target, settings.EXEC_TESTS_CMD, clean_path )
+
 	saveLocalContext(fullpath, contextjs)
 	url = "http://%s/%s?server=%s&path=/%s" % ( target, settings.EXEC_TESTS_CMD, server, path )
 	log.info("redirect to run suite %s" % url)
 	return HttpResponseRedirect( url )
+
+def compileSuiteCoffee(path, fullpath):
+	contrib.cleandir(fullpath)
+	tests = contrib.enum_files_in_folders(fullpath, lambda file_: not file_.endswith(coffeescript.ext))
+	for test in tests:
+		path = coffeescript.compile(None, None, os.path.join(fullpath, test))
+		log.info(path)
 
 @add_fullpath
 @error_handler
@@ -364,9 +378,17 @@ def runTest(request, fullpath):
 	#	saveLocalContext(fullpath, contextjs)
 	#	url = "http://%s/%s?path=/%s" % (target, settings.EXEC_TESTS_CMD, clean_path)
 	saveLocalContext(fullpath, contextjs)
+	if coffee(path):
+		path = coffeescript.compile(test_content, path, fullpath)
 	url = "http://%s/%s?server=%s&path=/%s" % (target, settings.EXEC_TESTS_CMD, server, path)
 	log.info("redirect to run test %s" % url)
 	return HttpResponseRedirect(url)
+
+def coffee(path):
+	return path.endswith('.coffee')
+
+def coffee(path):
+	return path.endswith('.coffee')
 
 def saveLocalContext(fullpath, contextjs):
 	if os.path.isdir(fullpath):

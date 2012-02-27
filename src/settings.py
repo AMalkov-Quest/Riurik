@@ -11,7 +11,7 @@
 #
 ########################################################################################
 # Django settings for web_reports project.
-import os, sys
+import os, sys, platform
 
 working_dir = os.path.dirname(os.path.abspath(__file__))
 root = os.path.normpath(os.path.dirname(working_dir))
@@ -110,9 +110,20 @@ INSTALLED_APPS = (
 	'src.plugins.search',
 )
 
-EXEC_TESTS_CMD='static/tests/riurik.html'
+if platform.system() == 'Windows':
+	nodejs = os.path.join(os.environ['ProgramFiles'], 'nodejs', 'node.exe')
+	coffee = os.path.join(r'C:\CoffeeScript', 'bin', 'coffee')
+	COFFEESCRIPT_EXECUTABLE = '"%s" "%s"' % (nodejs, coffee)
+elif platform.system() == 'Linux':
+	COFFEESCRIPT_EXECUTABLE = 'coffee'
+else:
+	COFFEESCRIPT_EXECUTABLE = None 
+
+EXEC_TESTS_CMD='static/testLoader.html'
 UPLOAD_TESTS_CMD='testsrc/upload'
 
+SUITE_SETUP_FILE_NAME = 'suite-setup.js'
+SPEC_URL_FILE_NAME = '.specification.url'
 TEST_CONTEXT_FILE_NAME = '.context.ini'
 TEST_CONTEXT_JS_FILE_NAME = '.context.js'
 TEST_FILE_EXT = '.js'
@@ -123,8 +134,4 @@ APPEND_SLASH = False
 CODEMIRROR_CALL_EDITOR_FOR = '^.*\.(?:js|ini|html|py)$'
 INCLUDE_KEY = 'include'
 EXCLUDE_KEY = 'exclude'
-
-#try:
-#	from local_settings import *
-#except Exception, ex: print ex
-#pass
+SUITE_SETUP = 'suite_setup'

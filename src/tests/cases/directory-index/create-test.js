@@ -38,7 +38,7 @@ asyncTest('check created', function() {
         $.wait( function() { return typeof frame.window().editor != 'undefined'  } ).then( function(){
           var editor = frame.window().editor; 
   
-          editor.setCode("content")          
+          editor.setValue("content")          
                           
           var evObj = document.createEvent('MouseEvents');
           evObj.initEvent( 'click', true, true );
@@ -47,21 +47,6 @@ asyncTest('check created', function() {
               
           $.when( frame.load() ).then(function(_$) {
             
-            /*var evObj = document.createEvent('MouseEvents');
-            evObj.initEvent( 'click', true, true );
-            window.frames[0].document.getElementById('close').dispatchEvent(evObj);  
-            QUnit.log('close send Event');
-            $.when( frame.load() ).then(function(_$) {             
-              QUnit.log('close get Event');
-  
-             equal(frame.window().location.pathname,"/tests/",'editor was closed')
-                              
-             $.when( frame.go("/tests/"+context.test_name+".js?editor") ).then(function(_$) {               
-               equal(frame.window().editor.getCode(),"content",'saved content is valid');
-
-               start();              
-            })
-          });*/
           start();
          });
         });        
