@@ -80,7 +80,13 @@ def template(name):
 	return content
 
 def mktest(path, name):
-	return mkscript(path, name, 'template_test.txt')
+	template_name = None
+	if name.endswith(settings.JS_FILE_EXT):
+		template_name = 'js_test.tmpl'
+	elif name.endswith(settings.COFFEE_FILE_EXT):
+		template_name = 'coffee_test.tmpl'
+	
+	return mkscript(path, name, template_name)
 
 def mkcontext(path, name):
 	return mkscript(path, name, 'template_context.txt')

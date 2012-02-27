@@ -2,15 +2,13 @@ import os, shlex, subprocess, platform
 import settings, dir_index_tools
 from logger import log
 
-ext = '.coffee'
-
 def coffee2js(path):
 	"""
 	>>> coffee2js('test.coffee')
 	('test.coffee', '.test.js')
 	"""
 	file_name = os.path.basename(path)
-	return (file_name, '.%s' % file_name.replace(ext, '.js'))
+	return (file_name, '.%s' % file_name.replace(settings.COFFEE_FILE_EXT, settings.JS_FILE_EXT))
 
 def execute(source, full_path):
 	if not settings.COFFEESCRIPT_EXECUTABLE:
