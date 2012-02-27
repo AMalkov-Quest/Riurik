@@ -194,9 +194,12 @@
 		{% endblock context-controls %}
 		{% endifequal %}
 		<li><a id="save" href="javascript:void(0);">{% trans "Save" %}</a></li>
-		<li><a id="discard" href="javascript: void(0);">{% trans "Discard" %}</a></li>
-		<li class="disabled"><a id="history" href="javascript: void(0);">{% trans "History" %}</a></li>
 		<li><a id="close" href="javascript: void(0);">{% trans "Close" %}</a></li>
+		{% if spec %}
+		<li><a id="open-spec" href="{{ spec }}" target="_blank" >{% trans "Spec" %}</a></li>
+		{% else %}
+		<li><a id="link-spec" href="{{ spec_name }}?editor" >{% trans "Link Spec" %}</a></li>
+		{% endif %}
 	</ul>
 	{% else %}
 	<ul class="horizontal-menu">

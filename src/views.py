@@ -129,6 +129,8 @@ def get_file_content_to_edit(path, fullpath, stubbed):
 		'is_stubbed': stubbed,
 		'favicon'   : 'dir-index-test.gif',
 		'filetype':  tools.get_type(fullpath),
+		'spec'		: spec.get_url(fullpath),
+		'spec_name'	: settings.SPEC_URL_FILE_NAME,
 	}
 
 def get_file_content(fullpath):
