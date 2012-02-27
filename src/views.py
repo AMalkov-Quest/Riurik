@@ -129,9 +129,14 @@ def get_file_content_to_edit(path, fullpath, stubbed):
 		'is_stubbed': stubbed,
 		'favicon'   : 'dir-index-test.gif',
 		'filetype':  tools.get_type(fullpath),
-		'spec'		: spec.get_url(fullpath),
-		'spec_name'	: settings.SPEC_URL_FILE_NAME,
+		'spec'		: get_spec(path, fullpath),
 	}
+
+def get_spec(target, path):
+	if spec.get_url(path):
+		return r'/spec/get?path=%s' % target
+	else:
+		return '%s?editor' % settings.SPEC_URL_FILE_NAME
 
 def get_file_content(fullpath):
 	statobj = os.stat(fullpath)
@@ -189,7 +194,6 @@ def get_dir_index(document_root, path, fullpath):
 		contexts = []
 
 	favicon = 'dir-index-%s.gif' % tools.get_type(fullpath)
-	spec_url = spec.get_url(fullpath)
 
 	return Context({
 		'directory' : path + '/',
@@ -198,8 +202,7 @@ def get_dir_index(document_root, path, fullpath):
 		'dir_list'  : dirs,
 		'contexts'  : contexts,
 		'favicon'   : favicon,
-		'spec'		: spec_url,
-		'spec_name'	: settings.SPEC_URL_FILE_NAME
+		'spec'	: get_spec(path, fullpath),
 	})
 
 def get_path(request):

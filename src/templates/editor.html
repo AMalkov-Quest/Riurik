@@ -195,11 +195,7 @@
 		{% endifequal %}
 		<li><a id="save" href="javascript:void(0);">{% trans "Save" %}</a></li>
 		<li><a id="close" href="javascript: void(0);">{% trans "Close" %}</a></li>
-		{% if spec %}
-		<li><a id="open-spec" href="{{ spec }}" target="_blank" >{% trans "Spec" %}</a></li>
-		{% else %}
-		<li><a id="link-spec" href="{{ spec_name }}?editor" >{% trans "Link Spec" %}</a></li>
-		{% endif %}
+		<li><a id="spec-link" href="{{ spec }}" target="_blank" >{% trans "Spec" %}</a></li>
 	</ul>
 	{% else %}
 	<ul class="horizontal-menu">
