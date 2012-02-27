@@ -343,7 +343,10 @@ def runSuite(request, fullpath):
 
 def compileSuiteCoffee(path, fullpath):
 	contrib.cleandir(fullpath)
-	tests = contrib.enum_files_in_folders(fullpath, lambda file_: not file_.endswith(coffeescript.ext))
+	tests = contrib.enum_files_in_folders(
+			fullpath,
+			lambda file_: not file_.endswith(settings.COFFEE_FILE_EXT)
+	)
 	for test in tests:
 		path = coffeescript.compile(None, None, os.path.join(fullpath, test))
 		log.info(path)
