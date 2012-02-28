@@ -133,8 +133,10 @@ def get_file_content_to_edit(path, fullpath, stubbed):
 	}
 
 def get_spec(target, path):
-	if spec.get_url(path):
-		return r'/spec/get?path=%s' % target
+	spec_url = spec.get_url(path)
+	log.info('spec url: %s' % spec_url)
+	if spec_url:
+		return spec_url
 	else:
 		return '%s?editor' % settings.SPEC_URL_FILE_NAME
 
