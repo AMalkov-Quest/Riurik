@@ -101,7 +101,8 @@ def serve(request, path, show_indexes=False):
 
 	if not os.path.exists(fullpath):
 		if 'editor' in request.REQUEST:
-			open(fullpath, 'w').close() # creating file if not exists by editor opening it first time
+			#open(fullpath, 'w').close() # creating file if not exists by editor opening it first time
+			tools.make(fullpath)
 		else:
 			raise Http404('"%s" does not exist' % fullpath)
 
@@ -275,7 +276,7 @@ def removeObject(request, fullpath):
 @add_fullpath
 def createSuite(request, fullpath):
 	result = {}
-	result['success'], result['result'] = tools.mkcontext(fullpath, request.POST["object-name"])
+	result['success'], result['result'] = tools.mkconfig(fullpath, request.POST["object-name"])
 	result['result'] += '?editor'
 	response = HttpResponse(mimetype='text/json')
 	response.write(json.dumps(result))
@@ -286,7 +287,7 @@ def createSuite(request, fullpath):
 def editSuite(request, fullpath):
 	log.debug('edit context %s' % fullpath)
 	if not os.path.exists(os.path.join(fullpath, settings.TEST_CONTEXT_FILE_NAME)):
-		tools.mkcontext(fullpath, settings.TEST_CONTEXT_FILE_NAME)
+		tools.mkconfig(fullpath, settings.TEST_CONTEXT_FILE_NAME)
 	redirect = '/' + request.GET['path'] + '/' + settings.TEST_CONTEXT_FILE_NAME + '?editor'
 	return HttpResponseRedirect(redirect)
 
