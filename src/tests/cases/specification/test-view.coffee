@@ -30,9 +30,10 @@ asyncTest 'should create new specification config file', ->
       start()
       
 asyncTest 'should provide link to the specification', ->
-  $.when( frame.go "#{context.test_path}?editor" ).then ->
-    equal _$('a#spec-link').attr('href'), context.spec_url, 'url to view specification'
-    start()
+  $.sleep(1000).then ->
+    $.when( frame.go "#{context.test_path}?editor" ).then ->
+      equal _$('a#spec-link').attr('href'), context.spec_url, 'url to view specification'
+      start()
     
 QUnit.teardown ->
   delete_folder context.suite_path
