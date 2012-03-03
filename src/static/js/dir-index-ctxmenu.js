@@ -8,9 +8,14 @@ var dirIndexActions = {
 		$('#context-action').submit();
 	},
 	
-	edit: function(target) {
+	editctx: function(target) {
 		var currentDir = $('#context-action > input[name=url]').val();
 		window.location = "/actions/suite/edit/?path=" + currentDir + target;
+	},
+	
+	editspec: function(target) {
+		var currentDir = $('#context-action > input[name=url]').val();
+		window.location = '/' + currentDir + '.specification.ini?editor';
 	}
 }
 
@@ -30,8 +35,12 @@ $(document).ready(function() {
             }
 	);
 	
-	function edit(target, context) {
-		dirIndexActions.edit(target);
+	function editctx(target, context) {
+		dirIndexActions.editctx(target);
+	};
+	
+	function editspec(target, context) {
+		dirIndexActions.editspec(target);
 	};
 	
 	function remove(target, context) {
