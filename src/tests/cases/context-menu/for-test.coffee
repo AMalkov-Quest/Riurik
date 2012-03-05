@@ -17,25 +17,17 @@ test 'should have appropriate actions', ->
     equal _$("#{@menu_locator} a:contains('Rename')").attr('href'), '#rename', 'Rename a suite or a test'
     equal _$("#{@menu_locator} a:contains('Move')").attr('href'), '#move', 'Move a suite or a test'
     equal _$("#{@menu_locator} a:contains('Run')").attr('href'), '#run', 'Execute a suite or a test'
-
-checkActionSucceeded = (actionName, callback)->
-  target = _$("#{context.menu_locator} a:contains('#{actionName}')")
-  action = target.attr('href').substring(1)
-  window.frames[0].ctxMenuActions.dispatcher(action, target)
-  $.when( frame.load() ).then ->
-    fwnd = frame.window()
-    $.wait( -> frame.window().editor? ).then ->
-      ok frame.window().editor.getValue()?, 'editor is not empty'
-      callback()
         
 asyncTest 'Edit context should open context for editing', ->
   $.when( frame.go( context.suite_path ) ).then ->
     checkActionSucceeded 'Context', ->
+      QUnit.substring _$('.CodeMirror-lines').text(), "[#{context.cws}]", 'editor content OK'
       start()
 
 asyncTest 'Edit spec should open spec urls for editing', ->
   $.when( frame.go( context.suite_path ) ).then ->
     checkActionSucceeded 'Specification', ->
+      QUnit.substring _$('.CodeMirror-lines').text(), "url=http://google.com", 'editor content OK'
       start()
 
 QUnit.teardown ->

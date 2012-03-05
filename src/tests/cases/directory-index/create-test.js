@@ -14,7 +14,6 @@ QUnit.asyncSetup(function(){
       
       $.when( frame.load() ).then(function(_$) {
         equal(_$('li#'+ context.suite_name + '.folder').length, 1, 'new folder for suite has been created');
-        window.frames[0].dirIndexActions.edit(context.suite_name);        
         start();
       });
     });
