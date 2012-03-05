@@ -47,13 +47,6 @@
 	border-top: solid 1px #CCC;
 }
 
-/*
-	Adding Icons
-	
-	You can add icons to the context menu by adding
-	classes to the respective LI element(s)
-*/
-
 .contextMenu LI.edit A { background-image: url(/static/img/dir_index_edit.png); }
 .contextMenu LI.delete A { background-image: url(/static/img/dir_index_delete.png); }
 .contextMenu LI.move A { background-image: url(/static/img/dir_index_move.png); }

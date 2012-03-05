@@ -8,39 +8,35 @@ var dirIndexActions = {
 		$('#context-action').submit();
 	},
 	
-	edit: function(target) {
-		var currentDir = $('#context-action > input[name=url]').val();
-		window.location = "/actions/suite/edit/?path=" + currentDir + target;
-	}
 }
 
-$(document).ready(function() {
+var ctxMenuActions = {
+
+	dispatcher: function (action, el, pos) {
+		var args = action.split('#');
+		action = args.shift();
+		args = ', [' + args.map(function(i){return '"'+i+'"';}).toString() + ']';
+		var parmas = '("' + $(el).find('a').text() + '", "' + $(el).attr('class') + '"'+ args +')';
+		eval('ctxMenuActions.' + action + parmas);
+	},
+
+	editctx: function (target, context) {
+		var currentDir = $('#context-action > input[name=url]').val();
+		window.location = "/actions/suite/edit/?path=" + currentDir + target;
+	},
 	
-	$('#dir-index-menu').disableContextMenuItems('move');
+	editspec: function (target, context) {
+		var currentDir = $('#context-action > input[name=url]').val();
+		window.location = '/' + currentDir + '.specification.ini?editor';
+	},
 	
-	$("#dir-index-id UL LI").contextMenu({
-	        menu: 'dir-index-menu'
-	    },  
-            function(action, el, pos) {
-                var args = action.split('#');
-                action = args.shift();
-                args = ', [' + args.map(function(i){return '"'+i+'"';}).toString() + ']';
-                var parmas = '("' + $(el).find('a').text() + '", "' + $(el).attr('class') + '"'+ args +')';
-                eval(action + parmas);
-            }
-	);
-	
-	function edit(target, context) {
-		dirIndexActions.edit(target);
-	};
-	
-	function remove(target, context) {
+	remove: function (target, context) {
 		if ( confirm('Do you realy want to delete "'+ target  +'"?') ) {
 			dirIndexActions.remove(target);
 		};
-	};
+	},
 	
-	function run(target, context, context_names) {
+	run: function (target, context, context_names) {
 		var currentDir = $('#context-action > input[name=url]').val();
 		var fullPath = currentDir + target;
 		var context = $('#context').val();
@@ -67,5 +63,16 @@ $(document).ready(function() {
 		}
 		alert('Unknown target type to run.');
 		return;
-	};
+	}
+};
+
+$(document).ready(function() {
+	
+	$('#dir-index-menu').disableContextMenuItems('move');
+	
+	$("#dir-index-id UL LI").contextMenu({
+	        menu: 'dir-index-menu'
+	    }, ctxMenuActions.dispatcher
+	);
+	
 });
