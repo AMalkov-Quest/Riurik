@@ -7,3 +7,4 @@
 local_settings.py
 .ropeproject
 tags
+virtual_paths.py

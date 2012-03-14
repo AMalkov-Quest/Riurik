@@ -11,7 +11,10 @@
 		$(function(){
 			var defaultText = 'Search', inp = $("#search input.text");
 			inp.val(defaultText).addClass('default')
-				.click(function(){ $('#search form').submit(); })
+				.keypress(function(e){ 
+					var code = (e.keyCode ? e.keyCode : e.which);
+					if ( code == 13 ) $('#search form').submit(); 
+				})
 				.focus(function(){
 					if ( inp.val() == defaultText ) inp.val('').removeClass('default');
 				})

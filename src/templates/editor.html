@@ -13,7 +13,6 @@
 	<script type="text/javascript" src="/static/codemirroreditor/mode/javascript/javascript.js"></script>
 	<script type="text/javascript" src="/static/codemirroreditor/mode/coffeescript/coffeescript.js"></script>
 	{% endif %}
-	<script type="text/javascript" src="/static/codemirroreditor/lib/ctrl.js"></script>
 	<script type="text/javascript" src="/static/js/jquery.cookie.js"></script>
     <script type="text/javascript">
    	  $(document).ready(function() {
@@ -115,7 +114,7 @@
                     saveDraft();
                 }
             },1000);
-			*/
+			
 			{% endif %}
             $.ctrl('R', function(){ $('#run').trigger('click'); });
 			$('#unstub').click(function(){
@@ -127,7 +126,7 @@
 						console.log('result', data)
 					}
 				);
-			});
+			});*/
 	  });
 	      {% if not is_stubbed %}
           setInterval(function(){
@@ -176,26 +175,24 @@
 	{% if not is_stubbed %}
 	<ul class="horizontal-menu">
 		{% ifequal filetype 'test'  %}
-		{% block context-controls %}
-		{% if contexts %}
-		<li><a id="run" href="javascript:void(0);">{% trans "Run" %}</a>
-		at <select name="context">{% for item in contexts %}<option value='{{item}}'{% if forloop.first %} selected="selected"{% endif %}>{{item}}</option>{% endfor %}</select></li>
+			{% block context-controls %}
+			{% if contexts %}
+				<li><a id="run" href="javascript:void(0);">{% trans "Run" %}</a><select name="context">{% for item in contexts %}<option value='{{item}}'{% if forloop.first %} selected="selected"{% endif %}>{{item}}</option>{% endfor %}</select></li>
 		
-		{% block context-btn %}
-		<li><a id="context-preview-ctrl" href=".context.ini" rel='context-preview'>{% trans "Context" %}</a></li>
-		{% endblock context-btn %}
-		{% endif %}
-		{% if not contexts %}
-		<li>
-			<a id="create-context" title="{% trans "To execute the test you have to define cotext" %}" href=".context.ini?editor" >{% trans "Create context" %}
-		</a>
-		</li>
-		{% endif %}
-		{% endblock context-controls %}
+				{% block context-btn %}
+				<li><a id="context-preview-ctrl" href=".context.ini" rel='context-preview'>{% trans "Context" %}</a></li>
+				{% endblock context-btn %}
+			{% endif %}
+			{% if not contexts %}
+			<li>
+				<a id="create-context" title="{% trans "To execute the test you have to define cotext" %}" href=".context.ini?editor" >{% trans "Create context" %}</a>
+			</li>
+			{% endif %}
+			{% endblock context-controls %}
+			<li><a id="spec-link" href="{{ spec }}" target="_blank" >{% trans "Spec" %}</a></li>
 		{% endifequal %}
+		
 		<li><a id="save" href="javascript:void(0);">{% trans "Save" %}</a></li>
-		<li><a id="discard" href="javascript: void(0);">{% trans "Discard" %}</a></li>
-		<li class="disabled"><a id="history" href="javascript: void(0);">{% trans "History" %}</a></li>
 		<li><a id="close" href="javascript: void(0);">{% trans "Close" %}</a></li>
 	</ul>
 	{% else %}

@@ -79,11 +79,30 @@ def template(name):
 	
 	return content
 
-def mktest(path, name):
-	return mkscript(path, name, 'template_test.txt')
+def make(fullpath):
+	path, name = os.path.split(fullpath)
+	if name.endswith(settings.INI_FILE_EXT):
+		return mkconfig(path, name)
+	else:
+		return mktest(path, name)
 
-def mkcontext(path, name):
-	return mkscript(path, name, 'template_context.txt')
+def mktest(path, name):
+	template_name = None
+	if name.endswith(settings.JS_FILE_EXT):
+		template_name = 'js_test.tmpl'
+	elif name.endswith(settings.COFFEE_FILE_EXT):
+		template_name = 'coffee_test.tmpl'
+	
+	return mkscript(path, name, template_name)
+
+def mkconfig(path, name):
+	template_name = None
+	if name == settings.TEST_CONTEXT_FILE_NAME:
+		template_name = 'context.tmpl'
+	elif name == settings.SPEC_URL_FILE_NAME:
+		template_name = 'spec.tmpl'
+
+	return mkscript(path, name, template_name)
 
 def mkscript(path, name, template_name=None):
 	try:

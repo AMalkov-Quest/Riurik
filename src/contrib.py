@@ -24,6 +24,7 @@ def parseURI(url):
 	>>> test.stub('socket.gethostname', returns='spb9914')
 	>>> parseURI('localhost:8000')
 	('spb9914', '8000')
+	>>> test.restore()
 	"""
 	hostport = url.split(':')
 	host = hostport[0] if hostport[0] != 'localhost' else socket.gethostname()
@@ -43,6 +44,7 @@ def patch_host_port(ctximpl, riurik_url):
 	>>> patch_host_port(ci, 'spb9914')
 	>>> ci.get('host')
 	'google.ru'
+	>>> test.restore()
 	"""
 	if ctximpl.has('host') and ctximpl.has('port'):
 		ctximpl.replace_if('host', socket.gethostname(), 'localhost')
@@ -259,7 +261,7 @@ def get_runner_url(context, riurik_url):
 	'google.com:22'
 	>>> get_runner_url({'host': 'google.com', 'port': '22', 'use_local_runner': True}, 'spb123:8010')
 	'spb123:8010'
-	>>> from minimock import mock
+	>>> from minimock import mock, restore
 	>>> import os
 	>>> mock('socket.gethostname', returns='google.com')
 	>>> get_runner_url({'host': 'localhost', 'port': '22'}, 'localhost:8000')
@@ -268,6 +270,7 @@ def get_runner_url(context, riurik_url):
 	>>> get_runner_url({'port': '22'}, 'localhost:22')
 	Called socket.gethostname()
 	'google.com:22'
+	>>> restore()
 	"""
 	def replace_localhost(url):
 		return url.replace('localhost', socket.gethostname())

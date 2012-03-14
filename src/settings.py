@@ -117,16 +117,18 @@ if platform.system() == 'Windows':
 elif platform.system() == 'Linux':
 	COFFEESCRIPT_EXECUTABLE = 'coffee'
 else:
-	COFFEESCRIPT_EXECUTABLE = None 
+	COFFEESCRIPT_EXECUTABLE = None
 
 EXEC_TESTS_CMD='static/testLoader.html'
 UPLOAD_TESTS_CMD='testsrc/upload'
 
 SUITE_SETUP_FILE_NAME = 'suite-setup.js'
-SPEC_URL_FILE_NAME = '.specification.url'
+SPEC_URL_FILE_NAME = '.specification.ini'
 TEST_CONTEXT_FILE_NAME = '.context.ini'
 TEST_CONTEXT_JS_FILE_NAME = '.context.js'
-TEST_FILE_EXT = '.js'
+JS_FILE_EXT = '.js'
+INI_FILE_EXT = '.ini'
+COFFEE_FILE_EXT = '.coffee'
 TEST_SWAP_FILE_NAME = '.%s.swp'
 LIB_KEY_NAME = 'libraries'
 LIB_DEFAULT_NAME = 'library.js'

@@ -14,7 +14,7 @@ asyncTest('folder', function() {
   $.when( frame.go( contexter.URL(context, context.current_folder) ) ).then(function(_$) {
     
     equal(_$('#' + context.folder_name).length, 1, 'the ' + context.folder_name + ' folder is exist');
-    window.frames[0].dirIndexActions.remove(context.folder_name);
+    window.frames[0].ctxMenuActions.removeimpl(context.folder_name);
     $.when( frame.load() ).then(function(_$) {
       equal(_$('#' + context.folder_name).length, 0, 'the ' + context.folder_name + ' folder is deleted');
       start();
@@ -30,7 +30,7 @@ asyncTest('suite', function() {
   $.when( frame.go( contexter.URL(context, context.folder_path) ) ).then(function(_$) {
     
     equal(_$('#' + context.suite_name).length, 1, 'the ' + context.suite_name + ' suite is exist');
-    window.frames[0].dirIndexActions.remove(context.suite_name);
+    window.frames[0].ctxMenuActions.removeimpl(context.suite_name);
     $.when( frame.load() ).then(function(_$) {
       equal(_$('#' + context.suite_name).length, 0, 'the ' + context.suite_name + ' suite is deleted');
       start();
@@ -50,7 +50,7 @@ asyncTest('test', function() {
   $.when( frame.go( contexter.URL(context, suite_path) ) ).then(function(_$) {
     
     equal(_$('#' + test_name).length, 1, 'the ' + test_name + ' test is exist');
-    window.frames[0].dirIndexActions.remove(test_name);
+    window.frames[0].ctxMenuActions.removeimpl(test_name);
     $.when( frame.load() ).then(function(_$) {
       equal(_$('#' + test_name).length, 0, 'the ' + test_name + ' test is deleted');
       start();

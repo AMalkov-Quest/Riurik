@@ -26,11 +26,11 @@ asyncTest('virtual root is correct', function(){
 
 asyncTest('control panel is available', function(){
   $.when( frame.go(contexter.URL(context, context.test_path))).then(function(_$){
-    ok( _$('a#run').is(':visible'), 'Run button is visible' );
+    ok( _$('a#run').is(':visible'), 'Run test button is visible' );
     
     ok( _$('a#context-preview-ctrl').is(':visible'), 'Context button is visible' );
+    ok( _$('a#spec-link').is(':visible'), 'Spec button is visible' );
     ok( _$('a#save').is(':visible'), 'Save button is visible' );
-    ok( _$('a#discard').is(':visible'), 'Discard button is visible' );
     ok( _$('a#close').is(':visible'), 'Close button is visible' );
     start();
   });
@@ -48,7 +48,7 @@ asyncTest('Run button sends a valid request', function(){
       equal(o.context, "localhost", 'Context is OK');
       ok(o.content.length > 0, 'Content is not empty');
       equal(_$('form#apply-test').attr('action'), "/actions/test/submit/", 'form action');
-      equal(_$('form#apply-test').attr('target'), "first-test.js", 'form target');
+      equal(_$('form#apply-test').attr('target'), "localhostfirst-test.js", 'form target');
       _$('form#apply-test').get(0).submit = function(){ return false; };
       start();
       return false;

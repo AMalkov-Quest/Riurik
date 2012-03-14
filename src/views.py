@@ -101,7 +101,8 @@ def serve(request, path, show_indexes=False):
 
 	if not os.path.exists(fullpath):
 		if 'editor' in request.REQUEST:
-			open(fullpath, 'w').close() # creating file if not exists by editor opening it first time
+			#open(fullpath, 'w').close() # creating file if not exists by editor opening it first time
+			tools.make(fullpath)
 		else:
 			raise Http404('"%s" does not exist' % fullpath)
 
@@ -129,7 +130,16 @@ def get_file_content_to_edit(path, fullpath, stubbed):
 		'is_stubbed': stubbed,
 		'favicon'   : 'dir-index-test.gif',
 		'filetype':  tools.get_type(fullpath),
+		'spec'		: get_spec(path, fullpath),
 	}
+
+def get_spec(target, path):
+	spec_url = spec.get_url(path)
+	log.info('spec url: %s' % spec_url)
+	if spec_url:
+		return spec_url
+	else:
+		return '%s?editor' % settings.SPEC_URL_FILE_NAME
 
 def get_file_content(fullpath):
 	statobj = os.stat(fullpath)
@@ -187,7 +197,6 @@ def get_dir_index(document_root, path, fullpath):
 		contexts = []
 
 	favicon = 'dir-index-%s.gif' % tools.get_type(fullpath)
-	spec_url = spec.get_url(fullpath)
 
 	return Context({
 		'directory' : path + '/',
@@ -196,8 +205,7 @@ def get_dir_index(document_root, path, fullpath):
 		'dir_list'  : dirs,
 		'contexts'  : contexts,
 		'favicon'   : favicon,
-		'spec'		: spec_url,
-		'spec_name'	: settings.SPEC_URL_FILE_NAME
+		'spec'	: get_spec(path, fullpath),
 	})
 
 def get_path(request):
@@ -268,7 +276,7 @@ def removeObject(request, fullpath):
 @add_fullpath
 def createSuite(request, fullpath):
 	result = {}
-	result['success'], result['result'] = tools.mkcontext(fullpath, request.POST["object-name"])
+	result['success'], result['result'] = tools.mkconfig(fullpath, request.POST["object-name"])
 	result['result'] += '?editor'
 	response = HttpResponse(mimetype='text/json')
 	response.write(json.dumps(result))
@@ -279,7 +287,7 @@ def createSuite(request, fullpath):
 def editSuite(request, fullpath):
 	log.debug('edit context %s' % fullpath)
 	if not os.path.exists(os.path.join(fullpath, settings.TEST_CONTEXT_FILE_NAME)):
-		tools.mkcontext(fullpath, settings.TEST_CONTEXT_FILE_NAME)
+		tools.mkconfig(fullpath, settings.TEST_CONTEXT_FILE_NAME)
 	redirect = '/' + request.GET['path'] + '/' + settings.TEST_CONTEXT_FILE_NAME + '?editor'
 	return HttpResponseRedirect(redirect)
 
@@ -343,7 +351,10 @@ def runSuite(request, fullpath):
 
 def compileSuiteCoffee(path, fullpath):
 	contrib.cleandir(fullpath)
-	tests = contrib.enum_files_in_folders(fullpath, lambda file_: not file_.endswith(coffeescript.ext))
+	tests = contrib.enum_files_in_folders(
+			fullpath,
+			lambda file_: not file_.endswith(settings.COFFEE_FILE_EXT)
+	)
 	for test in tests:
 		path = coffeescript.compile(None, None, os.path.join(fullpath, test))
 		log.info(path)
