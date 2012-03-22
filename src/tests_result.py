@@ -100,6 +100,8 @@ def saveProgress(test):
 
 def saveResults(test):
 	fileName = getResultsFile(test.path, test.date)
+	if not os.path.exists(fileName):
+		fileName = getDoneFile(test.path, test.date)
 	appendResults(fileName, test)
 
 def save(result):
