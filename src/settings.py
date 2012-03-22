@@ -119,7 +119,6 @@ elif platform.system() == 'Linux':
 else:
 	COFFEESCRIPT_EXECUTABLE = None
 
-EXEC_TESTS_CMD='static/testLoader.html'
 UPLOAD_TESTS_CMD='testsrc/upload'
 
 SUITE_SETUP_FILE_NAME = 'suite-setup.js'

@@ -12,12 +12,12 @@ def coffee2js(path):
 
 def execute(source, full_path):
 	if not settings.COFFEESCRIPT_EXECUTABLE:
-		raise Exception("Unsupported platform: %s. Can't compile CoffeeScript" % platform.system())	
+		raise Exception("Unsupported platform: %s. Can't compile CoffeeScript" % platform.system())
 
 	try:
 		args = shlex.split("%s -c -b -s -p" % settings.COFFEESCRIPT_EXECUTABLE)
 		p = subprocess.Popen(args, stdin=subprocess.PIPE, stdout=subprocess.PIPE)
-		return p.communicate(source.encode("utf-8"))
+		return p.communicate(source)
 	except Exception, e:
 		log.exception(e)
 		raise Exception("Can't execute CoffeeScript compiler: %s" % settings.COFFEESCRIPT_EXECUTABLE)
@@ -34,9 +34,13 @@ def save(full_path, path, out):
 	return path.replace(coffee_name, js_name) if path else None
 
 def compile(source, path, full_path):
-    if not source:
-        source = dir_index_tools.gettest(full_path)
-    out, errors = execute(source, full_path)
-    if not out:
-        raise Exception('CoffeeScript compilation error ...')
-    return save(full_path, path, out)
+	log.info('compile %s' % full_path)
+	if not source:
+		source = dir_index_tools.gettest(full_path)
+	else:
+		source = source.encode("utf-8")
+	log.info(source)
+	out, errors = execute(source, full_path)
+	if not out:
+		raise Exception('CoffeeScript compilation error ...')
+	return save(full_path, path, out)

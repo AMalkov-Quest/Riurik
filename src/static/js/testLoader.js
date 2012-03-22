@@ -673,7 +673,8 @@ QUnit.get_tools_console = function() {
 QUnit.getCSS = function(){
 	if ( QUnit.__css ) return QUnit.__css;
 	var result = '';
-	$.ajax('/testsrc/loader/qunit.css', {
+	url = make_remote_url('/static/css/qunit.css');
+	$.ajax(url, {
 		success: function(data){
 			result = data;
 		},
