@@ -398,9 +398,6 @@ def runTest(request, fullpath):
 def coffee(path):
 	return path.endswith('.coffee')
 
-def coffee(path):
-	return path.endswith('.coffee')
-
 def saveLocalContext(fullpath, contextjs):
 	if os.path.isdir(fullpath):
 		contextjs_path = os.path.join(fullpath, settings.TEST_CONTEXT_JS_FILE_NAME)
@@ -607,34 +604,20 @@ def live_settings_save(request):
 	tools.savetest(request.POST["content"], fullpath)
 	return HttpResponseRedirect('/settings')
 
+
+
 def report_callback(req):
-	event	= req.GET.get('event')
-	name	= req.GET.get('name')
-	passed	= req.GET.get('passed')
-	failed	= req.GET.get('passed')
-	total	= req.GET.get('total')
-	date	= req.GET.get('date')
-	
-	folder = os.path.abspath(__file__)
-	folder = os.path.dirname( folder )
-	folder = os.path.join( folder, 'testResults', date )
-	if not os.path.exists(folder):
-		os.makedirs(folder)
-	f = open( os.path.join(folder,'results.txt'), 'a' )
-	import json
-	f.write(json.dumps({
-		'event': event,
-		'name': name,
-		'passed': passed,
-		'failed': failed,
-		'total': total
-	})+'\n')
-
+	import tests_result
+	try:
+		event = req.GET.get('event')
+		if event == 'begin':
+			tests_result.start(req.GET)
+		elif event == 'done':
+			tests_result.done(req.GET)
+		elif event == 'testDone':
+			tests_result.save(req.GET)
+		else:
+			pass
+	except Exception, e:
+		print e
 	return HttpResponse()
-	
-	
-
-
-
-
-

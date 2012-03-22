@@ -513,6 +513,7 @@ function clone(o) {
 }
 
 riurik.init = function() {
+	console.log('riurik init !!!!!!!!!!!!!!!')
 	QUnit.__tests_result_storage = new Array();
 	QUnit.riurik = {};
 	QUnit.riurik.current = { 'module': {}, 'test': '' };
@@ -539,6 +540,10 @@ riurik.init = function() {
 QUnit.begin = function() {
 	QUnit.config.reorder = false;
 	QUnit.log('tests are begun');
+	QUnit.riurik.report({ 
+		'event': 'begin',
+		'path': test_path
+	})
 }
 
 QUnit.done = function(result) {
@@ -550,6 +555,10 @@ QUnit.done = function(result) {
 			document.title.replace(/^[\u2714\u2716] /i, "")
 		].join(" ");
 	}
+	QUnit.riurik.report({ 
+		'event': 'done',
+		'path': test_path
+	})
 }
 
 QUnit.moduleStart = function(module) {
@@ -594,15 +603,6 @@ QUnit.moduleDone = function(module) {
 			'results': getTestResultDivs(module.name)
 	}
 	QUnit.__tests_result_storage.push($.toJSON(module_results));
-
-	// ********** for riurik reporting callback ************** //
-	QUnit.riurik.report({ 
-		'event': 'moduleDone', 
-		'name': module.name,
-		'failed': module.failed,
-		'passed': module.passed,
-		'total': module.total
-	});
 }
 
 QUnit.testStart = function(test) {
@@ -617,6 +617,7 @@ QUnit.testDone = function(test) {
 	// ********** for riurik reporting callback ************** //
 	QUnit.riurik.report({ 
 		'event': 'testDone',
+		'path': test_path,
 		'name': test.name,
 		'failed': test.failed,
 		'passed': test.passed,
