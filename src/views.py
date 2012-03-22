@@ -349,14 +349,15 @@ def runSuite(request, fullpath):
 	log.info("redirect to run suite %s" % url)
 	return HttpResponseRedirect( url )
 
-def compileSuiteCoffee(path, fullpath):
-	contrib.cleandir(fullpath)
+def compileSuiteCoffee(path, suite_path):
+	contrib.cleandir(suite_path)
 	tests = contrib.enum_files_in_folders(
-			fullpath,
+			suite_path,
 			lambda file_: not file_.endswith(settings.COFFEE_FILE_EXT)
 	)
 	for test in tests:
-		path = coffeescript.compile(None, None, os.path.join(fullpath, test))
+		fullpath = os.path.join(suite_path, test)
+		path = coffeescript.compile(None, None, fullpath)
 		log.info(path)
 
 @add_fullpath

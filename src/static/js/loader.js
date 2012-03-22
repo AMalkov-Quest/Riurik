@@ -48,43 +48,41 @@ var load_remote_style = function(url){
 	document.body.appendChild( style );
 };
 
-loader( load_remote_script ).queue('/static/js/jquery.min.js', function(){
-	document.title = /\/([^\/]*)\/*$/.exec(test_path)[1];
-	loader( load_remote_script )
-	.queue('/static/js/jquery.json.min.js')
-	.queue('/static/jquery-ui/js/jquery-ui.custom.min.js')
-	.queue('/static/js/qunit.js')
-	.queue('/static/js/testLoader.js')
-	.queue(test_location+'/.context.js')
-	.then(function(){
-		$(document).ready(function() {
-			riurik.init();
-			$("#tabs").tabs();
-			QUnit.riurik.context = clone(context);
-			var l = loader( load_remote_script );
-			$.each(context.libraries || [],function(i,url){l.queue( '/' + url );});
-			
-			if ( /\.js$/.test(test_path) ) {
-				l.queue( test_path );
-			} else {
-				if(typeof context.suite_setup != 'undefined'){
-					l.queue( test_location+'/'+context.suite_setup );
-				}
-				$.each(context.include || [],function(i,url){l.queue( test_location+'/'+url );});
-			};
-			l.then(function(){
-				QUnit.config.autorun = false;
-				QUnit.load();
-			});
-			setTimeout(function force_qunit_to_start() {
-				if( QUnit.config.autostart != true ) {
-					QUnit.log('scripts load timeout, forcing tests to start ...');
-				}	
-			}, 10000);
-		});
-	});
+load_remote_style('/static/css/loader.css');
+load_remote_style('/static/css/qunit.css');
+load_remote_style('/static/jquery-ui/css/redmond/jquery-ui.custom.css');
 
-	load_remote_style('/static/css/loader.css');
-	load_remote_style('/static/css/qunit.css');
-	load_remote_style('/static/jquery-ui/css/redmond/jquery-ui.custom.css');
+loader( load_remote_script )
+.queue('/static/js/jquery.json.min.js')
+.queue('/static/jquery-ui/js/jquery-ui.custom.min.js')
+.queue('/static/js/qunit.js')
+.queue('/static/js/testLoader.js')
+.queue(test_location+'/.context.js')
+.then(function(){
+	$(document).ready(function() {
+		document.title = /\/([^\/]*)\/*$/.exec(test_path)[1];
+		riurik.init();
+		$("#tabs").tabs();
+		QUnit.riurik.context = clone(context);
+		var l = loader( load_remote_script );
+		$.each(context.libraries || [],function(i,url){l.queue( '/' + url );});
+		
+		if ( /\.js$/.test(test_path) ) {
+			l.queue( test_path );
+		} else {
+			if(typeof context.suite_setup != 'undefined'){
+				l.queue( test_location+'/'+context.suite_setup );
+			}
+			$.each(context.include || [],function(i,url){l.queue( test_location+'/'+url );});
+		};
+		l.then(function(){
+			QUnit.config.autorun = false;
+			QUnit.load();
+		});
+		setTimeout(function force_qunit_to_start() {
+			if( QUnit.config.autostart != true ) {
+				QUnit.log('scripts load timeout, forcing tests to start ...');
+			}	
+		}, 10000);
+	});
 });
