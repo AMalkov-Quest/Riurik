@@ -542,6 +542,7 @@ QUnit.begin = function() {
 	QUnit.log('tests are begun');
 	QUnit.riurik.report({ 
 		'event': 'begin',
+		'context': context.__name__,
 		'path': test_path
 	})
 }
@@ -559,6 +560,7 @@ QUnit.done = function(result) {
 	setTimeout(function() {
 		QUnit.riurik.report({ 
 			'event': 'done',
+			'context': context.__name__,
 			'path': test_path
 		})
 	}, 5000);
@@ -620,6 +622,7 @@ QUnit.testDone = function(test) {
 	// ********** for riurik reporting callback ************** //
 	QUnit.riurik.report({ 
 		'event': 'testDone',
+		'context': context.__name__,
 		'path': test_path,
 		'name': test.name,
 		'failed': test.failed,

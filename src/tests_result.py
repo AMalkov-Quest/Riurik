@@ -18,6 +18,7 @@ class TestResult(TestBase):
 		self.result = {
 			'date': result['date'],
 			'path': result['path'],
+			'context': result['context'],
 			'name': result['name'],
 			'passed': result['passed'],
 			'failed': result['failed'],
@@ -30,6 +31,7 @@ class TestInfo(TestBase):
 		self.result = {
 			'date': result['date'],
 			'path': result['path'],
+			'context': result['context'],
 		}
 
 def getTestsResultRoot():
@@ -42,27 +44,27 @@ def getTestsResultRoot():
 
 	return testsDir
 
-def getTestResultDir(test_path):
+def getTestResultDir(test_path, context):
 	testsRoot = getTestsResultRoot()
 	testPath = os.path.dirname(test_path).strip('/')
-	testDir = os.path.join(testsRoot, testPath)
+	testDir = os.path.join(testsRoot, testPath, context)
 	if not os.path.exists(testDir):
 		os.makedirs(testDir)
 
 	return testDir
 
-def getFileName(path, date, ext):
-	testDir = getTestResultDir(path)
+def getFileName(path, context, date, ext):
+	testDir = getTestResultDir(path, context)
 	return os.path.join(testDir, '%s.%s' % (date, ext))
 
-def getProgressFile(path, date):
-	return getFileName(path, date, 'progress')
+def getProgressFile(path, context, date):
+	return getFileName(path, context, date, 'progress')
 
-def getResultsFile(path, date):
-	return getFileName(path, date, 'json')
+def getResultsFile(path, context, date):
+	return getFileName(path, context, date, 'json')
 
-def getDoneFile(path, date):
-	return getFileName(path, date, 'done')
+def getDoneFile(path, context, date):
+	return getFileName(path, context, date, 'done')
 
 def proceed(fileName, mode, func):
 	with mutex:
@@ -80,7 +82,7 @@ def load(fileName):
 
 def start(data):
 	start = TestInfo(data)
-	fileName = getProgressFile(start.path, start.date)
+	fileName = getProgressFile(start.path, start.context, start.date)
 	dump(fileName, json.dumps([]))
 
 def getPrevResults(fileName):
@@ -102,7 +104,7 @@ def saveProgress(test):
 	appendResults(fileName, test)
 
 def saveResults(test):
-	fileName = getResultsFile(test.path, test.date)
+	fileName = getResultsFile(test.path, test.context, test.date)
 	appendResults(fileName, test)
 
 def save(result):
@@ -114,6 +116,6 @@ def done(data):
 	done = TestInfo(data)
 	with mutex:
 		os.rename(
-			getProgressFile(done.path, done.date),
-			getDoneFile(done.path, done.date)
+			getProgressFile(done.path, done.context, done.date),
+			getDoneFile(done.path, done.context, done.date)
 		)
