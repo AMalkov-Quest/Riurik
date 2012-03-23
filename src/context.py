@@ -25,8 +25,8 @@ def get_URL(instance, resolve=False):
 		url =  'http://%s:%s' % (host, instance.get('port'))
 	return url
 
-def render(path, ctx, riurik_url):
-	ctxitems = patch(path, ctx, riurik_url)
+def render(path, ctx, riurik_url, ctxname):
+	ctxitems = patch(path, ctx, riurik_url, ctxname)
 	t = Template("""{% load json_tags %}
 		var context = {
 			{% for option in options %}
@@ -64,6 +64,10 @@ def add_start_time(ctximpl):
 	now = time.localtime(time.time())
 	ctximpl.add('test_start_time', time.mktime(now))
 
+def add_name(ctximpl, name):
+	if name:
+		ctximpl.add('__name__', name)
+
 def include_tests(path, ctx, ctximpl):
 
 	def contextjs(path):
@@ -98,11 +102,12 @@ def include_tests(path, ctx, ctximpl):
 def patch_suite_setup(ctximpl, path):
 	ctximpl.add(settings.SUITE_SETUP, path)
 
-def patch(path, ctx, riurik_url):
+def patch(path, ctx, riurik_url, ctxname=None):
 	ctximpl = contrib.context_impl(ctx.items())
 	include_tests(path, ctx, ctximpl)
 	patch_libraries(path, ctximpl, ctx)
 	add_start_time(ctximpl)
+	add_name(ctximpl, ctxname)
 	contrib.patch_host_port(ctximpl, riurik_url)
 
 	return ctximpl.as_tuple()

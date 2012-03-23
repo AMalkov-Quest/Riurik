@@ -9,12 +9,8 @@ def json_to_elem(jsonobj):
 	'''
 	>>> o = '{"tag1": "1", "tag2": "2"}'
 	>>> json_to_elem(json.loads(o))
-	>>> o = '{"testsuite": { "@name": "export", "#text": "empty"} }'
-	>>> json_to_elem(json.loads(o))
-	>>> o = '{"testsuite": { "@name": "module", "#tail": "testcase" } }'
-	>>> json_to_elem(json.loads(o))
-	>>> o = '{"testsuite": { "@name": "module", "testcase": {"@name": "test"} } }'
-	>>> json_to_elem(json.loads(o))
+	<tag1>1</tag1>
+	<tag2>2</tag2>
 	'''
 	attrs = {}
 	text = ''
@@ -34,5 +30,5 @@ def json_to_elem(jsonobj):
 
 		e = ET.Element(key, attrs)
 		e.text = text
-		e.tail = tail
+		#e.tail = tail
 		print ET.tostring(e)

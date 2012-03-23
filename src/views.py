@@ -328,7 +328,7 @@ def runSuite(request, fullpath):
 	log.info('run suite %s with context %s' % (path, context_name))
 	server = request.get_host();
 	compileSuiteCoffee(path, fullpath)
-	contextjs = context.render(path, ctx, server)
+	contextjs = context.render(path, ctx, server, context_name)
 
 	clean_path = contrib.get_relative_clean_path(path)
 	target = contrib.get_runner_url(ctx, server)
@@ -369,7 +369,7 @@ def runTest(request, fullpath):
 
 	log.info('run test %s with context %s' % (path, context_name))
 	server = request.get_host()
-	contextjs = context.render(path, ctx, server)
+	contextjs = context.render(path, ctx, server, context_name)
 	log.debug('contextJS: '+ contextjs)
 
 	clean_path = contrib.get_relative_clean_path(path)
