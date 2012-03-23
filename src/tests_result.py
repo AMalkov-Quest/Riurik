@@ -1,5 +1,8 @@
 import os, json
 import threading
+from logger import log
+
+mutex = threading.RLock()
 
 class TestBase(object):
 
@@ -62,7 +65,7 @@ def getDoneFile(path, date):
 	return getFileName(path, date, 'done')
 
 def proceed(fileName, mode, func):
-	with threading.RLock():
+	with mutex:
 		with open( fileName, mode ) as f:
 			result = func(f)
 
@@ -89,15 +92,13 @@ def getPrevResults(fileName):
 	return results
 
 def appendResults(fileName, test):
-	with threading.RLock():
+	with mutex:
 		results = getPrevResults(fileName)
 		results.append(test.toDict())
 		dump(fileName, json.dumps(results))
 
 def saveProgress(test):
 	fileName = getProgressFile(test.path, test.date)
-	if not os.path.exists(fileName):
-		fileName = getDoneFile(test.path, test.date)
 	appendResults(fileName, test)
 
 def saveResults(test):
@@ -111,7 +112,7 @@ def save(result):
 
 def done(data):
 	done = TestInfo(data)
-	with threading.Lock():
+	with mutex:
 		os.rename(
 			getProgressFile(done.path, done.date),
 			getDoneFile(done.path, done.date)

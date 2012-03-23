@@ -555,10 +555,13 @@ QUnit.done = function(result) {
 			document.title.replace(/^[\u2714\u2716] /i, "")
 		].join(" ");
 	}
-	QUnit.riurik.report({ 
-		'event': 'done',
-		'path': test_path
-	})
+	//wait for tests done reporting is completed
+	setTimeout(function() {
+		QUnit.riurik.report({ 
+			'event': 'done',
+			'path': test_path
+		})
+	}, 5000);
 }
 
 QUnit.moduleStart = function(module) {

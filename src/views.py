@@ -605,8 +605,6 @@ def live_settings_save(request):
 	tools.savetest(request.POST["content"], fullpath)
 	return HttpResponseRedirect('/settings')
 
-
-
 def report_callback(req):
 	import tests_result
 	try:
@@ -618,7 +616,8 @@ def report_callback(req):
 		elif event == 'testDone':
 			tests_result.save(req.GET)
 		else:
-			pass
+			log.exception('Unsupported event on tests callback')
 	except Exception, e:
-		print e
+		log.exception(e)
+
 	return HttpResponse()
