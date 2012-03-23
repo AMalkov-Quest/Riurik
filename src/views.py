@@ -606,15 +606,15 @@ def live_settings_save(request):
 	return HttpResponseRedirect('/settings')
 
 def report_callback(req):
-	import tests_result
+	import reporting
 	try:
 		event = req.GET.get('event')
 		if event == 'begin':
-			tests_result.start(req.GET)
+			reporting.start(req.GET)
 		elif event == 'done':
-			tests_result.done(req.GET)
+			reporting.done(req.GET)
 		elif event == 'testDone':
-			tests_result.save(req.GET)
+			reporting.save(req.GET)
 		else:
 			log.exception('Unsupported event on tests callback')
 	except Exception, e:
@@ -623,10 +623,10 @@ def report_callback(req):
 	return HttpResponse()
 
 def tests_status(request):
-	import tests_result
+	import reporting
 	path = request.GET.get('path')
 	context = request.GET.get('context')
-	status = tests_result.status(path, context)
+	status = reporting.status(path, context)
 	return HttpResponse(status)
 	
 def tests_progress(request):

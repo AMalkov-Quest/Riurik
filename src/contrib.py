@@ -14,7 +14,7 @@ def cleandir(path, pattern):
 				n = n + 1
 				os.remove(os.path.join(path, file_))
 
-	log.info('%s is cleaned, removed %d files' % (path, n))
+	log.info('%s is cleaned, removed %d %s files' % (path, n, pattern))
 
 def parseURI(url):
 	"""
