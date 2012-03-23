@@ -5,12 +5,12 @@ from logger import log
 import socket
 import fnmatch
 
-def cleandir(path):
+def cleandir(path, pattern):
 	n = 0
 	for root, dirs, files in os.walk(path):
 		for file_ in files:
 			log.info(file_)
-			if fnmatch.fnmatch(file_, '.*.js'):
+			if fnmatch.fnmatch(file_, pattern):
 				n = n + 1
 				os.remove(os.path.join(path, file_))
 

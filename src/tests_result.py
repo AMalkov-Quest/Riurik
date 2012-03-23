@@ -1,6 +1,7 @@
 import os, json
 import threading
 from logger import log
+import contrib
 
 mutex = threading.RLock()
 
@@ -84,6 +85,9 @@ def start(data):
 	start = TestInfo(data)
 	fileName = getProgressFile(start.path, start.context, start.date)
 	dump(fileName, json.dumps([]))
+	
+	cwd = getTestResultDir(start.path, start.context)
+	contrib.cleandir(cwd, '*.done')
 
 def getPrevResults(fileName):
 	if os.path.exists(fileName):
@@ -119,3 +123,15 @@ def done(data):
 			getProgressFile(done.path, done.context, done.date),
 			getDoneFile(done.path, done.context, done.date)
 		)
+		
+def status(path, context):
+	cwd = getTestResultDir(path, context)
+	for root, dirs, files in os.walk(cwd):
+		for name in files:
+			if name.endswith('.progress'):
+				return 'begin'
+				
+			if name.endswith('.done'):
+				return 'done'
+				
+	return cwd

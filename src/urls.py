@@ -28,6 +28,8 @@ urlpatterns = patterns('',
 	(r'^settings[/]?$', 'views.live_settings_view'),
 	(r'^settings/save[/]?$', 'views.live_settings_save'),
 	(r'^report_callback/$', 'views.report_callback'),
+	(r'^report/status$', 'views.tests_status'),
+	(r'^report/progress$', 'views.tests_progress'),
 )
 
 urlpatterns += patterns('',

@@ -350,7 +350,7 @@ def runSuite(request, fullpath):
 	return HttpResponseRedirect( url )
 
 def compileSuiteCoffee(path, suite_path):
-	contrib.cleandir(suite_path)
+	contrib.cleandir(suite_path, '.*.js')
 	tests = contrib.enum_files_in_folders(
 			suite_path,
 			lambda file_: not file_.endswith(settings.COFFEE_FILE_EXT)
@@ -621,3 +621,14 @@ def report_callback(req):
 		log.exception(e)
 
 	return HttpResponse()
+
+def tests_status(request):
+	import tests_result
+	path = request.GET.get('path')
+	context = request.GET.get('context')
+	status = tests_result.status(path, context)
+	return HttpResponse(status)
+	
+def tests_progress(request):
+	pass
+	
