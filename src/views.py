@@ -630,5 +630,8 @@ def tests_status(request):
 	return HttpResponse(status)
 	
 def tests_progress(request):
-	pass
-	
+	import reporting
+	path = request.GET.get('path')
+	context = request.GET.get('context')
+	progress = reporting.progress(path, context)
+	return HttpResponse(progress)

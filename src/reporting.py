@@ -23,7 +23,9 @@ class TestResult(TestBase):
 			'name': result['name'],
 			'passed': result['passed'],
 			'failed': result['failed'],
-			'total': result['total']
+			'total': result['total'],
+			'duration': result['duration'],
+			'html': result['html']
 		}
 
 class TestInfo(TestBase):
@@ -72,6 +74,9 @@ def getFileName(path, context, date, ext):
 	testDir = getTestResultDir(path, context)
 	return os.path.join(testDir, '%s.%s' % (date, ext))
 
+def getBeginFile(path, context, date):
+	return getFileName(path, context, date, 'begin')
+	
 def getProgressFile(path, context, date):
 	return getFileName(path, context, date, 'progress')
 
@@ -89,7 +94,7 @@ def proceed(fileName, mode, func):
 	return result
 
 def dump(fileName, data):
-	proceed(fileName, 'w', lambda f: f.write(data))
+	proceed(fileName, 'w', lambda f: f.write(json.dumps(data)))
 
 def load(fileName):
 	data = proceed(fileName, 'r', lambda f: f.read())
@@ -97,11 +102,14 @@ def load(fileName):
 
 def start(data):
 	start = TestInfo(data)
-	fileName = getProgressFile(start.path, start.context, start.date)
-	dump(fileName, json.dumps([]))
 	
 	cwd = getTestResultDir(start.path, start.context)
+	contrib.cleandir(cwd, '*.begin')
+	contrib.cleandir(cwd, '*.progress')
 	contrib.cleandir(cwd, '*.done')
+	
+	fileName = getBeginFile(start.path, start.context, start.date)
+	dump(fileName, [])
 
 def getPrevResults(fileName):
 	if os.path.exists(fileName):
@@ -115,10 +123,12 @@ def appendResults(fileName, test):
 	with mutex:
 		results = getPrevResults(fileName)
 		results.append(test.toDict())
-		dump(fileName, json.dumps(results))
+		dump(fileName, results)
 
 def saveProgress(test):
-	fileName = getProgressFile(test.path, test.date)
+	fileName = getProgressFile(test.path, test.context, test.date)
+	if not os.path.exists(fileName):
+		fileName = getBeginFile(test.path, test.context, test.date)
 	appendResults(fileName, test)
 
 def saveResults(test):
@@ -133,8 +143,11 @@ def save(result):
 def done(data):
 	done = TestInfo(data)
 	with mutex:
+		fileName = getProgressFile(done.path, done.context, done.date)
+		if not os.path.exists(fileName):
+			fileName = getBeginFile(done.path, done.context, done.date)
 		os.rename(
-			getProgressFile(done.path, done.context, done.date),
+			fileName,
 			getDoneFile(done.path, done.context, done.date)
 		)
 		
@@ -142,10 +155,38 @@ def status(path, context):
 	cwd = getTestResultDir(path, context)
 	for root, dirs, files in os.walk(cwd):
 		for name in files:
-			if name.endswith('.progress'):
+			if name.endswith('.begin'):
 				return 'begin'
+				
+			if name.endswith('.progress'):
+				return 'progress'
 				
 			if name.endswith('.done'):
 				return 'done'
 				
-	return cwd
+	return 'undefined'
+
+def progress(path, context):
+	cwd = getTestResultDir(path, context)
+	for root, dirs, files in os.walk(cwd):
+		for name in files:
+			#if name.endswith('.begin') or name.endswith('.progress') or name.endswith('.done'):
+			if not name.endswith('.json'):
+				with mutex:
+					root, ext = os.path.splitext(name)
+					#if name.endswith('.begin'):
+					if ext == '.begin':
+						date = root
+						fileName = getProgressFile(path, context, date)
+						os.rename(
+							getBeginFile(path, context, date),
+							fileName
+						)
+					else:
+						fileName = os.path.join(cwd, name)
+				
+					progress = proceed(fileName, 'r', lambda f: f.read())
+					dump(fileName, [])
+					return progress
+				
+	return json.dumps([])

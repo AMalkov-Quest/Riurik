@@ -516,7 +516,7 @@ riurik.init = function() {
 	console.log('riurik init !!!!!!!!!!!!!!!')
 	QUnit.__tests_result_storage = new Array();
 	QUnit.riurik = {};
-	QUnit.riurik.current = { 'module': {}, 'test': '' };
+	QUnit.riurik.current = { 'module': {}, 'test': {} };
 	QUnit.riurik.status = 'started';
 	QUnit.riurik.server = server_name;
 	QUnit.riurik.report_url = 'http://'+QUnit.riurik.server + '/report_callback/';
@@ -594,7 +594,7 @@ QUnit.moduleDone = function(module) {
 		//html = escape(html)
 		return html;
 	};
-
+	
 	var time = (QUnit.riurik.current.module.finished - QUnit.riurik.current.module.started)/1000;
 	if(isNaN(time)) {
 		time = 0;
@@ -612,22 +612,49 @@ QUnit.moduleDone = function(module) {
 
 QUnit.testStart = function(test) {
 	QUnit.log('the "' + test.name + '" test is started');
-	QUnit.riurik.current.test = test.name;
+	QUnit.riurik.current.test.name = test.name;
+	QUnit.riurik.current.test.started = new Date();
 	console.log('Test start: ', test);
 }
 
 QUnit.testDone = function(test) {
 	QUnit.log('the "' + test.name + '" test is done');
-	console.log('Test done: ', test.name);
-	// ********** for riurik reporting callback ************** //
+	
+	var duration = (new Date() - QUnit.riurik.current.test.started)/1000;
+	if(isNaN(duration)) {
+		duration = 0;
+	}
+	console.log('Test done: ', test);
+	console.log('Test duration: ', (new Date() - QUnit.riurik.current.test.started)/1000);
+	
+	
+	function getTestResults(moduleName, testName) {
+		var elements = $('#qunit-tests li')
+			.has(".module-name:contains('"+moduleName+"')")
+			.has(".test-name:contains('"+testName+"')");
+		var out = '';
+		elements.each(function(i, element){
+			if ( 
+				$('.module-name',element).text() == moduleName &&
+				$('.test-name',element).text() == testName
+			) {
+				out = $(element).outerHTML();
+				return false;
+			};
+		});
+		return encodeURIComponent( out );
+	}
+
 	QUnit.riurik.report({ 
 		'event': 'testDone',
 		'context': context.__name__,
 		'path': test_path,
-		'name': test.name,
+		'name': test.module + ': ' + test.name,
 		'failed': test.failed,
 		'passed': test.passed,
-		'total': test.total
+		'total': test.total,
+		'duration': duration,
+		'html': getTestResults(test.module, test.name)
 	});
 }
 
