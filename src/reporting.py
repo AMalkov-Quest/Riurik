@@ -152,19 +152,22 @@ def done(data):
 		)
 		
 def status(path, context):
+	def mkstatus(status, date):
+		return json.dumps({
+			'status': status,
+			'date': date
+		})
 	cwd = getTestResultDir(path, context)
-	for root, dirs, files in os.walk(cwd):
-		for name in files:
-			if name.endswith('.begin'):
-				return 'begin'
-				
-			if name.endswith('.progress'):
-				return 'progress'
-				
-			if name.endswith('.done'):
-				return 'done'
-				
-	return 'undefined'
+	with mutex:
+		for root, dirs, files in os.walk(cwd):
+			for name in files:
+				root, ext = os.path.splitext(name)
+				date = root
+				if ext == '.begin' or ext == '.progress' or ext == '.done':
+					status = ext.strip('.')
+					return mkstatus(status, date)
+
+	return mkstatus('undefined', '')
 
 def progress(path, context):
 	cwd = getTestResultDir(path, context)
@@ -174,7 +177,6 @@ def progress(path, context):
 			if not name.endswith('.json'):
 				with mutex:
 					root, ext = os.path.splitext(name)
-					#if name.endswith('.begin'):
 					if ext == '.begin':
 						date = root
 						fileName = getProgressFile(path, context, date)
@@ -190,3 +192,8 @@ def progress(path, context):
 					return progress
 				
 	return json.dumps([])
+	
+def getResults(path, context, date):
+	fileName = getResultsFile(path, context, date)
+	results = load(fileName)
+	return results

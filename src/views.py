@@ -92,6 +92,13 @@ def serve(request, path, show_indexes=False):
 	fullpath = contrib.get_full_path(document_root, path)
 	log.debug('show index of %s(%s %s)' % (fullpath, document_root, path))
 	if os.path.isdir(fullpath):
+		if 'history' in request.REQUEST:
+			date = request.REQUEST.get('history')
+			context = request.REQUEST.get('context')
+			import reporting
+			tests_list = reporting.getResults(path, context, date)
+			return _render_to_response('history.html', locals())
+
 		if request.path and request.path[-1:] != '/':
 			return HttpResponseRedirect(request.path + '/')
 		if show_indexes:

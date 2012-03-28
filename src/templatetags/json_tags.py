@@ -16,3 +16,8 @@ def tojson(input):
 	except Exception, ex:
 		pass
 	return mark_safe("\"%s\"" % input)
+
+@register.filter
+def unqoute(input):
+	import urllib
+	return mark_safe(urllib.unquote(input))
