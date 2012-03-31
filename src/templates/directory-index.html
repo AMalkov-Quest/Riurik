@@ -23,7 +23,7 @@
     <script type="text/javascript" src="/static/js/jquery.contextMenu.js"></script>
     <script type="text/javascript" src="/static/js/dir-index-ctxmenu.js"></script>
     <script type="text/javascript" src="/static/js/dir-index-tools.js"></script>
-    
+	    
     <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
     <meta http-equiv="Content-Language" content="en-us" />
     <meta name="robots" content="NONE,NOARCHIVE" />
@@ -46,6 +46,10 @@
 		<div class="tittle-riurik">Riurik Web Based Acceptance Testing Framework</div>
 	</div>
 	<div class="content">
+		{% block title %}
+		<p class="breadcrumbs">{{ directory|breadcrumbs }}</p>
+		{% endblock title %}
+		<div id="syntax" style="float:left;padding:15px 0 0 20px;"></div>
 		<div style="float:right;">
 			{% block controls %}
 			<form id="run-suite" method="POST" action="/actions/suite/submit/" target="{{ directory }}">
@@ -82,11 +86,7 @@
 			{% endblock controls %}
 			{% block search %}{% include 'search/include/search.html' %}{% endblock search %}
 		</div>
-		{% block title %}
-		<p class="breadcrumbs">{{ directory|breadcrumbs }}</p>
-		{% endblock title %}
 		<div style="clear:both;"></div>
-		
 		<div class="line">
 			{% block content %}
 			<div id="dir-index-id" class="dir-index" style="width:500px;">

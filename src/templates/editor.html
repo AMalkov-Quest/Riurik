@@ -8,53 +8,67 @@
 
 {% block javascripts %}
 	{{ block.super }}
+	<script type="text/javascript" src="/static/js/coffeescript-compiler.js"></script>
 	{% if not is_stubbed %}
-	<script type="text/javascript" src="/static/codemirroreditor/lib/codemirror.js"></script>
-	<script type="text/javascript" src="/static/codemirroreditor/mode/javascript/javascript.js"></script>
-	<script type="text/javascript" src="/static/codemirroreditor/mode/coffeescript/coffeescript.js"></script>
+		<script type="text/javascript" src="/static/codemirroreditor/lib/codemirror.js"></script>
+		<script type="text/javascript" src="/static/codemirroreditor/mode/javascript/javascript.js"></script>
+		<script type="text/javascript" src="/static/codemirroreditor/mode/coffeescript/coffeescript.js"></script>
 	{% endif %}
 	<script type="text/javascript" src="/static/js/jquery.cookie.js"></script>
-    <script type="text/javascript">
+	<script type="text/javascript">
    	  $(document).ready(function() {
 		  try { var last_context = $.cookie('last_context');
 			  if ( typeof last_context == 'string' ) 
 				$('select[name=context]').val(last_context);
 		  } catch (e) { console.log(e); }
 		  {% if not is_stubbed %}	
-		  var source_value = draft_value = $('#code').val();
-		  var mode = ( /\.coffee\?/.test(window.location.href) ) ? "coffeescript" : "javascript";
-  		  var editor = CodeMirror.fromTextArea(document.getElementById("code"), {
-			mode: mode,
-		    content: source_value,
-			lineWrapping: true,
-		    autoMatchParens: true,
-		    lineNumbers: true,
-			matchBrackets: true,
-			extraKeys: {
-				"Ctrl-S": function(){ $('#save').trigger('click'); },
-				"Ctrl-R": function(){ $('#run').trigger('click'); }
-			}
-		  });
-		  window.editor = editor;
-	        var ConfirmDiscardchanges = function(){
-                var new_value = editor.getValue();
-                if ( new_value == source_value ) {
-                    return true
-                }
-                if ( confirm('{% trans "Are you sure to close this file and discard all changes?" %}') == false ) {
-                    return false;
-                }
-                return true;
-            };
-            $(document).unload(ConfirmDiscardchanges);
-            $('a').click(function(e){
-                e.stopPropagation();
-                if ($(this).attr('id') != 'save' && $(this).attr('id') != 'run' && $(this).attr('id') != 'discard' && $(this).attr('id') != 'close') {
-                    return ConfirmDiscardchanges();
-                }
-            });
-            $('#discard').click(function(){ if ( ConfirmDiscardchanges() ) document.location=document.location;});
-            $('#close').click(function(){ if ( ConfirmDiscardchanges() ) document.location='{{ request.path|above }}';});
+		  	var source_value = draft_value = $('#code').val();
+		  	coffeeScriptSyntaxChecker = function(code, el) { 
+				try { 
+					CoffeeScript.compile(code); 
+					$(el).text('syntax OK'); 
+				} catch (e) { 
+					$(el).text(e.message); 
+				} 
+			};
+		  	var mode = ( /\.coffee\?/.test(window.location.href) ) ? "coffeescript" : "javascript";
+  		  	var editor = CodeMirror.fromTextArea(document.getElementById("code"), {
+				mode: mode,
+		    		content: source_value,
+				lineWrapping: true,
+		    		autoMatchParens: true,
+		    		lineNumbers: true,
+				matchBrackets: true,
+				extraKeys: {
+					"Ctrl-S": function(){ $('#save').trigger('click'); },
+					"Ctrl-R": function(){ $('#run').trigger('click'); }
+				},
+				onChange: function(editor, options) {
+					if ( mode == 'coffeescript' ) {
+						coffeeScriptSyntaxChecker(editor.getValue(), '#syntax');
+					}
+				}
+			});
+			window.editor = editor;
+		        var ConfirmDiscardchanges = function(){
+	        	        var new_value = editor.getValue();
+		                if ( new_value == source_value ) {
+        		            return true
+                		}
+		                if ( confirm('{% trans "Are you sure to close this file and discard all changes?" %}') == false ) {
+        		            return false;
+                		}
+	                	return true;
+	    		};
+            		$(document).unload(ConfirmDiscardchanges);
+            		$('a').click(function(e){
+		                e.stopPropagation();
+                		if ($(this).attr('id') != 'save' && $(this).attr('id') != 'run' && $(this).attr('id') != 'discard' && $(this).attr('id') != 'close') {
+		                    return ConfirmDiscardchanges();
+                		}
+	    		});
+            		$('#discard').click(function(){ if ( ConfirmDiscardchanges() ) document.location=document.location;});
+            		$('#close').click(function(){ if ( ConfirmDiscardchanges() ) document.location='{{ request.path|above }}';});
 		  {% endif %}
     
 		  $('#run').click(function(){ 
@@ -68,7 +82,7 @@
 				.attr('action', '/actions/test/submit/')
 				.attr('target', context + '{{ request.path|current }}');
 			$('#apply-test').submit();
-	     });
+	 	  });
 
 		 {% if not is_stubbed %}
 			$('#save').click(function(){ 
@@ -81,57 +95,23 @@
 				}
 				$('#apply-test').submit(); 
 			});
-			/* // AutoSave if turned off
-            var ticks = 0;
-            var savingDraft = false;
-            var saveDraft = function(){
-				console.log('saveDraft called')
-                if ( savingDraft === false ) {
-                    var new_value = editor.getCode();
-					$('#save').addClass('disabled');
-                    savingDraft = true;
-                    ticks = 0;
-                    $.post(
-                        '/actions/test/save/draft/',
-                        {'path':'{{ relative_file_path }}','url':'{{ request.path }}', 'content':new_value},
-                        function(data){
-                            draft_value = new_value;
-                            ticks = 0;
-                            savingDraft = false;
-                        }    
-                    );
-                }
-            };
-            setInterval(function(){
-				console.log('save draft check', savingDraft, ticks)
-                var new_value = editor.getCode();
-                if ( new_value == draft_value ) { return; }
-                ticks = ticks + 1;
-                if ( savingDraft === false ) {
-		    $('#save').removeClass('disabled');
-                }
-                if ( savingDraft === false && ticks > 5 ) {
-                    saveDraft();
-                }
-            },1000);
-			
-			{% endif %}
-            $.ctrl('R', function(){ $('#run').trigger('click'); });
-			$('#unstub').click(function(){
-				console.log('get control')
-				$.get(
-					'/actions/test/control/',
-					{ 'path': '{{ relative_file_path }}' },
-					function(data){
-						console.log('result', data)
-					}
-				);
-			});*/
-	  });
+		 {% endif %}
+
+            	 //$.ctrl('R', function(){ $('#run').trigger('click'); });
+		 $('#unstub').click(function(){
+			console.log('get control')
+			$.get(
+				'/actions/test/control/',
+				{ 'path': '{{ relative_file_path }}' },
+				function(data){
+					console.log('result', data)
+				}
+			);
+		});
+
 	      {% if not is_stubbed %}
-          setInterval(function(){
-			 
-             $.get(
+ 	         setInterval(function(){
+        	     $.get(
 				'/actions/test/stub/', 
 				{ path: '{{ relative_file_path }}', '_':  Math.random().toString() },
 				function(request_control){
@@ -166,8 +146,9 @@
 					}
 				}
 			);
-          }, 30 * 1000);
-		  {% endif %}
+          	}, 30 * 1000);
+	   {% endif %}
+	});
 	</script>
 {% endblock %}
 

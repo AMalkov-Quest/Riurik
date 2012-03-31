@@ -1,7 +1,7 @@
 from django.shortcuts import render_to_response as _render_to_response
 from django.template.loader import render_to_string
 from django.template import loader, RequestContext, Context, Template, TemplateDoesNotExist
-from django.http import Http404, HttpResponse, HttpResponseRedirect, HttpRequest
+from django.http import Http404, HttpResponse, HttpResponseRedirect, HttpRequest, HttpResponseServerError
 from django.utils.http import http_date
 from django.core.cache import cache
 import django.views.static
@@ -611,7 +611,7 @@ def live_settings_save(request):
 
 	tools.savetest(request.POST["content"], fullpath)
 	return HttpResponseRedirect('/settings')
-
+	
 def report_callback(req):
 	import reporting
 	try:
@@ -626,19 +626,28 @@ def report_callback(req):
 			log.exception('Unsupported event on tests callback')
 	except Exception, e:
 		log.exception(e)
-
-	return HttpResponse()
+		return HttpResponseServerError(e)
+		
+	return HttpResponse('')
 
 def tests_status(request):
-	import reporting
-	path = request.GET.get('path')
-	context = request.GET.get('context')
-	status = reporting.status(path, context)
-	return HttpResponse(status)
-	
+	try:
+		import reporting
+		path = request.GET.get('path')
+		context = request.GET.get('context')
+		status = reporting.status(path, context)
+		return HttpResponse(status)
+	except Exception, e:
+		log.exception(e)
+		return HttpResponseServerError(e)
+		
 def tests_progress(request):
-	import reporting
-	path = request.GET.get('path')
-	context = request.GET.get('context')
-	progress = reporting.progress(path, context)
-	return HttpResponse(progress)
+	try:
+		import reporting
+		path = request.GET.get('path')
+		context = request.GET.get('context')
+		progress = reporting.progress(path, context)
+		return HttpResponse(progress)
+	except Exception, e:
+		log.exception(e)
+		return HttpResponseServerError(e)
