@@ -513,7 +513,6 @@ function clone(o) {
 }
 
 riurik.init = function() {
-	console.log('riurik init !!!!!!!!!!!!!!!')
 	QUnit.__tests_result_storage = new Array();
 	QUnit.riurik = {};
 	QUnit.riurik.current = { 'module': {}, 'test': {} };
@@ -534,7 +533,6 @@ riurik.init = function() {
 			}
 		});
 	};
-	//QUnit.riurik.context = clone(context)
 }
 
 QUnit.begin = function() {
@@ -619,15 +617,19 @@ QUnit.testStart = function(test) {
 
 QUnit.testDone = function(test) {
 	QUnit.log('the "' + test.name + '" test is done');
-	
+	reportResults(test);
+}
+
+function getTestDuration()
 	var duration = (new Date() - QUnit.riurik.current.test.started)/1000;
 	if(isNaN(duration)) {
 		duration = 0;
 	}
-	console.log('Test done: ', test);
-	console.log('Test duration: ', (new Date() - QUnit.riurik.current.test.started)/1000);
-	
-	
+	return duration;
+}
+
+function reportResults(test) {
+
 	function getTestResults(moduleName, testName) {
 		var elements = $('#qunit-tests li')
 			.has(".module-name:contains('"+moduleName+"')")
@@ -653,7 +655,7 @@ QUnit.testDone = function(test) {
 		'failed': test.failed,
 		'passed': test.passed,
 		'total': test.total,
-		'duration': duration,
+		'duration': getTestDuration(),
 		'html': getTestResults(test.module, test.name)
 	});
 }

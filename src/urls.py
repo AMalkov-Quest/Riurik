@@ -36,13 +36,6 @@ urlpatterns += patterns('',
 	(r'^search', include('plugins.search.urls')),
 )
 
-try:
-	urlpatterns += patterns('',
-		(r'^testsrc', include('%s.urls' % settings.inner_testsloader_path)),
-	)
-except AttributeError, e:
-	log.info(e)
-
 urlpatterns += patterns('',
 	(r'^static/(?P<path>.*)$', 'django.views.static.serve',
 		{
