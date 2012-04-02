@@ -620,7 +620,7 @@ QUnit.testDone = function(test) {
 	reportResults(test);
 }
 
-function getTestDuration()
+function getTestDuration() {
 	var duration = (new Date() - QUnit.riurik.current.test.started)/1000;
 	if(isNaN(duration)) {
 		duration = 0;
