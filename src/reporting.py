@@ -25,6 +25,15 @@ class TestResult(TestBase):
 			'failed': result['failed'],
 			'total': result['total'],
 			'duration': result['duration'],
+		}
+
+class TestHtml(TestBase):
+
+	def __init__(self, result):
+		self.result = {
+			'date': result['date'],
+			'path': result['path'],
+			'context': result['context'],
 			'html': result['html']
 		}
 
@@ -127,6 +136,12 @@ def appendResults(fileName, test):
 		results.append(test.toDict())
 		dump(fileName, results)
 
+def appendHtml(fileName, data):
+	with mutex:
+		results = getPrevResults(fileName)
+		results[-1]['html'] = data.html
+		dump(fileName, results)
+
 def saveProgress(test):
 	fileName = getProgressFile(test.path, test.context, test.date)
 	if not os.path.exists(fileName):
@@ -137,10 +152,18 @@ def saveResults(test):
 	fileName = getResultsFile(test.path, test.context, test.date)
 	appendResults(fileName, test)
 
+def saveHtml(data):
+	fileName = getResultsFile(data.path, data.context, data.date)
+	appendHtml(fileName, data)
+
 def save(result):
 	test = TestResult(result)
 	saveResults(test)
 	saveProgress(test)
+
+def add_html(result):
+	data = TestHtml(result)
+	saveHtml(data)
 
 def done(data):
 	done = TestInfo(data)

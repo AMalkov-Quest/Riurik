@@ -622,6 +622,8 @@ def report_callback(req):
 			reporting.done(req.GET)
 		elif event == 'testDone':
 			reporting.save(req.GET)
+		elif event == 'html':
+			reporting.add_html(req.GET)
 		else:
 			log.exception('Unsupported event on tests callback')
 	except Exception, e:
