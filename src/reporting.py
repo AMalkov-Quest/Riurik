@@ -44,7 +44,7 @@ def getTestsResultRoot():
 	testsDir = os.path.join(os.path.abspath( root ), 'testsResult' )
 	if not os.path.exists(testsDir):
 		os.makedirs(testsDir)
-
+	log.info('root for tests result: %s' % testsDir)
 	return testsDir
 
 def getTestResultDir(test_path, context):
@@ -63,8 +63,10 @@ def getTestResultDir(test_path, context):
 	if test_path.endswith('.js'):
 		testPath = os.path.dirname(test_path)
 	else:
-		testPath = test_path.strip('/')
-	testDir = os.path.join(testsRoot, testPath, context)
+		testPath = test_path
+	testDir = os.path.join(testsRoot, testPath.strip('/'), context)
+	log.info((testsRoot, testPath, context))
+	log.info('tests result location: %s' % testDir)
 	if not os.path.exists(testDir):
 		os.makedirs(testDir)
 
