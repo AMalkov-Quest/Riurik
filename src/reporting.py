@@ -25,6 +25,7 @@ class TestResult(TestBase):
 			'failed': result['failed'],
 			'total': result['total'],
 			'duration': result['duration'],
+			'html': ''
 		}
 
 class TestHtml(TestBase):
@@ -34,6 +35,7 @@ class TestHtml(TestBase):
 			'date': result['date'],
 			'path': result['path'],
 			'context': result['context'],
+			'id': result['testId'],
 			'html': result['html']
 		}
 
@@ -53,7 +55,7 @@ def getTestsResultRoot():
 	testsDir = os.path.join(os.path.abspath( root ), 'testsResult' )
 	if not os.path.exists(testsDir):
 		os.makedirs(testsDir)
-	log.info('root for tests result: %s' % testsDir)
+	#log.info('root for tests result: %s' % testsDir)
 	return testsDir
 
 def getTestResultDir(test_path, context):
@@ -74,8 +76,8 @@ def getTestResultDir(test_path, context):
 	else:
 		testPath = test_path
 	testDir = os.path.join(testsRoot, testPath.strip('/'), context)
-	log.info((testsRoot, testPath, context))
-	log.info('tests result location: %s' % testDir)
+	#log.info((testsRoot, testPath, context))
+	#log.info('tests result location: %s' % testDir)
 	if not os.path.exists(testDir):
 		os.makedirs(testDir)
 
@@ -139,7 +141,7 @@ def appendResults(fileName, test):
 def appendHtml(fileName, data):
 	with mutex:
 		results = getPrevResults(fileName)
-		results[-1]['html'] = data.html
+		results[-1]['html'] += data.html
 		dump(fileName, results)
 
 def saveProgress(test):
@@ -198,7 +200,6 @@ def progress(path, context):
 	cwd = getTestResultDir(path, context)
 	for root, dirs, files in os.walk(cwd):
 		for name in files:
-			#if name.endswith('.begin') or name.endswith('.progress') or name.endswith('.done'):
 			if not name.endswith('.json'):
 				with mutex:
 					root, ext = os.path.splitext(name)
