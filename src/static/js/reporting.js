@@ -3,7 +3,7 @@ function reportBegin() {
 		'event': 'begin'
 	};
 	QUnit.__tests_result_storage.push(message);
-	send();
+	worker();
 };
 
 function reportDone() {
@@ -12,17 +12,6 @@ function reportDone() {
 		'event': 'done'
 	};
 	QUnit.__tests_result_storage.push(message);
-
-	(function f(){
-		var queue = QUnit.__tests_result_storage;
-		if ( queue.length > 0 && queue[0].event == 'done' ){
-			console.log('send tests are done')
-			send();
-		} else {
-			console.log('done is waiting for empty queue: ' + queue.length)
-			setTimeout(f, 100);
-		}
-	})();
 };
 
 function tochunks(size, data) {
@@ -59,13 +48,9 @@ function getHtmlTestResults(moduleName, testName) {
 function reportTestDone(test) {
 	console.log('the "' + test.name + '" test is done');
 
-	var testId = $('#qunit-tests li.pass[id*="test-output"]').length;
-	console.log('test id ' + testId);
-
 	QUnit.__tests_result_storage.push({ 
 		'event': 'testDone',
 		'name': test.module + ': ' + test.name,
-		'testId': testId,
 		'failed': test.failed,
 		'passed': test.passed,
 		'total': test.total,
@@ -76,29 +61,9 @@ function reportTestDone(test) {
 	$.each( tochunks(2000, html), function(i, chunk){
 		QUnit.__tests_result_storage.push({
 			'event': 'html',
-			'chunkId': i,
-			'testId': testId,
 			'html': chunk
 		});
 	});
-	
-	function sendChunk() {
-		var queue = QUnit.__tests_result_storage;
-		if ( queue.length > 0 && queue[0].event == 'html' ) {
-			send(sendChunk);
-		}
-	}
-	
-	(function f(){
-		var queue = QUnit.__tests_result_storage;
-		if ( queue.length > 0 && queue[0].event == 'testDone' && queue[0].testId == testId ){
-			console.log('send tests are done')
-			send(sendChunk);
-		} else {
-			console.log('send test is waiting for empty queue: ' + queue.length);
-			setTimeout(f, 100);
-		}
-	})();
 };
 
 function send(callback) {
@@ -133,3 +98,20 @@ function getTestDuration()
 	return duration;
 };
 
+function worker(){
+	var sending = false;
+	(function f(){
+		if ( ! sending ) {
+			var queue = QUnit.__tests_result_storage;
+			if ( queue.length > 0 ){
+				sending = true;
+				console.log('send tests are done')
+				send(function(){
+					sending = false;
+				});
+			}
+			console.log('send test is waiting for empty queue: ' + queue.length);
+		};
+		setTimeout(f, 100);
+	})();
+};

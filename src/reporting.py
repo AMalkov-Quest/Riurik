@@ -35,7 +35,6 @@ class TestHtml(TestBase):
 			'date': result['date'],
 			'path': result['path'],
 			'context': result['context'],
-			'id': result['testId'],
 			'html': result['html']
 		}
 
