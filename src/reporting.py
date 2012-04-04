@@ -195,29 +195,21 @@ def status(path, context):
 
 	return mkstatus('undefined', '')
 
-def progress(path, context):
-	cwd = getTestResultDir(path, context)
-	for root, dirs, files in os.walk(cwd):
-		for name in files:
-			if not name.endswith('.json'):
-				with mutex:
-					root, ext = os.path.splitext(name)
-					if ext == '.begin':
-						date = root
-						fileName = getProgressFile(path, context, date)
-						os.rename(
-							getBeginFile(path, context, date),
-							fileName
-						)
-					else:
-						fileName = os.path.join(cwd, name)
-				
-					progress = proceed(fileName, 'r', lambda f: f.read())
-					dump(fileName, [])
-					return progress
-				
-	return json.dumps([])
-	
+def progress(date, path, context):
+	fileName = getProgressFile(path, context, date)
+	if not os.path.exists(fileName):
+		beginFileName = getBeginFile(path, context, date)
+		if os.path.exists(beginFileName):
+			os.rename(beginFileName, fileName)
+		else:
+			fileName = getDoneFile(path, context, date)
+			if not os.path.exists(fileName):
+				return json.dumps([])
+		
+	progress = proceed(fileName, 'r', lambda f: f.read())
+	dump(fileName, [])
+	return progress
+
 def getResults(path, context, date):
 	fileName = getResultsFile(path, context, date)
 	results = load(fileName)

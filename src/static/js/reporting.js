@@ -18,13 +18,13 @@ function tochunks(size, data) {
 	var len = data.length;
 	var i = 0;
 	var chunks = new Array();
-	console.log('test data length: ' + len);
+	
 	while(len > 0) {
 		chunks[i] = data.substring(i*size, i*size + size);
 		len -= size;
 		i += 1;
 	}
-	console.log('splitted in ' + chunks.length + ' chunks');
+	
 	return chunks;
 };
 
@@ -71,8 +71,7 @@ function send(callback) {
 	data['date'] = formatDate(QUnit.riurik.date, 'yyyy-MM-dd-HH-mm-ss');
 	data['context'] = context.__name__;
 	data['path'] = test_path;
-	console.log('report tests result')
-	console.log(data);
+	
 	$(document).unbind('ajaxError');
 	$.ajax({
 		'url': QUnit.riurik.report_url,
@@ -105,12 +104,10 @@ function worker(){
 			var queue = QUnit.__tests_result_storage;
 			if ( queue.length > 0 ){
 				sending = true;
-				console.log('send tests are done')
 				send(function(){
 					sending = false;
 				});
 			}
-			console.log('send test is waiting for empty queue: ' + queue.length);
 		};
 		setTimeout(f, 100);
 	})();

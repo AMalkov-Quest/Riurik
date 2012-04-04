@@ -648,7 +648,8 @@ def tests_progress(request):
 		import reporting
 		path = request.GET.get('path')
 		context = request.GET.get('context')
-		progress = reporting.progress(path, context)
+		date = request.GET.get('date')
+		progress = reporting.progress(date, path, context)
 		return HttpResponse(progress)
 	except Exception, e:
 		log.exception(e)
