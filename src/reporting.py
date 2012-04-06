@@ -112,17 +112,6 @@ def load(fileName):
 	data = proceed(fileName, 'r', lambda f: f.read())
 	return json.loads(data)
 
-def start(data):
-	start = TestInfo(data)
-	
-	cwd = getTestResultDir(start.path, start.context)
-	contrib.cleandir(cwd, '*.begin')
-	contrib.cleandir(cwd, '*.progress')
-	contrib.cleandir(cwd, '*.done')
-	
-	fileName = getBeginFile(start.path, start.context, start.date)
-	dump(fileName, [])
-
 def getPrevResults(fileName):
 	if os.path.exists(fileName):
 		results = load(fileName)
@@ -145,9 +134,10 @@ def appendHtml(fileName, data):
 
 def saveProgress(test):
 	fileName = getProgressFile(test.path, test.context, test.date)
-	if not os.path.exists(fileName):
-		fileName = getBeginFile(test.path, test.context, test.date)
-	appendResults(fileName, test)
+	with mutex:
+		if not os.path.exists(fileName):
+			fileName = getBeginFile(test.path, test.context, test.date)
+		appendResults(fileName, test)
 
 def saveResults(test):
 	fileName = getResultsFile(test.path, test.context, test.date)
@@ -165,6 +155,17 @@ def save(result):
 def add_html(result):
 	data = TestHtml(result)
 	saveHtml(data)
+
+def start(data):
+	start = TestInfo(data)
+	
+	cwd = getTestResultDir(start.path, start.context)
+	contrib.cleandir(cwd, '*.begin')
+	contrib.cleandir(cwd, '*.progress')
+	contrib.cleandir(cwd, '*.done')
+	
+	fileName = getBeginFile(start.path, start.context, start.date)
+	dump(fileName, [])
 
 def done(data):
 	done = TestInfo(data)
@@ -197,17 +198,19 @@ def status(path, context):
 
 def progress(date, path, context):
 	fileName = getProgressFile(path, context, date)
-	if not os.path.exists(fileName):
-		beginFileName = getBeginFile(path, context, date)
-		if os.path.exists(beginFileName):
-			os.rename(beginFileName, fileName)
-		else:
-			fileName = getDoneFile(path, context, date)
-			if not os.path.exists(fileName):
-				return json.dumps([])
-		
-	progress = proceed(fileName, 'r', lambda f: f.read())
-	dump(fileName, [])
+	with mutex:
+		if not os.path.exists(fileName):
+			beginFileName = getBeginFile(path, context, date)
+			if os.path.exists(beginFileName):
+				os.rename(beginFileName, fileName)
+			else:
+				fileName = getDoneFile(path, context, date)
+				if not os.path.exists(fileName):
+					return json.dumps([])
+			
+		progress = proceed(fileName, 'r', lambda f: f.read())
+		dump(fileName, [])
+	
 	return progress
 
 def getResults(path, context, date):
