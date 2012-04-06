@@ -3,7 +3,7 @@ function reportBegin() {
 		'event': 'begin'
 	};
 	QUnit.__tests_result_storage.push(message);
-	worker();
+	consignor();
 };
 
 function reportDone() {
@@ -97,7 +97,7 @@ function getTestDuration()
 	return duration;
 };
 
-function worker(){
+function consignor(){
 	var sending = false;
 	(function f(){
 		if ( ! sending ) {
