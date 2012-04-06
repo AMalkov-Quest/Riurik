@@ -99,14 +99,17 @@ function getTestDuration()
 
 function consignor(){
 	var sending = false;
+	var sendingTimeOut;
 	(function f(){
 		if ( ! sending ) {
-			var queue = QUnit.__tests_result_storage;
-			if ( queue.length > 0 ){
+			var next = function(){
+				clearTimeout( sendingTimeOut );
+				sending = false;
+			};
+			sendingTimeOut = setTimeout(next, 30 * 1000);
+			if ( QUnit.__tests_result_storage.length > 0 ){
 				sending = true;
-				send(function(){
-					sending = false;
-				});
+				send( next );
 			}
 		};
 		setTimeout(f, 100);
