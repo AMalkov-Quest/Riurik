@@ -25,6 +25,20 @@ class TestResult(TestBase):
 			'failed': result['failed'],
 			'total': result['total'],
 			'duration': result['duration'],
+			'testId': int(result['id']),
+			'htmlChunkId': -1,
+			'html': ''
+		}
+
+class TestHtml(TestBase):
+
+	def __init__(self, result):
+		self.result = {
+			'date': result['date'],
+			'path': result['path'],
+			'context': result['context'],
+			'testId': int(result['testId']),
+			'chunkId': int(result['chunkId']),
 			'html': result['html']
 		}
 
@@ -44,7 +58,7 @@ def getTestsResultRoot():
 	testsDir = os.path.join(os.path.abspath( root ), 'testsResult' )
 	if not os.path.exists(testsDir):
 		os.makedirs(testsDir)
-	log.info('root for tests result: %s' % testsDir)
+	#log.info('root for tests result: %s' % testsDir)
 	return testsDir
 
 def getTestResultDir(test_path, context):
@@ -65,8 +79,6 @@ def getTestResultDir(test_path, context):
 	else:
 		testPath = test_path
 	testDir = os.path.join(testsRoot, testPath.strip('/'), context)
-	log.info((testsRoot, testPath, context))
-	log.info('tests result location: %s' % testDir)
 	if not os.path.exists(testDir):
 		os.makedirs(testDir)
 
@@ -102,17 +114,6 @@ def load(fileName):
 	data = proceed(fileName, 'r', lambda f: f.read())
 	return json.loads(data)
 
-def start(data):
-	start = TestInfo(data)
-	
-	cwd = getTestResultDir(start.path, start.context)
-	contrib.cleandir(cwd, '*.begin')
-	contrib.cleandir(cwd, '*.progress')
-	contrib.cleandir(cwd, '*.done')
-	
-	fileName = getBeginFile(start.path, start.context, start.date)
-	dump(fileName, [])
-
 def getPrevResults(fileName):
 	if os.path.exists(fileName):
 		results = load(fileName)
@@ -127,20 +128,62 @@ def appendResults(fileName, test):
 		results.append(test.toDict())
 		dump(fileName, results)
 
+def appendHtml(fileName, data):
+	with mutex:
+		results = getPrevResults(fileName)
+		#just for debugging
+		last = results[-1]
+		testId = int(last['testId'])
+		prevChunkId = int(last['htmlChunkId'])
+		if prevChunkId + 1 != data.chunkId:
+			log.exception(last['name'])
+			log.exception('test %d: chunks id is mismatched %d != %d' % (testId, prevChunkId + 1, data.chunkId))
+			
+		if testId != data.testId:
+			log.exception(last['name'])
+			log.exception('tests id is mismatched %d != %d' % (testId, data.testId))
+			
+		results[-1]['htmlChunkId'] = data.chunkId
+		log.exception('recieved new %d chunk for %d test' % (data.chunkId, testId))
+		#just for debugging		
+		results[-1]['html'] += data.html
+		dump(fileName, results)
+
 def saveProgress(test):
 	fileName = getProgressFile(test.path, test.context, test.date)
-	if not os.path.exists(fileName):
-		fileName = getBeginFile(test.path, test.context, test.date)
-	appendResults(fileName, test)
+	with mutex:
+		if not os.path.exists(fileName):
+			fileName = getBeginFile(test.path, test.context, test.date)
+		appendResults(fileName, test)
 
 def saveResults(test):
 	fileName = getResultsFile(test.path, test.context, test.date)
+	log.exception('recieved new %d test' % (test.testId))
 	appendResults(fileName, test)
+
+def saveHtml(data):
+	fileName = getResultsFile(data.path, data.context, data.date)
+	appendHtml(fileName, data)
 
 def save(result):
 	test = TestResult(result)
 	saveResults(test)
 	saveProgress(test)
+
+def add_html(result):
+	data = TestHtml(result)
+	saveHtml(data)
+
+def start(data):
+	start = TestInfo(data)
+	
+	cwd = getTestResultDir(start.path, start.context)
+	contrib.cleandir(cwd, '*.begin')
+	contrib.cleandir(cwd, '*.progress')
+	contrib.cleandir(cwd, '*.done')
+	
+	fileName = getBeginFile(start.path, start.context, start.date)
+	dump(fileName, [])
 
 def done(data):
 	done = TestInfo(data)
@@ -171,30 +214,23 @@ def status(path, context):
 
 	return mkstatus('undefined', '')
 
-def progress(path, context):
-	cwd = getTestResultDir(path, context)
-	for root, dirs, files in os.walk(cwd):
-		for name in files:
-			#if name.endswith('.begin') or name.endswith('.progress') or name.endswith('.done'):
-			if not name.endswith('.json'):
-				with mutex:
-					root, ext = os.path.splitext(name)
-					if ext == '.begin':
-						date = root
-						fileName = getProgressFile(path, context, date)
-						os.rename(
-							getBeginFile(path, context, date),
-							fileName
-						)
-					else:
-						fileName = os.path.join(cwd, name)
-				
-					progress = proceed(fileName, 'r', lambda f: f.read())
-					dump(fileName, [])
-					return progress
-				
-	return json.dumps([])
+def progress(date, path, context):
+	fileName = getProgressFile(path, context, date)
+	with mutex:
+		if not os.path.exists(fileName):
+			beginFileName = getBeginFile(path, context, date)
+			if os.path.exists(beginFileName):
+				os.rename(beginFileName, fileName)
+			else:
+				fileName = getDoneFile(path, context, date)
+				if not os.path.exists(fileName):
+					return json.dumps([])
+			
+		progress = proceed(fileName, 'r', lambda f: f.read())
+		dump(fileName, [])
 	
+	return progress
+
 def getResults(path, context, date):
 	fileName = getResultsFile(path, context, date)
 	results = load(fileName)

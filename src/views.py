@@ -622,6 +622,8 @@ def report_callback(req):
 			reporting.done(req.GET)
 		elif event == 'testDone':
 			reporting.save(req.GET)
+		elif event == 'html':
+			reporting.add_html(req.GET)
 		else:
 			log.exception('Unsupported event on tests callback')
 	except Exception, e:
@@ -646,7 +648,8 @@ def tests_progress(request):
 		import reporting
 		path = request.GET.get('path')
 		context = request.GET.get('context')
-		progress = reporting.progress(path, context)
+		date = request.GET.get('date')
+		progress = reporting.progress(date, path, context)
 		return HttpResponse(progress)
 	except Exception, e:
 		log.exception(e)

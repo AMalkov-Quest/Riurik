@@ -39,7 +39,7 @@ def compile(source, path, full_path):
 		source = dir_index_tools.gettest(full_path)
 	else:
 		source = source.encode("utf-8")
-	log.info(source)
+
 	out, errors = execute(source, full_path)
 	if not out:
 		raise Exception('CoffeeScript compilation error ...')
