@@ -455,13 +455,9 @@ function clone(o) {
 }
 
 riurik.init = function() {
-	QUnit.riurik = {};
-	QUnit.riurik.current = { 'module': {}, 'test': {} };
-	QUnit.riurik.status = 'started';
-	QUnit.riurik.server = server_name;
-	QUnit.riurik.report_url = 'http://'+QUnit.riurik.server + '/report_callback/';
-	QUnit.riurik.date = new Date();
-	
+	riurik.QUnit = {};
+	riurik.QUnit.current = { 'module': {}, 'test': {} };
+	riurik.QUnit.status = 'started';
 }
 
 QUnit.begin = function() {
@@ -472,7 +468,7 @@ QUnit.begin = function() {
 
 QUnit.done = function(result) {
 	QUnit.log('tests are done');
-	QUnit.riurik.status = 'done';
+	riurik.QUnit.status = 'done';
 	if( result.total == 0 ) {
 		document.title = [
 			("\u2716"),
@@ -483,23 +479,23 @@ QUnit.done = function(result) {
 }
 
 QUnit.moduleStart = function(module) {
-	QUnit.riurik.current.module.name = module.name;
-	QUnit.riurik.current.module.status = 'started';
-	QUnit.riurik.current.module.started = new Date();
-	QUnit.log('the "' + module.name + '" module is started ', QUnit.riurik.current.module.started);
-	context = clone(QUnit.riurik.context)
+	riurik.QUnit.current.module.name = module.name;
+	riurik.QUnit.current.module.status = 'started';
+	riurik.QUnit.current.module.started = new Date();
+	QUnit.log('the "' + module.name + '" module is started ', riurik.QUnit.current.module.started);
+	context = clone(riurik.QUnit.context)
 }
 
 QUnit.moduleDone = function(module) {
 	QUnit.log('the "' + module.name + '" module is done');
-	QUnit.riurik.current.module.status = 'done';
-	QUnit.riurik.current.module.finished = new Date();
+	riurik.QUnit.current.module.status = 'done';
+	riurik.QUnit.current.module.finished = new Date();
 }
 
 QUnit.testStart = function(test) {
 	QUnit.log('the "' + test.name + '" test is started');
-	QUnit.riurik.current.test.name = test.name;
-	QUnit.riurik.current.test.started = new Date();
+	riurik.QUnit.current.test.name = test.name;
+	riurik.QUnit.current.test.started = new Date();
 	console.log('Test start: ', test);
 }
 
@@ -507,14 +503,6 @@ QUnit.testDone = function(test) {
 	QUnit.log('the "' + test.name + '" test is done');
 	riurik.reporter.testDone(test);
 }
-
-QUnit.get_results = function() {
-	if ( QUnit.__tests_result_storage != 'undefined' && QUnit.__tests_result_storage.length > 0 ) {
-		return QUnit.__tests_result_storage.shift();
-	}else{
-		return '';
-	}
-};
 
 QUnit._get_results_view = function() {
 	var html = '<html><head><link rel="stylesheet" type="text/css" href="qunit.css"></head><body>'

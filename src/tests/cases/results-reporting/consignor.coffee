@@ -3,18 +3,21 @@ module 'consignor'
 asyncTest 'should send given data', ->
   $.wait( -> riurik.reporter.queue.length == 0 ).then ->
     
-    riurik.reporter.queue.push {'event': 'test'}
+    equal riurik.reporter.url, 'http://localhost:8000/report_callback/'
+    ok riurik.reporter.queue?, 'queue for tests result should be created'
+    reportingData = {'event': 'test'}
+    riurik.reporter.queue.push reportingData
+    
     $.mockjax({
-      url: QUnit.riurik.report_url,
+      url: riurik.reporter.url,
       response: (args) ->
-        console.log args
         
-        equal args.dataType, 'jsonp'
-        ok ?args.data
-        equal args.data.context, context.__name__
-        equal args.data.date, formatDate(QUnit.riurik.date, 'yyyy-MM-dd-HH-mm-ss')
-        equal args.data.path, test_path
-        equal args.data.event, 'test'
+        equal args.dataType, 'jsonp', 'request should be cross-domain'
+        ok args.data?, 'reporting data should be extracted from the queue'
+        equal args.data.context, context.__name__, 'context name'
+        equal args.data.date, riurik.reporter.date
+        equal args.data.path, test_path, 'path to test'
+        equal args.data.event, reportingData.event, 'event type'
         
         $.mockjaxClear()
         start()

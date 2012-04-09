@@ -1,5 +1,10 @@
 riurik.reporter = {}
 
+riurik.reporter.server = riurik_server_name;
+riurik.reporter.url = 'http://' + riurik_server_name + '/report_callback/';
+riurik.reporter.date = formatDate(new Date(), 'yyyy-MM-dd-HH-mm-ss');
+riurik.reporter.target_tests_path = test_path
+
 riurik.reporter.queue = new Array();
 
 riurik.reporter.begin = function () {
@@ -74,12 +79,12 @@ riurik.reporter.getHtmlTestResults = function (moduleName, testName) {
 	return encodeURIComponent( out );
 };
 
-riurik.reporter.send = function (callback) {
+riurik.reporter.send = function (data, callback) {
 	$(document).unbind('ajaxError');
 	console.log('send');
 	console.log(data);
 	$.ajax({
-		'url': QUnit.riurik.report_url,
+		'url': riurik.reporter.url,
 		'data': data,
 		'dataType': 'jsonp',
 		'complete': function(){
@@ -92,7 +97,7 @@ riurik.reporter.send = function (callback) {
 };
 
 riurik.reporter.getTestDuration = function () {
-	var duration = (new Date() - QUnit.riurik.current.test.started)/1000;
+	var duration = (new Date() - riurik.QUnit.current.test.started)/1000;
 	if(isNaN(duration)) {
 		duration = 0;
 	}
@@ -106,7 +111,7 @@ riurik.reporter.consignor = function () {
 
 	(function f(){
 		if ( ! busy ) {
-			var next = function(){
+			var next = function() {
 				clearTimeout( busyTimeOut );
 				busy = false;
 			};
@@ -114,9 +119,9 @@ riurik.reporter.consignor = function () {
 			busyTimeOut = setTimeout(next, 120 * 1000);
 			if ( riurik.reporter.queue.length > 0 ){
 				data = riurik.reporter.queue.shift();
-				data['date'] = formatDate(QUnit.riurik.date, 'yyyy-MM-dd-HH-mm-ss');
+				data['date'] = riurik.reporter.date;
 				data['context'] = context.__name__;
-				data['path'] = test_path;
+				data['path'] = riurik.reporter.target_tests_path;
 				
 				busy = true;
 				riurik.reporter.send( data, next );

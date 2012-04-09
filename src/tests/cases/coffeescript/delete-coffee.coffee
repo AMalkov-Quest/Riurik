@@ -14,12 +14,11 @@ QUnit.setup ->
              
 asyncTest 'should delete compiled js file so it will not be executed next time', ->
   $.when( frame.go(context.url) ).then ->
-    fwnd = frame.window()
-    $.wait( -> fwnd.QUnit? and fwnd.QUnit.riurik? and fwnd.QUnit.riurik.status == 'done' ).then ->
+    $.wait( frameTestsAreDone ).then ->
       equal _$('.test-name').length, 2, 'both tests are executed first time'
       delete_test context.test2_path
       $.when( frame.go(context.url) ).then ->
-        $.wait( -> fwnd.QUnit? and fwnd.QUnit.riurik? and fwnd.QUnit.riurik.status == 'done' ).then ->
+        $.wait( frameTestsAreDone ).then ->
           equal _$('.test-name').length, 1, 'only one test is executed next time'
           start()
     

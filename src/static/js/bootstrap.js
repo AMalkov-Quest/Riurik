@@ -63,7 +63,7 @@ loader( load_remote_script ).queue('/static/js/jquery.min.js', function(){
 		$(document).ready(function() {
 			riurik.init();
 			$("#tabs").tabs();
-			QUnit.riurik.context = clone(context);
+			riurik.QUnit.context = clone(context);
 			var l = loader( load_remote_script );
 			$.each(context.libraries || [],function(i,url){l.queue( '/' + url );});
 			

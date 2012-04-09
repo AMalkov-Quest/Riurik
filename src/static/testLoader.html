@@ -11,7 +11,7 @@
 				var p = (new RegExp(param+'=([^&$]+)')).exec(window.location.href);
 				if ( p ) return p[1];
 			};
-			var server_name = extract_param( 'server' );
+			var riurik_server_name = extract_param( 'server' );
 			var test_path = extract_param( 'path' );
 			var test_location = (
 				function extract_context_path(path){
@@ -20,7 +20,7 @@
 				}
 			)(test_path);
 			var make_remote_url = function(url_part){
-				return 'http://'+server_name+url_part;
+				return 'http://' + riurik_server_name + url_part;
 			};
 			var load_remote_script = function(url, callback){
 				var url = make_remote_url( url )+'?_='+Math.random().toString();
