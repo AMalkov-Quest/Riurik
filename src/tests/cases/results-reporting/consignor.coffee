@@ -1,9 +1,9 @@
 module 'consignor'
 
 asyncTest 'should send given data', ->
-  $.wait( -> QUnit.__tests_result_storage.length == 0 ).then ->
+  $.wait( -> riurik.reporter.queue.length == 0 ).then ->
     
-    QUnit.__tests_result_storage.push {'event': 'test'}
+    riurik.reporter.queue.push {'event': 'test'}
     $.mockjax({
       url: QUnit.riurik.report_url,
       response: (args) ->

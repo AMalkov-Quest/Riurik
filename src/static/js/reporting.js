@@ -1,20 +1,45 @@
-function reportBegin() {
+riurik.reporter = {}
+
+riurik.reporter.queue = new Array();
+
+riurik.reporter.begin = function () {
 	var message = { 
 		'event': 'begin'
 	};
-	QUnit.__tests_result_storage.push(message);
-	consignor();
+	riurik.reporter.queue.push(message);
+	riurik.reporter.consignor();
 };
 
-function reportDone() {
+riurik.reporter.done = function () {
 	console.log('tests are done')
 	var message = { 
 		'event': 'done'
 	};
-	QUnit.__tests_result_storage.push(message);
+	riurik.reporter.queue.push(message);
 };
 
-function tochunks(size, data) {
+riurik.reporter.testDone = function (test) {
+	console.log('the "' + test.name + '" test is done');
+
+	riurik.reporter.queue.push({ 
+		'event': 'testDone',
+		'name': test.module + ': ' + test.name,
+		'failed': test.failed,
+		'passed': test.passed,
+		'total': test.total,
+		'duration': getTestDuration()
+	});
+	
+	var html = riurik.reporter.getHtmlTestResults(test.module, test.name);
+	$.each( riurik.reporter.tochunks(2000, html), function(i, chunk){
+		riurik.reporter.queue.push({
+			'event': 'html',
+			'html': chunk
+		});
+	});
+};
+
+riurik.reporter.tochunks = function (size, data) {
 	var len = data.length;
 	var i = 0;
 	var chunks = new Array();
@@ -28,7 +53,7 @@ function tochunks(size, data) {
 	return chunks;
 };
 
-function getHtmlTestResults(moduleName, testName) {
+riurik.reporter.getHtmlTestResults = function (moduleName, testName) {
 	var elements = $('#qunit-tests li')
 		.has(".module-name:contains('"+moduleName+"')")
 		.has(".test-name:contains('"+testName+"')");
@@ -45,29 +70,8 @@ function getHtmlTestResults(moduleName, testName) {
 	return encodeURIComponent( out );
 };
 
-function reportTestDone(test) {
-	console.log('the "' + test.name + '" test is done');
-
-	QUnit.__tests_result_storage.push({ 
-		'event': 'testDone',
-		'name': test.module + ': ' + test.name,
-		'failed': test.failed,
-		'passed': test.passed,
-		'total': test.total,
-		'duration': getTestDuration()
-	});
-	
-	var html = getHtmlTestResults(test.module, test.name);
-	$.each( tochunks(2000, html), function(i, chunk){
-		QUnit.__tests_result_storage.push({
-			'event': 'html',
-			'html': chunk
-		});
-	});
-};
-
-function send(callback) {
-	data = QUnit.__tests_result_storage[0];
+riurik.reporter.send = function (callback) {
+	data = riurik.reporter.queue[0];
 	data['date'] = formatDate(QUnit.riurik.date, 'yyyy-MM-dd-HH-mm-ss');
 	data['context'] = context.__name__;
 	data['path'] = test_path;
@@ -78,7 +82,7 @@ function send(callback) {
 		'data': data,
 		'dataType': 'jsonp',
 		'complete': function(){
-			QUnit.__tests_result_storage.shift();
+			riurik.reporter.queue.shift();
 			$(document).bind('ajaxError', ajaxError);
 			if(typeof callback != 'undefined') {
 				callback();
@@ -87,8 +91,7 @@ function send(callback) {
 	});
 };
 
-function getTestDuration()
-{
+riurik.reporter.getTestDuration = function () {
 	var duration = (new Date() - QUnit.riurik.current.test.started)/1000;
 	if(isNaN(duration)) {
 		duration = 0;
@@ -97,7 +100,7 @@ function getTestDuration()
 	return duration;
 };
 
-function consignor(){
+riurik.reporter.consignor = function () {
 	var sending = false;
 	var sendingTimeOut;
 	(function f(){
@@ -107,9 +110,9 @@ function consignor(){
 				sending = false;
 			};
 			sendingTimeOut = setTimeout(next, 30 * 1000);
-			if ( QUnit.__tests_result_storage.length > 0 ){
+			if ( riurik.reporter.queue.length > 0 ){
 				sending = true;
-				send( next );
+				riurik.reporter.send( next );
 			}
 		};
 		setTimeout(f, 100);
