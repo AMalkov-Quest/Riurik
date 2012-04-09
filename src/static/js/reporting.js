@@ -21,19 +21,23 @@ riurik.reporter.done = function () {
 riurik.reporter.testDone = function (test) {
 	console.log('the "' + test.name + '" test is done');
 
+	var testId = $('#qunit-tests li.pass[id*="test-output"]').length;
 	riurik.reporter.queue.push({ 
 		'event': 'testDone',
+		'id': testId,
 		'name': test.module + ': ' + test.name,
 		'failed': test.failed,
 		'passed': test.passed,
 		'total': test.total,
-		'duration': getTestDuration()
+		'duration': riurik.reporter.getTestDuration()
 	});
 	
 	var html = riurik.reporter.getHtmlTestResults(test.module, test.name);
 	$.each( riurik.reporter.tochunks(2000, html), function(i, chunk){
 		riurik.reporter.queue.push({
 			'event': 'html',
+			'testId': testId,
+			'chunkId': i,
 			'html': chunk
 		});
 	});
@@ -71,18 +75,14 @@ riurik.reporter.getHtmlTestResults = function (moduleName, testName) {
 };
 
 riurik.reporter.send = function (callback) {
-	data = riurik.reporter.queue[0];
-	data['date'] = formatDate(QUnit.riurik.date, 'yyyy-MM-dd-HH-mm-ss');
-	data['context'] = context.__name__;
-	data['path'] = test_path;
-	
 	$(document).unbind('ajaxError');
+	console.log('send');
+	console.log(data);
 	$.ajax({
 		'url': QUnit.riurik.report_url,
 		'data': data,
 		'dataType': 'jsonp',
 		'complete': function(){
-			riurik.reporter.queue.shift();
 			$(document).bind('ajaxError', ajaxError);
 			if(typeof callback != 'undefined') {
 				callback();
@@ -101,18 +101,25 @@ riurik.reporter.getTestDuration = function () {
 };
 
 riurik.reporter.consignor = function () {
-	var sending = false;
-	var sendingTimeOut;
+	var busy = false;
+	var busyTimeOut;
+
 	(function f(){
-		if ( ! sending ) {
+		if ( ! busy ) {
 			var next = function(){
-				clearTimeout( sendingTimeOut );
-				sending = false;
+				clearTimeout( busyTimeOut );
+				busy = false;
 			};
-			sendingTimeOut = setTimeout(next, 30 * 1000);
+
+			busyTimeOut = setTimeout(next, 120 * 1000);
 			if ( riurik.reporter.queue.length > 0 ){
-				sending = true;
-				riurik.reporter.send( next );
+				data = riurik.reporter.queue.shift();
+				data['date'] = formatDate(QUnit.riurik.date, 'yyyy-MM-dd-HH-mm-ss');
+				data['context'] = context.__name__;
+				data['path'] = test_path;
+				
+				busy = true;
+				riurik.reporter.send( data, next );
 			}
 		};
 		setTimeout(f, 100);

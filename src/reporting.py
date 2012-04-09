@@ -25,6 +25,8 @@ class TestResult(TestBase):
 			'failed': result['failed'],
 			'total': result['total'],
 			'duration': result['duration'],
+			'testId': int(result['id']),
+			'htmlChunkId': -1,
 			'html': ''
 		}
 
@@ -35,6 +37,8 @@ class TestHtml(TestBase):
 			'date': result['date'],
 			'path': result['path'],
 			'context': result['context'],
+			'testId': int(result['testId']),
+			'chunkId': int(result['chunkId']),
 			'html': result['html']
 		}
 
@@ -75,8 +79,6 @@ def getTestResultDir(test_path, context):
 	else:
 		testPath = test_path
 	testDir = os.path.join(testsRoot, testPath.strip('/'), context)
-	#log.info((testsRoot, testPath, context))
-	#log.info('tests result location: %s' % testDir)
 	if not os.path.exists(testDir):
 		os.makedirs(testDir)
 
@@ -129,6 +131,21 @@ def appendResults(fileName, test):
 def appendHtml(fileName, data):
 	with mutex:
 		results = getPrevResults(fileName)
+		#just for debugging
+		last = results[-1]
+		testId = int(last['testId'])
+		prevChunkId = int(last['htmlChunkId'])
+		if prevChunkId + 1 != data.chunkId:
+			log.exception(last['name'])
+			log.exception('test %d: chunks id is mismatched %d != %d' % (testId, prevChunkId + 1, data.chunkId))
+			
+		if testId != data.testId:
+			log.exception(last['name'])
+			log.exception('tests id is mismatched %d != %d' % (testId, data.testId))
+			
+		results[-1]['htmlChunkId'] = data.chunkId
+		log.exception('recieved new %d chunk for %d test' % (data.chunkId, testId))
+		#just for debugging		
 		results[-1]['html'] += data.html
 		dump(fileName, results)
 
@@ -141,6 +158,7 @@ def saveProgress(test):
 
 def saveResults(test):
 	fileName = getResultsFile(test.path, test.context, test.date)
+	log.exception('recieved new %d test' % (test.testId))
 	appendResults(fileName, test)
 
 def saveHtml(data):
