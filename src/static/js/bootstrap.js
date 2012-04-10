@@ -1,3 +1,7 @@
+if ( typeof console == 'undefined' || typeof console.log == 'undefined' ) {
+	var console = { log: function(){} };
+}
+
 var loader = function( load_script_fn ){
 	var queue = [];
 	var callbacks = [];
@@ -9,7 +13,6 @@ var loader = function( load_script_fn ){
 			load_script_fn( 
 				task.url, 
 				function(){
-					console.log(task.url, task.callback);
 					if ( typeof task.callback == 'function' ) 
 						task.callback();
 					setTimeout( execute, 0 );
@@ -44,13 +47,13 @@ var load_remote_style = function(url){
 	var style = document.createElement( 'link' );
 	style.type = 'text/css';
 	style.rel = 'stylesheet';
-	style.href = make_remote_url(url)+'?_='+Math.random().toString();
+	style.href = riurik.make_remote_url(url)+'?_='+Math.random().toString();
 	document.body.appendChild( style );
 };
 
-loader( load_remote_script ).queue('/static/js/jquery.min.js', function(){
-	document.title = /\/([^\/]*)\/*$/.exec(test_path)[1];
-	loader( load_remote_script )
+loader( riurik.load_remote_script ).queue('/static/js/jquery.min.js', function(){
+	document.title = /\/([^\/]*)\/*$/.exec(riurik.args.path)[1];
+	loader( riurik.load_remote_script )
 	.queue('/static/js/jquery.json.min.js')
 	.queue('/static/jquery-ui/js/jquery-ui.custom.min.js')
 	.queue('/static/js/qunit.js')
@@ -64,11 +67,11 @@ loader( load_remote_script ).queue('/static/js/jquery.min.js', function(){
 			riurik.init();
 			$("#tabs").tabs();
 			riurik.QUnit.context = clone(context);
-			var l = loader( load_remote_script );
+			var l = loader( riurik.load_remote_script );
 			$.each(context.libraries || [],function(i,url){l.queue( '/' + url );});
 			
-			if ( /\.js$/.test(test_path) ) {
-				l.queue( test_path );
+			if ( /\.js$/.test(riurik.args.path) ) {
+				l.queue(riurik.args.path);
 			} else {
 				if(typeof context.suite_setup != 'undefined'){
 					l.queue( test_location+'/'+context.suite_setup );

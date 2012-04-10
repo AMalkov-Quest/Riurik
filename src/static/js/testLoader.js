@@ -63,7 +63,8 @@ var frame = {
 					var d = __frame.document;
 					var j = d.createElement('script');
 					j.type='text/javascript';
-					j.src = /^(.*?)[^\/]*\?/.exec(window.location)[1] + $("head script[src*='jquery.min.js']").attr('src');
+					//j.src = /^(.*?)[^\/]*\?/.exec(window.location)[1] + $("head script[src*='jquery.min.js']").attr('src');
+					j.src = riurik.src.jquery;
 					d.head.appendChild(j);
 				}
 

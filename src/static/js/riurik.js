@@ -1,7 +1,9 @@
 /**
  * Top level namespace for Riurik
  */
-var riurik = {}
+if( typeof riurik == 'undefined' ) {
+	var riurik = {}
+}
 
 riurik.sleep = function(msec) {
 	var dfd = new $.Deferred();

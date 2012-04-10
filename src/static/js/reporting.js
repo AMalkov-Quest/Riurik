@@ -1,9 +1,9 @@
 riurik.reporter = {}
 
-riurik.reporter.server = riurik_server_name;
-riurik.reporter.url = 'http://' + riurik_server_name + '/report_callback/';
+riurik.reporter.server = riurik.args.server;
+riurik.reporter.url = 'http://' + riurik.args.server + '/report_callback/';
 riurik.reporter.date = formatDate(new Date(), 'yyyy-MM-dd-HH-mm-ss');
-riurik.reporter.target_tests_path = test_path
+riurik.reporter.target_tests_path = riurik.args.path;
 
 riurik.reporter.queue = new Array();
 
