@@ -28,6 +28,8 @@ def search_view(request, folders, url, search_pattern, as_json=False):
 	folder = folders[0]
 	searches = {}
 	for filepath in libsearch.iter_files(folders):
+		head, tail = os.path.split(filepath)
+		if contrib.ishidden(tail): continue
 		log.debug('Searching in %s' % filepath)
 		res = libsearch.search_in_file( filepath,  search_pattern)
 		if not res: continue
