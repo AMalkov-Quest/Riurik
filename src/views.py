@@ -341,18 +341,8 @@ def runSuite(request, fullpath):
 	target = contrib.get_runner_url(ctx, server)
 	log.info('target of suite %s is %s' % (clean_path, target))
 
-	#if contrib.target_is_remote( target, server):
-	#	url = "http://%s/%s" % (target, settings.UPLOAD_TESTS_CMD)
-	#	saveRemoteContext(clean_path, contextjs, url, ctx)
-	#	distributor.saveSuiteAllTests(url, path, ctx)
-	#	distributor.saveTestSatelliteScripts(url, path, ctx)
-	#	url = "http://%s/%s?suite=/%s" % ( target, settings.EXEC_TESTS_CMD, clean_path )
-	#else:
-	#	saveLocalContext(fullpath, contextjs)
-	#	url = "http://%s/%s?suite=/%s" % ( target, settings.EXEC_TESTS_CMD, clean_path )
-
 	saveLocalContext(fullpath, contextjs)
-	url = "http://%s/%s?server=%s&path=/%s" % ( target, settings.EXEC_TESTS_CMD, server, path )
+	url = "http://%s/%s?server=%s&path=/%s" % ( target, settings.EXEC_TESTS_CMD, target, path )
 	log.info("redirect to run suite %s" % url)
 	return HttpResponseRedirect( url )
 
@@ -385,21 +375,11 @@ def runTest(request, fullpath):
 
 	tools.savetest(request.REQUEST.get('content', None), fullpath)
 	test_content = request.REQUEST.get("content", open(fullpath, 'r').read())
-
-	#if contrib.target_is_remote( target, server):
-	#	log.debug('TARGET: %s, %s' % ( target, server ))
-	#	url = "http://%s/%s" % (target, settings.UPLOAD_TESTS_CMD)
-	#	saveRemoteContext(os.path.dirname(clean_path), contextjs, url, ctx)
-	#	distributor.saveTestSatelliteScripts(url, path, ctx)
-	#	distributor.sendContentToRemote(clean_path, test_content, url, ctx)
-	#	url = "http://%s/%s?path=/%s" % (target, settings.EXEC_TESTS_CMD, clean_path)
-	#else:
-	#	saveLocalContext(fullpath, contextjs)
-	#	url = "http://%s/%s?path=/%s" % (target, settings.EXEC_TESTS_CMD, clean_path)
+	
 	saveLocalContext(fullpath, contextjs)
 	if coffee(path):
 		path = coffeescript.compile(test_content, path, fullpath)
-	url = "http://%s/%s?server=%s&path=/%s" % (target, settings.EXEC_TESTS_CMD, server, path)
+	url = "http://%s/%s?server=%s&path=/%s" % (target, settings.EXEC_TESTS_CMD, target, path)
 	log.info("redirect to run test %s" % url)
 	return HttpResponseRedirect(url)
 

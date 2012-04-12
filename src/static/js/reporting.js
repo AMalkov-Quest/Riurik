@@ -1,7 +1,6 @@
 riurik.reporter = {}
 
-riurik.reporter.server = riurik.args.server;
-riurik.reporter.url = 'http://' + riurik.args.server + '/report_callback/';
+riurik.reporter.url = riurik.BuildHttpUri('/report_callback/');
 riurik.reporter.date = formatDate(new Date(), 'yyyy-MM-dd-HH-mm-ss');
 riurik.reporter.target_tests_path = riurik.args.path;
 

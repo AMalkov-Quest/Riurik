@@ -4,25 +4,34 @@
 		<title></title>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 		<script type="text/javascript">
+			//Top level namespace for Riurik
 			var riurik = {};
 
 			riurik.src = {};
 			riurik.src.jquery = '/static/js/jquery.min.js';
 			riurik.src.bootstrap = '/static/js/bootstrap.js';
 
-			riurik.GetArgument = function( name ){
+			riurik.GetArgument = function( name ) {
 				var arg = (new RegExp( name + '=([^&$]+)' )).exec(window.location.href);
 				if ( arg ) return arg[1];
+				else alert('Can not find argument ' + name);
 			};
 
-			riurik.make_remote_url = function(url_part){
-				return 'http://' + riurik.args.server + url_part;
+			riurik.BuildHttpUri = function(url) {
+				return 'http://'.concat(riurik.args.server, url);
 			};
 
+			riurik.GetCwd = function(path) {
+				if ( ! /\.js$/.test(path) ) {
+					//current target is suite, just return it
+					return path;
+				}
+				//current target is test, return it's folder
+				return /(.*?)\/[^\/]*$/.exec(path)[1];
+			};
 			
-			
-			riurik.load_remote_script = function(url, callback){
-				var url = riurik.make_remote_url( url )+'?_='+Math.random().toString();
+			riurik.LoadScript = function(url, callback){
+				var url = riurik.BuildHttpUri( url );
 				var script = document.createElement( 'script' );
 				script.type = 'text/javascript';
 				script.src = url;
@@ -50,16 +59,11 @@
 			riurik.args = {};
 			riurik.args.server = riurik.GetArgument('server');
 			riurik.args.path = riurik.GetArgument('path');
-			var test_location = (
-				function extract_context_path(path){
-					if ( ! /\.js$/.test(path) ) return path; // suite (as is)
-					return /(.*?)\/[^\/]*$/.exec(path)[1]; // test folder
-				}
-			)(riurik.args.path);
+			riurik.args.cwd = riurik.GetCwd(riurik.args.path);
 
 			window.onload = function(){
-				riurik.load_remote_script(riurik.src.jquery, function(){
-					riurik.load_remote_script(riurik.src.bootstrap);
+				riurik.LoadScript(riurik.src.jquery, function(){
+					riurik.LoadScript(riurik.src.bootstrap);
 				});
 			};
 		</script>

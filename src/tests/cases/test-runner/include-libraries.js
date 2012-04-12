@@ -1,4 +1,4 @@
-module('libraries');
+module('include libraries');
 
 test('should be included', function() {
   equal( library1.method1(20), 20, 'method from library 1 is available' );
