@@ -13,6 +13,10 @@ def strip(s, chars):
 	return s.strip(chars)
 
 @register.filter
+def make_int(s):
+	return int(s)
+
+@register.filter
 def make_url(val):
 	return re.sub('\/+', '/', '/'.join(val.split('\\')))
 

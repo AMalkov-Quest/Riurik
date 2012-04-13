@@ -93,9 +93,12 @@ def serve(request, path, show_indexes=False):
 	log.debug('show index of %s(%s %s)' % (fullpath, document_root, path))
 	if os.path.isdir(fullpath):
 		if 'history' in request.REQUEST:
-			date = request.REQUEST.get('history')
-			context = request.REQUEST.get('context')
 			import reporting
+			context = request.REQUEST.get('context')
+			date = request.REQUEST.get('history', None)
+			if not date:
+				results = reporting.getSuiteHistoryResults(path, context)
+				return  _render_to_response('history_list.html', locals())
 			tests_list = reporting.getResults(path, context, date)
 			return _render_to_response('history.html', locals())
 
@@ -342,7 +345,7 @@ def runSuite(request, fullpath):
 	log.info('target of suite %s is %s' % (clean_path, target))
 
 	saveLocalContext(fullpath, contextjs)
-	url = "http://%s/%s?server=%s&path=/%s" % ( target, settings.EXEC_TESTS_CMD, target, path )
+	url = "http://%s/%s?server=%s&path=/%s" % ( target, settings.EXEC_TESTS_CMD, server, path )
 	log.info("redirect to run suite %s" % url)
 	return HttpResponseRedirect( url )
 
@@ -379,7 +382,7 @@ def runTest(request, fullpath):
 	saveLocalContext(fullpath, contextjs)
 	if coffee(path):
 		path = coffeescript.compile(test_content, path, fullpath)
-	url = "http://%s/%s?server=%s&path=/%s" % (target, settings.EXEC_TESTS_CMD, target, path)
+	url = "http://%s/%s?server=%s&path=/%s" % (target, settings.EXEC_TESTS_CMD, server, path)
 	log.info("redirect to run test %s" % url)
 	return HttpResponseRedirect(url)
 

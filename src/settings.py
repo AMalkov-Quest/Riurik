@@ -136,3 +136,22 @@ CODEMIRROR_CALL_EDITOR_FOR = '^.*\.(?:js|ini|html|py)$'
 INCLUDE_KEY = 'include'
 EXCLUDE_KEY = 'exclude'
 SUITE_SETUP = 'suite_setup'
+
+settings_fullpath = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'virtual_paths.py')
+if not os.path.exists(settings_fullpath):
+	f = open(settings_fullpath, 'w')
+	f.write(
+"""import os
+
+VIRTUAL_PATHS = {
+  'riurik-inner-tests': os.path.join(os.path.dirname( __file__ ), 'tests', 'cases'),
+  'other-tests': os.path.join(os.path.dirname( __file__ ), 'tests-1', 'cases'),
+  'django-app-tests': os.path.join(os.path.dirname( __file__ ), 'tests-2', 'cases'),
+}
+
+inner_testsloader_path = 'src.tests.loader'
+EXEC_TESTS_CMD='static/testLoader.html'"""
+	)
+	f.close()
+
+
