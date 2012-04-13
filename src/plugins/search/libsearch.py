@@ -1,9 +1,33 @@
 # coding: utf-8
 
 import re, os
+import contrib
+from logger import log
+
+def search(folder, path, search_pattern):
+	"""
+	>>> from tl.testing.fs import new_sandbox
+	>>> new_sandbox('''\
+	... f test-1.js asdf
+	... f test-2.js asdf
+	... ''')
+	>>> search(os.getcwd(), 'cases', 'asdf')
+	"""
+	searches = {}
+	for filepath in iter_files(folder):
+		head, tail = os.path.split(filepath)
+		if contrib.ishidden(tail): continue
+		print 'Searching in %s' % filepath
+		res = search_in_file( filepath,  search_pattern)
+		if not res: continue
+		log.debug('Got results: %s' % res)
+		filepath = filepath.replace(folder, path).replace('\\', '/').replace('//', '/')
+		searches[filepath] = res
+	
+	return searches
 
 def make_regexp(search_pattern):
-	return re.compile(r'('+ search_pattern +r')');
+	return re.compile(r'('+ search_pattern +r')')
 
 def search_in_file(filepath, search_pattern):
 	regexp = make_regexp( search_pattern )
@@ -36,14 +60,5 @@ def iter_files(folders):
 	for folder in folders:
 		for root,dirs,files in os.walk(folder):
 			for fname in files:
+				print fname
 				yield os.path.join(root,fname)
-
-if __name__ == '__main__':
-
-	f = '/home/wraith/projects/quest/sasp/SharePoint Information Portal/Application/tests/cases/scheduler/report-export/api-delete-task-for-report.js'
-	for k in search_in_file(f, 'equal'):
-		print '\n'
-		for l,v,h in k:
-			print "%s\t%s\t%s" % (l,v,':'+h if h else '')
-
-
