@@ -345,7 +345,7 @@ def runSuite(request, fullpath):
 	log.info('target of suite %s is %s' % (clean_path, target))
 
 	saveLocalContext(fullpath, contextjs)
-	url = "http://%s/%s?server=%s&path=/%s" % ( target, settings.EXEC_TESTS_CMD, target, path )
+	url = "http://%s/%s?server=%s&path=/%s" % ( target, settings.EXEC_TESTS_CMD, server, path )
 	log.info("redirect to run suite %s" % url)
 	return HttpResponseRedirect( url )
 
@@ -382,7 +382,7 @@ def runTest(request, fullpath):
 	saveLocalContext(fullpath, contextjs)
 	if coffee(path):
 		path = coffeescript.compile(test_content, path, fullpath)
-	url = "http://%s/%s?server=%s&path=/%s" % (target, settings.EXEC_TESTS_CMD, target, path)
+	url = "http://%s/%s?server=%s&path=/%s" % (target, settings.EXEC_TESTS_CMD, server, path)
 	log.info("redirect to run test %s" % url)
 	return HttpResponseRedirect(url)
 
