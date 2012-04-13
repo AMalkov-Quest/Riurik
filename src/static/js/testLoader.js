@@ -35,7 +35,7 @@ function wrapErrorHandler(handler, func) {
 
 var frame = {
 
-		go: function(path) {
+		go: function(path, cache) {
 			var dfd = $.Deferred();
 			var url = path;
 			var regex = new RegExp('^http://[a-zA-Z0-9]');
@@ -43,11 +43,14 @@ var frame = {
 				url = 'http://' + context.host + ':' + context.port + '/' + path;
 			}
 
-			if (url.indexOf('?') != -1) {
-				url += '&_=' + Math.random().toString();
-			}else{
-				url += '?_=' + Math.random().toString();
+			if( !(cache === true) ) {
+				if (url.indexOf('?') != -1) {
+					url += '&_=' + Math.random().toString();
+				}else{
+					url += '?_=' + Math.random().toString();
+				}
 			}
+			
 			if( window.frames[0].window ) {
 				window.frames[0].window.onerror = function(){};
 			}
