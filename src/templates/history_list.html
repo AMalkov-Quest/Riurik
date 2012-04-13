@@ -1,0 +1,53 @@
+{% extends 'directory-index.html' %}
+{% load i18n dir_index_tags history %}
+{% block styles %}
+	{{ block.super }}
+	<link rel="stylesheet" href="/static/css/history.css" type="text/css">
+{% endblock styles %}
+
+{% block javascripts %}
+	{{ block.super }}
+{% endblock %}
+
+{% block controls %}
+{% endblock controls %}
+
+{% block title %}<p class="breadcrumbs">{{ request.path|breadcrumbs }}</p>{% endblock title %}
+
+{% block content %}
+	{% for suite_runs in results %}
+		{% if forloop.first %}
+			<table class="history">
+				<thead>
+					<caption>
+						<a href=".">go to Suite</a>
+					</caption>
+				</thead>
+				<tbody>
+		{% endif %}
+		<tr class="runs {% if suite_runs|aggregate_results:'failed' > 0 %}failed{% else %}passed{% endif %}">
+			<td class="date">
+				<a href="?history={{ suite_runs.0.date }}&context={{ suite_runs.0.context }}">{{ suite_runs.0.date }}</a>
+			</td>
+			<td class="details">
+				<table>
+				{% for suite_result in suite_runs %}
+					<tr class="{% if suite_result.failed|make_int %}failed{% else %}{% if suite_result.passed|make_int %}passed{% else %}unknown{% endif %}{% endif %}">
+						<td>{{ suite_result.name }}</td>
+						<td>Total: {{ suite_result.total|make_int }}</td>
+						<td>Passed: {{ suite_result.passed|make_int }}</td>
+						<td>Failed: {{ suite_result.failed|make_int }}</td>
+						{#%<td>{{ suite_result }}</td>#}
+					</tr>
+				{% endfor %}
+				</table>
+			</td>
+		</tr>
+		{% if forloop.last %}
+				</tbody>
+			</table>
+		{% endif %}
+	{% empty %}
+		<p>This suite did not run</p>
+	{% endfor %}
+{% endblock content %}

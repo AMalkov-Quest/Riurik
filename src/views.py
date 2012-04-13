@@ -93,9 +93,12 @@ def serve(request, path, show_indexes=False):
 	log.debug('show index of %s(%s %s)' % (fullpath, document_root, path))
 	if os.path.isdir(fullpath):
 		if 'history' in request.REQUEST:
-			date = request.REQUEST.get('history')
-			context = request.REQUEST.get('context')
 			import reporting
+			context = request.REQUEST.get('context')
+			date = request.REQUEST.get('history', None)
+			if not date:
+				results = reporting.getSuiteHistoryResults(path, context)
+				return  _render_to_response('history_list.html', locals())
 			tests_list = reporting.getResults(path, context, date)
 			return _render_to_response('history.html', locals())
 

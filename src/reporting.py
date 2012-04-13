@@ -1,4 +1,4 @@
-import os, json
+import os, json, re
 import threading
 from logger import log
 import contrib
@@ -83,6 +83,17 @@ def getTestResultDir(test_path, context):
 		os.makedirs(testDir)
 
 	return testDir
+
+def getFileNames(path, context):
+	testDir = getTestResultDir(path, context)
+	for root, dirs, files in os.walk( testDir ):
+		for fileName in files:
+			yield os.path.join(root, fileName)
+
+def getSuiteHistoryResults(path, context):
+	for fileName in getFileNames(path, context):
+		if re.search('[\-\d]+\.json$', fileName):
+			yield load(fileName)
 
 def getFileName(path, context, date, ext):
 	testDir = getTestResultDir(path, context)
