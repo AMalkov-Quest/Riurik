@@ -7,17 +7,19 @@ from logger import log
 def search(folder, path, search_pattern):
 	"""
 	>>> from tl.testing.fs import new_sandbox
-	>>> new_sandbox('''\
+	>>> new_sandbox('''\\
 	... f test-1.js asdf
 	... f test-2.js asdf
+	... f .test-2.js asdf
+	... f test-3.js hjkl
 	... ''')
 	>>> search(os.getcwd(), 'cases', 'asdf')
+	{'cases/test-2.js': [[(0, 'asdf', 'asdf')]], 'cases/test-1.js': [[(0, 'asdf', 'asdf')]]}
 	"""
 	searches = {}
 	for filepath in iter_files(folder):
 		head, tail = os.path.split(filepath)
 		if contrib.ishidden(tail): continue
-		print 'Searching in %s' % filepath
 		res = search_in_file( filepath,  search_pattern)
 		if not res: continue
 		log.debug('Got results: %s' % res)
@@ -60,5 +62,4 @@ def iter_files(folders):
 	for folder in folders:
 		for root,dirs,files in os.walk(folder):
 			for fname in files:
-				print fname
 				yield os.path.join(root,fname)
