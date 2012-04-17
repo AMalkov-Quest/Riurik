@@ -4,35 +4,50 @@ import re, os
 import contrib
 from logger import log
 
+def listfiles(folder):
+	for root, dirs, files in os.walk(folder):
+		for fname in files:
+			if not contrib.ishidden(fname):
+				yield os.path.join(root, fname)
+
 def search(folder, path, search_pattern):
 	"""
 	>>> from tl.testing.fs import new_sandbox
 	>>> new_sandbox('''\\
-	... f test-1.js asdf
-	... f test-2.js asdf
-	... f .test-2.js asdf
+	... f test-1.js asdfg
+	... f test-2.js asdft
+	... f .test-2.js asdfg
 	... f test-3.js hjkl
 	... ''')
-	>>> search(os.getcwd(), 'cases', 'asdf')
-	{'cases/test-2.js': [[(0, 'asdf', 'asdf')]], 'cases/test-1.js': [[(0, 'asdf', 'asdf')]]}
+	>>> result = search(os.getcwd(), 'cases', 'asdf')
+	>>> 'cases/test-1.js' in result
+	True
+	>>> 'cases/test-2.js' in result 
+	True
+	>>> 'cases/.test-2.js' in result
+	False
+	>>> 'cases/test-3.js' in result
+	False
 	"""
 	searches = {}
-	for filepath in iter_files(folder):
-		head, tail = os.path.split(filepath)
-		if contrib.ishidden(tail): continue
-		res = search_in_file( filepath,  search_pattern)
-		if not res: continue
-		log.debug('Got results: %s' % res)
-		filepath = filepath.replace(folder, path).replace('\\', '/').replace('//', '/')
-		searches[filepath] = res
+	for filepath in listfiles(folder):
+		result = find( filepath,  search_pattern)
+		if result:
+			filepath = filepath.replace(folder, path).replace('\\', '/').replace('//', '/')
+			searches[filepath] = result
 	
 	return searches
 
-def make_regexp(search_pattern):
-	return re.compile(r'('+ search_pattern +r')')
-
-def search_in_file(filepath, search_pattern):
-	regexp = make_regexp( search_pattern )
+def find(filepath, search_pattern):
+	"""
+	>>> from tl.testing.fs import new_sandbox
+	>>> new_sandbox('''\\
+	... f test-1.js asdfg
+	... ''')
+	>>> find(os.getcwd() + '/test-1.js', 'asdf')
+	[[(0, 'asdfg', 'asdf')]]
+	"""
+	regexp = re.compile(r'('+ search_pattern +r')')
 	f = open(filepath, 'r')
 	filecontent = f.read()
 	f.close()
@@ -56,10 +71,3 @@ def search_in_file(filepath, search_pattern):
 		all_results +=  [ match_result ]
 
 	return all_results
-
-def iter_files(folders):
-	if not isinstance( folders, list ): folders = [ folders ]
-	for folder in folders:
-		for root,dirs,files in os.walk(folder):
-			for fname in files:
-				yield os.path.join(root,fname)
