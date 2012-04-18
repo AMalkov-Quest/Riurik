@@ -19,20 +19,34 @@ def search(folder, path, search_pattern):
 	... f .test-2.js asdfg
 	... f test-3.js hjkl
 	... ''')
-	>>> search(os.getcwd(), 'cases', 'asdf')
-	{'cases/test-2.js': [[(0, 'asdft', 'asdf')]], 'cases/test-1.js': [[(0, 'asdfg', 'asdf')]]}
+	>>> result = search(os.getcwd(), 'cases', 'asdf')
+	>>> 'cases/test-1.js' in result
+	True
+	>>> 'cases/test-2.js' in result 
+	True
+	>>> 'cases/.test-2.js' in result
+	False
+	>>> 'cases/test-3.js' in result
+	False
 	"""
 	searches = {}
 	for filepath in listfiles(folder):
 		result = find( filepath,  search_pattern)
 		if result:
-			log.debug('Got results: %s' % result)
 			filepath = filepath.replace(folder, path).replace('\\', '/').replace('//', '/')
 			searches[filepath] = result
 	
 	return searches
 
 def find(filepath, search_pattern):
+	"""
+	>>> from tl.testing.fs import new_sandbox
+	>>> new_sandbox('''\\
+	... f test-1.js asdfg
+	... ''')
+	>>> find(os.getcwd() + '/test-1.js', 'asdf')
+	[[(0, 'asdfg', 'asdf')]]
+	"""
 	regexp = re.compile(r'('+ search_pattern +r')')
 	f = open(filepath, 'r')
 	filecontent = f.read()
