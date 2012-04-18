@@ -5,23 +5,23 @@
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 		<script type="text/javascript">
 			//Top level namespace for Riurik
-			var riurik = {};
+			var riurikldr = {};
 
-			riurik.src = {};
-			riurik.src.jquery = '/static/js/jquery.min.js';
-			riurik.src.bootstrap = '/static/js/bootstrap.js';
+			riurikldr.src = {};
+			riurikldr.src.jquery = '/static/js/jquery.min.js';
+			riurikldr.src.bootstrap = '/static/js/bootstrap.js';
 
-			riurik.GetArgument = function( name ) {
+			riurikldr.GetArgument = function( name ) {
 				var arg = (new RegExp( name + '=([^&$]+)' )).exec(window.location.href);
 				if ( arg ) return arg[1];
 				else alert('Can not find argument ' + name);
 			};
 
-			riurik.BuildHttpUri = function(url) {
-				return 'http://'.concat(riurik.args.server, url);
+			riurikldr.BuildHttpUri = function(url) {
+				return 'http://'.concat(riurikldr.args.server, url);
 			};
 
-			riurik.GetCwd = function(path) {
+			riurikldr.GetCwd = function(path) {
 				if ( ! /\.js$/.test(path) ) {
 					//current target is suite, just return it
 					return path;
@@ -30,8 +30,8 @@
 				return /(.*?)\/[^\/]*$/.exec(path)[1];
 			};
 			
-			riurik.LoadScript = function(url, callback){
-				var url = riurik.BuildHttpUri( url );
+			riurikldr.LoadScript = function(url, callback){
+				var url = riurikldr.BuildHttpUri( url );
 				var script = document.createElement( 'script' );
 				script.type = 'text/javascript';
 				script.src = url;
@@ -56,14 +56,14 @@
 				document.body.appendChild( script );
 			};
 
-			riurik.args = {};
-			riurik.args.server = riurik.GetArgument('server');
-			riurik.args.path = riurik.GetArgument('path');
-			riurik.args.cwd = riurik.GetCwd(riurik.args.path);
+			riurikldr.args = {};
+			riurikldr.args.server = riurikldr.GetArgument('server');
+			riurikldr.args.path = riurikldr.GetArgument('path');
+			riurikldr.args.cwd = riurikldr.GetCwd(riurikldr.args.path);
 
 			window.onload = function(){
-				riurik.LoadScript(riurik.src.jquery, function(){
-					riurik.LoadScript(riurik.src.bootstrap);
+				riurikldr.LoadScript(riurikldr.src.jquery, function(){
+					riurikldr.LoadScript(riurikldr.src.bootstrap);
 				});
 			};
 		</script>

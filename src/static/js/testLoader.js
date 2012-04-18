@@ -619,5 +619,6 @@ $(document).ready(function() {
 	window.onerror = wrapErrorHandler(window.onerror, onErrorHandler);
 	$(document).ajaxError( ajaxError );
 
-	QUnit.extend(window, riurik);
+	//QUnit.extend(window, riurik);
+	jQuery.extend(window, riurik.exports);
 });

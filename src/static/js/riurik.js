@@ -1,24 +1,23 @@
 /**
  * Top level namespace for Riurik
  */
-if( typeof riurik == 'undefined' ) {
-	var riurik = {}
-}
+var riurik = {}
 
-riurik.sleep = function(msec) {
-	var dfd = new $.Deferred();
-	setTimeout( function() {
-		dfd.resolve(dfd);
-	}, msec);
-		
-	return dfd.promise(dfd);
-};
+jQuery.extend(true, riurik, riurikldr);
 
-riurik.strip = function(s, c) {
+riurik.exports = {}
+
+riurik.util = {}
+
+riurik.util.log = function() {
+	QUnit.log(arguments);
+}	
+
+riurik.util.strip = function(s, c) {
 	return s.replace(new RegExp('^' + c + '+'), '').replace(new RegExp(c + '+$'), '');
 };
 	
-riurik.load_js = function(jsfile_src) {
+riurik.util.load_js = function(jsfile_src) {
 	var scr = jsfile_src;
 	QUnit.log('Adding script '+jsfile_src+' to queue to load');
 	var dfd = new $.Deferred();
@@ -50,20 +49,32 @@ riurik.load_js = function(jsfile_src) {
 	return dfd.promise(dfd);
 };
 
-riurik.pass = function(message) {
+jQuery.extend(riurik.exports, riurik.util);
+
+riurik.matchers = {}
+
+riurik.matchers.pass = function(message) {
 	ok(true, message || '');
 };
 
-riurik.fail = function(message) {
-	console.log('!!!!!!!!!!');
+riurik.matchers.fail = function(message) {
 	ok(false, message || '');
 };
 
-riurik.util = {}
+riurik.matchers.substring = function(actual, expected, message) {
+	//replace non-breaking space(&nbsp;) with just space
+	actual = actual.replace(/\xA0/g, ' ');
+	expected = expected.replace(/\xA0/g, ' ');
 
-riurik.util.log = function() {
-	QUnit.log(arguments);
-}	
+	var i = actual.indexOf(expected);
+	if( i >= 0 ) {
+		actual = actual.substring(i, i + expected.length);
+	}
+
+	QUnit.push(i >= 0, actual, expected, message);
+};
+
+jQuery.extend(riurik.exports, riurik.matchers);
 
 /**
  * Waits is a class to wait for a certain condition to occur before proceeding 
@@ -71,8 +82,8 @@ riurik.util.log = function() {
  */
 riurik.Waits = function() { 
 
-	this.timeout = 10 * 1000;	//default timeout in milliseconds to stop waiting
-	this.checkEvery = 100;		//check condition every given milliseconds
+	this.timeout = 1000;	//default timeout in milliseconds to stop waiting
+	this.checkEvery = 100;	//check condition every given milliseconds
 };
 
 /**
@@ -86,7 +97,7 @@ riurik.Waits = function() {
  */
 riurik.Waits.prototype.wait = function(condition, timeout) {
 	var dfd = $.Deferred();
-	var timeout = timeout || context.timeout || this.timeout;
+	var timeout = timeout || this.timeout;
 
 	riurik.util.log('waiting for ' + condition + ' timeout: ' + timeout );
 
@@ -109,6 +120,16 @@ riurik.Waits.prototype.wait = function(condition, timeout) {
 	return this;
 };
 
+riurik.Waits.prototype.sleep = function(msec) {
+	var dfd = new $.Deferred();
+	var timeout = msec || this.timeout;
+	setTimeout( function() {
+		dfd.resolve(dfd);
+	}, timeout);
+		
+	return dfd.promise(dfd);
+};
+
 riurik.Waits.prototype.condition = function(condition, timeout) {
 	this.timeoutMessage = 'wait timeout for ' + condition + ' is exceeded';
 	return this.wait(condition, timeout);
@@ -119,7 +140,7 @@ riurik.Waits.prototype.then = function(doneCallback, failCallback) {
 	if(typeof failCallback === 'undefined') {
 		var message = this.timeoutMessage;
 		failCallback = function() {
-			riurik.fail(message);
+			riurik.matchers.fail(message);
 			start();
 		};
 	}
@@ -134,4 +155,4 @@ riurik.Waits.prototype.fail = function(callback) {
 	return this.promise.fail(callback);
 };
 
-riurik.wait = new riurik.Waits();
+riurik.exports.wait = new riurik.Waits();
