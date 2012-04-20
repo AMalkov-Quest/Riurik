@@ -5,12 +5,31 @@ var riurik = {}
 
 jQuery.extend(true, riurik, riurikldr);
 
+riurik.getQUnit = function() {
+	return QUnit;
+}
 
-/**
- * Riurik relies on QUnit, so it should be preliminary loaded
- */
-if (!QUnit) {
-	alert('QUnit should be preliminary loaded');
+riurik.getContext = function() {
+	return context;
+}
+
+riurik.init = function() {
+	//Riurik relies on QUnit, so it should be preliminary loaded
+	if (!riurik.getQUnit()) {
+		alert('QUnit should be preliminary loaded');
+	}
+
+	//context is object that holds environment for tests, so it should be preliminary loaded
+	if (!riurik.getContext()) {
+		alert('context should be preliminary loaded');
+		return;
+	}
+
+	riurik.exports.wait = new riurik.Waits(context.timeout);
+
+	riurik.QUnit = {};
+	riurik.QUnit.current = { 'module': {}, 'test': {} };
+	riurik.QUnit.status = 'started';
 }
 
 riurik.exports = {}
@@ -88,10 +107,10 @@ jQuery.extend(riurik.exports, riurik.matchers);
  * Waits is a class to wait for a certain condition to occur before proceeding 
  * further in the test code.
  */
-riurik.Waits = function() { 
+riurik.Waits = function(timeout) { 
 
-	this.timeout = 1000;	//default timeout in milliseconds to stop waiting
-	this.checkEvery = 100;	//check condition every given milliseconds
+	this.timeout = timeout || 1000;	//default timeout in milliseconds to stop waiting
+	this.checkEvery = 100;			//check condition every given milliseconds
 };
 
 /**
@@ -215,5 +234,3 @@ riurik.Waits.prototype.done = function(callback) {
 riurik.Waits.prototype.fail = function(callback) {
 	return this.promise.fail(callback);
 };
-
-riurik.exports.wait = new riurik.Waits();

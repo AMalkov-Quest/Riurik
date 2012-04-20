@@ -1,5 +1,13 @@
 module 'Waits'
 
+test 'should use default timeout', ->
+  waits = new riurik.Waits()
+  equal waits.timeout, 1000
+  
+test 'should use given timeout', ->
+  waits = new riurik.Waits(250)
+  equal waits.timeout, 250
+
 asyncTest 'should wait for a certain condition to occure', ->
   expect(1)
   waits = new riurik.Waits()
@@ -17,8 +25,8 @@ asyncTest 'should fail a test and continue execution if timeout is exceeded', ->
   waits.wait( (-> riurik.vartest2?), 1 ).then -> pass()
   
   setTimeout ( ->
-    QUnit.equal true, QUnit.ok.withArgs(false, '').calledOnce, 'the test was failed'
-    QUnit.equal true, QUnit.start.calledOnce, 'tests execution is continued'
+    QUnit.equal QUnit.ok.withArgs(false, '').calledOnce, true, 'the test was failed'
+    QUnit.equal QUnit.start.calledOnce, true, 'tests execution is continued'
     
     QUnit.ok.restore()
     QUnit.start.restore()

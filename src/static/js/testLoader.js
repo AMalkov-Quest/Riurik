@@ -455,12 +455,6 @@ function clone(o) {
 	return c;
 }
 
-riurik.init = function() {
-	riurik.QUnit = {};
-	riurik.QUnit.current = { 'module': {}, 'test': {} };
-	riurik.QUnit.status = 'started';
-}
-
 QUnit.begin = function() {
 	QUnit.config.reorder = false;
 	QUnit.log('tests are begun');

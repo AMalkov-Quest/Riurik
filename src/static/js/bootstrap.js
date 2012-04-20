@@ -58,10 +58,10 @@ riurikldr.loader().queue('/static/js/jquery.min.js', function(){
 	.queue('/static/jquery-ui/js/jquery-ui.custom.min.js')
 	.queue('/static/js/qunit.js')
 	.queue('/static/js/dates.js')
+	.queue(riurikldr.args.cwd + '/.context.js')
 	.queue('/static/js/riurik.js')
 	.queue('/static/js/reporting.js')
 	.queue('/static/js/testLoader.js')
-	.queue(riurikldr.args.cwd + '/.context.js')
 	.then(function(){
 		$(document).ready(function() {
 			riurik.init();
