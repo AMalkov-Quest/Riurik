@@ -10,21 +10,21 @@ asyncTest 'should wait for a certain condition to occure', ->
   riurik.vartest1 = {}
 
 asyncTest 'should fail a test and continue execution if timeout is exceeded', ->
-  sinon.stub window, "ok"
-  sinon.stub window, "start"
+  sinon.stub QUnit, "ok"
+  sinon.stub QUnit, "start"
   
   waits = new riurik.Waits()
-  waits.wait( (()-> riurik.vartest2?), 100 ).then -> pass()
+  waits.wait( (-> riurik.vartest2?), 1 ).then -> pass()
   
-  setTimeout (() ->
-    QUnit.ok window.ok.withArgs(false, '').calledOnce, 'the test was failed'
-    QUnit.ok window.start.calledOnce, 'tests execution is continued'
+  setTimeout ( ->
+    QUnit.equal true, QUnit.ok.withArgs(false, '').calledOnce, 'the test was failed'
+    QUnit.equal true, QUnit.start.calledOnce, 'tests execution is continued'
     
-    window.ok.restore()
-    window.start.restore()
+    QUnit.ok.restore()
+    QUnit.start.restore()
     
     start()
-  ), 1000
+  ), 100
   
 asyncTest 'should call given success callback if a certain condition is occured', ->
   expect(1)
@@ -53,7 +53,7 @@ asyncTest 'the condition method should wait for given condition to occure', ->
   
 asyncTest 'the condition method should fail a test with a particular message', ->
   waits = new riurik.Waits()
-  waits.condition( (()-> riurik.vartest6?), 1 ).fail ->
+  waits.condition( (-> riurik.vartest6?), 1 ).fail ->
     substring waits.timeoutMessage, 'wait timeout for function'
     substring waits.timeoutMessage, 'return riurik.vartest6 != null'
     start()
@@ -76,4 +76,25 @@ asyncTest 'the sleep method should delay execution for default period of time if
     clock.restore()
     start()
     
-  clock.tick(1000)  
+  clock.tick(1000)
+  
+asyncTest 'the event method should wait for given event to occure', ->
+  target = $(window.document)
+  args = 'arg1'
+  eName = 'testEvent'
+  
+  waits = new riurik.Waits()
+  waits.event( eName, target ).then (e, args)->
+    pass 'waiting is resolved successfully'
+    equal 'arg1', args, 'arguments are passed'
+    start()
+    
+  target.trigger(eName, args);
+  
+asyncTest 'the event method should fail a test with a particular message', ->
+  eName = 'testEvent'
+  
+  waits = new riurik.Waits()
+  waits.event( eName, $(window.document), 1 ).fail ->
+    equal waits.timeoutMessage, "wait timeout for the #{eName} event is exceeded"
+    start()

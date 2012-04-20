@@ -5,6 +5,14 @@ var riurik = {}
 
 jQuery.extend(true, riurik, riurikldr);
 
+
+/**
+ * Riurik relies on QUnit, so it should be preliminary loaded
+ */
+if (!QUnit) {
+	alert('QUnit should be preliminary loaded');
+}
+
 riurik.exports = {}
 
 riurik.util = {}
@@ -54,11 +62,11 @@ jQuery.extend(riurik.exports, riurik.util);
 riurik.matchers = {}
 
 riurik.matchers.pass = function(message) {
-	ok(true, message || '');
+	QUnit.ok(true, message || '');
 };
 
 riurik.matchers.fail = function(message) {
-	ok(false, message || '');
+	QUnit.ok(false, message || '');
 };
 
 riurik.matchers.substring = function(actual, expected, message) {
@@ -95,7 +103,7 @@ riurik.Waits = function() {
  * @param {Function} condition to occur before proceeding to the next block
  * @param {Number} timeout milliseconds to wait
  */
-riurik.Waits.prototype.wait = function(condition, timeout) {
+riurik.Waits.prototype.wait = function(condition, timeout, getArgs) {
 	var dfd = $.Deferred();
 	var timeout = timeout || this.timeout;
 
@@ -104,7 +112,12 @@ riurik.Waits.prototype.wait = function(condition, timeout) {
 	(function f(){
 		if ( condition() === true ) {
 			riurik.util.log('waiting for ' + condition + ' is resolved');
-			dfd.resolve();
+			if(getArgs) {
+				var args = getArgs();
+				dfd.resolve.apply(true, args);
+			}else{
+				dfd.resolve();
+			}
 			return;
 		}
 		timeout -= 100;
@@ -120,6 +133,14 @@ riurik.Waits.prototype.wait = function(condition, timeout) {
 	return this;
 };
 
+/**
+ * Delays execution for give period of time 
+ *
+ * Note: <b>It's bad idea</b> to use sleep in tests. But it can be very usefull during the
+ * developing phase. So get rid of sleep in a test ASAP.
+ *
+ * @param {Number} milliseconds to delay
+ */
 riurik.Waits.prototype.sleep = function(msec) {
 	var dfd = new $.Deferred();
 	var timeout = msec || this.timeout;
@@ -130,9 +151,49 @@ riurik.Waits.prototype.sleep = function(msec) {
 	return dfd.promise(dfd);
 };
 
+/**
+ * Waits for given condition to occure
+ *
+ * @example
+ * wait.condition((-> $(element).length > 10), 1000).then ->
+ *
+ * @param {Function} condition to occur before proceeding to the next block
+ * @param {Number} timeout milliseconds to wait
+ */
 riurik.Waits.prototype.condition = function(condition, timeout) {
 	this.timeoutMessage = 'wait timeout for ' + condition + ' is exceeded';
 	return this.wait(condition, timeout);
+};
+
+/**
+ * Waits for given event to occure
+ *
+ * @example 
+ * wait.event('eventName', $(window.document), 1000).then ->
+ *
+ * @param {String} name of event to occur before proceeding to the next block
+ * @param {jQuery Object} element that the event is bound on
+ * @param {Number} timeout milliseconds to wait
+ */
+riurik.Waits.prototype.event = function(event_name, target, timeout) {
+	this.timeoutMessage = 'wait timeout for the ' + event_name + ' event is exceeded';
+	var eventTriggered = false;
+	var eventArgs = null;
+
+	target.bind(event_name, function() {
+		eventArgs = arguments;
+		eventTriggered = true;
+	});
+
+	var condition = function() {
+		return eventTriggered;
+	};
+
+	var getEventArgs = function() {
+		return eventArgs;
+	};
+
+	return this.wait(condition, timeout, getEventArgs);
 };
 
 riurik.Waits.prototype.then = function(doneCallback, failCallback) {
@@ -141,7 +202,7 @@ riurik.Waits.prototype.then = function(doneCallback, failCallback) {
 		var message = this.timeoutMessage;
 		failCallback = function() {
 			riurik.matchers.fail(message);
-			start();
+			QUnit.start();
 		};
 	}
 	return this.promise.then(doneCallback, failCallback);
