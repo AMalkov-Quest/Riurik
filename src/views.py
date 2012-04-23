@@ -152,10 +152,14 @@ def get_spec(target, path):
 		return '%s?editor' % settings.SPEC_URL_FILE_NAME
 
 def get_file_content(fullpath):
+	log.debug('get content of %s' % fullpath)
 	statobj = os.stat(fullpath)
 	mimetype, encoding = mimetypes.guess_type(fullpath)
 	mimetype = mimetype or 'application/octet-stream'
-	content = open(fullpath, 'rb').read()
+	if coffeescript.coffee(fullpath):
+		content = coffeescript.compile(None, fullpath)
+	else:
+		content = open(fullpath, 'rb').read()
 	response = HttpResponse(content, mimetype=mimetype)
 	response["Last-Modified"] = http_date(statobj[stat.ST_MTIME])
 	response["Content-Length"] = len(content)
@@ -357,7 +361,7 @@ def compileSuiteCoffee(path, suite_path):
 	)
 	for test in tests:
 		fullpath = os.path.join(suite_path, test)
-		path = coffeescript.compile(None, None, fullpath)
+		path = coffeescript.compile2js(None, None, fullpath)
 		log.info(path)
 
 @add_fullpath
@@ -381,7 +385,7 @@ def runTest(request, fullpath):
 	
 	saveLocalContext(fullpath, contextjs)
 	if coffee(path):
-		path = coffeescript.compile(test_content, path, fullpath)
+		path = coffeescript.compile2js(test_content, path, fullpath)
 	url = "http://%s/%s?server=%s&path=/%s" % (target, settings.EXEC_TESTS_CMD, server, path)
 	log.info("redirect to run test %s" % url)
 	return HttpResponseRedirect(url)
