@@ -156,10 +156,7 @@ def get_file_content(fullpath):
 	statobj = os.stat(fullpath)
 	mimetype, encoding = mimetypes.guess_type(fullpath)
 	mimetype = mimetype or 'application/octet-stream'
-	if coffeescript.coffee(fullpath):
-		content = coffeescript.compile(None, fullpath)
-	else:
-		content = open(fullpath, 'rb').read()
+	content = open(fullpath, 'rb').read()
 	response = HttpResponse(content, mimetype=mimetype)
 	response["Last-Modified"] = http_date(statobj[stat.ST_MTIME])
 	response["Content-Length"] = len(content)
