@@ -141,15 +141,10 @@ class context_impl():
 
 def get_virtual_paths():
 	"""
-	>>> from minimock import mock
-	>>> mock('reload')
 	>>> virtual_paths.VIRTUAL_PATHS = {'key': 'value'}
-	>>> get_virtual_paths() #doctest: +ELLIPSIS
-	Called reload...
-	...<module 'src.virtual_paths'...
+	>>> get_virtual_paths()
 	{'key': 'value'}
 	"""
-	reload(virtual_paths)
 	return virtual_paths.VIRTUAL_PATHS
 
 def target_is_remote(target, host):
@@ -330,7 +325,6 @@ def get_document_root(path):
 	'/'
 	"""
 	if path:
-		reload(virtual_paths)
 		key = path.strip('/').split('/')[0]
 		vpaths = get_virtual_paths()
 		if key and key in vpaths:
@@ -465,7 +459,6 @@ def enum_files_in_folders(target, skip=(lambda file_: file_.startswith('.'))):
 	return all_files
 
 def patch_fullpaths(fullpath, newpath=''):
-	reload(virtual_paths)
 	for key in virtual_paths.VIRTUAL_URLS:
 		m = re.search('^%s(.*)$' % key, newpath)
 		if m:

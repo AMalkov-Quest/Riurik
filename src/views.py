@@ -183,8 +183,7 @@ def get_dir_index(document_root, path, fullpath):
 
 	if not document_root:
 		pagetype = 'front-page'
-		reload(virtual_paths)
-		for key in virtual_paths.VIRTUAL_PATHS:
+		for key in contrib.get_virtual_paths():
 			dir_descriptor = get_descriptor(key)
 			dirs.append(dir_descriptor)
 	else:
