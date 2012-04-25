@@ -120,7 +120,7 @@ class global_settings(object):
 		self.inifile = None
 		for virtpath in settings.VIRTUAL_PATHS.values():
 			if virtpath in path:
-				self.inifile = os.path.join(virtpath, '.settings.ini')
+				self.inifile = os.path.join(virtpath, settings.GLOBAL_CONTEXT_FILE_NAME)
 		self.section = section
 
 	def get(self, option, default=None):

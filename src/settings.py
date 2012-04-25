@@ -124,6 +124,7 @@ UPLOAD_TESTS_CMD='testsrc/upload'
 SUITE_SETUP_FILE_NAME = 'suite-setup.js'
 SPEC_URL_FILE_NAME = '.specification.ini'
 TEST_CONTEXT_FILE_NAME = '.context.ini'
+GLOBAL_CONTEXT_FILE_NAME = '.settings.ini'
 TEST_CONTEXT_JS_FILE_NAME = '.context.js'
 JS_FILE_EXT = '.js'
 INI_FILE_EXT = '.ini'
@@ -153,5 +154,3 @@ inner_testsloader_path = 'src.tests.loader'
 EXEC_TESTS_CMD='static/testLoader.html'"""
 	)
 	f.close()
-
-
