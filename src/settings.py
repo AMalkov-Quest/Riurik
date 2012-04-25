@@ -137,6 +137,8 @@ CODEMIRROR_CALL_EDITOR_FOR = '^.*\.(?:js|ini|html|py)$'
 INCLUDE_KEY = 'include'
 EXCLUDE_KEY = 'exclude'
 SUITE_SETUP = 'suite_setup'
+PRODUCT_CODE_PATH = 'product_code_path'
+PRODUCT_CODE_ALIAS = 'product_code_alias'
 
 settings_fullpath = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'virtual_paths.py')
 if not os.path.exists(settings_fullpath):

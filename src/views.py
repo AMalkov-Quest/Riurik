@@ -404,10 +404,8 @@ def saveRemoteContext(path, content, url, ctx):
 	distributor.sendContentToRemote(contextjs_path, content, url, ctx)
 
 def recvLogRecords(request):
-	from logger import FILENAME, DJANGO_APP, timeFormat
+	from logger import FILENAME, timeFormat
 	log_file = FILENAME
-	if request.REQUEST.get('source', None):
-		log_file = DJANGO_APP
 	f = codecs.open(log_file, 'r', 'utf-8')
 	records = f.read()
 	f.close()
