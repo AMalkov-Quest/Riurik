@@ -1,6 +1,6 @@
 # coding: utf-8
-import os, re
-import settings, virtual_paths
+import os, re, config
+import settings
 from logger import log
 import socket
 import fnmatch
@@ -139,13 +139,32 @@ class context_impl():
 	def as_tuple(self):
 		return tuple(self.items_as_list)
 
+def extend_virtual_paths(root, path, alias, virtual_paths):
+	config_path = os.path.join(path, settings.GLOBAL_CONTEXT_FILE_NAME)
+	product_code_path = config.get(config_path, 'DEFAULT', settings.PRODUCT_CODE_PATH)
+	product_code_alias = config.get(config_path, 'DEFAULT', settings.PRODUCT_CODE_ALIAS)
+	if product_code_path and product_code_alias:
+		product_code_alias = '%s-%s' % (alias, product_code_alias)
+		virtual_paths[product_code_alias] = os.path.join(root, product_code_path)
+
 def get_virtual_paths():
 	"""
 	>>> virtual_paths.VIRTUAL_PATHS = {'key': 'value'}
 	>>> get_virtual_paths()
 	{'key': 'value'}
 	"""
-	return virtual_paths.VIRTUAL_PATHS
+	import virtual_paths
+	result = {}
+	for alias, path in virtual_paths.VIRTUAL_PATHS.iteritems():
+		if isinstance(path, tuple):
+			root = path[0]
+			realpath = os.path.join(*path)
+			result[alias] = realpath
+		else:
+			result[alias] = path
+		extend_virtual_paths(root, realpath, alias, result)
+
+	return result
 
 def target_is_remote(target, host):
 	"""

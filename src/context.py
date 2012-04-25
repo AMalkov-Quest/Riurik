@@ -118,7 +118,7 @@ class global_settings(object):
 	def __init__(self, path, section='DEFAULT'):
 		log.debug('initing global_settings by from %s, section:%s' % (path, section))
 		self.inifile = None
-		for virtpath in settings.VIRTUAL_PATHS.values():
+		for virtpath in contrib.get_virtual_paths().values():
 			if virtpath in path:
 				self.inifile = os.path.join(virtpath, settings.GLOBAL_CONTEXT_FILE_NAME)
 		self.section = section
