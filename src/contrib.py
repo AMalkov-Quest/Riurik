@@ -179,9 +179,9 @@ def get_virtual_paths():
 			root = path[0]
 			realpath = os.path.join(*path)
 			result[alias] = realpath
+			extend_virtual_paths(root, realpath, alias, result)
 		else:
 			result[alias] = path
-		extend_virtual_paths(root, realpath, alias, result)
 
 	return result
 
