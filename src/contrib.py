@@ -139,10 +139,29 @@ class context_impl():
 	def as_tuple(self):
 		return tuple(self.items_as_list)
 
+vp_cache = {}
+
 def extend_virtual_paths(root, path, alias, virtual_paths):
 	config_path = os.path.join(path, settings.GLOBAL_CONTEXT_FILE_NAME)
-	product_code_path = config.get(config_path, 'DEFAULT', settings.PRODUCT_CODE_PATH)
-	product_code_alias = config.get(config_path, 'DEFAULT', settings.PRODUCT_CODE_ALIAS)
+	if not os.path.exists(config_path): return
+	# caching
+	config_items = None
+	if vp_cache.has_key( config_path ):
+		lastmtime, items = vp_cache.get(config_path)
+		if lastmtime == os.path.getmtime(config_path):
+			config_items = items
+	if not config_items:
+		config_items = config.items(config_path, 'DEFAULT')
+		lastmtime = os.path.getmtime(config_path)
+
+		config_items = dict( config_items )
+
+		vp_cache[ config_path ] = lastmtime, config_items
+	# end of caching 
+	
+
+	product_code_path = config_items.get(settings.PRODUCT_CODE_PATH)   #config.get(config_path, 'DEFAULT', settings.PRODUCT_CODE_PATH)
+	product_code_alias = config_items.get(settings.PRODUCT_CODE_ALIAS) #config.get(config_path, 'DEFAULT', settings.PRODUCT_CODE_ALIAS)
 	if product_code_path and product_code_alias:
 		product_code_alias = '%s-%s' % (alias, product_code_alias)
 		virtual_paths[product_code_alias] = os.path.join(root, product_code_path)
