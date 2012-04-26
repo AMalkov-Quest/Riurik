@@ -17,7 +17,10 @@ working_dir = os.path.dirname(os.path.abspath(__file__))
 root = os.path.normpath(os.path.dirname(working_dir))
 
 from oldsettings import *
-from virtual_paths import *
+try:
+	from virtual_paths import *
+except:
+	from virtual_paths_default import *
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
