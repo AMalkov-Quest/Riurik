@@ -96,9 +96,15 @@ def serve(request, path, show_indexes=False):
 			import reporting
 			context = request.REQUEST.get('context')
 			date = request.REQUEST.get('history', None)
+			xml = request.REQUEST.get('xml', None)
 			if not date:
 				results = reporting.getSuiteHistoryResults(path, context)
 				return  _render_to_response('history_list.html', locals())
+
+			if xml:
+				tests_list = reporting.getResultsAsXml(path, context, date)
+				return HttpResponse(tests_list)
+
 			tests_list = reporting.getResults(path, context, date)
 			return _render_to_response('history.html', locals())
 

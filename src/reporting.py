@@ -242,6 +242,11 @@ def progress(date, path, context):
 	
 	return progress
 
+def getResultsAsXml(path, context, date):
+	import json2xml
+	results = getResults(path, context, date)
+	return json2xml.convert(results)
+
 def getResults(path, context, date):
 	fileName = getResultsFile(path, context, date)
 	results = load(fileName)
