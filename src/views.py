@@ -105,6 +105,10 @@ def serve(request, path, show_indexes=False):
 				return HttpResponse(tests_list)
 
 			tests_list = reporting.getResults(path, context, date)
+
+			if json:
+				return HttpResponse(tests_list)
+
 			return _render_to_response('history.html', locals())
 
 		if request.path and request.path[-1:] != '/':
