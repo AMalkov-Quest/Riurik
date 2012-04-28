@@ -95,18 +95,19 @@ def serve(request, path, show_indexes=False):
 			import reporting
 			context = request.REQUEST.get('context')
 			date = request.REQUEST.get('history', None)
-			xml = request.REQUEST.get('xml', None)
+			asxml = request.REQUEST.get('xml', None)
+			asjson = request.REQUEST.get('json', None)
 			if not date:
 				results = reporting.getSuiteHistoryResults(path, context)
 				return  _render_to_response('history_list.html', locals())
 
-			if xml:
+			if asxml:
 				tests_list = reporting.getResultsAsXml(path, context, date, request)
 				return HttpResponse(tests_list)
 
 			tests_list = reporting.getResults(path, context, date)
 
-			if json:
+			if asjson:
 				url = reporting.getTestResultsUrl(path, context, date, request)
 				result = { 'url': url, 'data': tests_list }
 				return HttpResponse(json.dumps(result))
