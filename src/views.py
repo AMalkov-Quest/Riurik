@@ -16,7 +16,6 @@ import mimetypes, datetime
 import stat
 import urllib, urllib2
 import codecs, time
-import virtual_paths
 import distributor
 import coffeescript
 import spec
@@ -540,10 +539,18 @@ def getOpenedFiles(request, clean=False):
 	return files
 
 def live_settings_view(request):
-	return _render_to_response('configure.html', live_settings_json(request), context_instance=RequestContext(request))
+	return _render_to_response(
+			'configure.html',
+			live_settings_json(request),
+			context_instance=RequestContext(request)
+		)
+
+def get_virtual_paths_path():
+	root = os.path.dirname(os.path.abspath(__file__))
+	return os.path.join(root, settings.virtual_paths_py)
 
 def live_settings_json(request, content=None):
-	settings_fullpath = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'virtual_paths.py')
+	settings_fullpath = get_virtual_paths_path()
 	if not content:
 		content = open(settings_fullpath, 'r').read()
 	descriptor = {
@@ -558,7 +565,7 @@ def live_settings_json(request, content=None):
 	return descriptor
 
 def live_settings_save(request):
-	fullpath = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'virtual_paths.py')
+	fullpath = get_virtual_paths_path()
 	url = request.POST["url"].lstrip('/')
 	stub(url, request)
 

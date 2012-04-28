@@ -6,6 +6,3 @@ VIRTUAL_PATHS = {
   'other-tests': (root, 'tests-1', 'cases'),
   'django-app-tests': (root, 'tests-2', 'cases'),
 }
-
-inner_testsloader_path = 'src.tests.loader'
-EXEC_TESTS_CMD='static/testLoader.html'

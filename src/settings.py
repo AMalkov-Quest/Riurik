@@ -18,9 +18,11 @@ root = os.path.normpath(os.path.dirname(working_dir))
 
 from oldsettings import *
 try:
-	from virtual_paths import *
+	import virtual_paths
+	virtual_paths_py = 'virtual_paths.py'
 except:
-	from virtual_paths_default import *
+	import virtual_paths_default as virtual_paths
+	virtual_paths_py = 'virtual_paths_default.py'
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
@@ -123,7 +125,7 @@ else:
 	COFFEESCRIPT_EXECUTABLE = None
 
 UPLOAD_TESTS_CMD='testsrc/upload'
-
+EXEC_TESTS_CMD='static/testLoader.html'
 SUITE_SETUP_FILE_NAME = 'suite-setup.js'
 SPEC_URL_FILE_NAME = '.specification.ini'
 TEST_CONTEXT_FILE_NAME = '.context.ini'
@@ -142,20 +144,3 @@ EXCLUDE_KEY = 'exclude'
 SUITE_SETUP = 'suite_setup'
 PRODUCT_CODE_PATH = 'product_code_path'
 PRODUCT_CODE_ALIAS = 'product_code_alias'
-
-settings_fullpath = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'virtual_paths.py')
-if not os.path.exists(settings_fullpath):
-	f = open(settings_fullpath, 'w')
-	f.write(
-"""import os
-
-VIRTUAL_PATHS = {
-  'riurik-inner-tests': os.path.join(os.path.dirname( __file__ ), 'tests', 'cases'),
-  'other-tests': os.path.join(os.path.dirname( __file__ ), 'tests-1', 'cases'),
-  'django-app-tests': os.path.join(os.path.dirname( __file__ ), 'tests-2', 'cases'),
-}
-
-inner_testsloader_path = 'src.tests.loader'
-EXEC_TESTS_CMD='static/testLoader.html'"""
-	)
-	f.close()
