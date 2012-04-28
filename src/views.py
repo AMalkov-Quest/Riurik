@@ -107,7 +107,7 @@ def serve(request, path, show_indexes=False):
 			tests_list = reporting.getResults(path, context, date)
 
 			if json:
-				return HttpResponse(tests_list)
+				return HttpResponse(json.dumps(tests_list))
 
 			return _render_to_response('history.html', locals())
 
