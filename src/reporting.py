@@ -242,10 +242,12 @@ def progress(date, path, context):
 	
 	return progress
 
-def getResultsAsXml(path, context, date):
+def getResultsAsXml(path, context, date, request):
 	import json2xml
 	results = getResults(path, context, date)
-	return json2xml.convert(results)
+	host = contrib.resolveURI(request.get_host())
+	url = '%s/%s?history=%s&context=%s' % (host, path, date, context)
+	return json2xml.convert(results, url)
 
 def getResults(path, context, date):
 	fileName = getResultsFile(path, context, date)

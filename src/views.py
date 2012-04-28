@@ -102,7 +102,7 @@ def serve(request, path, show_indexes=False):
 				return  _render_to_response('history_list.html', locals())
 
 			if xml:
-				tests_list = reporting.getResultsAsXml(path, context, date)
+				tests_list = reporting.getResultsAsXml(path, context, date, request)
 				return HttpResponse(tests_list)
 
 			tests_list = reporting.getResults(path, context, date)

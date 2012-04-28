@@ -30,6 +30,13 @@ def parseURI(url):
 	host = hostport[0] if hostport[0] != 'localhost' else socket.gethostname()
 	return host, hostport[1] if len(hostport) > 1 else '80'
 
+def resolveURI(uri):
+	host, port = parseURI(uri)
+	if int(port) == 80:
+		return 'http://%s' % (host)
+	else:
+		return 'http://%s:%s' % (host, port)
+
 def patch_host_port(ctximpl, riurik_url):
 	"""
 	>>> ci = context_impl([])

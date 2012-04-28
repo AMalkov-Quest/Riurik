@@ -16,15 +16,15 @@ class TestInfo(object):
 	def toDict(self):
 		return self.result
 
-def convert(jsonobjs):
+def convert(jsonobjs, url):
 	suite = ET.Element('testsuite', {'name': 'test'})
 	for obj in jsonobjs:
-		test = totest(TestInfo(obj))
+		test = totest(TestInfo(obj), url)
 		suite.append(test)
 
 	return ET.tostring(suite)
 
-def totest(testInfo):
+def totest(testInfo, url):
 	attrs = {
 		'name': testInfo.name,
 		'time': testInfo.duration
@@ -36,8 +36,9 @@ def totest(testInfo):
 	else:
 		subelName = 'system-out'
 
-	sub = ET.Element(subelName)
-	e.append(sub)
+	subel = ET.Element(subelName)
+	subel.text = url
+	e.append(subel)
 
 	return e
 
