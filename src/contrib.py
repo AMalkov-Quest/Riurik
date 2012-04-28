@@ -146,29 +146,38 @@ class context_impl():
 	def as_tuple(self):
 		return tuple(self.items_as_list)
 
-vp_cache = {}
+config_cache = {}
+def config_cacher(fn):
+	def _f(*args, **kwargs):
+		global config_cache
+		config_path = args[0]
+		if config_cache.has_key( config_path ):
+			print 'try to get config items from cache'
+			lastmtime, items = config_cache.get(config_path)
+			if lastmtime == os.path.getmtime(config_path):
+				return items
+		print 'load config items from disk'	
+		items = fn(*args, **kwargs)
+		lastmtime = os.path.getmtime(config_path)
+		config_cache[ config_path ] = lastmtime, items
+
+		return items
+
+	return _f
+
+@config_cacher
+def getVirtualPathConfig(config_path):
+	items = config.items(config_path, 'DEFAULT')
+	return dict( items )
 
 def extend_virtual_paths(root, path, alias, virtual_paths):
 	config_path = os.path.join(path, settings.GLOBAL_CONTEXT_FILE_NAME)
 	if not os.path.exists(config_path): return
-	# caching
-	config_items = None
-	if vp_cache.has_key( config_path ):
-		lastmtime, items = vp_cache.get(config_path)
-		if lastmtime == os.path.getmtime(config_path):
-			config_items = items
-	if not config_items:
-		config_items = config.items(config_path, 'DEFAULT')
-		lastmtime = os.path.getmtime(config_path)
 
-		config_items = dict( config_items )
+	config_items = getVirtualPathConfig(config_path)
 
-		vp_cache[ config_path ] = lastmtime, config_items
-	# end of caching 
-	
-
-	product_code_path = config_items.get(settings.PRODUCT_CODE_PATH)   #config.get(config_path, 'DEFAULT', settings.PRODUCT_CODE_PATH)
-	product_code_alias = config_items.get(settings.PRODUCT_CODE_ALIAS) #config.get(config_path, 'DEFAULT', settings.PRODUCT_CODE_ALIAS)
+	product_code_path = config_items.get(settings.PRODUCT_CODE_PATH)
+	product_code_alias = config_items.get(settings.PRODUCT_CODE_ALIAS)
 	if product_code_path and product_code_alias:
 		product_code_alias = '%s-%s' % (alias, product_code_alias)
 		virtual_paths[product_code_alias] = os.path.join(root, product_code_path)
@@ -179,9 +188,8 @@ def get_virtual_paths():
 	>>> get_virtual_paths()
 	{'key': 'value'}
 	"""
-	import virtual_paths
 	result = {}
-	for alias, path in virtual_paths.VIRTUAL_PATHS.iteritems():
+	for alias, path in settings.virtual_paths.VIRTUAL_PATHS.iteritems():
 		if isinstance(path, tuple):
 			root = path[0]
 			realpath = os.path.join(*path)
