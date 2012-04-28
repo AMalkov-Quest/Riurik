@@ -68,6 +68,11 @@ def add_name(ctximpl, name):
 	if name:
 		ctximpl.add('__name__', name)
 
+def add_virtual_root(ctximpl, path):
+	vroot = contrib.get_virtual_root(path)
+	if vroot:
+		ctximpl.add('__virtual_root__', vroot)
+
 def include_tests(path, ctx, ctximpl):
 
 	def contextjs(path):
@@ -108,6 +113,7 @@ def patch(path, ctx, riurik_url, ctxname=None):
 	patch_libraries(path, ctximpl, ctx)
 	add_start_time(ctximpl)
 	add_name(ctximpl, ctxname)
+	add_virtual_root(ctximpl, path)
 	contrib.patch_host_port(ctximpl, riurik_url)
 
 	return ctximpl.as_tuple()
