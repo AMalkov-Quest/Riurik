@@ -1,0 +1,31 @@
+.history, .history table {
+	border: 0 none;	
+}
+
+.history .runs {
+	margin: 5px 0;	
+}
+
+.history .passed {
+	background: #C6E746;
+}
+
+.history .failed {
+	background: #EE5757;
+}
+
+.history .unknown {
+	background: #CCC;
+}
+
+.history .date {
+	padding: 10px;	
+}
+
+.history .details {
+	padding: 0;
+}
+
+.history .details table {
+	margin: 0; padding: 0;
+}

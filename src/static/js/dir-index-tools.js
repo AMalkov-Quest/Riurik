@@ -2,9 +2,14 @@ $(function () {
 	$('#run-suite-btn').click(function(){
 		var context = $('select[name=context]').val();
 		var target = $('#run-suite').attr('target');
+		$('#run-suite').attr('method', 'POST').attr('action', '/actions/suite/submit/');
 		$('#run-suite').attr('target', context + '-' + target);
 		$('#run-suite').submit();
 	});
+	
+	$('select[name=context]').change(function(){
+		$('a#history').attr('href', '?history&context='+$('select[name=context]').val());
+	}).change();
 
 	$('#context-preview-ctrl').click(function(){
 		$('#context-preview').dialog({

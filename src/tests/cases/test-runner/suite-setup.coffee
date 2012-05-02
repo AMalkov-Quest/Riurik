@@ -15,8 +15,7 @@ QUnit.setup ->
              
 asyncTest 'should be executed first of all', ->
   $.when( frame.go(context.url) ).then ->
-    fwnd = frame.window()
-    $.wait( -> fwnd.QUnit? and fwnd.QUnit.riurik? and fwnd.QUnit.riurik.status == 'done' ).then ->
+    $.wait( -> frameTestsAreDone ).then ->
       equal _$('.test-name').length, 3, 'both suite-setup and tests are executed'
       equal _$('#test-output0 .test-name').text(), 'suite setup', 'suite setup is executed first'
       start()

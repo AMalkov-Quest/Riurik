@@ -93,9 +93,12 @@ def serve(request, path, show_indexes=False):
 	log.debug('show index of %s(%s %s)' % (fullpath, document_root, path))
 	if os.path.isdir(fullpath):
 		if 'history' in request.REQUEST:
-			date = request.REQUEST.get('history')
-			context = request.REQUEST.get('context')
 			import reporting
+			context = request.REQUEST.get('context')
+			date = request.REQUEST.get('history', None)
+			if not date:
+				results = reporting.getSuiteHistoryResults(path, context)
+				return  _render_to_response('history_list.html', locals())
 			tests_list = reporting.getResults(path, context, date)
 			return _render_to_response('history.html', locals())
 
@@ -341,16 +344,6 @@ def runSuite(request, fullpath):
 	target = contrib.get_runner_url(ctx, server)
 	log.info('target of suite %s is %s' % (clean_path, target))
 
-	#if contrib.target_is_remote( target, server):
-	#	url = "http://%s/%s" % (target, settings.UPLOAD_TESTS_CMD)
-	#	saveRemoteContext(clean_path, contextjs, url, ctx)
-	#	distributor.saveSuiteAllTests(url, path, ctx)
-	#	distributor.saveTestSatelliteScripts(url, path, ctx)
-	#	url = "http://%s/%s?suite=/%s" % ( target, settings.EXEC_TESTS_CMD, clean_path )
-	#else:
-	#	saveLocalContext(fullpath, contextjs)
-	#	url = "http://%s/%s?suite=/%s" % ( target, settings.EXEC_TESTS_CMD, clean_path )
-
 	saveLocalContext(fullpath, contextjs)
 	url = "http://%s/%s?server=%s&path=/%s" % ( target, settings.EXEC_TESTS_CMD, server, path )
 	log.info("redirect to run suite %s" % url)
@@ -385,17 +378,7 @@ def runTest(request, fullpath):
 
 	tools.savetest(request.REQUEST.get('content', None), fullpath)
 	test_content = request.REQUEST.get("content", open(fullpath, 'r').read())
-
-	#if contrib.target_is_remote( target, server):
-	#	log.debug('TARGET: %s, %s' % ( target, server ))
-	#	url = "http://%s/%s" % (target, settings.UPLOAD_TESTS_CMD)
-	#	saveRemoteContext(os.path.dirname(clean_path), contextjs, url, ctx)
-	#	distributor.saveTestSatelliteScripts(url, path, ctx)
-	#	distributor.sendContentToRemote(clean_path, test_content, url, ctx)
-	#	url = "http://%s/%s?path=/%s" % (target, settings.EXEC_TESTS_CMD, clean_path)
-	#else:
-	#	saveLocalContext(fullpath, contextjs)
-	#	url = "http://%s/%s?path=/%s" % (target, settings.EXEC_TESTS_CMD, clean_path)
+	
 	saveLocalContext(fullpath, contextjs)
 	if coffee(path):
 		path = coffeescript.compile(test_content, path, fullpath)
@@ -622,6 +605,8 @@ def report_callback(req):
 			reporting.done(req.GET)
 		elif event == 'testDone':
 			reporting.save(req.GET)
+		elif event == 'html':
+			reporting.add_html(req.GET)
 		else:
 			log.exception('Unsupported event on tests callback')
 	except Exception, e:
@@ -646,7 +631,8 @@ def tests_progress(request):
 		import reporting
 		path = request.GET.get('path')
 		context = request.GET.get('context')
-		progress = reporting.progress(path, context)
+		date = request.GET.get('date')
+		progress = reporting.progress(date, path, context)
 		return HttpResponse(progress)
 	except Exception, e:
 		log.exception(e)

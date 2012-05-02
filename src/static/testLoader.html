@@ -4,26 +4,34 @@
 		<title></title>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 		<script type="text/javascript">
-			if ( typeof console == 'undefined' || typeof console.log == 'undefined' ) {
-				var console = { log: function(){} };
-			}
-			var extract_param = function( param ){
-				var p = (new RegExp(param+'=([^&$]+)')).exec(window.location.href);
-				if ( p ) return p[1];
+			//Top level namespace for Riurik
+			var riurik = {};
+
+			riurik.src = {};
+			riurik.src.jquery = '/static/js/jquery.min.js';
+			riurik.src.bootstrap = '/static/js/bootstrap.js';
+
+			riurik.GetArgument = function( name ) {
+				var arg = (new RegExp( name + '=([^&$]+)' )).exec(window.location.href);
+				if ( arg ) return arg[1];
+				else alert('Can not find argument ' + name);
 			};
-			var server_name = extract_param( 'server' );
-			var test_path = extract_param( 'path' );
-			var test_location = (
-				function extract_context_path(path){
-					if ( ! /\.js$/.test(path) ) return path; // suite (as is)
-					return /(.*?)\/[^\/]*$/.exec(path)[1]; // test folder
+
+			riurik.BuildHttpUri = function(url) {
+				return 'http://'.concat(riurik.args.server, url);
+			};
+
+			riurik.GetCwd = function(path) {
+				if ( ! /\.js$/.test(path) ) {
+					//current target is suite, just return it
+					return path;
 				}
-			)(test_path);
-			var make_remote_url = function(url_part){
-				return 'http://'+server_name+url_part;
+				//current target is test, return it's folder
+				return /(.*?)\/[^\/]*$/.exec(path)[1];
 			};
-			var load_remote_script = function(url, callback){
-				var url = make_remote_url( url )+'?_='+Math.random().toString();
+			
+			riurik.LoadScript = function(url, callback){
+				var url = riurik.BuildHttpUri( url );
 				var script = document.createElement( 'script' );
 				script.type = 'text/javascript';
 				script.src = url;
@@ -47,9 +55,15 @@
 				}
 				document.body.appendChild( script );
 			};
+
+			riurik.args = {};
+			riurik.args.server = riurik.GetArgument('server');
+			riurik.args.path = riurik.GetArgument('path');
+			riurik.args.cwd = riurik.GetCwd(riurik.args.path);
+
 			window.onload = function(){
-				load_remote_script('/static/js/jquery.min.js', function(){
-					load_remote_script('/static/js/loader.js');
+				riurik.LoadScript(riurik.src.jquery, function(){
+					riurik.LoadScript(riurik.src.bootstrap);
 				});
 			};
 		</script>
