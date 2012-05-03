@@ -3,6 +3,7 @@ riurik.reporter = {}
 riurik.reporter.url = riurik.BuildHttpUri('/report_callback/');
 riurik.reporter.date = formatDate(new Date(), 'yyyy-MM-dd-HH-mm-ss');
 riurik.reporter.target_tests_path = riurik.args.path;
+riurik.reporter.state = 'begin';
 
 riurik.reporter.queue = new Array();
 
@@ -89,7 +90,7 @@ riurik.reporter.send = function (data, callback) {
 		'complete': function(){
 			$(document).bind('ajaxError', ajaxError);
 			if(typeof callback != 'undefined') {
-				callback();
+				callback(data);
 			}	
 		}
 	});
@@ -110,9 +111,12 @@ riurik.reporter.consignor = function () {
 
 	(function f(){
 		if ( ! busy ) {
-			var next = function() {
+			var next = function(data) {
 				clearTimeout( busyTimeOut );
 				busy = false;
+				if( data.event == 'done') {
+					riurik.reporter.state = 'done';
+				}
 			};
 
 			busyTimeOut = setTimeout(next, 120 * 1000);
