@@ -86,9 +86,13 @@ def getTestResultDir(test_path, context):
 
 def getFileNames(path, context):
 	testDir = getTestResultDir(path, context)
+	paths = []
 	for root, dirs, files in os.walk( testDir ):
 		for fileName in files:
-			yield os.path.join(root, fileName)
+			paths.append( os.path.join(root, fileName) )
+	paths.sort()
+	paths.reverse()
+	return paths
 
 def getSuiteHistoryResults(path, context):
 	for fileName in getFileNames(path, context):
