@@ -7,11 +7,11 @@
 }
 
 .history .passed {
-	background: #C6E746;
+	background: #AAFFAA;
 }
 
 .history .failed {
-	background: #EE5757;
+	background: #FFAAAA;
 }
 
 .history .unknown {
