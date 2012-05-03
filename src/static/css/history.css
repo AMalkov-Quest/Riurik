@@ -1,5 +1,11 @@
+.history {
+	width: 100%;
+	padding: 0 10px;	
+}
+
 .history, .history table {
 	border: 0 none;	
+	color: black;
 }
 
 .history .runs {
@@ -27,5 +33,7 @@
 }
 
 .history .details table {
-	margin: 0; padding: 0;
+	margin: 0; 
+	padding: 0;
+	width: 100%;
 }
