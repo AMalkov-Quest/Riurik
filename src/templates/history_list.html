@@ -27,7 +27,7 @@
 		{% endif %}
 		<tr class="runs {% if suite_runs|aggregate_results:'failed' > 0 %}failed{% else %}passed{% endif %}">
 			<td class="date">
-				<a href="?history={{ suite_runs.0.date }}&context={{ suite_runs.0.context }}">{{ suite_runs.0.date }}</a>
+				<a href="?history={{ suite_runs.0.date }}&context={{ suite_runs.0.context }}">{{ suite_runs.0.date|date_from_str|date:'D, Y M d' }}<br>{{ suite_runs.0.date|date_from_str|date:'H:i' }}</a>
 			</td>
 			<td class="details">
 				<table>
