@@ -21,6 +21,6 @@ sudo npm install -g coffee-script
 git clone git@github.com:andrew-malkov/Riurik.git
 cd ~/Riurik/src
 git checkout quick_tests_support
-#sh autoconf.sh hunterbranch1 ~/SASPHunter
+sh autoconf.sh info-portal-tests $REPPATH
 
 
