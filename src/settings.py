@@ -1,15 +1,4 @@
 #######################################################################################
-#Copyright (C) 2008 Quest Software, Inc.
-#File:		settings.py
-#Version:       1.0.0.0
-
-#######################################################################################
-#
-#       THIS CODE AND INFORMATION IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND,
-#       EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED
-#       WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A PARTICULAR PURPOSE.
-#
-########################################################################################
 # Django settings for web_reports project.
 import os, sys, platform
 
