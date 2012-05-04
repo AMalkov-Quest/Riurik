@@ -3,16 +3,16 @@
 # A word about this shell script:
 #
 # the pip package should be installed previously
-sudo apt-get install python-pip
+sudo apt-get install -y python-pip
 
 # install Django
 sudo pip install Django
 
 # install nodejs
-sudo apt-get install python-software-properties
+sudo apt-get install -y python-software-properties
 sudo add-apt-repository ppa:chris-lea/node.js
 sudo apt-get update
-sudo apt-get install nodejs npm
+sudo apt-get install -y nodejs npm
 
 # install CoffeeScript
 sudo npm install -g coffee-script
