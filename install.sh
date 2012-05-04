@@ -3,19 +3,19 @@
 # A word about this shell script:
 #
 # the pip package should be installed previously
-apt-get install python-pip
+sudo apt-get install python-pip
 
 # install Django
-pip install Django
+sudo pip install Django
 
 # install nodejs
-apt-get install python-software-properties
-add-apt-repository ppa:chris-lea/node.js
-apt-get update
-apt-get install nodejs npm
+sudo apt-get install python-software-properties
+sudo add-apt-repository ppa:chris-lea/node.js
+sudo apt-get update
+sudo apt-get install nodejs npm
 
 # install CoffeeScript
-npm install -g coffee-script
+sudo npm install -g coffee-script
  
 # install Riurik
 git clone git@github.com:andrew-malkov/Riurik.git
