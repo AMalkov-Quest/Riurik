@@ -16,7 +16,6 @@ import mimetypes, datetime
 import stat
 import urllib, urllib2
 import codecs, time
-import virtual_paths
 import distributor
 import coffeescript
 import spec
@@ -96,10 +95,23 @@ def serve(request, path, show_indexes=False):
 			import reporting
 			context = request.REQUEST.get('context')
 			date = request.REQUEST.get('history', None)
+			asxml = request.REQUEST.get('xml', None)
+			asjson = request.REQUEST.get('json', None)
 			if not date:
 				results = reporting.getSuiteHistoryResults(path, context)
 				return  _render_to_response('history_list.html', locals())
+
+			if asxml:
+				tests_list = reporting.getResultsAsXml(path, context, date, request)
+				return HttpResponse(tests_list)
+
 			tests_list = reporting.getResults(path, context, date)
+
+			if asjson:
+				url = reporting.getTestResultsUrl(path, context, date, request)
+				result = { 'url': url, 'data': tests_list }
+				return HttpResponse(json.dumps(result))
+
 			return _render_to_response('history.html', locals())
 
 		if request.path and request.path[-1:] != '/':
@@ -152,6 +164,7 @@ def get_spec(target, path):
 		return '%s?editor' % settings.SPEC_URL_FILE_NAME
 
 def get_file_content(fullpath):
+	log.debug('get content of %s' % fullpath)
 	statobj = os.stat(fullpath)
 	mimetype, encoding = mimetypes.guess_type(fullpath)
 	mimetype = mimetype or 'application/octet-stream'
@@ -182,8 +195,7 @@ def get_dir_index(document_root, path, fullpath):
 
 	if not document_root:
 		pagetype = 'front-page'
-		reload(virtual_paths)
-		for key in virtual_paths.VIRTUAL_PATHS:
+		for key in contrib.get_virtual_paths():
 			dir_descriptor = get_descriptor(key)
 			dirs.append(dir_descriptor)
 	else:
@@ -357,7 +369,7 @@ def compileSuiteCoffee(path, suite_path):
 	)
 	for test in tests:
 		fullpath = os.path.join(suite_path, test)
-		path = coffeescript.compile(None, None, fullpath)
+		path = coffeescript.compile2js(None, None, fullpath)
 		log.info(path)
 
 @add_fullpath
@@ -381,7 +393,7 @@ def runTest(request, fullpath):
 	
 	saveLocalContext(fullpath, contextjs)
 	if coffee(path):
-		path = coffeescript.compile(test_content, path, fullpath)
+		path = coffeescript.compile2js(test_content, path, fullpath)
 	url = "http://%s/%s?server=%s&path=/%s" % (target, settings.EXEC_TESTS_CMD, server, path)
 	log.info("redirect to run test %s" % url)
 	return HttpResponseRedirect(url)
@@ -404,10 +416,8 @@ def saveRemoteContext(path, content, url, ctx):
 	distributor.sendContentToRemote(contextjs_path, content, url, ctx)
 
 def recvLogRecords(request):
-	from logger import FILENAME, DJANGO_APP, timeFormat
+	from logger import FILENAME, timeFormat
 	log_file = FILENAME
-	if request.REQUEST.get('source', None):
-		log_file = DJANGO_APP
 	f = codecs.open(log_file, 'r', 'utf-8')
 	records = f.read()
 	f.close()
@@ -536,10 +546,18 @@ def getOpenedFiles(request, clean=False):
 	return files
 
 def live_settings_view(request):
-	return _render_to_response('configure.html', live_settings_json(request), context_instance=RequestContext(request))
+	return _render_to_response(
+			'configure.html',
+			live_settings_json(request),
+			context_instance=RequestContext(request)
+		)
+
+def get_virtual_paths_path():
+	root = os.path.dirname(os.path.abspath(__file__))
+	return os.path.join(root, settings.virtual_paths_py)
 
 def live_settings_json(request, content=None):
-	settings_fullpath = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'virtual_paths.py')
+	settings_fullpath = get_virtual_paths_path()
 	if not content:
 		content = open(settings_fullpath, 'r').read()
 	descriptor = {
@@ -554,7 +572,7 @@ def live_settings_json(request, content=None):
 	return descriptor
 
 def live_settings_save(request):
-	fullpath = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'virtual_paths.py')
+	fullpath = get_virtual_paths_path()
 	url = request.POST["url"].lstrip('/')
 	stub(url, request)
 

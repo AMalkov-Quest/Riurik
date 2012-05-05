@@ -68,6 +68,11 @@ def add_name(ctximpl, name):
 	if name:
 		ctximpl.add('__name__', name)
 
+def add_virtual_root(ctximpl, path):
+	vroot = contrib.get_virtual_root(path)
+	if vroot:
+		ctximpl.add('__virtual_root__', vroot)
+
 def include_tests(path, ctx, ctximpl):
 
 	def contextjs(path):
@@ -108,6 +113,7 @@ def patch(path, ctx, riurik_url, ctxname=None):
 	patch_libraries(path, ctximpl, ctx)
 	add_start_time(ctximpl)
 	add_name(ctximpl, ctxname)
+	add_virtual_root(ctximpl, path)
 	contrib.patch_host_port(ctximpl, riurik_url)
 
 	return ctximpl.as_tuple()
@@ -118,9 +124,9 @@ class global_settings(object):
 	def __init__(self, path, section='DEFAULT'):
 		log.debug('initing global_settings by from %s, section:%s' % (path, section))
 		self.inifile = None
-		for virtpath in settings.VIRTUAL_PATHS.values():
+		for virtpath in contrib.get_virtual_paths().values():
 			if virtpath in path:
-				self.inifile = os.path.join(virtpath, '.settings.ini')
+				self.inifile = os.path.join(virtpath, settings.GLOBAL_CONTEXT_FILE_NAME)
 		self.section = section
 
 	def get(self, option, default=None):

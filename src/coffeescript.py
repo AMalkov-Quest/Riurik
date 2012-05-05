@@ -2,6 +2,10 @@ import os, shlex, subprocess, platform
 import settings, dir_index_tools
 from logger import log
 
+def coffee(path):
+	file_name = os.path.basename(path)
+	return file_name.endswith(settings.COFFEE_FILE_EXT)
+
 def coffee2js(path):
 	"""
 	>>> coffee2js('test.coffee')
@@ -33,7 +37,7 @@ def save(full_path, path, out):
 
 	return path.replace(coffee_name, js_name) if path else None
 
-def compile(source, path, full_path):
+def compile(source, full_path):
 	log.info('compile %s' % full_path)
 	if not source:
 		source = dir_index_tools.gettest(full_path)
@@ -43,4 +47,9 @@ def compile(source, path, full_path):
 	out, errors = execute(source, full_path)
 	if not out:
 		raise Exception('CoffeeScript compilation error ...')
+
+	return out
+
+def compile2js(source, path, full_path):
+	out = compile(source, full_path)
 	return save(full_path, path, out)

@@ -1,6 +1,6 @@
 # coding: utf-8
-import os, re
-import settings, virtual_paths
+import os, re, config
+import settings
 from logger import log
 import socket
 import fnmatch
@@ -32,6 +32,13 @@ def parseURI(url):
 	hostport = url.split(':')
 	host = hostport[0] if hostport[0] != 'localhost' else socket.gethostname()
 	return host, hostport[1] if len(hostport) > 1 else '80'
+
+def resolveURI(uri):
+	host, port = parseURI(uri)
+	if int(port) == 80:
+		return 'http://%s' % (host)
+	else:
+		return 'http://%s:%s' % (host, port)
 
 def patch_host_port(ctximpl, riurik_url):
 	"""
@@ -142,18 +149,58 @@ class context_impl():
 	def as_tuple(self):
 		return tuple(self.items_as_list)
 
+config_cache = {}
+def config_cacher(fn):
+	def _f(*args, **kwargs):
+		global config_cache
+		config_path = args[0]
+		if config_cache.has_key( config_path ):
+			lastmtime, items = config_cache.get(config_path)
+			if lastmtime == os.path.getmtime(config_path):
+				return items
+
+		items = fn(*args, **kwargs)
+		lastmtime = os.path.getmtime(config_path)
+		config_cache[ config_path ] = lastmtime, items
+
+		return items
+
+	return _f
+
+@config_cacher
+def getVirtualPathConfig(config_path):
+	items = config.items(config_path, 'DEFAULT')
+	return dict( items )
+
+def extend_virtual_paths(root, path, alias, virtual_paths):
+	config_path = os.path.join(path, settings.GLOBAL_CONTEXT_FILE_NAME)
+	if not os.path.exists(config_path): return
+
+	config_items = getVirtualPathConfig(config_path)
+
+	product_code_path = config_items.get(settings.PRODUCT_CODE_PATH)
+	product_code_alias = config_items.get(settings.PRODUCT_CODE_ALIAS)
+	if product_code_path and product_code_alias:
+		product_code_alias = '%s-%s' % (alias, product_code_alias)
+		virtual_paths[product_code_alias] = os.path.join(root, product_code_path)
+
 def get_virtual_paths():
 	"""
-	>>> from minimock import mock
-	>>> mock('reload')
 	>>> virtual_paths.VIRTUAL_PATHS = {'key': 'value'}
-	>>> get_virtual_paths() #doctest: +ELLIPSIS
-	Called reload...
-	...<module 'src.virtual_paths'...
+	>>> get_virtual_paths()
 	{'key': 'value'}
 	"""
-	reload(virtual_paths)
-	return virtual_paths.VIRTUAL_PATHS
+	result = {}
+	for alias, path in settings.virtual_paths.VIRTUAL_PATHS.iteritems():
+		if isinstance(path, tuple):
+			root = path[0]
+			realpath = os.path.join(*path)
+			result[alias] = realpath
+			extend_virtual_paths(root, realpath, alias, result)
+		else:
+			result[alias] = path
+
+	return result
 
 def target_is_remote(target, host):
 	"""
@@ -196,7 +243,7 @@ def get_libraries_impl(path, ctxitems, ctx):
 		if re.search(r'\.coffee$', lib):
 			root = get_document_root(lib)
 			fullpath = get_full_path(root, lib)
-			return coffeescript.compile(None, lib, fullpath)
+			return coffeescript.compile2js(None, lib, fullpath)
 		return lib
 	libraries = map( patch_coffeescript_lib, libraries )
 
@@ -333,7 +380,6 @@ def get_document_root(path):
 	'/'
 	"""
 	if path:
-		reload(virtual_paths)
 		key = path.strip('/').split('/')[0]
 		vpaths = get_virtual_paths()
 		if key and key in vpaths:
@@ -468,7 +514,6 @@ def enum_files_in_folders(target, skip=(lambda file_: file_.startswith('.'))):
 	return all_files
 
 def patch_fullpaths(fullpath, newpath=''):
-	reload(virtual_paths)
 	for key in virtual_paths.VIRTUAL_URLS:
 		m = re.search('^%s(.*)$' % key, newpath)
 		if m:
