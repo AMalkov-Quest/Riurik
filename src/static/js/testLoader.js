@@ -71,11 +71,14 @@ var frame = {
 					d.head.appendChild(j);
 				}
 
-				$.wait( function () { return typeof __frame.window.jQuery != 'undefined'; } , 5*1000)
-				.then(function(){
+				$.wait.condition( 
+					function () { return typeof __frame.window.jQuery != 'undefined'; } ,
+					5*1000
+				).then(function(){
 					window._$ = __frame.window.jQuery;
 					if( __frame.window.jQuery ) {
-						jQExtend(__frame.window.jQuery);
+						//jQExtend(__frame.window.jQuery);
+						__frame.window.jQuery.extend(riurik.exports);
 					} else {
 						QUnit.ok(false, 'there is no JQuery and it\'s not injected');
 					}
@@ -126,176 +129,6 @@ var frame = {
 			return window.frames[0].window;
 		}
 
-};
-
-function jQExtend( $ ) {
-
-	$.sleep = function(msec) {
-		var dfd = new $.Deferred();
-		QUnit.log('sleeping for ' + msec + ' msec' );
-		setTimeout( function() {
-			QUnit.log('sleeping for ' + msec + ' msec is resolved');
-			dfd.resolve(dfd);
-		}, msec);
-		
-		return dfd.promise(dfd);
-	};
-	
-	$.defer = function( lambda, timeout ){
-		var dfd = $.Deferred();
-		var timeout = timeout || context.timeout || 10 * 1000; // 10 sec by default
-		var time = 0;
-		(function f(){
-			if ( lambda() === true ) {
-				QUnit.log('resolve wait');
-				dfd.resolve();
-				return;
-			}
-			time += 100;
-			if ( time < timeout ) {
-				setTimeout(f, 100)
-			} else {
-				QUnit.log('wait timeout');
-				dfd.reject();
-			}
-		})();
-
-		return dfd.promise(dfd);
-	};
-	
-	$.wait = function( lambda, timeout ){
-		var dfd = $.Deferred();
-		var timeout = timeout || context.timeout || 10 * 1000;
-		QUnit.log('waiting for ' + lambda + ' timeout: ' + timeout );
-		var time = 0;
-		(function f(){
-			if ( lambda() === true ) {
-				QUnit.log('waiting for ' + lambda + ' is resolved');
-				dfd.resolve();
-				return;
-			}
-			time += 100;
-			if ( time < timeout ) {
-				setTimeout(f, 100)
-			} else {
-				QUnit.log('wait timeout for ' + lambda + 'exceeded');
-				dfd.resolve();
-			}
-		})();
-
-		return dfd.promise(dfd);
-	};
-
-	$.wait_event = function( target, event_name, timeout ){
-		var dfd = $.Deferred();
-		var timeout = timeout || context.timeout || 10 * 1000; // 10 sec by default
-		var time = 0;
-		var resolved = false;
-
-		target.bind(event_name, function() {
-			var args = arguments;	
-			resolved = true;
-			setTimeout(function(){
-				QUnit.log('resolve the ' + event_name + ' event wait');
-				dfd.resolve.apply(true, args); 
-			}, 1);
-		});
-
-		(function f(){
-			if ( resolved ) {
-				return;
-			}
-			time += 100;
-			if ( time < timeout ) {
-				setTimeout(f, 100)
-			} else {
-				QUnit.log('the ' + event_name + ' event wait timeout');
-				dfd.resolve(false);
-				return;
-			}
-		})();
-
-		return dfd.promise();
-	};
-
-	$.fn.extend({ 
-		sameAs : function(checks) {
-			console.log('check', this, arguments)
-			var options = {
-				checks: checks
-			}
-			return this.each(function(i,el){
-				var value = options['checks'][i];
-				if ( value != null ) {
-					equals(_$(el).html(), value, 'test');
-				};
-			});
-		},
-
-		strip: function(c) {
-			return this.replace(new RegExp('^' + c + '+'), '').replace(new RegExp(c + '+$'), '');
-		},
-		outerHTML: function(s) {
-			return (s) 
-			? this.before(s).remove() 
-					: $('<p>').append(this.eq(0).clone()).html();
-		}
-	});
-	
-	String.prototype.strip = function(c) {
-		return this.replace(new RegExp('^' + c + '+'), '').replace(new RegExp(c + '+$'), '');
-	};
-
-	String.prototype.format = function(__silent) { 
-		/*
-			Extending string usage as a template with local variables
-
-			Arguments:
-				silent - If true, then no errors throws when variable is undefined
-
-			Example:
-				var name = 'Anton', 
-				answer = 'fine'; 
-
-				"-Hi, ${name}! How are you?\n-${answer}".format()
-
-			Result is:
-				"-Hi, Anton! How are you?
-				-fine"
-		*/
-
-		var __reg = new RegExp('\\$\\{([^\}]*?)\\}', 'g'); 
-		var __match = true, 
-			__vars = {}; 
-		while ( __match != null ) { 
-			__match = __reg.exec(this); 
-			if ( __match != null ) {
-				__vars[__match[1]] = null; 
-			}
-		}; 
-		for (__name in __vars) { 
-			try { 
-				__vars[__name] = eval(__name); 
-			} catch (e) { 
-				if ( __silent !== true ) {
-					throw __name+' variable not found in context while  formatting'; 
-				} else {
-					__vars[__name] = '';	
-				} 
-			} 
-		} 
-		var result = this; 
-		for ( __name in __vars ) { 
-			var old_str = '', 
-				new_str = result; 
-			while ( old_str != new_str ) { 
-				old_str = new_str; 
-				new_str = new_str.replace('${'+__name+'}', __vars[__name].toString());
-			} 
-			result = new_str; 
-		} 
-		return result.toString(); 
-	}
 };
 
 jQuery.extend(QUnit, {
@@ -610,12 +443,39 @@ QUnit.asyncTeardown = function(callback) {
 	QUnit.test('teardown', null, callback, true);
 }
 
-jQExtend($);
+$.fn.extend({ 
+	
+	sameAs : function(checks) {
+		console.log('check', this, arguments)
+		var options = {
+			checks: checks
+		}
+		return this.each(function(i,el){
+			var value = options['checks'][i];
+			if ( value != null ) {
+				equals(_$(el).html(), value, 'test');
+			};
+		});
+	},
+
+	strip: function(c) {
+		return this.replace(new RegExp('^' + c + '+'), '').replace(new RegExp(c + '+$'), '');
+	},
+	outerHTML: function(s) {
+		return (s) 
+		? this.before(s).remove() 
+				: $('<p>').append(this.eq(0).clone()).html();
+	}
+});
+
+String.prototype.strip = function(c) {
+	return this.replace(new RegExp('^' + c + '+'), '').replace(new RegExp(c + '+$'), '');
+};
 
 $(document).ready(function() {
 	window.onerror = wrapErrorHandler(window.onerror, onErrorHandler);
 	$(document).ajaxError( ajaxError );
 
 	//QUnit.extend(window, riurik);
-	jQuery.extend(window, riurik.exports);
+	//jQuery.extend(window, riurik.exports);
 });

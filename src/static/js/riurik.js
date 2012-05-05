@@ -1,10 +1,16 @@
-/**
- * Top level namespace for Riurik
- */
+/* Top level namespace for Riurik */
 var riurik = {}
+
+/* Namespace for exposing api in the jQuery namespace */
+riurik.exports = {}
 
 jQuery.extend(true, riurik, riurikldr);
 
+/* TODO:
+ * these two methods are just for testability
+ * because I was not able to mock the window object
+ * it would be great to get rid of them ASAP
+ * */
 riurik.getQUnit = function() {
 	return QUnit;
 }
@@ -14,12 +20,13 @@ riurik.getContext = function() {
 }
 
 riurik.init = function() {
-	//Riurik relies on QUnit, so it should be preliminary loaded
+
+	/* Riurik relies on QUnit, so it should be preliminary loaded */
 	if (!riurik.getQUnit()) {
 		alert('QUnit should be preliminary loaded');
 	}
 
-	//context is object that holds environment for tests, so it should be preliminary loaded
+	/* context is object that holds environment for tests, so it should be preliminary loaded */
 	if (!riurik.getContext()) {
 		alert('context should be preliminary loaded');
 		return;
@@ -30,9 +37,9 @@ riurik.init = function() {
 	riurik.QUnit = {};
 	riurik.QUnit.current = { 'module': {}, 'test': {} };
 	riurik.QUnit.status = 'started';
-}
 
-riurik.exports = {}
+	$.extend(riurik.exports);
+}
 
 riurik.util = {}
 
