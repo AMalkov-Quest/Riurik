@@ -23,14 +23,14 @@ asyncTest 'should create new specification config file', ->
   simulateClick 'spec-link', 'click'
   $.when( frame.load() ).then ->
     fwnd = frame.window()
-    $.wait( -> fwnd.editor? ).then ->
+    $.wait.condition( -> fwnd.editor? ).then ->
       QUnit.substring fwnd.editor.getValue(), "[DEFAULT]\nurl=\ntitle=", 'config is created by a template'
       fwnd.editor.setValue("[#{context.test_name}]\nurl=#{context.spec_url}\ntitle=#{context.spec_title}")
       simulateClick 'save', 'click'
       start()
       
 asyncTest 'should provide link to the specification', ->
-  $.sleep(1000).then ->
+  $.wait.sleep(1000).then ->
     $.when( frame.go "#{context.test_path}?editor" ).then ->
       equal _$('a#spec-link').attr('href'), context.spec_url, 'url to view specification'
       start()

@@ -34,7 +34,7 @@ asyncTest( 'search is available inside virtual folder', function() {
     form.attr( 'target', '' );
     form.submit();
 
-    $.wait( function() {
+    $.wait.condition( function() {
 
       return frame.window().jQuery && frame.window().jQuery( "div[class=search]" ).length > 0;
     }).then( function() {

@@ -34,7 +34,7 @@ asyncTest('check created', function() {
       $.when( frame.load() ).then(function(_$) {
         equal(_$('#create-dir-index-dialog').is(":visible"), false, 'dialog is invisible');
         
-        $.wait( function() { return typeof frame.window().editor != 'undefined'  } ).then( function(){
+        $.wait.condition( function() { return typeof frame.window().editor != 'undefined'  } ).then( function(){
           var editor = frame.window().editor; 
   
           editor.setValue("content")          

@@ -135,7 +135,7 @@ riurik.Waits.prototype.wait = function(condition, timeout, getArgs) {
 
 	riurik.util.log('waiting for ' + condition + ' timeout: ' + timeout );
 
-	(function f(){
+	(function check(checkEvery){
 		if ( condition() === true ) {
 			riurik.util.log('waiting for ' + condition + ' is resolved');
 			if(getArgs) {
@@ -146,14 +146,15 @@ riurik.Waits.prototype.wait = function(condition, timeout, getArgs) {
 			}
 			return;
 		}
-		timeout -= 100;
+		
 		if ( timeout > 0 ) {
-			setTimeout(f, this.checkEvery)
+			timeout -= checkEvery;
+			setTimeout(function() { check(checkEvery) }, checkEvery)
 		} else {
 			riurik.util.log('wait timeout for ' + condition + ' is exceeded');
 			dfd.reject();
 		}
-	})();
+	})(this.checkEvery);
 
 	this.promise = dfd.promise(dfd);
 	return this;

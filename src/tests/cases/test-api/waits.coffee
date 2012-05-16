@@ -12,7 +12,7 @@ asyncTest 'should wait for a certain condition to occure', ->
   expect(1)
   waits = new riurik.Waits()
   waits.wait( -> riurik.vartest1? ).then ->
-    pass('waiting is resolved successfully')
+    $.pass('waiting is resolved successfully')
     start()
     
   riurik.vartest1 = {}
@@ -22,7 +22,7 @@ asyncTest 'should fail a test and continue execution if timeout is exceeded', ->
   sinon.stub QUnit, "start"
   
   waits = new riurik.Waits()
-  waits.wait( (-> riurik.vartest2?), 1 ).then -> pass()
+  waits.wait( (-> riurik.vartest2?), 1 ).then -> $.pass()
   
   setTimeout ( ->
     QUnit.equal QUnit.ok.withArgs(false, '').calledOnce, true, 'the test was failed'
@@ -34,11 +34,22 @@ asyncTest 'should fail a test and continue execution if timeout is exceeded', ->
     start()
   ), 100
   
+asyncTest 'should delay execution for give period of time befor fail', ->
+  clock = sinon.useFakeTimers()
+  waits = new riurik.Waits()
+  waits.wait( (-> riurik.vartest2?), 200 ).fail ->
+    $.pass()
+    
+    clock.restore()
+    start()
+  
+  clock.tick(200)
+  
 asyncTest 'should call given success callback if a certain condition is occured', ->
   expect(1)
   waits = new riurik.Waits()
   waits.wait( -> riurik.vartest3? ).done ->
-    pass('waiting is resolved successfully')
+    $.pass('waiting is resolved successfully')
     start()
     
   riurik.vartest3 = {}
@@ -47,14 +58,14 @@ asyncTest 'should call given failure callback if a certain condition is not occu
   expect(1)
   waits = new riurik.Waits()
   waits.wait( -> riurik.vartest4? ).fail ->
-    pass('unsuccessful waiting is resolved')
+    $.pass('unsuccessful waiting is resolved')
     start()
     
 asyncTest 'the condition method should wait for given condition to occure', ->
   expect(1)
   waits = new riurik.Waits()
   waits.condition( -> riurik.vartest5? ).then ->
-    pass('waiting is resolved successfully')
+    $.pass('waiting is resolved successfully')
     start()
     
   riurik.vartest5 = {}  
@@ -62,15 +73,15 @@ asyncTest 'the condition method should wait for given condition to occure', ->
 asyncTest 'the condition method should fail a test with a particular message', ->
   waits = new riurik.Waits()
   waits.condition( (-> riurik.vartest6?), 1 ).fail ->
-    substring waits.timeoutMessage, 'wait timeout for function'
-    substring waits.timeoutMessage, 'return riurik.vartest6 != null'
+    $.substring waits.timeoutMessage, 'wait timeout for function'
+    $.substring waits.timeoutMessage, 'return riurik.vartest6 != null'
     start()
     
 asyncTest 'the sleep method should delay execution for give period of time', ->
   clock = sinon.useFakeTimers()
   waits = new riurik.Waits()
   waits.sleep( 2 ).then ->
-    pass('test execution is continued')
+    $.pass('test execution is continued')
     clock.restore()
     start()
     
@@ -80,7 +91,7 @@ asyncTest 'the sleep method should delay execution for default period of time if
   clock = sinon.useFakeTimers()
   waits = new riurik.Waits()
   waits.sleep().then ->
-    pass('test execution is continued')
+    $.pass('test execution is continued')
     clock.restore()
     start()
     
@@ -93,7 +104,7 @@ asyncTest 'the event method should wait for given event to occure', ->
   
   waits = new riurik.Waits()
   waits.event( eName, target ).then (e, args)->
-    pass 'waiting is resolved successfully'
+    $.pass 'waiting is resolved successfully'
     equal 'arg1', args, 'arguments are passed'
     start()
     
