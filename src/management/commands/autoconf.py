@@ -1,7 +1,7 @@
 import os, config
 from django.core.management.base import BaseCommand
 from django.core.management import call_command
-import settings, virtual_paths, context, contrib
+import settings, context, contrib
 
 def listfiles(folder):
 	for root, dirs, files in os.walk(folder):
@@ -15,7 +15,7 @@ def ScanCwdForSettings(cwd):
 			return path
 
 def ConfigureServer(alias, cwd, path):
-	virtual_paths.VIRTUAL_PATHS = {
+	settings.virtual_paths.VIRTUAL_PATHS = {
 		alias: (cwd, os.path.relpath(path, cwd))
 	}
 

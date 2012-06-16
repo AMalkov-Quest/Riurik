@@ -94,7 +94,6 @@ def getFileNames(path, context):
 	paths.reverse()
 	return paths
 
-
 def getSuiteHistoryResults(path, context):
 	for fileName in getFileNames(path, context):
 		if re.search('[\-\d]+\.json$', fileName):
@@ -247,11 +246,14 @@ def progress(date, path, context):
 	
 	return progress
 
+def getTestResultsUrl(path, context, date, request):
+	host = contrib.resolveURI(request.get_host())
+	return '%s/%s?history=%s&context=%s' % (host, path, date, context)
+
 def getResultsAsXml(path, context, date, request):
 	import json2xml
 	results = getResults(path, context, date)
-	host = contrib.resolveURI(request.get_host())
-	url = '%s/%s?history=%s&context=%s' % (host, path, date, context)
+	url = getTestResultsUrl(path, context, date, request)
 	return json2xml.convert(results, url)
 
 def getResults(path, context, date):

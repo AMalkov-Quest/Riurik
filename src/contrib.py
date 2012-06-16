@@ -152,11 +152,10 @@ def config_cacher(fn):
 		global config_cache
 		config_path = args[0]
 		if config_cache.has_key( config_path ):
-			print 'try to get config items from cache'
 			lastmtime, items = config_cache.get(config_path)
 			if lastmtime == os.path.getmtime(config_path):
 				return items
-		print 'load config items from disk'	
+
 		items = fn(*args, **kwargs)
 		lastmtime = os.path.getmtime(config_path)
 		config_cache[ config_path ] = lastmtime, items
