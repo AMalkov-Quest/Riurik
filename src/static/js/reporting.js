@@ -62,6 +62,12 @@ riurik.reporter.tochunks = function (size, data) {
 	return chunks;
 };
 
+riurik.reporter.outerHTML = function (s) {
+	return (s) 
+		? this.before(s).remove()
+		: $('<p>').append(this.eq(0).clone()).html();
+};
+
 riurik.reporter.getHtmlTestResults = function (moduleName, testName) {
 	var elements = $('#qunit-tests li')
 		.has(".module-name:contains('"+moduleName+"')")
