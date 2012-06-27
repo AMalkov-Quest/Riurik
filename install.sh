@@ -27,8 +27,6 @@
  
 # install Riurik
 ##git clone git@github.com:andrew-malkov/Riurik.git
-cd Riurik
+cd Riurik/src
 git checkout quick_tests_support
-sh src/autoconf.sh info-portal-tests ../SASPHunter
-
-
+sh autoconf.sh info-portal-tests ../../SASPHunter
