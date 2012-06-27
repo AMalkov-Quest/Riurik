@@ -19,16 +19,16 @@
 ##sudo npm install -g coffee-script
 
 # checkout production code
-git clone git@github.com:andrew-malkov/SASP.git SASPHunter
-cd SASPHunter
-git checkout $BRANCH
+##git clone git@github.com:andrew-malkov/SASP.git SASPHunter
+##cd SASPHunter
+##git checkout $BRANCH
 
-cd ..
+##cd ..
  
 # install Riurik
-git clone git@github.com:andrew-malkov/Riurik.git
+##git clone git@github.com:andrew-malkov/Riurik.git
 cd Riurik
 git checkout quick_tests_support
-sh autoconf.sh info-portal-tests SASPHunter
+sh src/autoconf.sh info-portal-tests ../SASPHunter
 
 
