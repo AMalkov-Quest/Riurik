@@ -16,11 +16,18 @@ sudo apt-get install -y nodejs npm
 
 # install CoffeeScript
 sudo npm install -g coffee-script
+
+# checkout production code
+git clone git@github.com:andrew-malkov/SASP.git SASPHunter
+cd SASPHunter
+git checkout $BRANCH
+
+cd ..
  
 # install Riurik
 git clone git@github.com:andrew-malkov/Riurik.git
-cd ~/Riurik/src
+cd Riurik
 git checkout quick_tests_support
-sh autoconf.sh info-portal-tests $REPPATH
+sh autoconf.sh info-portal-tests SASPHunter
 
 
