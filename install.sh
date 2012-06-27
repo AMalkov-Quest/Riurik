@@ -7,7 +7,7 @@
 sudo apt-get install -y python-pip
 
 # install Django
-#sudo pip install Django
+sudo pip install Django
 
 # install nodejs
 #sudo apt-get install -y python-software-properties
