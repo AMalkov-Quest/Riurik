@@ -7,7 +7,7 @@ QUnit.setup ->
 asyncTest 'runs only given tests', ->
   $.when( frame.go( context.url ) ).then ->
     $.wait.condition( -> frameTestsAreStarted() ).then ->
-      frame.window().QUnit.done = ->   
+      frame.window().QUnit.done = ->
         equal _$('.test-name').length, 3, 'only given tests are ran'
         equal _$('.test-name').first().text(), 'first test'
         equal _$('.test-name').last().text(), 'fifth test'
