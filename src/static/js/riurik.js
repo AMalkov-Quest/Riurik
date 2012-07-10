@@ -14,7 +14,7 @@ riurik.trigger = function(event){
 
 riurik.on = function( event, handler ){
 	console.log( 'riurik.on', event, 'registering', handler );
-	$(riurik).on.apply( $( riurik ), arguments );
+	$(riurik).on.apply( $( riurik ), $.makeArray(arguments) );
 }
 
 riurik.getContext = function() {

@@ -44,7 +44,7 @@ riurik.reporter.testStart = function(e, test) {
 };
 
 riurik.reporter.testDone = function(e, name, passed, failed, total) {
-	console.log('the "' + test.name + '" test is done');
+	console.log('the "' + name + '" test is done', arguments);
 	var module = riurik.reporter.suite;
 	riurik.reporter.testNum  = riurik.reporter.testNum + 1;
 	riurik.reporter.queue.push({ 
