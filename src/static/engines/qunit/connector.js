@@ -14,7 +14,7 @@ riurik.engine.init = function( next ){
 	load_remote_style('/static/engines/qunit/qunit.css');
 };
 
-riurik.on( "riurik.tests.loaded",function(){
+riurik.on("riurik.tests.loaded", function(){
 	QUnit.config.autorun = false;
 	QUnit.config.autostart = true;
 	QUnit.load();
@@ -41,15 +41,6 @@ riurik.matchers.substring = function(actual, expected, message) {
 
 	QUnit.push(i >= 0, actual, expected, message);
 };
-
-
-riurik.on("riurik.engine.assert_ok", function( result, message ){
-	QUnit.ok( result, message );
-});
-
-riurik.on("riurik.engine.assert_equal", function( actual, expected, message ){
-	QUnit.equal( actual, expected, message );
-});
 
 riurik.on("riurik.engine.loaded", function(){
 	/* Riurik relies on QUnit, so it should be preliminary loaded */

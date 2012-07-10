@@ -49,7 +49,7 @@ riurik.on("riurik.inited", function(){
 	}
 });
 
-riurik.on("riurik.error", function(msg, url, line){
+riurik.on("riurik.error", function(e, msg, url, line){
 	riurik.matchers.fail( msg );
 });
 
@@ -61,21 +61,21 @@ riurik.on("riurik.tests.end", function(){
 	riurik.log("Tests ends");
 });
 
-riurik.on("riurik.tests.suite.start", function(suite){
+riurik.on("riurik.tests.suite.start", function(e, suite){
 	riurik.log("Suite '"+suite+"' started");
 });
 
-riurik.on("riurik.tests.suite.done", function(suite){
+riurik.on("riurik.tests.suite.done", function(e, suite){
 	riurik.log("Suite '"+suite+"' done");
 });
 
-riurik.on("riurik.tests.test.start", function(test, suite){
+riurik.on("riurik.tests.test.start", function(e, test){
 	context = clone(riurik.context)
-	riurik.log("Test '"+suite+"."+test+"' started");
+	riurik.log("Test '"+test+"' started");
 });
 
-riurik.on("riurik.tests.test.done", function(test, suite){
-	riurik.log("Test '"+suite+"."+test+"' done");
+riurik.on("riurik.tests.test.done", function(e, test){
+	riurik.log("Test '"+test+"' done");
 });
 
 riurik.load_tests = function(){
