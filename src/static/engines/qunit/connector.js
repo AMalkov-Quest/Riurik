@@ -121,5 +121,5 @@ connect = function() {
 		return QUnit;
 	}
 
-
+	QUnit.log = riurik.log;
 };

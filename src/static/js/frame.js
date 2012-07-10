@@ -19,10 +19,12 @@
 			if( window.frames[0].window ) {
 				window.frames[0].window.onerror = function(){};
 			}
+			riurik.log("Frame loading "+url+" ...")
 			$('#frame').attr('src', url);
 			$('#frame-url').html('<a href="'+url+'">'+url+'</a>');
 			$('#frame').unbind('load');
 			$('#frame').load(function() {
+				riurik.log("Frame loaded "+url+".")
 				var __frame = window.frames[0];
 				__frame.window.onerror = riurik.wrapErrorHandler( __frame.window.onerror, riurik.onErrorHandler );
 
