@@ -2,7 +2,7 @@ if ( typeof console == 'undefined' || typeof console.log == 'undefined' ) {
 	var console = { log: function(){} };
 }
 
-riurik.loader = function() {
+riurikldr.loader = function() {
 	var queue = [];
 	var callbacks = [];
 	var running = false;
@@ -10,7 +10,7 @@ riurik.loader = function() {
 		running = true;
 		if ( queue.length > 0 ) {
 			var task = queue.shift();
-			riurik.LoadScript( 
+			riurikldr.LoadScript( 
 				task.url, 
 				function(){
 					if ( typeof task.callback == 'function' ) 
@@ -47,36 +47,36 @@ var load_remote_style = function(url){
 	var style = document.createElement( 'link' );
 	style.type = 'text/css';
 	style.rel = 'stylesheet';
-	style.href = riurik.BuildHttpUri(url)+'?_='+Math.random().toString();
+	style.href = riurikldr.BuildHttpUri(url)+'?_='+Math.random().toString();
 	document.body.appendChild( style );
 };
 
-riurik.loader().queue('/static/js/jquery.min.js', function(){
-	document.title = /\/([^\/]*)\/*$/.exec(riurik.args.path)[1];
-	riurik.loader()
+riurikldr.loader().queue('/static/js/jquery.min.js', function(){
+	document.title = /\/([^\/]*)\/*$/.exec(riurikldr.args.path)[1];
+	riurikldr.loader()
 	.queue('/static/js/jquery.json.min.js')
 	.queue('/static/jquery-ui/js/jquery-ui.custom.min.js')
 	.queue('/static/js/qunit.js')
 	.queue('/static/js/dates.js')
+	.queue(riurikldr.args.cwd + '/.context.js')
 	.queue('/static/js/riurik.js')
 	.queue('/static/js/reporting.js')
 	.queue('/static/js/testLoader.js')
-	.queue(riurik.args.cwd + '/.context.js')
 	.then(function(){
 		$(document).ready(function() {
 			riurik.init();
 			$("#tabs").tabs();
 			riurik.QUnit.context = clone(context);
-			var l = riurik.loader();
+			var l = riurikldr.loader();
 			$.each(context.libraries || [],function(i,url){l.queue( '/' + url );});
 			
-			if ( /\.js$/.test(riurik.args.path) ) {
-				l.queue(riurik.args.path);
+			if ( /\.js$/.test(riurikldr.args.path) ) {
+				l.queue(riurikldr.args.path);
 			} else {
 				if(typeof context.suite_setup != 'undefined'){
-					l.queue( riurik.args.cwd + '/' + context.suite_setup );
+					l.queue( riurikldr.args.cwd + '/' + context.suite_setup );
 				}
-				$.each(context.include || [],function(i,url){l.queue( riurik.args.cwd + '/' + url );});
+				$.each(context.include || [],function(i,url){l.queue( riurikldr.args.cwd + '/' + url );});
 			};
 			l.then(function(){
 				QUnit.config.autorun = false;

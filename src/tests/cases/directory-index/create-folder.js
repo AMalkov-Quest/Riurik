@@ -31,7 +31,7 @@ asyncTest('error reporting', function() {
     _$('#object-name').val(context.folder_name);
     _$('#create-folder-btn').click();
     
-    $.wait( function() { return _$('#operationResult').is(":visible") }, 1000 ).then(function() {
+    $.waitFor.condition( function() { return _$('#operationResult').is(":visible") }, 1000 ).then(function() {
       QUnit.substring( _$('#operationResult').text(), 'exists', 'dialog with error is visible');
       start();
     });

@@ -5,6 +5,9 @@ from logger import log
 import socket
 import fnmatch
 
+def ishidden(filename):
+	return filename.startswith('.') and filename != settings.TEST_CONTEXT_FILE_NAME
+
 def cleandir(path, pattern):
 	n = 0
 	for root, dirs, files in os.walk(path):
