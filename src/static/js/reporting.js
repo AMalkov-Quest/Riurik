@@ -83,6 +83,7 @@ riurik.reporter.send = function (data, callback) {
 	$(document).unbind('ajaxError');
 	console.log('send');
 	console.log(data);
+
 	$.ajax({
 		'url': riurik.reporter.url,
 		'data': data,
@@ -90,7 +91,7 @@ riurik.reporter.send = function (data, callback) {
 		'complete': function(){
 			$(document).bind('ajaxError', ajaxError);
 			if(typeof callback != 'undefined') {
-				callback(data);
+				callback(data.event);
 			}	
 		}
 	});
@@ -111,10 +112,10 @@ riurik.reporter.consignor = function () {
 
 	(function f(){
 		if ( ! busy ) {
-			var next = function(data) {
+			var next = function(event) {
 				clearTimeout( busyTimeOut );
 				busy = false;
-				if( data.event == 'done') {
+				if( event == 'done') {
 					riurik.reporter.state = 'done';
 				}
 			};
