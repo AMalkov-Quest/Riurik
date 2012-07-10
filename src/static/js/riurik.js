@@ -32,7 +32,7 @@ riurik.init = function() {
 		return;
 	}
 
-	riurik.exports.wait = new riurik.Waits(context.timeout);
+	riurik.exports.waitFor = new riurik.Waits(context.timeout);
 
 	riurik.QUnit = {};
 	riurik.QUnit.current = { 'module': {}, 'test': {} };

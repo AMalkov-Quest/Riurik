@@ -1,7 +1,7 @@
 module 'consignor'
 
 asyncTest 'should send given data', ->
-  $.wait.condition( -> riurik.reporter.queue.length == 0 ).then ->
+  $.waitFor.condition( -> riurik.reporter.queue.length == 0 ).then ->
     
     equal riurik.reporter.url, riurik.BuildHttpUri('/report_callback/')
     ok riurik.reporter.queue?, 'queue for tests result should be created'

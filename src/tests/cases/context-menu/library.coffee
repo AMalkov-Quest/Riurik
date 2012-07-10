@@ -4,6 +4,6 @@ checkActionSucceeded = (actionName, callback)->
   window.frames[0].ctxMenuActions.dispatcher(action, target)
   $.when( frame.load() ).then ->
     fwnd = frame.window()
-    $.wait.condition( -> frame.window().editor? ).then ->
+    $.waitFor.condition( -> frame.window().editor? ).then ->
       ok frame.window().editor.getValue()?, 'editor is not empty'
       callback()

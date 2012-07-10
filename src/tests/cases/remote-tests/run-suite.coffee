@@ -14,7 +14,7 @@ QUnit.setup ->
              
 asyncTest 'should be executed on the remote server', ->
   $.when( frame.go(context.url) ).then ->
-    $.wait.condition( frameTestsAreDone ).then ->
+    $.waitFor.condition( frameTestsAreDone ).then ->
       QUnit.substring frame.window().location.host, "#{context.remote_port}", 'suite is executed on the remote server' 
       equal _$('.test-name').length, 2, 'both tests are executed on the remote server'
       start()

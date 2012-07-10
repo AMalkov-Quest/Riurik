@@ -71,7 +71,7 @@ var frame = {
 					d.head.appendChild(j);
 				}
 
-				$.wait.condition( 
+				$.waitFor.condition( 
 					function () { return typeof __frame.window.jQuery != 'undefined'; } ,
 					5*1000
 				).then(function(){

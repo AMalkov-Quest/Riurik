@@ -7,8 +7,8 @@ module('test runner', {
 
 asyncTest('test is executed', function() {
   $.when( frame.go( context.url ) ).then(function(_$) {
-    $.wait.condition(function() { return typeof frame.window().context != 'undefined'}).done( function() {
-      $.wait.condition(function() { return frameTestsAreDone() }).then( function(module) {
+    $.waitFor.condition(function() { return typeof frame.window().context != 'undefined'}).done( function() {
+      $.waitFor.condition(function() { return frameTestsAreDone() }).then( function(module) {
         ok( _$('#qunit-testresult').length == 1, 'test result is present');
         equal( _$('.test-name').length, 2, 'all tests are ran' );
     

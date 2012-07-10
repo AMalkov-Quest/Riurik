@@ -12,7 +12,7 @@ QUnit.setup ->
 QUnit.asyncTest 'suite title', ->
   url = contexter.URL(context, "actions/suite/run/?path=/#{context.suite_path}&context=#{context.suite_context}")
   $.when( frame.go url ).then ->
-    $.wait.condition( frameTestsAreDone ).then ->
+    $.waitFor.condition( frameTestsAreDone ).then ->
       QUnit.substring frame.document().title, "\u2716", 'should show x if suite has no any asserts'
       QUnit.substring frame.document().title, context.suite_name, 'should show suite name'
       equal frame.document().title.indexOf(context.suite_name), 2, 'suite name follows right after the status sing'
@@ -22,7 +22,7 @@ QUnit.asyncTest 'test title', ->
   write_test(context.test_path, "test 'first test', -> ok true")
   url = contexter.URL(context, "actions/test/run/?path=#{context.test_path}&context=#{context.suite_context}")
   $.when( frame.go url ).then ->
-    $.wait.condition( frameTestsAreDone ).then ->
+    $.waitFor.condition( frameTestsAreDone ).then ->
       QUnit.substring frame.document().title, context.test_name, 'should show test name'
       equal frame.document().title.indexOf(context.test_name), 3, 'test name follows right after the status sing'
       start()
