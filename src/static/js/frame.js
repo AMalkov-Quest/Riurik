@@ -31,7 +31,6 @@
 					var d = __frame.document;
 					var j = d.createElement('script');
 					j.type='text/javascript';
-					//j.src = /^(.*?)[^\/]*\?/.exec(window.location)[1] + $("head script[src*='jquery.min.js']").attr('src');
 					j.src = riurik.src.jquery;
 					d.head.appendChild(j);
 				}
@@ -42,10 +41,9 @@
 				).then(function(){
 					window._$ = __frame.window.jQuery;
 					if( __frame.window.jQuery ) {
-						//jQExtend(__frame.window.jQuery);
 						__frame.window.jQuery.extend(riurik.exports);
 					} else {
-						QUnit.ok(false, 'there is no JQuery and it\'s not injected');
+						riurik.matchers.fail('there is no JQuery and it\'s not injected');
 					}
 					dfd.resolve(__frame.window.jQuery);
 				});
@@ -56,7 +54,6 @@
 
 		load: function() {
 			var dfd = $.Deferred();
-
 			$('#frame').load(function() {
 				dfd.resolve(window.frames[0].window.jQuery);
 			});

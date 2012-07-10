@@ -1,7 +1,7 @@
 (function(){ 
 	function onErrorHandler(msg, url, line) {
 		riurik.log("error(" + url + ": " +  line + "): " + msg);
-		riurik.trigger( "error", msg, url, line );
+		riurik.trigger( "riurik.error", msg, url, line );
 		return true;
 	};
 

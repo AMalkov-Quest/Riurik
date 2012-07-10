@@ -17,15 +17,6 @@ riurik.on = function( event, handler ){
 	$(riurik).on.apply( $( riurik ), arguments );
 }
 
-/* TODO:
- * these two methods are just for testability
- * because I was not able to mock the window object
- * it would be great to get rid of them ASAP
- * */
-riurik.getQUnit = function() {
-	return QUnit;
-}
-
 riurik.getContext = function() {
 	return context;
 }
@@ -43,22 +34,25 @@ riurik.on( "riurik.inited", function(){
 
 riurik.init = function() {
 	riurik.trigger( "riurik.initing" );
-	/* Riurik relies on QUnit, so it should be preliminary loaded */
-	//if (!riurik.getQUnit()) {
-	//	alert('QUnit should be preliminary loaded');
-	//}
+
 	$("#tabs").tabs();
 	riurik.context = clone(context);
 
+	riurik.trigger( "riurik.inited" );
+}
+
+riurik.on("riurik.inited", function(){
 	/* context is object that holds environment for tests, so it should be preliminary loaded */
 	if (!riurik.getContext()) {
 		alert('context should be preliminary loaded');
 		return;
 	}
+});
 
+riurik.on("riurik.error", function(msg, url, line){
+	riurik.matchers.fail( msg );
+});
 
-	riurik.trigger( "riurik.inited" );
-}
 
 riurik.load_tests = function(){
 	riurik.trigger( "riurik.tests.loading" );
@@ -102,7 +96,7 @@ riurik.util.strip = function(s, c) {
 	
 riurik.util.load_js = function(jsfile_src) {
 	var scr = jsfile_src;
-	QUnit.log('Adding script '+jsfile_src+' to queue to load');
+	riurik.log('Adding script '+jsfile_src+' to queue to load');
 	var dfd = new $.Deferred();
 		
 	var script = document.createElement( 'script' );
@@ -110,13 +104,13 @@ riurik.util.load_js = function(jsfile_src) {
 	script.src = jsfile_src;
 		
 	var onload = function() {
-		QUnit.log(scr +' is loaded.');
+		riurik.log(scr +' is loaded.');
 		dfd.resolve(dfd);
 	};
 	
 	if( $.browser.msie ) {
 		script.onreadystatechange = function() {
-			QUnit.log('IE readyState is ' + script.readyState)
+			riurik.log('IE readyState is ' + script.readyState)
 			if (script.readyState == 'loaded' ||
 				script.readyState == 'complete') {
 				script.onreadystatechange = null;
@@ -137,26 +131,15 @@ jQuery.extend(riurik.exports, riurik.util);
 riurik.matchers = {}
 
 riurik.matchers.pass = function(message) {
-	riurik.trigger("riurik.engine.assert_ok", [true, message || '']);
-	//QUnit.ok(true, message || '');
+	alert('Test Engine pass is not implemented');
 };
 
 riurik.matchers.fail = function(message) {
-	riurik.trigger("riurik.engine.assert_ok", [false, message || '']);
-	//QUnit.ok(false, message || '');
+	alert('Test Engine fail is not implemented');
 };
 
 riurik.matchers.substring = function(actual, expected, message) {
-	//replace non-breaking space(&nbsp;) with just space
-	actual = actual.replace(/\xA0/g, ' ');
-	expected = expected.replace(/\xA0/g, ' ');
-
-	var i = actual.indexOf(expected);
-	if( i >= 0 ) {
-		actual = actual.substring(i, i + expected.length);
-	}
-
-	QUnit.push(i >= 0, actual, expected, message);
+	alert('Test Engine substring is not implemented');
 };
 
 jQuery.extend(riurik.exports, riurik.matchers);
@@ -280,7 +263,6 @@ riurik.Waits.prototype.then = function(doneCallback, failCallback) {
 		var message = this.timeoutMessage;
 		failCallback = function() {
 			riurik.matchers.fail(message);
-			QUnit.start();
 		};
 	}
 	return this.promise.then(doneCallback, failCallback);
@@ -304,10 +286,10 @@ riurik.__log = function() {
 	/* Private log function. 
 	 * It gets messages from riurik message storage and put to riurik-console tab
 	 * */
-	if ( riurik.__log_storage.length > 0 && $('#qunit-console').length > 0 ) {
+	if ( riurik.__log_storage.length > 0 && $('#riurik-console').length > 0 ) {
 		while ( riurik.__log_storage.length > 0 ) {
 			var o = riurik.__log_storage.shift();
-			$('#qunit-console').prepend( o.toString()+'<hr/>' );
+			$('#riurik-console').prepend( o.toString()+'<hr/>' );
 		}
 	}
 };
