@@ -2,139 +2,13 @@ if ( typeof console == 'undefined' || typeof console.log == 'undefined' ) {
 	var console = { log: function(){} };
 }
 
-function onErrorHandler(msg, url, line) {
-	if( msg == 'Script error.') {
-		ok(false, 'See the browser console for details');
-	}
-	QUnit.log("error(" + url + ": " +  line + "): " + msg);
-	QUnit.start();
-	return true;
-};
-
-function ajaxError(event, jqXHR, ajaxSettings, exception) { 
-	QUnit.log("ajax error:" + jqXHR.responseText);
-	console.log(jqXHR);
-	QUnit.ok(false, exception); 
-	QUnit.start();
-}
-
-function wrapErrorHandler(handler, func) {
-	var l = handler;
-	if ( typeof handler == 'function' ) {
-		return function() {
-			l.apply(l, arguments);
-			func.apply(func, arguments);	
-		};
-	}else{
-		return function() {
-			ok(false, arguments[0]);
-			func.apply(func, arguments);	
-		};
-	}
-};
-
-var frame = {
-
-		go: function(path, cache) {
-			var dfd = $.Deferred();
-			var url = path;
-			var regex = new RegExp('^http://[a-zA-Z0-9]');
-			if(!regex.test(url)) {
-				url = 'http://' + context.host + ':' + context.port + '/' + path;
-			}
-
-			if( !(cache === true) ) {
-				if (url.indexOf('?') != -1) {
-					url += '&_=' + Math.random().toString();
-				}else{
-					url += '?_=' + Math.random().toString();
-				}
-			}
-			
-			if( window.frames[0].window ) {
-				window.frames[0].window.onerror = function(){};
-			}
-			$('#frame').attr('src', url);
-			$('#frame-url').html('<a href="'+url+'">'+url+'</a>');
-			$('#frame').unbind('load');
-			$('#frame').load(function() {
-				var __frame = window.frames[0];
-				__frame.window.onerror = wrapErrorHandler( __frame.window.onerror, onErrorHandler );
-
-				if( ! __frame.window.jQuery ) {
-					// inject one
-					var d = __frame.document;
-					var j = d.createElement('script');
-					j.type='text/javascript';
-					//j.src = /^(.*?)[^\/]*\?/.exec(window.location)[1] + $("head script[src*='jquery.min.js']").attr('src');
-					j.src = riurik.src.jquery;
-					d.head.appendChild(j);
-				}
-
-				$.wait( function () { return typeof __frame.window.jQuery != 'undefined'; } , 5*1000)
-				.then(function(){
-					window._$ = __frame.window.jQuery;
-					if( __frame.window.jQuery ) {
-						jQExtend(__frame.window.jQuery);
-					} else {
-						QUnit.ok(false, 'there is no JQuery and it\'s not injected');
-					}
-					dfd.resolve(__frame.window.jQuery);
-				});
-			});
-
-			return dfd.promise();
-		},
-
-		load: function() {
-			var dfd = $.Deferred();
-
-			$('#frame').load(function() {
-				dfd.resolve(window.frames[0].window.jQuery);
-			});
-
-			return dfd.promise();
-		},
-
-		println: function(message) {
-			var regexp = new RegExp('\\n', 'gi');
-			var html = message.replace(regexp, '<br>')+'<hr/>';
-			$('#powershell-console').prepend(html);
-			
-		},
-
-		console_complete: function(){
-			frame.__console_timeout = setTimeout(function(){
-				$('#tabs-2-loading').hide();
-			}, 500);
-			$('#tabs-2').parent().attr('title', '');
-		},
-
-		console_working: function(title){
-			if ( frame.__console_timeout ) { clearTimeout(frame.__console_timeout) }
-			$('#tabs-2').parent().attr('title', title);
-			$('#tabs-2-loading').show();
-		},
-
-		jQuery: function() {
-			return window.frames[0].window.jQuery;
-		},
-		document: function(){
-			return window.frames[0].document;
-		},
-		window: function(){
-			return window.frames[0].window;
-		}
-
-};
-
 function jQExtend( $ ) {
 
 	$.sleep = function(msec) {
 		var dfd = new $.Deferred();
-		QUnit.log('sleeping for ' + msec + ' msec' );
+		riurik.log('sleeping for ' + msec + ' msec' );
 		setTimeout( function() {
-			QUnit.log('sleeping for ' + msec + ' msec is resolved');
+			riurik.log('sleeping for ' + msec + ' msec is resolved');
 			dfd.resolve(dfd);
 		}, msec);
 		
@@ -147,7 +21,7 @@ function jQExtend( $ ) {
 		var time = 0;
 		(function f(){
 			if ( lambda() === true ) {
-				QUnit.log('resolve wait');
+				riurik.log('resolve wait');
 				dfd.resolve();
 				return;
 			}
@@ -155,7 +29,7 @@ function jQExtend( $ ) {
 			if ( time < timeout ) {
 				setTimeout(f, 100)
 			} else {
-				QUnit.log('wait timeout');
+				riurik.log('wait timeout');
 				dfd.reject();
 			}
 		})();
@@ -166,11 +40,11 @@ function jQExtend( $ ) {
 	$.wait = function( lambda, timeout ){
 		var dfd = $.Deferred();
 		var timeout = timeout || context.timeout || 10 * 1000;
-		QUnit.log('waiting for ' + lambda + ' timeout: ' + timeout );
+		riurik.log('waiting for ' + lambda + ' timeout: ' + timeout );
 		var time = 0;
 		(function f(){
 			if ( lambda() === true ) {
-				QUnit.log('waiting for ' + lambda + ' is resolved');
+				riurik.log('waiting for ' + lambda + ' is resolved');
 				dfd.resolve();
 				return;
 			}
@@ -178,7 +52,7 @@ function jQExtend( $ ) {
 			if ( time < timeout ) {
 				setTimeout(f, 100)
 			} else {
-				QUnit.log('wait timeout for ' + lambda + 'exceeded');
+				riurik.log('wait timeout for ' + lambda + 'exceeded');
 				dfd.resolve();
 			}
 		})();
@@ -196,7 +70,7 @@ function jQExtend( $ ) {
 			var args = arguments;	
 			resolved = true;
 			setTimeout(function(){
-				QUnit.log('resolve the ' + event_name + ' event wait');
+				riurik.log('resolve the ' + event_name + ' event wait');
 				dfd.resolve.apply(true, args); 
 			}, 1);
 		});
@@ -209,7 +83,7 @@ function jQExtend( $ ) {
 			if ( time < timeout ) {
 				setTimeout(f, 100)
 			} else {
-				QUnit.log('the ' + event_name + ' event wait timeout');
+				riurik.log('the ' + event_name + ' event wait timeout');
 				dfd.resolve(false);
 				return;
 			}
@@ -376,7 +250,7 @@ jQuery.extend(QUnit, {
 		}
 		output += "</table>";
 
-		QUnit.log(details);
+		riurik.log(details);
 
 		QUnit.config.current.assertions.push({
 			result: !!result,
@@ -458,169 +332,6 @@ function clone(o) {
 	return c;
 }
 
-riurik.init = function() {
-	riurik.QUnit = {};
-	riurik.QUnit.current = { 'module': {}, 'test': {} };
-	riurik.QUnit.status = 'started';
-}
-
-QUnit.begin = function() {
-	QUnit.config.reorder = false;
-	QUnit.log('tests are begun');
-	riurik.reporter.begin();
-}
-
-QUnit.done = function(result) {
-	QUnit.log('tests are done');
-	riurik.QUnit.status = 'done';
-	if( result.total == 0 ) {
-		document.title = [
-			("\u2716"),
-			document.title.replace(/^[\u2714\u2716] /i, "")
-		].join(" ");
-	}
-	riurik.reporter.done();
-}
-
-QUnit.moduleStart = function(module) {
-	riurik.QUnit.current.module.name = module.name;
-	riurik.QUnit.current.module.status = 'started';
-	riurik.QUnit.current.module.started = new Date();
-	QUnit.log('the "' + module.name + '" module is started ', riurik.QUnit.current.module.started);
-	context = clone(riurik.QUnit.context)
-}
-
-QUnit.moduleDone = function(module) {
-	QUnit.log('the "' + module.name + '" module is done');
-	riurik.QUnit.current.module.status = 'done';
-	riurik.QUnit.current.module.finished = new Date();
-}
-
-QUnit.testStart = function(test) {
-	QUnit.log('the "' + test.name + '" test is started');
-	riurik.QUnit.current.test.name = test.name;
-	riurik.QUnit.current.test.started = new Date();
-	console.log('Test start: ', test);
-}
-
-QUnit.testDone = function(test) {
-	QUnit.log('the "' + test.name + '" test is done');
-	riurik.reporter.testDone(test);
-}
-
-QUnit._get_results_view = function() {
-	var html = '<html><head><link rel="stylesheet" type="text/css" href="qunit.css"></head><body>'
-		html += '<ol class="qunit-tests" id="qunit-tests">';
-	$('#qunit-tests').each(function(i, el){
-		var ohtml = $(el).outerHTML().replace(new RegExp('display: none', 'gi'), 'display: block');
-		html += ohtml;
-	});
-	html += '</ol></body></html>';
-	return html;
-};
-
-QUnit.get_results_view = function() {
-	var html = '<html><head><link rel="stylesheet" type="text/css" href="qunit.css"></head><body>'
-		html += '<ol class="qunit-tests" id="qunit-tests">';
-	html += $('#qunit-tests').html().replace(new RegExp('display: none', 'gi'), 'display: block');
-	html += '</ol></body></html>';
-	return html;
-};
-
-QUnit.get_qunit_console = function() {
-	return (function getConsoleDivs() {
-		var html = '<html><head><title>QUnit console</title></head><body>'
-			html += $('#qunit-console').html();
-		html += '</body></html>';
-		return html;
-	})();
-};
-
-QUnit.get_tools_console = function() {
-	return (function getConsoleDivs() {
-		var html = '<html><head><title>PowerShell console</title></head><body>'
-			html += $('#powershell-console').html();
-		html += '</body></html>';
-		return html;
-	})();
-};
-
-QUnit.getCSS = function(){
-	if ( QUnit.__css ) return QUnit.__css;
-	var result = '';
-	url = make_remote_url('/static/css/qunit.css');
-	$.ajax(url, {
-		success: function(data){
-			result = data;
-		},
-		async: false,
-		cache: true
-	});
-	QUnit.__css = result;
-	return result;
-};
-
-QUnit.__log_storage = new Array(); // storage for QUnit.log messages
-QUnit.__log = function() {
-	/* Private log function. 
-	 * It gets messages from QUnit message storage and put to qunit-console tab
-	 * */
-	if ( QUnit.__log_storage.length > 0 && $('#qunit-console').length > 0 ) {
-		while ( QUnit.__log_storage.length > 0 ) {
-			var o = QUnit.__log_storage.shift();
-			$('#qunit-console').prepend( o.toString()+'<hr/>' );
-		}
-	}
-};
-setInterval( QUnit.__log, 500 );
-QUnit.log = function(){
-	/* QUnit.log interface
-	 * Put message into QUnit message storage
-	 * */
-	var args = new Array();
-	$( arguments ).each(function(i, e){
-		var o = e;
-		try {
-			if ( typeof e == 'object' ) {
-				o = $.toJSON(e);
-			}
-			if ( typeof e == 'function' ) {
-				o = e.toString();
-			}
-		} catch (ex) {
-			o = e.toString();
-			args.push('QUnit.log raised a error during formatting: ' + ex.toString());
-		}
-		args.push(o);
-	});
-	QUnit.__log_storage.push(args);
-}
-
-QUnit.log('QUnit console: initialized');
-
-QUnit.config.reorder = false;
-
-QUnit.setup = function(callback) {
-	QUnit.test('setup', null, callback, false);
-}
-
-QUnit.asyncSetup = function(callback) {
-	QUnit.test('setup', null, callback, true);
-}
-
-QUnit.teardown = function(callback) {
-	QUnit.test('teardown', null, callback, false);
-}
-
-QUnit.asyncTeardown = function(callback) {
-	QUnit.test('teardown', null, callback, true);
-}
-
 jQExtend($);
 
-$(document).ready(function() {
-	window.onerror = wrapErrorHandler(window.onerror, onErrorHandler);
-	$(document).ajaxError( ajaxError );
 
-	QUnit.extend(window, riurik);
-});

@@ -57,3 +57,44 @@ riurik.pass = function() {
 riurik.fail = function() {
 	ok(false)
 };
+
+
+riurik.__log_storage = new Array(); // storage for riurik.log messages
+riurik.__log = function() {
+	/* Private log function. 
+	 * It gets messages from riurik message storage and put to riurik-console tab
+	 * */
+	if ( riurik.__log_storage.length > 0 && $('#qunit-console').length > 0 ) {
+		while ( riurik.__log_storage.length > 0 ) {
+			var o = riurik.__log_storage.shift();
+			$('#qunit-console').prepend( o.toString()+'<hr/>' );
+		}
+	}
+};
+setInterval( riurik.__log, 500 );
+riurik.log = function(){
+	/* riurik.log interface
+	 * Put message into Riurik message storage
+	 * */
+	var args = new Array();
+	$( arguments ).each(function(i, e){
+		var o = e;
+		try {
+			if ( typeof e == 'object' ) {
+				o = $.toJSON(e);
+			}
+			if ( typeof e == 'function' ) {
+				o = e.toString();
+			}
+		} catch (ex) {
+			o = e.toString();
+			args.push('Riurik.log raised a error during formatting: ' + ex.toString());
+		}
+		args.push(o);
+	});
+	riurik.__log_storage.push(args);
+}
+
+riurik.log('Riurik console: initialized');
+
+
