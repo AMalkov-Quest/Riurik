@@ -60,8 +60,8 @@ test 'init should check if context is loaded', ->
 test 'init should create the Waits object with context.timeout', ->
   riurik.init()
   
-  ok riurik.exports.wait?, 'object is created'
-  equal riurik.exports.wait.timeout, context.timeout, 'timeout is fine'
+  ok riurik.exports.waitFor?, 'object is created'
+  equal riurik.exports.waitFor.timeout, context.timeout, 'timeout is fine'
   
 test 'init should create the QUnit namespace', ->
   riurik.init()

@@ -1,5 +1,5 @@
 asyncTest('first test', function() {
-  $.wait.sleep(1000).then(function() {
+  $.waitFor.sleep(1000).then(function() {
     ok(true, 'first check');
     ok(true, 'second check');
     start();
