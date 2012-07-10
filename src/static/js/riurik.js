@@ -62,6 +62,7 @@ riurik.on("riurik.tests.end", function(){
 });
 
 riurik.on("riurik.tests.suite.start", function(e, suite){
+	context = clone(riurik.context)
 	riurik.log("Suite '"+suite+"' started");
 });
 
@@ -70,7 +71,6 @@ riurik.on("riurik.tests.suite.done", function(e, suite){
 });
 
 riurik.on("riurik.tests.test.start", function(e, test){
-	context = clone(riurik.context)
 	riurik.log("Test '"+test+"' started");
 });
 
