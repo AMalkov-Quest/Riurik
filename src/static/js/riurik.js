@@ -53,6 +53,30 @@ riurik.on("riurik.error", function(msg, url, line){
 	riurik.matchers.fail( msg );
 });
 
+riurik.on("riurik.tests.begin", function(){
+	riurik.log("Tests begins");
+});
+
+riurik.on("riurik.tests.end", function(){
+	riurik.log("Tests ends");
+});
+
+riurik.on("riurik.tests.suite.start", function(suite){
+	riurik.log("Suite '"+suite+"' started");
+});
+
+riurik.on("riurik.tests.suite.done", function(suite){
+	riurik.log("Suite '"+suite+"' done");
+});
+
+riurik.on("riurik.tests.test.start", function(test, suite){
+	context = clone(riurik.context)
+	riurik.log("Test '"+suite+"."+test+"' started");
+});
+
+riurik.on("riurik.tests.test.done", function(test, suite){
+	riurik.log("Test '"+suite+"."+test+"' done");
+});
 
 riurik.load_tests = function(){
 	riurik.trigger( "riurik.tests.loading" );

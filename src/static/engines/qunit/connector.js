@@ -84,32 +84,19 @@ connect = function() {
 	}
 
 	QUnit.moduleStart = function(module) {
-		riurik.QUnit.current.module.name = module.name;
-		riurik.QUnit.current.module.status = 'started';
-		riurik.QUnit.current.module.started = new Date();
-		riurik.log('the "' + module.name + '" module is started ', riurik.QUnit.current.module.started);
-		context = clone(riurik.context)
-		riurik.trigger("riurik.tests.suite.start");
+		riurik.trigger("riurik.tests.suite.start", module.name);
 	}
 
 	QUnit.moduleDone = function(module) {
-		riurik.log('the "' + module.name + '" module is done');
-		riurik.QUnit.current.module.status = 'done';
-		riurik.QUnit.current.module.finished = new Date();
-		riurik.trigger("riurik.tests.suite.done");
+		riurik.trigger("riurik.tests.suite.done", module.name);
 	}
 
 	QUnit.testStart = function(test) {
-		riurik.log('the "' + test.name + '" test is started');
-		riurik.QUnit.current.test.name = test.name;
-		riurik.QUnit.current.test.started = new Date();
-		console.log('Test start: ', test);
-		riurik.trigger("riurik.tests.test.start");
+		riurik.trigger("riurik.tests.test.start", test.name);
 	}
 
 	QUnit.testDone = function(test) {
-		riurik.log('the "' + test.name + '" test is done');
-		riurik.trigger("riurik.tests.test.done", test);
+		riurik.trigger("riurik.tests.test.done", test.name, test.passed, test.failed, test.total);
 	}
 
 	/* TODO:
@@ -122,4 +109,23 @@ connect = function() {
 	}
 
 	QUnit.log = riurik.log;
+
+	riurik.reporter.getHtmlTestResults = function () {
+		var moduleName = riurik.reporter.suite,
+			testName = riurik.reporter.test;
+		var elements = $('#qunit-tests li')
+			.has(".module-name:contains('"+moduleName+"')")
+			.has(".test-name:contains('"+testName+"')");
+		var out = '';
+		elements.each(function(i, element){
+			if ( 
+				$('.module-name',element).text() == moduleName &&
+				$('.test-name',element).text() == testName
+			) {
+				out = $(element).outerHTML();
+				return false;
+			};
+		});
+		return encodeURIComponent( out );
+	};
 };
