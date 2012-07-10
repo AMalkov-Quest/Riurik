@@ -54,43 +54,21 @@ var load_remote_style = function(url){
 riurikldr.loader().queue('/static/js/jquery.min.js', function(){
 	document.title = /\/([^\/]*)\/*$/.exec(riurikldr.args.path)[1];
 	riurikldr.loader()
+	.queue('/static/js/tools.js')
 	.queue('/static/js/jquery.json.min.js')
 	.queue('/static/jquery-ui/js/jquery-ui.custom.min.js')
-	.queue('/static/js/qunit.js')
 	.queue('/static/js/dates.js')
 	.queue(riurikldr.args.cwd + '/.context.js')
 	.queue('/static/js/riurik.js')
+	.queue('/static/engines/engines.js')
 	.queue('/static/js/reporting.js')
-	.queue('/static/js/testLoader.js')
-	.then(function(){
-		$(document).ready(function() {
-			riurik.init();
-			$("#tabs").tabs();
-			riurik.QUnit.context = clone(context);
-			var l = riurikldr.loader();
-			$.each(context.libraries || [],function(i,url){l.queue( '/' + url );});
-			
-			if ( /\.js$/.test(riurikldr.args.path) ) {
-				l.queue(riurikldr.args.path);
-			} else {
-				if(typeof context.suite_setup != 'undefined'){
-					l.queue( riurikldr.args.cwd + '/' + context.suite_setup );
-				}
-				$.each(context.include || [],function(i,url){l.queue( riurikldr.args.cwd + '/' + url );});
-			};
-			l.then(function(){
-				QUnit.config.autorun = false;
-				QUnit.load();
-			});
-			setTimeout(function force_qunit_to_start() {
-				if( QUnit.config.autostart != true ) {
-					QUnit.log('scripts load timeout, forcing tests to start ...');
-				}	
-			}, 10000);
-		});
+	.queue('/static/js/frame.js')
+	.queue('/static/js/errors.js')
+	.then(function() {
+		var engine = 'qunit';
+		riurik.load_test_engine( engine );
 	});
 
 	load_remote_style('/static/css/loader.css');
-	load_remote_style('/static/css/qunit.css');
 	load_remote_style('/static/jquery-ui/css/redmond/jquery-ui.custom.css');
 });

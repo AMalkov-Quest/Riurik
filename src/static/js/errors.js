@@ -1,7 +1,7 @@
 (function(){ 
 	function onErrorHandler(msg, url, line) {
 		riurik.log("error(" + url + ": " +  line + "): " + msg);
-		riurik.trigger( "error", [msg, url, line] );
+		riurik.trigger( "error", msg, url, line );
 		return true;
 	};
 
@@ -25,8 +25,11 @@
 		}
 	};
 
+	riurik.ajaxError = ajaxError;
+	riurik.wrapErrorHandler = wrapErrorHandler;
+	riurik.onErrorHandler = onErrorHandler;
 	$(function() {
 		window.onerror = wrapErrorHandler(window.onerror, onErrorHandler);
-		$(document).ajaxError( ajaxError );
+		$(document).ajaxError( riurik.ajaxError );
 	});
 })();

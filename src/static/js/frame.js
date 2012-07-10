@@ -24,7 +24,7 @@
 			$('#frame').unbind('load');
 			$('#frame').load(function() {
 				var __frame = window.frames[0];
-				__frame.window.onerror = wrapErrorHandler( __frame.window.onerror, onErrorHandler );
+				__frame.window.onerror = riurik.wrapErrorHandler( __frame.window.onerror, riurik.onErrorHandler );
 
 				if( ! __frame.window.jQuery ) {
 					// inject one
@@ -36,11 +36,14 @@
 					d.head.appendChild(j);
 				}
 
-				$.wait( function () { return typeof __frame.window.jQuery != 'undefined'; } , 5*1000)
-				.then(function(){
+				$.waitFor.condition( 
+					function () { return typeof __frame.window.jQuery != 'undefined'; } ,
+					5*1000
+				).then(function(){
 					window._$ = __frame.window.jQuery;
 					if( __frame.window.jQuery ) {
-						jQExtend(__frame.window.jQuery);
+						//jQExtend(__frame.window.jQuery);
+						__frame.window.jQuery.extend(riurik.exports);
 					} else {
 						QUnit.ok(false, 'there is no JQuery and it\'s not injected');
 					}

@@ -6,6 +6,17 @@ riurik.exports = {}
 
 jQuery.extend(true, riurik, riurikldr);
 
+riurik.trigger = function(event){
+	var args = $.makeArray( arguments );
+	console.log( 'riurik.trigger', event, 'with args:', args.slice(1) );
+	$(riurik).trigger.apply( $(riurik) , args );
+};
+
+riurik.on = function( event, handler ){
+	console.log( 'riurik.on', event, 'registering', handler );
+	$(riurik).on.apply( $( riurik ), arguments );
+}
+
 /* TODO:
  * these two methods are just for testability
  * because I was not able to mock the window object
@@ -19,12 +30,25 @@ riurik.getContext = function() {
 	return context;
 }
 
-riurik.init = function() {
+riurik.on( "riurik.engine.loaded", function(){
+	/* Wait until DOM.ready and init Ruirik */
+	$(function() {
+		riurik.init();
+	});
+});
 
+riurik.on( "riurik.inited", function(){
+	riurik.load_tests();
+});
+
+riurik.init = function() {
+	riurik.trigger( "riurik.initing" );
 	/* Riurik relies on QUnit, so it should be preliminary loaded */
-	if (!riurik.getQUnit()) {
-		alert('QUnit should be preliminary loaded');
-	}
+	//if (!riurik.getQUnit()) {
+	//	alert('QUnit should be preliminary loaded');
+	//}
+	$("#tabs").tabs();
+	riurik.context = clone(context);
 
 	/* context is object that holds environment for tests, so it should be preliminary loaded */
 	if (!riurik.getContext()) {
@@ -32,19 +56,44 @@ riurik.init = function() {
 		return;
 	}
 
-	riurik.exports.waitFor = new riurik.Waits(context.timeout);
 
-	riurik.QUnit = {};
-	riurik.QUnit.current = { 'module': {}, 'test': {} };
-	riurik.QUnit.status = 'started';
+	riurik.trigger( "riurik.inited" );
+}
 
-	$.extend(riurik.exports);
+riurik.load_tests = function(){
+	riurik.trigger( "riurik.tests.loading" );
+	var l = riurikldr.loader();
+	$.each(context.libraries || [],function(i,url){
+		l.queue( '/' + url, function(){ 
+			riurik.trigger("riurik.tests.library.loaded", '/'+url);
+		});
+ 	});
+	
+	if ( /\.js$/.test(riurikldr.args.path) ) {
+		l.queue(riurikldr.args.path, function(){ 
+			riurik.trigger("riurik.tests.test.loaded", riurikldr.args.path);
+		});
+	} else {
+		if(typeof context.suite_setup != 'undefined'){
+			l.queue( riurikldr.args.cwd + '/' + context.suite_setup, function(){ 
+				riurik.trigger("riurik.tests.suite_setup.loaded", riurikldr.args.cwd+'/'+context.suite_setup);
+			});
+		}
+		$.each(context.include || [],function(i,url){
+			l.queue( riurikldr.args.cwd + '/' + url, function(){
+				riurik.trigger("riurik.tests.include.loaded", riurikldr.args.cwd+'/'+url);
+			});
+		});
+	};
+	l.then(function(){
+		riurik.trigger( "riurik.tests.loaded" );
+	});
 }
 
 riurik.util = {}
 
 riurik.util.log = function() {
-	QUnit.log(arguments);
+	riurik.log(arguments);
 }	
 
 riurik.util.strip = function(s, c) {
@@ -88,11 +137,13 @@ jQuery.extend(riurik.exports, riurik.util);
 riurik.matchers = {}
 
 riurik.matchers.pass = function(message) {
-	QUnit.ok(true, message || '');
+	riurik.trigger("riurik.engine.assert_ok", [true, message || '']);
+	//QUnit.ok(true, message || '');
 };
 
 riurik.matchers.fail = function(message) {
-	QUnit.ok(false, message || '');
+	riurik.trigger("riurik.engine.assert_ok", [false, message || '']);
+	//QUnit.ok(false, message || '');
 };
 
 riurik.matchers.substring = function(actual, expected, message) {
@@ -242,6 +293,10 @@ riurik.Waits.prototype.done = function(callback) {
 riurik.Waits.prototype.fail = function(callback) {
 	return this.promise.fail(callback);
 };
+
+riurik.exports.waitFor = new riurik.Waits(context.timeout);
+
+$.extend(riurik.exports);
 
 
 riurik.__log_storage = new Array(); // storage for riurik.log messages
