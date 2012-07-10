@@ -7,9 +7,9 @@ riurik.exports = {}
 jQuery.extend(true, riurik, riurikldr);
 
 riurik.trigger = function(event){
-	var args = $.makeArray( arguments );
-	console.log( 'riurik.trigger', event, 'with args:', args.slice(1) );
-	$(riurik).trigger.call( $(riurik) , args );
+	var args = $.makeArray( arguments ).slice(1);
+	console.log( 'riurik.trigger', event, 'with args:', args );
+	$(riurik).trigger.apply( $(riurik) , [event, args] );
 };
 
 riurik.on = function( event, handler ){
