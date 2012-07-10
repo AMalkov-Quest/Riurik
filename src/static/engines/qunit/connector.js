@@ -1,16 +1,16 @@
 riurik.engine.init = function( next ){
 	riurik.trigger( "riurik.engine.initing" );
 	
-	$('#engine').load('/static/engines/qunit/qunit.html', function(){
-		riurikldr.loader()
-		.queue('/static/engines/qunit/qunit.js')
-		.queue('/static/engines/qunit/qunit.extentions.js')
-		.then(function() {
-			connect()
-			riurik.trigger( "riurik.engine.inited" );
-			next()
-		});
+	riurikldr.loader()
+	.queue('/static/engines/qunit/qunit.html.js')
+	.queue('/static/engines/qunit/qunit.js')
+	.queue('/static/engines/qunit/qunit.extentions.js')
+	.then(function() {
+		connect()
+		riurik.trigger( "riurik.engine.inited" );
+		next()
 	});
+
 	load_remote_style('/static/engines/qunit/qunit.css');
 };
 
