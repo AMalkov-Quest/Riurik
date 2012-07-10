@@ -1,15 +1,3 @@
-#######################################################################################
-#Copyright (C) 2008 Quest Software, Inc.
-#File:		manage.py
-#Version:       1.0.0.0
-
-#######################################################################################
-#
-#       THIS CODE AND INFORMATION IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND,
-#       EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED
-#       WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A PARTICULAR PURPOSE.
-#
-########################################################################################
 import os, sys
 current_dir = os.path.dirname(os.path.abspath(__file__))
 product_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
