@@ -3,7 +3,7 @@
 {% load json_tags %}
 <head>
 	<title>{{path}}</title>
-	<link type="text/css" rel="stylesheet" href="/static/css/qunit.css">
+	<link type="text/css" rel="stylesheet" href="/static/engines/qunit/qunit.css">
 	<script type="text/javascript" src="/static/js/jquery.min.js"></script>
 	<script type="text/javascript">
 	$(function(){
@@ -16,12 +16,6 @@
 <body>
 	<h1 id="qunit-header">Riurik - <a href="/{{path}}">/{{path}}</a> at {{date}}</h1>
 	<h2 id="qunit-banner" class="qunit-pass"></h2>
-	<p id="qunit-testresult" class="result">
-		Tests completed in 10946 milliseconds.<br>
-		<span class="passed">10</span> tests 
-		of <span class="total">10</span> passed, 
-		<span class="failed">0</span> failed.
-	</p>
 	<ol id="qunit-tests">
 	{% for test in tests_list %}
 	{{test.html|unqoute}}
