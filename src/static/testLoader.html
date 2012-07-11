@@ -11,9 +11,15 @@
 			riurikldr.src.jquery = '/static/js/jquery.min.js';
 			riurikldr.src.bootstrap = '/static/js/bootstrap.js';
 
-			riurikldr.GetArgument = function( name ) {
+			riurikldr.TryGetArgument = function( name ) {
 				var arg = (new RegExp( name + '=([^&$]+)' )).exec(window.location.href);
 				if ( arg ) return arg[1];
+				return null;
+			};
+
+			riurikldr.GetArgument = function( name ) {
+				var arg = riurikldr.TryGetArgument(name);
+				if ( arg ) return arg;
 				else alert('Can not find argument ' + name);
 			};
 
