@@ -65,7 +65,8 @@ riurikldr.loader().queue('/static/js/jquery.min.js', function(){
 	.queue('/static/js/frame.js')
 	.queue('/static/js/errors.js')
 	.then(function() {
-		var engine = 'qunit';
+		//var engine = 'qunit';
+		var engine = 'cucumber';
 		riurik.load_test_engine( engine );
 	});
 
