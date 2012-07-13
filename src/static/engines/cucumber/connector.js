@@ -69,6 +69,7 @@ riurik.CucumberHTMLListener = function($root) {
 					var errorMessage = error.stack || error;
 					result = {status: 'failed', error_message: errorMessage};
 				}
+				riurik.log( result );
 				formatter.match({uri:'report.feature', step: {line: currentStep.getLine()}});
 				formatter.result(result);
 				break;
@@ -124,7 +125,7 @@ function RunCucumber() {
 		_ref1 = riurik.stepDefinitions;
 		for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
 			stepDefinition = _ref1[_j];
-			console.log( stepDefinition, this.defineStep );	
+			console.log( stepDefinition, this.defineStep );
 			this.defineStep.apply(this.defineStep, stepDefinition);
 		}
 		console.log( '!!!', this )
@@ -134,7 +135,7 @@ function RunCucumber() {
 
 	var Cucumber				= require('./cucumber');
 
-	//console.log( _Spec, _Feature, riurik.worldDefinitions, riurik.stepDefinitions );
+	console.log( _Spec, _Feature, riurik.worldDefinitions, riurik.stepDefinitions );
 
 	var cucumber				= Cucumber(_Spec, _Feature);
 	var $output					= $('#engine');
