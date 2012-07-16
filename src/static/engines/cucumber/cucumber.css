@@ -44,12 +44,12 @@
   background-color: #C0C0C0;
 }
 
-#engine .passed {
-  background-color: #C5D88A;
+#engine .step, #engine .undefined, #engine .pending {
+  background-color: #EAEC2D;
 }
 
-#engine .undefined, #engine .pending {
-  background-color: #EAEC2D;
+#engine .passed {
+  background-color: #C5D88A;
 }
 
 #engine .skipped {
