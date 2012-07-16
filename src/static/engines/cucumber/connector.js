@@ -29,6 +29,7 @@ riurik.CucumberHTMLListener = function($root) {
 	var self = {
 		hear: function hear(event, callback) {
 			var eventName = event.getName();
+			console.log( 'HEAR hook', eventName, event )
 			switch (eventName) {
 			case 'BeforeFeature':
 				var feature = event.getPayloadItem('feature');
@@ -38,6 +39,12 @@ riurik.CucumberHTMLListener = function($root) {
 					line				: feature.getLine(),
 					description : feature.getDescription()
 				});
+				riurik.trigger("riurik.tests.suite.start", feature.getName());
+				break;
+
+			case 'AfterFeature':
+				var feature = event.getPayloadItem('feature');
+				riurik.trigger("riurik.tests.suite.done", feature.getName());
 				break;
 
 			case 'BeforeScenario':
@@ -52,7 +59,18 @@ riurik.CucumberHTMLListener = function($root) {
 
 			case 'BeforeStep':
 				var step = event.getPayloadItem('step');
+				riurik.trigger("riurik.tests.test.start", step.getName());
+				riurik.cucumber.total = 0;
+				riurik.cucumber.passed = 0;
+				riurik.cucumber.failed = 0;
 				self.handleAnyStep(step);
+				break;
+
+			case 'AfterStep':
+				var step = event.getPayloadItem('step');
+				console.log(step)
+				var stat = riurik.cucumber;
+				riurik.trigger("riurik.tests.test.done", step.getName(), stat.passed, stat.failed, stat.total);
 				break;
 
 			case 'StepResult':
@@ -89,6 +107,50 @@ riurik.CucumberHTMLListener = function($root) {
 	return self;
 };
 
+riurik.matchers.pass = function(message) {
+	riurik.log( 'pass: ' + message )
+	riurik.cucumber.total += 1;
+	riurik.cucumber.passed += 1;
+};
+
+riurik.matchers.fail = function(message) {
+	riurik.log( 'fail: ' + message )
+	riurik.cucumber.total += 1;
+	riurik.cucumber.failed += 1;
+	riurik.cucumber.next.fail( message );
+};
+
+riurik.matchers.substring = function(actual, expected, message) {
+	actual = actual.replace(/\xA0/g, ' ');
+	expected = expected.replace(/\xA0/g, ' ');
+
+	var i = actual.indexOf(expected);
+	if( i >= 0 ) {
+		actual = actual.substring(i, i + expected.length);
+	}
+
+	if (! i >= 0 ) {
+		riurik.matchers.fail( "'"+message+"'" + ": expected '"+expected+"', but actual '"+actual+"'");
+	} else {
+		riurik.matchers.pass( message );
+	}
+};
+
+window.ok = function( result, message ) {
+	if ( result ) {
+		riurik.matchers.pass( message );
+	} else {
+		riurik.matchers.fail( message );
+	}
+}
+
+window.equal = function( actual, expected, message ) {
+	if ( actual === expected ) {
+		riurik.matchers.pass( message );
+	} else {
+		riurik.matchers.fail( "'"+message+"'"+ ": expected '"+expected+"', but actual '"+actual+"'" );
+	}
+}
 riurik.World = function(callback){
 	$.extend(this, context);
 	callback();
@@ -110,6 +172,10 @@ var World = function( doF ){
 	riurik.worldDefinitions.push( doF );
 }
 
+riurik.reporter.getHtmlTestResults = function(){
+	return '<p>Not implemented</p>';
+}
+
 function RunCucumber() {
 	var _Feature = function(){
 		this.World = riurik.World;
@@ -126,7 +192,16 @@ function RunCucumber() {
 		for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
 			stepDefinition = _ref1[_j];
 			console.log( stepDefinition, this.defineStep );
-			this.defineStep.apply(this.defineStep, stepDefinition);
+			function successExtraction( stepCallback ) {
+				return function stepCallbackProxy() {
+					var stepCallbackArgs = $.makeArray( arguments );
+					riurik.cucumber.next = stepCallbackArgs[ stepCallbackArgs.length - 1 ];
+					stepCallback.apply(this, stepCallbackArgs);
+				}
+			}
+			var _regexp = stepDefinition[0];
+			var _fn = successExtraction( stepDefinition[1] );
+			this.defineStep.apply(this.defineStep, [_regexp, _fn]);
 		}
 		console.log( '!!!', this )
 	};
