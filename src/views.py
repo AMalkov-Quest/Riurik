@@ -357,7 +357,12 @@ def runSuite(request, fullpath):
 	log.info('target of suite %s is %s' % (clean_path, target))
 
 	saveLocalContext(fullpath, contextjs)
-	url = "http://%s/%s?server=%s&path=/%s" % ( target, settings.EXEC_TESTS_CMD, server, path )
+
+	engine = 'qunit'
+	if cucumber(ctx):
+		engine = 'cucumber'
+
+	url = "http://%s/%s?server=%s&engine=%s&path=/%s" % ( target, settings.EXEC_TESTS_CMD, server, engine, path )
 	log.info("redirect to run suite %s" % url)
 	return HttpResponseRedirect( url )
 
