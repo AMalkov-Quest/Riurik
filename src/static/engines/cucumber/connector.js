@@ -118,6 +118,7 @@ riurik.matchers.fail = function(message) {
 	riurik.cucumber.total += 1;
 	riurik.cucumber.failed += 1;
 	riurik.cucumber.next.fail( message );
+	riurik.cucumber.next = function(){};
 };
 
 riurik.matchers.substring = function(actual, expected, message) {
@@ -176,6 +177,8 @@ riurik.reporter.getHtmlTestResults = function(){
 	return '<p>Not implemented</p>';
 }
 
+riurik.reporter.engine = 'cucumber';
+
 function RunCucumber() {
 	var _Feature = function(){
 		this.World = riurik.World;
@@ -196,7 +199,12 @@ function RunCucumber() {
 				return function stepCallbackProxy() {
 					var stepCallbackArgs = $.makeArray( arguments );
 					riurik.cucumber.next = stepCallbackArgs[ stepCallbackArgs.length - 1 ];
-					stepCallback.apply(this, stepCallbackArgs);
+					var newArgs = stepCallbackArgs.slice(0, stepCallbackArgs.length-1);
+					newArgs.push(function(){
+						riurik.matchers.pass( 'test passed successfuly' );
+						riurik.cucumber.next();
+					});
+					stepCallback.apply(this, newArgs);
 				}
 			}
 			var _regexp = stepDefinition[0];

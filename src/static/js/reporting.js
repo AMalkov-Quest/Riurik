@@ -9,6 +9,7 @@ riurik.reporter.suiteStarted = null;
 riurik.reporter.testStarted = null;
 riurik.reporter.suite = null;
 riurik.reporter.test = null;
+riurik.reporter.engine = '';
 
 riurik.reporter.queue = new Array();
 
@@ -22,10 +23,20 @@ riurik.reporter.begin = function () {
 
 riurik.reporter.done = function () {
 	console.log('tests are done')
-	var message = { 
+	
+	var html = $('#engine').html();
+	$.each( riurik.reporter.tochunks(2000, html), function(i, chunk){
+		riurik.reporter.queue.push({
+			'event': 'html',
+			'testId': riurik.reporter.testNum,
+			'chunkId': i,
+			'html': chunk
+		});
+	});
+
+	riurik.reporter.queue.push({ 
 		'event': 'done'
-	};
-	riurik.reporter.queue.push(message);
+	});
 };
 
 riurik.reporter.suiteStart = function(e, suite) {
@@ -54,10 +65,11 @@ riurik.reporter.testDone = function(e, name, passed, failed, total) {
 		'failed': failed,
 		'passed': passed,
 		'total': total,
-		'duration': riurik.reporter.getTestDuration()
+		'duration': riurik.reporter.getTestDuration(),
+		'engine': riurik.reporter.engine
 	});
 	
-	var html = riurik.reporter.getHtmlTestResults();
+	/*var html = riurik.reporter.getHtmlTestResults();
 	$.each( riurik.reporter.tochunks(2000, html), function(i, chunk){
 		riurik.reporter.queue.push({
 			'event': 'html',
@@ -65,7 +77,7 @@ riurik.reporter.testDone = function(e, name, passed, failed, total) {
 			'chunkId': i,
 			'html': chunk
 		});
-	});
+	});*/
 	riurik.reporter.test = null;
 };
 
