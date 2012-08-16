@@ -10,13 +10,12 @@ sudo apt-get install -y python-pip
 sudo pip install Django
 
 # install nodejs
-#sudo apt-get install -y python-software-properties
-#sudo add-apt-repository ppa:chris-lea/node.js
-#sudo apt-get update
 #sudo apt-get install -y nodejs npm
 
 # install CoffeeScript
-#sudo npm install -g coffee-script
+# if you have proxy
+# sudo npm config set registry  http://registry.npmjs.org
+sudo npm install -g coffee-script
 
 # checkout production code
 git clone git@github.com:andrew-malkov/SASP.git SASPHunter
