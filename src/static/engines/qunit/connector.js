@@ -49,6 +49,8 @@ riurik.on("riurik.engine.loaded", function(){
 	}
 });
 
+riurik.reporter.engine = 'qunit';
+
 connect = function() {
 	QUnit.config.autostart = false;
 	QUnit.config.autorun = false;

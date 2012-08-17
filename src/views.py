@@ -111,8 +111,11 @@ def serve(request, path, show_indexes=False):
 				url = reporting.getTestResultsUrl(path, context, date, request)
 				result = { 'url': url, 'data': tests_list }
 				return HttpResponse(json.dumps(result))
-
-			return _render_to_response('history.html', locals())
+			
+			for test in tests_list:
+				engine = test.get('engine', 'qunit')
+				break
+			return _render_to_response('history_%s.html' % engine, locals())
 
 		if request.path and request.path[-1:] != '/':
 			return HttpResponseRedirect(request.path + '/')

@@ -12,7 +12,7 @@ Feature: Simple maths
   Scenario: much more complex stuff
     Given a variable set to 100
     When I increment the variable by 6
-    Then the variable should contain 106
+    Then the variable should contain 1061
 '''
 
 World ->
@@ -29,7 +29,5 @@ When /^I increment the variable by (\d+)$/, (number, callback)->
 
 
 Then /^the variable should contain (\d+)$/, (number, callback)->
-  if @variable != parseInt(number)
-    callback.fail new Error("Variable should contain #{number} but it contains #{@variable}.")
-  else
-    callback()
+  equal @variable, parseInt(number), "Variable should contain #{number} but it contains #{@variable}."
+  callback()

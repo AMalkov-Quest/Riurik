@@ -1,0 +1,20 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+{% load json_tags %}
+<head>
+	<title>{{path}}</title>
+	<link type="text/css" rel="stylesheet" href="/static/engines/cucumber/cucumber.css">
+	<script type="text/javascript" src="/static/js/jquery.min.js"></script>
+	<script type="text/javascript">
+	</script>
+</head>
+<body>
+	<h1 id="qunit-header">Riurik - <a href="/{{path}}">/{{path}}</a> at {{date}}</h1>
+	<h2 id="qunit-banner" class="qunit-pass"></h2>
+	<div id="engine">
+	{% for test in tests_list %}
+	{{test.html|unqoute}}
+	{% endfor %}
+	</div>
+</body>
+</html>
