@@ -56,7 +56,10 @@
 
 		load: function() {
 			var dfd = $.Deferred();
+			riurik.log("Frame loading awaiting...")
+			$('#frame').unbind('load');
 			$('#frame').load(function() {
+				riurik.log("Frame loaded.")
 				dfd.resolve(window.frames[0].window.jQuery);
 			});
 
