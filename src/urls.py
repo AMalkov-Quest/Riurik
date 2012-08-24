@@ -34,6 +34,7 @@ urlpatterns = patterns('',
 
 urlpatterns += patterns('',
 	(r'^search', include('plugins.search.urls')),
+	(r'^cloud', include('plugins.auth.urls')),
 )
 
 urlpatterns += patterns('',
