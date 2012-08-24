@@ -1,6 +1,6 @@
 #######################################################################################
 # Django settings for web_reports project.
-import os, sys, platform
+import os, sys, platform, socket
 
 working_dir = os.path.dirname(os.path.abspath(__file__))
 root = os.path.normpath(os.path.dirname(working_dir))
@@ -85,6 +85,7 @@ ROOT_URLCONF = 'urls'
 TEMPLATE_DIRS = (
 
     os.path.join(os.path.dirname( __file__ ), 'templates'),
+    os.path.join(os.path.dirname( __file__ ), 'auth', 'templates'),
 )
 
 TEMPLATE_CONTEXT_PROCESSORS = (
