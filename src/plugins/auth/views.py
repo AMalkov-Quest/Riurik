@@ -5,5 +5,5 @@ from github import Github
 def default(request):
 	git = Github('Riurik', 'riurik862879')
 	user = git.get_user()
-
-	return _render_to_response('github.html')
+	keys = user.get_keys()
+	return _render_to_response('github.html', locals())

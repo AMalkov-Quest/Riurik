@@ -9,6 +9,10 @@
 
 <body>
 	<H>{{user.login}}</H>
+	{% for key in keys %}
+		<br>
+		{{ key.key }}
+	{% endfor %}
 </body>
 
 </html>
