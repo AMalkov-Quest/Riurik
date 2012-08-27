@@ -9,9 +9,9 @@
 
 <body>
 	<H>{{user.login}}</H>
-	{% for key in keys %}
+	{% for repo in repos %}
 		<br>
-		{{ key.key }}
+		{{ repo.name }}
 	{% endfor %}
 </body>
 
