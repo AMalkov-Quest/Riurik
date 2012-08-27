@@ -3,6 +3,7 @@
 from django.shortcuts import render_to_response as _render_to_response
 from django.conf import settings
 import httplib, urllib, json
+from github import Github
 
 GITHUB_OAUTH_CLIENTID = 'c957aefa0b92f6841803' 
 GITHUB_OAUTH_AUTHORIZE = 'https://github.com/login/oauth/authorize'
@@ -20,7 +21,7 @@ def login(req):
 	code = req.GET.get('code')
 	state = req.GET.get('state')
 	
-	params = urllib.urlencode({ 
+	params = urllib.urlencode({
 		'code': code.encode('utf-8'),
 		'client_id': GITHUB_OAUTH_CLIENTID,
 		'state': state.encode('utf-8'),
@@ -29,8 +30,14 @@ def login(req):
 	conn = httplib.HTTPSConnection(host='github.com')
 	conn.request('POST', GITHUB_OAUTH_ACCESS_TOKEN, params, { 'Accept': 'application/json' })
 	resp = conn.getresponse()
-	token = resp.read()
+	token = json.loads(resp.read())
 
-	req.session['token'] = token	
+	req.session['token'] = token['access_token']
 
 	return _render_to_response("login.html", locals())
+
+def github_test(req):
+	git = Github( req.session['token'] )
+	user = git.get_user()
+	git = user.login
+	return _render_to_response("test.html", locals())

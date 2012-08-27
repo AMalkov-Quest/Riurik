@@ -32,6 +32,7 @@ urlpatterns = patterns('',
 	(r'^report/progress$', 'views.tests_progress'),
 	(r'^signin[/]?$', 'auth.views.signin'),
 	(r'^login[/]?$', 'auth.views.login'),
+	(r'^gh[/]?$', 'auth.views.github_test')
 
 )
 
