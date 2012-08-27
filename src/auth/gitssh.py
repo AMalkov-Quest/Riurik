@@ -31,7 +31,13 @@ class GitSSH(object):
 			'GIT_IDENTITY_FILE': self.privateFile,
 			'GIT_SSH': git_ssh_cmd
 		})
-		self.proc = subprocess.Popen( params, cwd=self.repository, env=env )
+		self.proc = subprocess.Popen(
+			params,
+			cwd=self.repository,
+			env=env,
+			stdout=subprocess.PIPE,
+			stderr=subprocess.PIPE
+		)
 		out, err = self.proc.communicate( input=input )
 		code = self.proc.returncode
 		return out, err, code
