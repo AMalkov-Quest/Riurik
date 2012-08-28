@@ -3,14 +3,24 @@ from django.http import HttpResponse
 from django.shortcuts import render_to_response as _render_to_response
 from github import Github
 
+repo_title = 'Repo added through Riurik Framework'
 key_title = 'Key added through Riurik Framework'
 
 def default(request):
 	git = Github('Riurik', 'riurik862879')
 	user = git.get_user()
-	ssh_key_gen(user)
-	#keys = get_keys(user)
+	
+	keys = get_keys(user)
 	repos = get_repos(user)
+	if not repos:
+		print 'create repo'
+		repo = user.create_repo('test-repo-2', repo_title)
+		print 'gen key'
+		key = ssh_key_gen(user)
+		if key:
+			print 'create key'
+			repo.create_key(key_title, key)
+
 	return _render_to_response('github.html', locals())
 
 def get_keys(user):
@@ -21,7 +31,7 @@ def get_repos(user):
 	repos = []
 	for repo in  user.get_repos():
 		for key in repo.get_keys():
-			if key_title == key.title:
+			if key_title == key.title and repo.description == repo_title:
 				repos.append(repo)
 
 	return repos
