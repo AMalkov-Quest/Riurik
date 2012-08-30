@@ -9,6 +9,10 @@
 
 <body>
 	<H>{{user.login}}</H>
+	{% for repo in repos %}
+		<br>
+		{{ repo.name }}
+	{% endfor %}
 </body>
 
 </html>
