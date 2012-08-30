@@ -1,6 +1,7 @@
 # coding: utf-8
 
 from django.shortcuts import render_to_response as _render_to_response
+from django.http import HttpResponseRedirect
 from django.conf import settings
 import httplib, urllib, json
 from github import Github
@@ -34,7 +35,7 @@ def login(req):
 
 	req.session['token'] = token['access_token']
 
-	return _render_to_response("login.html", locals())
+	return HttpResponseRedirect('/') #_render_to_response("login.html", locals())
 
 def github_test(req):
 	git = Github( req.session['token'] )
