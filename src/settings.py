@@ -78,6 +78,7 @@ CACHE_MIDDLEWARE_SECONDS = 600
 
 MIDDLEWARE_CLASSES = (
 	'django.contrib.sessions.middleware.SessionMiddleware',
+	'src.auth.middleware.GitHubAuth',
 )
 
 ROOT_URLCONF = 'urls'
