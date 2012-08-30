@@ -1,7 +1,9 @@
 {% extends 'directory-index.html' %}
 
-{% block title %}<h1>Login</h1>{% endblock %}
+{% block title %}<h1>Login</h1>ee{% endblock %}
 
 {% block content %}
-	{{GET}}
+	{{params}}
+	<hr>
+	{{token}}
 {% endblock %}

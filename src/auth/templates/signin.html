@@ -5,7 +5,7 @@
 {% block content %}
 	<form method="GET" action="{{GITHUB_OAUTH_AUTHORIZE}}">
 		<input type="hidden" value="{{GITHUB_OAUTH_CLIENTID}}" name="client_id">
-		<input type="hidden" value="{{RIURIK_URL}}login" name="redirect_uri">
+		<input type="hidden" value="{{RIURIK_URL}}" name="redirect_uri">
 		<button name="__submit__">Login with GitHub »</button>
 	</form>	
 {% endblock %}
