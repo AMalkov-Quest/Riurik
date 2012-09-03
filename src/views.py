@@ -92,7 +92,13 @@ def serve(request, path, show_indexes=False):
 	return serve_def(request, path, show_indexes)
 
 def serve_auth(request, path, show_indexes=False):
-	pass
+	from github import Github
+	import auth.gitware as gitware
+	gh = Github(request.session.get('token'))
+	user = gh.get_user()
+	#repos = gitware.get_repos(user)
+	repos = user.get_repos()
+	return _render_to_response('github.html', locals())
 
 def serve_def(request, path, show_indexes=False):
 	document_root = contrib.get_document_root(path)

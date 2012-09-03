@@ -1,6 +1,6 @@
 .header {
 	background: url(/static/img/head_bg.png);
-	height: 100px;
+	height: 30px;
 	width: 100%;
 }
 
@@ -51,7 +51,7 @@ a.logo {
 	float: left;
 	font-family: arial, serif;
 	font-size: 16px;
-	padding: 29px 0px 0px 121px;
+	padding: 6px 0px 0px 121px;
 }
 
 .content {
