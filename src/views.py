@@ -85,8 +85,16 @@ def show_context(request, path):
 
 	return HttpResponse(result)
 
-
 def serve(request, path, show_indexes=False):
+	if request.session.get('token'):
+		return serve_auth(request, path, show_indexes)
+
+	return serve_def(request, path, show_indexes)
+
+def serve_auth(request, path, show_indexes=False):
+	pass
+
+def serve_def(request, path, show_indexes=False):
 	document_root = contrib.get_document_root(path)
 	fullpath = contrib.get_full_path(document_root, path)
 	log.debug('show index of %s(%s %s)' % (fullpath, document_root, path))
