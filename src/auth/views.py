@@ -6,10 +6,10 @@ from django.conf import settings
 import httplib, urllib, json
 from github import Github
 
-GITHUB_OAUTH_CLIENTID = 'c957aefa0b92f6841803' 
+GITHUB_OAUTH_CLIENTID = 'cea1f31118f8468d79d8' 
 GITHUB_OAUTH_AUTHORIZE = 'https://github.com/login/oauth/authorize'
 GITHUB_OAUTH_ACCESS_TOKEN = 'https://github.com/login/oauth/access_token'
-GITHUB_OAUTH_SECRET = '1358b65fea47dfed49e2ad60e257a6352ec0d65d'
+GITHUB_OAUTH_SECRET = 'ebac30752e5a75df37d8386d192ac4bcabdc7546'
 
 def signin(req):
 	variables = { 'RIURIK_URL': 'http://'+req.META['HTTP_HOST']+'/login' }
