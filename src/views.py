@@ -97,6 +97,8 @@ def serve_auth(request, path, show_indexes=False):
 	gh = Github(request.session.get('token'))
 	user = gh.get_user()
 	repos = gitware.get_repos(user)
+	if repos:
+		gitware.ensure_deploy_key(user, repos[0])
 	return _render_to_response('github.html', locals())
 
 def serve_def(request, path, show_indexes=False):
