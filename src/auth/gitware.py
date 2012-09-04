@@ -21,14 +21,18 @@ def default(request):
 
 	return _render_to_response('github.html', locals())
 
-def get_keys(user):
-	keys = user.get_keys()
+def get_keys(obj):
+	try:
+		keys = obj.get_keys()
+	except Exception, e:
+		return []
+
 	return keys
 
 def get_repos(user):
 	repos = []
-	for repo in  user.get_repos():
-		for key in repo.get_keys():
+	for repo in user.get_repos():
+		for key in get_keys(repo):
 			if key_title == key.title and repo.description == repo_title:
 				repos.append(repo)
 

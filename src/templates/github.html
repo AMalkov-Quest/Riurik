@@ -8,11 +8,12 @@
 </head>
 
 <body>
-	<H>{{user.login}}</H>
+	<H>The <b>{{user.login}}</b> github user's repositories:</H>
+	<ul>
 	{% for repo in repos %}
-		<br>
-		{{ repo.name }}
+		<li>{{ repo.name }}</li>
 	{% endfor %}
+	</ul>
 </body>
 
 </html>

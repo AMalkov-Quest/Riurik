@@ -96,8 +96,7 @@ def serve_auth(request, path, show_indexes=False):
 	import auth.gitware as gitware
 	gh = Github(request.session.get('token'))
 	user = gh.get_user()
-	#repos = gitware.get_repos(user)
-	repos = user.get_repos()
+	repos = gitware.get_repos(user)
 	return _render_to_response('github.html', locals())
 
 def serve_def(request, path, show_indexes=False):
