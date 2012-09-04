@@ -32,6 +32,9 @@ def create_repo(user):
 def get_rsa_path(user):
 	return '%s/.ssh/%s_rsa' % (os.getenv('HOME'), user.login)
 
+def get_rsa_pub_path(user):
+	return '%s.pub' % get_rsa_path(user)
+
 def download_deploy_key(user, repo):
 	key = get_deploy_key(repo)
 	rsa_path = get_rsa_path(user)
@@ -48,6 +51,14 @@ def ensure_deploy_key(user, repo):
 			old_key = get_deploy_key(repo)
 			old_key.delete()
 			repo.create_key(key_title, new_key)
+
+def init_repo(user, repo):
+	from gitssh import GitSSH
+	with GitSSH(os.getenv('HOME'), get_rsa_path(user), get_rsa_pub_path(user)) as call:
+		cmd = 'git clone %s %s-%s' % (repo.ssh_url, user.login, repo.id)
+		print cmd
+		out, error, code = call(cmd)
+		print out, error, code
 
 def ssh_key_gen(user):
 	import shlex

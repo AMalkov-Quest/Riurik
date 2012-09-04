@@ -6,18 +6,16 @@ from django.conf import settings
 import httplib, urllib, json
 from github import Github
 
-GITHUB_OAUTH_CLIENTID = 'cea1f31118f8468d79d8' 
+GITHUB_OAUTH_CLIENTID = '26e2af67a56e633c8426' 
 GITHUB_OAUTH_AUTHORIZE = 'https://github.com/login/oauth/authorize'
 GITHUB_OAUTH_ACCESS_TOKEN = 'https://github.com/login/oauth/access_token'
-GITHUB_OAUTH_SECRET = 'ebac30752e5a75df37d8386d192ac4bcabdc7546'
+GITHUB_OAUTH_SECRET = '03d9bdc160d7364f31e5afefda6747658cdf12ab'
 
 def signin(req):
 	variables = { 'RIURIK_URL': 'http://'+req.META['HTTP_HOST']+'/login' }
 	variables.update(globals())
 	return _render_to_response("signin.html", variables)
 
-#import proxy
-#@proxy.use_proxy(host='localhost', port=3128)
 def login(req):
 	code = req.GET.get('code')
 	state = req.GET.get('state')

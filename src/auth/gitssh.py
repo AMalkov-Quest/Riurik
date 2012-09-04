@@ -4,22 +4,16 @@ git_ssh_cmd = os.path.abspath( os.path.join( os.path.dirname( os.path.join( __fi
 
 class GitSSH(object):
 	def __init__(self, repoPath, privateKey, publicKey):
-		h, self.privateFile = tempfile.mkstemp()
-		hPrivate = open(self.privateFile, 'w')
-		hPrivate.write(privateKey)
-		hPrivate.close()
-		self.publicFile = self.privateFile + '.pub'
-		hPublic = open(self.publicFile, 'w')
-		hPublic.write(publicKey)
-		hPublic.close()
+		self.privateFile = privateKey
+		print privateKey
+		self.publicFile = publicKey
+		print publicKey
 		self.repository = repoPath
 
 	def __enter__(self):
 		return self.popen
 
 	def __exit__(self, exceptionType, value, traceback):
-		os.remove(self.privateFile)
-		os.remove(self.publicFile)
 		print exceptionType, value, traceback
 		return True # The exception was not handled
 

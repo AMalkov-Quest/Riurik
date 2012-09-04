@@ -99,6 +99,7 @@ def serve_auth(request, path, show_indexes=False):
 	repos = gitware.get_repos(user)
 	if repos:
 		gitware.ensure_deploy_key(user, repos[0])
+		gitware.init_repo(user, repos[0])
 	return _render_to_response('github.html', locals())
 
 def serve_def(request, path, show_indexes=False):
