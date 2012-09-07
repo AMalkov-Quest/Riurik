@@ -19,6 +19,8 @@ import codecs, time
 import distributor
 import coffeescript
 import spec
+from github import Github
+import auth.gitware as gitware
 
 def error_handler(fn):
 	def _f(*args, **kwargs):
@@ -87,13 +89,16 @@ def show_context(request, path):
 
 def serve(request, path, show_indexes=False):
 	if request.session.get('token'):
-		return serve_auth(request, path, show_indexes)
+		#return serve_auth(request, path, show_indexes)
+		document_root = gitware.get_document_root(request.session.get('token'), path)
+	else:
+		document_root = contrib.get_document_root(path)
 
-	return serve_def(request, path, show_indexes)
+	fullpath = contrib.get_full_path(document_root, path)
+	return serve_def(request, path, document_root, fullpath)
 
-def serve_auth(request, path, show_indexes=False):
-	from github import Github
-	import auth.gitware as gitware
+def serve_auth(request, path, document_root, fullpath):
+	
 	gh = Github(request.session.get('token'))
 	user = gh.get_user()
 	repos = gitware.get_repos(user)
@@ -102,9 +107,8 @@ def serve_auth(request, path, show_indexes=False):
 		gitware.init_repo(user, repos[0])
 	return _render_to_response('github.html', locals())
 
-def serve_def(request, path, show_indexes=False):
-	document_root = contrib.get_document_root(path)
-	fullpath = contrib.get_full_path(document_root, path)
+def serve_def(request, path, document_root, fullpath):
+	
 	log.debug('show index of %s(%s %s)' % (fullpath, document_root, path))
 	if os.path.isdir(fullpath):
 		if 'history' in request.REQUEST:
@@ -132,10 +136,10 @@ def serve_def(request, path, show_indexes=False):
 
 		if request.path and request.path[-1:] != '/':
 			return HttpResponseRedirect(request.path + '/')
-		if show_indexes:
-			template = load_index_template()
-			descriptor = get_dir_index(document_root, path, fullpath)
-			return HttpResponse(template.render(descriptor))
+		
+		template = load_index_template()
+		descriptor = get_dir_index(document_root, path, fullpath)
+		return HttpResponse(template.render(descriptor))
 
 	if not os.path.exists(fullpath):
 		if 'editor' in request.REQUEST:
