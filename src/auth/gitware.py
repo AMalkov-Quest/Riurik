@@ -75,13 +75,19 @@ def get_pub_key(user):
 		return stdout.strip()
 
 def ensure_deploy_key(user, repo):
-	key = ensure_rsa_key(user)
-	if key:
+	key = get_rsa_key(user)
+	if not key:
+		key = ssh_key_gen(user)
 		old_key = get_deploy_key(repo)
 		if old_key:
 			old_key.delete()
 
 		repo.create_key(key_title, key)
+
+def get_rsa_key(user):
+	rsa_path = get_rsa_path(user)
+	if os.path.exists(rsa_path):
+		return get_pub_key(user)
 
 def ensure_rsa_key(user):
 	rsa_path = get_rsa_path(user)
@@ -118,18 +124,28 @@ def get_riurik_repo(user):
 	repos = get_repos(user)
 	if not repos:
 		repo = ensure_riurik_repo(user)
+		ensure_deploy_key(user, repo)
 	else:
 		repo = repos[0]
-
-	ensure_deploy_key(user, repo)
+	
 	init_repo(user, repo)
 
 	return repo
 
-def get_document_root(token, path):
+user = None
+repo = None
+
+def init_document_root(token):
+	global user
+	global repo
+
 	gh = Github(token)
 	user = gh.get_user()
 	repo = get_riurik_repo(user)
-	user_dir = get_user_dir(user.login, repo.id)
 
+def get_document_root():
+	global user
+	global repo
+
+	user_dir = get_user_dir(user.login, repo.id)
 	return get_full_path(user_dir)

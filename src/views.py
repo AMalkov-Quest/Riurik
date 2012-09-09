@@ -90,10 +90,9 @@ def show_context(request, path):
 def serve(request, path, show_indexes=False):
 	if request.session.get('token'):
 		#return serve_auth(request, path, show_indexes)
-		document_root = gitware.get_document_root(request.session.get('token'), path)
-	else:
-		document_root = contrib.get_document_root(path)
-
+		gitware.init_document_root(request.session.get('token'))
+		
+	document_root = contrib.get_document_root(path)
 	fullpath = contrib.get_full_path(document_root, path)
 	return serve_def(request, path, document_root, fullpath)
 
