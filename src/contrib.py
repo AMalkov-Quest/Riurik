@@ -183,7 +183,7 @@ def extend_virtual_paths(root, path, alias, virtual_paths):
 
 def get_virtual_paths():
 	"""
-	>>> virtual_paths.VIRTUAL_PATHS = {'key': 'value'}
+	>>> settings.virtual_paths.VIRTUAL_PATHS = {'key': 'value'}
 	>>> get_virtual_paths()
 	{'key': 'value'}
 	"""
@@ -388,7 +388,7 @@ def get_full_path(document_root, path):
 	"""
 	>>> import test
 	>>> test.stub('get_virtual_paths', returns={'tests-1': 'C:\\dir-1'})
-	>>> settings.VIRTUAL_PATHS['tests-1'] = 'C:\\dir-1'
+	>>> settings.virtual_paths.VIRTUAL_PATHS['tests-1'] = 'C:\\dir-1'
 	>>> get_full_path('/dir/dir-1', '')
 	'/dir/dir-1'
 	>>> get_full_path('/dir/dir-1', '/')
