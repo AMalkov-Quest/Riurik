@@ -132,20 +132,6 @@ def get_riurik_repo(user):
 
 	return repo
 
-user = None
-repo = None
-
-def init_document_root(token):
-	global user
-	global repo
-
-	gh = Github(token)
-	user = gh.get_user()
-	repo = get_riurik_repo(user)
-
-def get_document_root():
-	global user
-	global repo
-
+def get_document_root(user, repo):
 	user_dir = get_user_dir(user.login, repo.id)
 	return get_full_path(user_dir)

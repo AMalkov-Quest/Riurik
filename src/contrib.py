@@ -364,13 +364,6 @@ def get_virtual_root(path):
 			return key
 
 def get_document_root(path):
-	import auth.gitware as gitware
-	if gitware.user:
-		return gitware.get_document_root()
-	else:
-		return get_document_root_by_virtual(path)	
-
-def get_document_root_by_virtual(path):
 	"""
 	>>> import test
 	>>> test.stub('get_virtual_paths', returns={'some-key': 'some-value'})
