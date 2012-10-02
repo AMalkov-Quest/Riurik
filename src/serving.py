@@ -14,51 +14,49 @@ from auth import gitware
 def oAuth(request):
 	return request.session.get('token')
 
-def factory(request, path):
+def factory(request):
 	if oAuth(request):
-		return GitHandler(request, path)
+		return GitHandler(request)
 	else:
-		return DefaultHandler(request, path)
+		return DefaultHandler(request)
 
 def response(request, path):
-	handler = factory(request, path)
-	return handler.serve(request)
+	handler = factory(request)
+	return handler.serve(request, path)
 
 class BaseHandler:
 
-	def serve(self, request):
-		return serve_def(request, self.path, self.document_root, self.fullpath)
+	def serve(self, request, path):
+		document_root = self.get_document_root(path)
+		fullpath = self.get_full_path(path)
+
+		return serve_def(request, path, document_root, fullpath)
 
 class GitHandler(BaseHandler):
 
-	def __init__(self, request, path):
-		self.path = path
+	def __init__(self, request):
 		token = request.session.get('token')
 		ghub = gitware.Github(token)
 		self.user = ghub.get_user()
 		self.repo = gitware.get_riurik_repo(self.user)
 
-		self.document_root = self.get_document_root()
-		self.fullpath = self.get_full_path()
-
-	def get_document_root(self):
+	def get_document_root(self, path):
 		return gitware.get_document_root(self.user, self.repo)
 
-	def get_full_path(self):
-		return gitware.get_full_path(self.user, self.repo, self.path)
+	def get_full_path(self, path):
+		return gitware.get_full_path(self.user, self.repo, path)
 
 class DefaultHandler(BaseHandler):
 	
-	def __init__(self, request, path):
-		self.path = path
-		self.document_root = self.get_document_root()
-		self.fullpath = self.get_full_path()
+	def __init__(self, request):
+		pass
 
-	def get_document_root(self):
-		return contrib.get_document_root(self.path)
+	def get_document_root(self, path):
+		return contrib.get_document_root(path)
 
-	def get_full_path(self):
-		return contrib.get_full_path(self.document_root, self.path)
+	def get_full_path(self, path):
+		document_root = contrib.get_document_root(path)
+		return contrib.get_full_path(document_root, path)
 
 def serve_def(request, path, document_root, fullpath):
 	
