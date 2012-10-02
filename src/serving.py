@@ -29,8 +29,6 @@ class BaseHandler:
 	def serve(self, request):
 		return serve_def(request, self.path, self.document_root, self.fullpath)
 
-	
-
 class GitHandler(BaseHandler):
 
 	def __init__(self, request, path):
@@ -40,21 +38,27 @@ class GitHandler(BaseHandler):
 		self.user = ghub.get_user()
 		self.repo = gitware.get_riurik_repo(self.user)
 
-	def get_document_root(self, path):
+		self.document_root = self.get_document_root()
+		self.fullpath = self.get_full_path()
+
+	def get_document_root(self):
 		return gitware.get_document_root(self.user, self.repo)
+
+	def get_full_path(self):
+		return gitware.get_full_path(self.user, self.repo, self.path)
 
 class DefaultHandler(BaseHandler):
 	
 	def __init__(self, request, path):
 		self.path = path
-		self.document_root = self.get_document_root(path)
-		self.fullpath = self.get_full_path(path)
+		self.document_root = self.get_document_root()
+		self.fullpath = self.get_full_path()
 
-	def get_document_root(self, path):
-		return contrib.get_document_root(path)
+	def get_document_root(self):
+		return contrib.get_document_root(self.path)
 
-	def get_full_path(self, path):
-		return contrib.get_full_path(self.document_root, path)
+	def get_full_path(self):
+		return contrib.get_full_path(self.document_root, self.path)
 
 def serve_def(request, path, document_root, fullpath):
 	

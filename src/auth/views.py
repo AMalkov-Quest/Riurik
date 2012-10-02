@@ -23,7 +23,7 @@ def login(req):
 	params = urllib.urlencode({
 		'code': code.encode('utf-8'),
 		'client_id': GITHUB_OAUTH_CLIENTID,
-		'state': state.encode('utf-8'),
+		#'state': state.encode('utf-8'),
 		'client_secret': GITHUB_OAUTH_SECRET
 	})
 	conn = httplib.HTTPSConnection(host='github.com')

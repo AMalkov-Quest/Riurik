@@ -43,17 +43,11 @@ def get_user_dir(login, repo_id):
 def gen_repo_name(user):
 	return 'riurik-for-%s' % user.login
 
-def get_full_path(path=None):
-	if not path:
-		return os.getenv('HOME')
-
-	return os.path.join(os.getenv('HOME'), path)
-
 def init_repo(user, repo):
 	from gitssh import GitSSH
 	user_dir = get_user_dir(user.login, repo.id)
-	if not os.path.exists( get_full_path(user_dir) ):
-		with GitSSH(get_full_path(), get_rsa_path(user), get_rsa_pub_path(user)) as call:
+	if not os.path.exists( get_abspath(user_dir) ):
+		with GitSSH(get_abspath(), get_rsa_path(user), get_rsa_pub_path(user)) as call:
 			cmd = 'git clone %s %s' % (repo.ssh_url, user_dir)
 			out, error, code = call(cmd)
 
@@ -132,6 +126,17 @@ def get_riurik_repo(user):
 
 	return repo
 
+def get_abspath(path=None):
+	if not path:
+		return os.getenv('HOME')
+
+	return os.path.join(os.getenv('HOME'), path)
+
 def get_document_root(user, repo):
 	user_dir = get_user_dir(user.login, repo.id)
-	return get_full_path(user_dir)
+	return get_abspath(user_dir)
+
+def get_full_path(user, repo, path):
+	user_dir = get_user_dir(user.login, repo.id)
+	full_path = os.path.join(user_dir, path.strip('/'))
+	return get_abspath(full_path)
