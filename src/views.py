@@ -99,10 +99,10 @@ def add_fullpath(fn):
 	def patch(request):
 		path = get_path(request)
 		if path:
-			document_root = contrib.get_document_root(path)
-			full_path = contrib.get_full_path(document_root, path)
+			handler = serving.factory(request)
+			full_path = handler.get_full_path(path)
 			log.debug('add full path for %s path: %s , fullpath: %s' % (fn, path, full_path))
-			return fn(request, contrib.get_full_path(document_root, path))
+			return fn(request, full_path)
 		return fn(request)
 	return patch
 
