@@ -51,16 +51,20 @@ class BaseHandler:
 		files = []
 		dirs = []
 
+		def get_descriptor(title):
+			fullpath = os.path.join(path, title)
+			return { 'title': title, 'type': tools.get_type(contrib.get_full_path(document_root, fullpath)) }
+
 		if not document_root:
 			pagetype = 'front-page'
 			for key in contrib.get_virtual_paths():
-				dir_descriptor = self.get_descriptor(key, path)
+				dir_descriptor = get_descriptor(key)
 				dirs.append(dir_descriptor)
 		else:
 			pagetype = tools.get_type(fullpath)
 			for f in sorted(os.listdir(fullpath)):
 				if not f.startswith('.'):
-					descriptor = self.get_descriptor(f, path)
+					descriptor = get_descriptor(f)
 					if os.path.isfile(os.path.join(fullpath, f)):
 						files.append(descriptor)
 					else:
