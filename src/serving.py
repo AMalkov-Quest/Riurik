@@ -14,42 +14,45 @@ from auth import gitware
 def oAuth(request):
 	return request.session.get('token')
 
-def factory(request):
+def factory(request, path):
 	if oAuth(request):
-		return GitHandler(request)
+		return GitHandler(request, path)
 	else:
-		return DefaultHandler(request)
+		return DefaultHandler(request, path)
 
 def response(request, path):
-	handler = factory(request)
-	return handler.serve(request, path)
+	handler = factory(request, path)
+	return handler.serve(request)
 
 class BaseHandler:
 
-	def serve(self, request, path):
-		document_root = self.get_document_root(path)
-		fullpath = self.get_full_path(path)
+	def get_path(self):
+		return self.path
+
+	def serve(self, request):
+		document_root = self.get_document_root()
+		fullpath = self.get_full_path()
 
 		if os.path.isdir(fullpath):
 			if 'history' in request.REQUEST:
-				return get_history(request, path)
+				return get_history(request, self.path)
 
 			if request.path and request.path[-1:] != '/':
 				return HttpResponseRedirect(request.path + '/')
 
 			template = load_index_template()
-			descriptor = self.get_dir_index(document_root, path, fullpath)
+			descriptor = self.get_dir_index(document_root, fullpath)
 			return HttpResponse(template.render(descriptor))
 	
-		return serve_def(request, path, document_root, fullpath)
+		return serve_def(request, self.path, document_root, fullpath)
 
-	def get_dir_index(self, document_root, path, fullpath):
+	def get_dir_index(self, document_root, fullpath):
 		files = []
 		dirs = []
 
 		def get_descriptor(title):
-			abspath = os.path.join(path, title)
-			fullpath = self.get_full_path(abspath, document_root)
+			abspath = os.path.join(self.path, title)
+			fullpath = self.get_another_full_path(abspath)
 			return { 'title': title, 'type': tools.get_type(fullpath) }
 
 		if not document_root:
@@ -81,40 +84,47 @@ class BaseHandler:
 		favicon = 'dir-index-%s.gif' % tools.get_type(fullpath)
 
 		return Context({
-			'directory' : path + '/',
+			'directory' : self.path + '/',
 			'type'		: pagetype,
 			'file_list' : files,
 			'dir_list'  : dirs,
 			'contexts'  : contexts,
 			'favicon'   : favicon,
-			'spec'	: get_spec(path, fullpath),
+			'spec'	: get_spec(self.path, fullpath),
 		})
 
 class GitHandler(BaseHandler):
 
-	def __init__(self, request):
+	def __init__(self, request, path):
+		self.path = path
 		token = request.session.get('token')
 		ghub = gitware.Github(token)
 		self.user = ghub.get_user()
 		self.repo = gitware.get_riurik_repo(self.user)
 
-	def get_document_root(self, path):
+	def get_document_root(self):
 		return gitware.get_document_root(self.user, self.repo)
 
-	def get_full_path(self, path, document_root = None):
+	def get_full_path(self):
+		return gitware.get_full_path(self.user, self.repo, self.path)
+
+	def get_another_full_path(self, path):
 		return gitware.get_full_path(self.user, self.repo, path)
 
 class DefaultHandler(BaseHandler):
 	
-	def __init__(self, request):
-		pass
+	def __init__(self, request, path):
+		self.path = path
 
-	def get_document_root(self, path):
-		return contrib.get_document_root(path)
+	def get_document_root(self):
+		return contrib.get_document_root(self.path)
 
-	def get_full_path(self, path, document_root = None):
-		if document_root == None:
-			document_root = contrib.get_document_root(path)
+	def get_full_path(self):
+		document_root = contrib.get_document_root(self.path)
+		return contrib.get_full_path(document_root, self.path)
+
+	def get_another_full_path(self, path):
+		document_root = contrib.get_document_root(self.path)
 		return contrib.get_full_path(document_root, path)
 
 def serve_def(request, path, document_root, fullpath):

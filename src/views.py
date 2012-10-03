@@ -99,10 +99,10 @@ def add_fullpath(fn):
 	def patch(request):
 		path = get_path(request)
 		if path:
-			handler = serving.factory(request)
-			full_path = handler.get_full_path(path)
-			log.debug('add full path for %s path: %s , fullpath: %s' % (fn, path, full_path))
-			return fn(request, full_path)
+			RequestHandler = serving.factory(request, path)
+			full_path = RequestHandler.get_full_path()
+			log.debug('added request handler for %s path: %s , fullpath: %s' % (fn, path, full_path))
+			return fn(request, RequestHandler)
 		return fn(request)
 	return patch
 
@@ -229,7 +229,8 @@ def compileSuiteCoffee(path, suite_path):
 
 @add_fullpath
 @error_handler
-def runTest(request, fullpath):
+def runTest(request, RequestHandler):
+	fullpath = RequestHandler.get_full_path()
 	path = contrib.normpath(request.REQUEST["path"])
 	context_name = request.REQUEST.get("context", None)
 	ctx = context.get(fullpath, section=context_name)
