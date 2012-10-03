@@ -337,6 +337,10 @@ def get_virtual_paths_path():
 	root = os.path.dirname(os.path.abspath(__file__))
 	return os.path.join(root, settings.virtual_paths_py)
 
+def stubFile(request):
+	request_control = inuse.stub(request.GET['path'], request)
+	return HttpResponse(str(request_control))
+
 def live_settings_json(request, content=None):
 	settings_fullpath = get_virtual_paths_path()
 	if not content:

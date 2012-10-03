@@ -38,10 +38,6 @@ def stub(path, request):
 		request.session[path] = session_key
 	return cache_request_control
 
-def stubFile(request):
-	request_control = stub(request.GET['path'], request)
-	return HttpResponse(str(request_control))
-
 def getControl(request):
 	path = request.GET['path']
 	cache_value = cache.get(path)
