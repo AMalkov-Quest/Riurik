@@ -43,17 +43,14 @@ class BaseHandler:
 	
 		return serve_def(request, path, document_root, fullpath)
 
-	def get_descriptor(self, title, path):
-		fullpath = self.get_full_path( os.path.join(path, title) )
-		return { 'title': title, 'type': tools.get_type(fullpath) }
-
 	def get_dir_index(self, document_root, path, fullpath):
 		files = []
 		dirs = []
 
 		def get_descriptor(title):
-			fullpath = os.path.join(path, title)
-			return { 'title': title, 'type': tools.get_type(contrib.get_full_path(document_root, fullpath)) }
+			abspath = os.path.join(path, title)
+			fullpath = self.get_full_path(abspath, document_root)
+			return { 'title': title, 'type': tools.get_type(fullpath) }
 
 		if not document_root:
 			pagetype = 'front-page'
@@ -64,11 +61,11 @@ class BaseHandler:
 			pagetype = tools.get_type(fullpath)
 			for f in sorted(os.listdir(fullpath)):
 				if not f.startswith('.'):
-					descriptor = get_descriptor(f)
 					if os.path.isfile(os.path.join(fullpath, f)):
+						descriptor = get_descriptor(f)
 						files.append(descriptor)
 					else:
-						f += '/'
+						descriptor = get_descriptor(f + '/')
 						dirs.append(descriptor)
 
 		try:
@@ -104,7 +101,7 @@ class GitHandler(BaseHandler):
 	def get_document_root(self, path):
 		return gitware.get_document_root(self.user, self.repo)
 
-	def get_full_path(self, path):
+	def get_full_path(self, path, document_root = None):
 		return gitware.get_full_path(self.user, self.repo, path)
 
 class DefaultHandler(BaseHandler):
@@ -115,8 +112,9 @@ class DefaultHandler(BaseHandler):
 	def get_document_root(self, path):
 		return contrib.get_document_root(path)
 
-	def get_full_path(self, path):
-		document_root = contrib.get_document_root(path)
+	def get_full_path(self, path, document_root = None):
+		if document_root == None:
+			document_root = contrib.get_document_root(path)
 		return contrib.get_full_path(document_root, path)
 
 def serve_def(request, path, document_root, fullpath):
