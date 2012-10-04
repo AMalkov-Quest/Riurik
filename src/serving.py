@@ -111,6 +111,9 @@ class GitHandler(BaseHandler):
 	def get_another_full_path(self, path):
 		return gitware.get_full_path(self.user, self.repo, path)
 
+	def get_virtual_root(self):
+		return '' 
+
 class DefaultHandler(BaseHandler):
 	
 	def __init__(self, request, path):
@@ -126,6 +129,9 @@ class DefaultHandler(BaseHandler):
 	def get_another_full_path(self, path):
 		document_root = contrib.get_document_root(self.path)
 		return contrib.get_full_path(document_root, path)
+
+	def get_virtual_root(self):
+		return contrib.get_virtual_root(self.path)
 
 def serve_def(request, path, document_root, fullpath):
 	

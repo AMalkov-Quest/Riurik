@@ -244,7 +244,7 @@ def runTest(request, RequestHandler):
 
 	log.info('run test %s with context %s' % (path, context_name))
 	server = request.get_host()
-	contextjs = context.render(path, ctx, server, context_name)
+	contextjs = context.render(RequestHandler, ctx, server, context_name)
 	log.debug('contextJS: '+ contextjs)
 
 	clean_path = contrib.get_relative_clean_path(path)

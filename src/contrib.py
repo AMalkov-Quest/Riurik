@@ -220,30 +220,30 @@ def target_is_remote(target, host):
 def get_libraries(path, context):
 	return get_libraries_impl(path, context.items(), context)
 
-def get_libraries_impl(path, ctxitems, ctx):
+def get_libraries_impl(RequestHandler, ctxitems, ctx):
 	libraries = []
-
+	path = RequestHandler.get_path()
 	libs = get_libraries_raw(ctxitems)
-	root = get_document_root(path)
+	root = RequestHandler.get_document_root()
 	log.info('libs are %s' % libs)
 	if libs != None:
 		for lib in libs:
-			lib_path = get_lib_path_by_name(path, lib, ctx)
+			lib_path = get_lib_path_by_name(RequestHandler, lib, ctx)
 			if lib_path:
 				libraries.append(lib_path)
 		if not libraries:
 			log.info('there are no precofigured libs to include, try defaults ...')
-			libraries = libraries_default(path, ctx)
+			libraries = libraries_default(RequestHandler, ctx)
 
 	import coffeescript
 	def patch_coffeescript_lib(lib):
 		if re.search(r'\.coffee$', lib):
-			root = get_document_root(lib)
+			root = RequestHandler.get_document_root()
 			fullpath = get_full_path(root, lib)
 			return coffeescript.compile2js(None, lib, fullpath)
 		return lib
 	libraries = map( patch_coffeescript_lib, libraries )
-
+	log.debug(libraries)
 	return libraries
 
 def loadListFromString(source):
@@ -268,10 +268,10 @@ def get_libraries_raw(ctxitems):
 				return None
 	return []
 
-def libraries_default(path, ctx):
+def libraries_default(RequestHandler, ctx):
 	libraries = []
-	root = get_document_root(path)
-	virtual_root = get_virtual_root(path)
+	root = RequestHandler.get_document_root()
+	virtual_root = RequestHandler.get_virtual_root()
 	lib_paths = get_global_context_lib_path(ctx)
 	for lib_path in lib_paths:
 		full_path = os.path.abspath(os.path.join(root, lib_path.strip()))
@@ -280,7 +280,7 @@ def libraries_default(path, ctx):
 			lib_relpath = lib_path.replace(root, virtual_root).lstrip('/')
 			libraries.append(str(lib_relpath))
 
-	lib_relpath = get_local_lib_path(path, settings.LIB_DEFAULT_NAME, ctx)
+	lib_relpath = get_local_lib_path(RequestHandler, settings.LIB_DEFAULT_NAME, ctx)
 	if lib_relpath:
 		libraries.append(lib_relpath)
 
@@ -376,11 +376,9 @@ def get_document_root(path):
 	>>> get_document_root('/')
 	'/'
 	"""
-	if path:
-		key = path.strip('/').split('/')[0]
-		vpaths = get_virtual_paths()
-		if key and key in vpaths:
-			return vpaths[key]
+	key = get_virtual_root(path)
+	if key:
+		return get_virtual_paths()[key]
 
 	return path
 
@@ -456,9 +454,9 @@ def get_list_value_from_context(value):
 
 	return []
 
-def get_local_lib_path(path, lib_name, ctx):
-	root = get_document_root(path)
-	virtual_root = get_virtual_root(path)
+def get_local_lib_path(RequestHandler, lib_name, ctx):
+	root = RequestHandler.get_document_root()
+	virtual_root = RequestHandler.get_virtual_root()
 	current_suite_path = os.path.abspath(os.path.join(ctx.get_folder(), lib_name))
 	if os.path.exists(current_suite_path):
 		log.info('%s lib is located in current suite folder' % lib_name)
@@ -466,13 +464,14 @@ def get_local_lib_path(path, lib_name, ctx):
 
 	return ''
 
-def get_lib_path_by_name(path, lib, ctx):
-	root = get_document_root(path)
-	virtual_root = get_virtual_root(path)
+def get_lib_path_by_name(RequestHandler, lib, ctx):
+	path = RequestHandler.get_path()
+	root = RequestHandler.get_document_root()
+	virtual_root = RequestHandler.get_virtual_root()
 	full_path = os.path.abspath(os.path.join(root, lib))
 	lib_relpath = ''
 	if not os.path.exists(full_path):
-		lib_relpath = get_local_lib_path(path, lib, ctx)
+		lib_relpath = get_local_lib_path(RequestHandler, lib, ctx)
 		if not lib_relpath:
 			for path in get_global_context_lib_path(ctx):
 				global_libs_path = os.path.abspath(os.path.join(root, path.strip(), lib))

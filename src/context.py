@@ -53,8 +53,8 @@ def render_ini(path, ctx, riurik_url, section_name='default'):
 		c['options'] += [ (name, value, hasattr(value, 'comment')), ]
 	return t.render(c)
 
-def patch_libraries(path, ctximpl, ctx):
-	libraries = contrib.get_libraries_impl(path, ctximpl.as_list(), ctx)
+def patch_libraries(RequestHandler, ctximpl, ctx):
+	libraries = contrib.get_libraries_impl(RequestHandler, ctximpl.as_list(), ctx)
 	log.info('libs are %s' % libraries)
 	if libraries != None:
 		ctximpl.replace(settings.LIB_KEY_NAME, str(libraries).replace('\'','\"'))
@@ -107,10 +107,11 @@ def include_tests(path, ctx, ctximpl):
 def patch_suite_setup(ctximpl, path):
 	ctximpl.add(settings.SUITE_SETUP, path)
 
-def patch(path, ctx, riurik_url, ctxname=None):
+def patch(RequestHandler, ctx, riurik_url, ctxname=None):
+	path = RequestHandler.get_path()
 	ctximpl = contrib.context_impl(ctx.items())
 	include_tests(path, ctx, ctximpl)
-	patch_libraries(path, ctximpl, ctx)
+	patch_libraries(RequestHandler, ctximpl, ctx)
 	add_start_time(ctximpl)
 	add_name(ctximpl, ctxname)
 	add_virtual_root(ctximpl, path)
