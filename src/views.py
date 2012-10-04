@@ -135,7 +135,8 @@ def log_errors(fn):
 	return log_it
 
 @add_fullpath
-def createFolder(request, fullpath):
+def createFolder(request, RequestHandler):
+	fullpath = RequestHandler.get_full_path()
 	result = tools.mkdir(fullpath, request.POST["object-name"])
 
 	response = HttpResponse(mimetype='text/plain')
@@ -144,14 +145,16 @@ def createFolder(request, fullpath):
 	return response
 
 @add_fullpath
-def removeObject(request, fullpath):
+def removeObject(request, RequestHandler):
+	fullpath = RequestHandler.get_full_path()
 	log.debug('removeObject: ' + fullpath)
 	tools.remove(fullpath)
 	redirect = '/' + request.POST["url"].lstrip('/')
 	return HttpResponseRedirect(redirect)
 
 @add_fullpath
-def createSuite(request, fullpath):
+def createSuite(request, RequestHandler):
+	fullpath = RequestHandler.get_full_path()
 	result = {}
 	result['success'], result['result'] = tools.mkconfig(fullpath, request.POST["object-name"])
 	result['result'] += '?editor'
@@ -161,7 +164,8 @@ def createSuite(request, fullpath):
 	return response
 
 @add_fullpath
-def editSuite(request, fullpath):
+def editSuite(request, RequestHandler):
+	fullpath = RequestHandler.get_full_path()
 	log.debug('edit context %s' % fullpath)
 	if not os.path.exists(os.path.join(fullpath, settings.TEST_CONTEXT_FILE_NAME)):
 		tools.mkconfig(fullpath, settings.TEST_CONTEXT_FILE_NAME)
@@ -169,7 +173,8 @@ def editSuite(request, fullpath):
 	return HttpResponseRedirect(redirect)
 
 @add_fullpath
-def createTest(request, fullpath):
+def createTest(request, RequestHandler):
+	fullpath = RequestHandler.get_full_path()
 	log.debug('createTest: '+ request.POST["object-name"])
 	result = {}
 	result['success'], result['result'] = tools.mktest(fullpath, request.POST["object-name"])
@@ -181,7 +186,8 @@ def createTest(request, fullpath):
 	return response
 
 @add_fullpath
-def saveTest(request, fullpath):
+def saveTest(request, RequestHandler):
+	fullpath = RequestHandler.get_full_path()
 	if fullpath == 'settings':
 		fullpath = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'virtual_paths.py')
 	url = request.POST["url"].lstrip('/')
@@ -197,7 +203,8 @@ def submitSuite(request):
 
 @add_fullpath
 @error_handler
-def runSuite(request, fullpath):
+def runSuite(request, RequestHandler):
+	fullpath = RequestHandler.get_full_path()
 	path = contrib.normpath(request.REQUEST["path"])
 	context_name = request.REQUEST["context"]
 	ctx = context.get(fullpath, section=context_name)

@@ -27,7 +27,10 @@ asyncTest 'Edit context should open context for editing', ->
 asyncTest 'Edit spec should open spec urls for editing', ->
   $.when( frame.go( context.suite_path ) ).then ->
     checkActionSucceeded 'Specification', ->
-      QUnit.substring _$('.CodeMirror-lines').text(), "url=http://google.com", 'editor content OK'
+      editorContent = _$('.CodeMirror-lines').text()
+      QUnit.substring editorContent, "[DEFAULT]"
+      QUnit.substring editorContent, "url="
+      QUnit.substring editorContent, "title="
       start()
 
 QUnit.teardown ->

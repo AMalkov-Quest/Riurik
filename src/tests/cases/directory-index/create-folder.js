@@ -18,7 +18,7 @@ asyncTest('check created', function() {
       equal(_$('li#'+ context.folder_name + '.folder').length, 1, 'new folder has been created');
       var folder_link = _$('li#'+ context.folder_name + ' > a');
       ok(folder_link.is(":visible"), 'link to the folder is visible');
-      equal(folder_link.attr('href'), context.folder_name, 'link to the folder has right href');
+      equal(folder_link.attr('href'), context.folder_name + '/', 'link to the folder has right href');
       
       start();
     });
