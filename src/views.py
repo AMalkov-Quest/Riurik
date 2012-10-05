@@ -240,7 +240,7 @@ def runTest(request, RequestHandler):
 	fullpath = RequestHandler.get_full_path()
 	path = contrib.normpath(request.REQUEST["path"])
 	context_name = request.REQUEST.get("context", None)
-	ctx = context.get(fullpath, section=context_name)
+	ctx = context.get(RequestHandler, fullpath, section=context_name)
 
 	log.info('run test %s with context %s' % (path, context_name))
 	server = request.get_host()
