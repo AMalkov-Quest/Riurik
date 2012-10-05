@@ -1,4 +1,4 @@
-import os
+import os, os.path
 from django.shortcuts import render_to_response as _render_to_response
 from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.template import loader, RequestContext, Context, Template, TemplateDoesNotExist
@@ -44,7 +44,56 @@ class BaseHandler:
 			descriptor = self.get_dir_index(document_root, fullpath)
 			return HttpResponse(template.render(descriptor))
 	
-		return serve_def(request, self.path, document_root, fullpath)
+		#return serve_def(request, self.path, document_root, fullpath)
+		#def serve_def(request, path, document_root, fullpath):
+	
+		log.debug('show index of %s(%s %s)' % (fullpath, document_root, self.path))
+		if not os.path.exists(fullpath):
+			if 'editor' in request.REQUEST:
+				tools.make(fullpath)
+			else:
+				raise Http404('"%s" does not exist' % fullpath)
+
+		if 'editor' in request.REQUEST:
+			descriptor = self.get_file_content_to_edit(fullpath, inuse.is_stubbed(self.path, request))
+			inuse.stub(self.path, request)
+			return _render_to_response('editor.html', descriptor, context_instance=RequestContext(request))
+
+		return get_file_content(fullpath)
+
+	def get_file_content_to_edit(self, fullpath, stubbed):
+		try:
+			contexts = context.get( fullpath ).sections()
+		except Exception, e:
+			log.exception(e)
+			contexts = []
+
+		content = open(fullpath, 'rb').read()
+
+		return {
+			'directory': self.path,
+			'content': content,
+			'contexts': contexts,
+			'relative_file_path': self.path,
+			'is_stubbed': stubbed,
+			'favicon'   : 'dir-index-test.gif',
+			'filetype':  self.get_type(fullpath),
+			'spec'		: get_spec(self.path, fullpath),
+		}
+
+	def is_document_root(self, fullpath):
+		document_root = self.get_document_root()
+		if document_root:
+			return os.path.samefile(fullpath, document_root)
+		else:
+			return False
+
+	def get_type(self, fullpath):
+		result = tools.get_type(fullpath)
+		if result == 'folder' and self.is_document_root( fullpath.rstrip('/').rstrip('\\') ):
+				return 'virtual'
+
+		return result
 
 	def get_dir_index(self, document_root, fullpath):
 		files = []
@@ -53,7 +102,7 @@ class BaseHandler:
 		def get_descriptor(title):
 			abspath = os.path.join(self.path, title)
 			fullpath = self.get_another_full_path(abspath)
-			return { 'title': title, 'type': tools.get_type(fullpath) }
+			return { 'title': title, 'type': self.get_type(fullpath) }
 
 		if not document_root:
 			pagetype = 'front-page'
@@ -61,7 +110,7 @@ class BaseHandler:
 				dir_descriptor = get_descriptor(key)
 				dirs.append(dir_descriptor)
 		else:
-			pagetype = tools.get_type(fullpath)
+			pagetype = self.get_type(fullpath)
 			for f in sorted(os.listdir(fullpath)):
 				if not f.startswith('.'):
 					if os.path.isfile(os.path.join(fullpath, f)):
@@ -72,7 +121,7 @@ class BaseHandler:
 						dirs.append(descriptor)
 
 		try:
-			if tools.get_type(fullpath) == 'virtual':
+			if self.get_type(fullpath) == 'virtual':
 				contexts = context.global_settings(fullpath).sections()
 			else:
 				contexts = context.get(fullpath).sections()
@@ -81,7 +130,7 @@ class BaseHandler:
 			log.error(e)
 			contexts = []
 
-		favicon = 'dir-index-%s.gif' % tools.get_type(fullpath)
+		favicon = 'dir-index-%s.gif' % self.get_type(fullpath)
 
 		return Context({
 			'directory' : self.path + '/',
@@ -133,24 +182,6 @@ class DefaultHandler(BaseHandler):
 	def get_virtual_root(self):
 		return contrib.get_virtual_root(self.path)
 
-def serve_def(request, path, document_root, fullpath):
-	
-	log.debug('show index of %s(%s %s)' % (fullpath, document_root, path))
-		
-	if not os.path.exists(fullpath):
-		if 'editor' in request.REQUEST:
-			#open(fullpath, 'w').close() # creating file if not exists by editor opening it first time
-			tools.make(fullpath)
-		else:
-			raise Http404('"%s" does not exist' % fullpath)
-
-	if 'editor' in request.REQUEST:
-		descriptor = get_file_content_to_edit(path, fullpath, inuse.is_stubbed(path, request))
-		inuse.stub(path, request)
-		return _render_to_response('editor.html', descriptor, context_instance=RequestContext(request))
-
-	return get_file_content(fullpath)
-
 def get_history(request, path):
 	import reporting
 	context = request.REQUEST.get('context')
@@ -173,26 +204,6 @@ def get_history(request, path):
 		return HttpResponse(json.dumps(result))
 
 	return _render_to_response('history.html', locals())
-
-def get_file_content_to_edit(path, fullpath, stubbed):
-	try:
-		contexts = context.get( fullpath ).sections()
-	except Exception, e:
-		log.exception(e)
-		contexts = []
-
-	content = open(fullpath, 'rb').read()
-
-	return {
-		'directory': path,
-		'content': content,
-		'contexts': contexts,
-		'relative_file_path': path,
-		'is_stubbed': stubbed,
-		'favicon'   : 'dir-index-test.gif',
-		'filetype':  tools.get_type(fullpath),
-		'spec'		: get_spec(path, fullpath),
-	}
 
 def get_spec(target, path):
 	spec_url = spec.get_url(path)

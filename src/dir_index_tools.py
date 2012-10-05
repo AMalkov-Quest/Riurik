@@ -21,9 +21,9 @@ def get_type(path):
 		if os.path.isdir(path):
 			if os.path.exists( os.path.join(path, settings.TEST_CONTEXT_FILE_NAME) ):
 				return 'suite'
-			if path.rstrip('/').rstrip('\\') in contrib.get_virtual_paths().values():
-				return 'virtual'
+			
 			return 'folder'
+
 		if '.ini' in path:
 			return 'configfile'
 
