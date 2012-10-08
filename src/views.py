@@ -212,7 +212,7 @@ def runSuite(request, RequestHandler):
 	log.info('run suite %s with context %s' % (path, context_name))
 	server = request.get_host();
 	compileSuiteCoffee(path, fullpath)
-	contextjs = context.render(path, ctx, server, context_name)
+	contextjs = context.render(RequestHandler, ctx, server, context_name)
 
 	clean_path = contrib.get_relative_clean_path(path)
 	target = contrib.get_runner_url(ctx, server)
