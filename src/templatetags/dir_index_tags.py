@@ -42,7 +42,7 @@ def current(path):
 	return path.rsplit('/')[-1]
 
 @register.filter
-def breadcrumbs(path):
+def breadcrumbs(path, pagetype):
 	"""
 	>>> breadcrumbs('')
 	''
@@ -52,12 +52,7 @@ def breadcrumbs(path):
 	'<a href="/">&#8226;</a>&nbsp;&nbsp;<a>path1</a>&nbsp;&nbsp;<a href="//"><img height="11" src="/static/img/up.png" /></a>'
 	"""
 	path = path.replace('\\','/')
-	
-	document_root = contrib.get_document_root(path)
-	fullpath = contrib.get_full_path(document_root, path)
-	type = dir_index_tools.get_type(fullpath)
-	
-	if document_root and document_root != '/':
+	if not pagetype in ('front-page', 'virtual') :
 		html = '<a href="/">&#8226;</a>&nbsp;&nbsp;'
 		root = '/'
 		lastpath = root
@@ -73,7 +68,7 @@ def breadcrumbs(path):
 				else:
 					html += '<a>%s</a>&nbsp;&nbsp;' % ( p )
 				
-		if type != 'test':
+		if pagetype != 'test':
 			html += '<a href="%s%s"><img height="11" src="/static/img/up.png" /></a>' % (root, above(path))
 	else:
 		html = ''
