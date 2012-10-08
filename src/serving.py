@@ -29,6 +29,20 @@ class BaseHandler:
 	def get_path(self):
 		return self.path
 
+	def get_context_path(self):
+		fullpath = self.get_full_path()
+		if os.path.isdir(fullpath):
+			return os.path.join(fullpath, settings.TEST_CONTEXT_FILE_NAME)
+		else:
+			dirname = os.path.dirname(fullpath)
+			return os.path.join(dirname, settings.TEST_CONTEXT_FILE_NAME)
+
+	def get_global_context_path(self):
+		return os.path.join(
+				self.get_document_root(),
+				settings.GLOBAL_CONTEXT_FILE_NAME
+				)		
+
 	def serve(self, request):
 		document_root = self.get_document_root()
 		fullpath = self.get_full_path()
@@ -43,9 +57,6 @@ class BaseHandler:
 			template = load_index_template()
 			descriptor = self.get_dir_index(document_root, fullpath)
 			return HttpResponse(template.render(descriptor))
-	
-		#return serve_def(request, self.path, document_root, fullpath)
-		#def serve_def(request, path, document_root, fullpath):
 	
 		log.debug('show index of %s(%s %s)' % (fullpath, document_root, self.path))
 		if not os.path.exists(fullpath):
@@ -63,7 +74,7 @@ class BaseHandler:
 
 	def get_file_content_to_edit(self, fullpath, stubbed):
 		try:
-			contexts = context.get( fullpath ).sections()
+			contexts = context.get( self ).sections()
 		except Exception, e:
 			log.exception(e)
 			contexts = []
@@ -122,9 +133,9 @@ class BaseHandler:
 
 		try:
 			if self.get_type(fullpath) == 'virtual':
-				contexts = context.global_settings(fullpath).sections()
+				contexts = context.global_settings(self).sections()
 			else:
-				contexts = context.get(fullpath).sections()
+				contexts = context.get(self).sections()
 			log.debug(contexts)
 		except Exception, e:
 			log.error(e)

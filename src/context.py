@@ -11,8 +11,8 @@ def host(instance, resolve=True):
 		return contrib.resolveRemoteAddr(instance.get(key), cache)
 	return instance.get(key)
 
-def get(RequestHandler, name, section='default'):
-	return context(RequestHandler, name, section)
+def get(RequestHandler, section='default'):
+	return context(RequestHandler, section)
 
 def get_URL(instance, resolve=False):
 	url = instance.get('url')
@@ -122,16 +122,10 @@ def patch(RequestHandler, ctx, riurik_url, ctxname=None):
 class global_settings(object):
 	comment = 'from global settings'
 
-	def __init__(self, RequestHandler, path, section='DEFAULT'):
-		log.debug('initing global_settings by from %s, section:%s' % (path, section))
-		self.inifile = None
-		#for virtpath in contrib.get_virtual_paths().values():
-		#	if virtpath in path:
-		#		self.inifile = os.path.join(virtpath, settings.GLOBAL_CONTEXT_FILE_NAME)
-		self.inifile = os.path.join(
-				RequestHandler.get_document_root(),
-				settings.GLOBAL_CONTEXT_FILE_NAME)
+	def __init__(self, RequestHandler, section='DEFAULT'):
+		self.inifile = RequestHandler.get_global_context_path()
 		self.section = section
+		log.debug('read global settings from %s, section:%s' % (self.inifile, section))
 
 	def get(self, option, default=None):
 		value = config.get(self.inifile, self.section, option)
@@ -164,27 +158,24 @@ class global_settings(object):
 class context(global_settings):
 	comment = 'context.ini'
 
-	def __init__(self, RequestHandler, test, section='DEFAULT'):
-		self.rhandler = RequestHandler
-		if os.path.isdir(test):
-			self.inifile = os.path.join(test, settings.TEST_CONTEXT_FILE_NAME)
-		else:
-			self.inifile = os.path.join(os.path.dirname(test), settings.TEST_CONTEXT_FILE_NAME)
+	def __init__(self, RequestHandler, section='DEFAULT'):
+		self.requestHandler = RequestHandler
+		self.inifile = RequestHandler.get_context_path()
 		self.section = section
-		log.debug('context: %s, section: %s, test: %s' % (self.inifile, self.section, test))
+		log.debug('context: %s, section: %s' % (self.inifile, self.section))
 
 	def	get(self, option, default=None):
 		value = super(context, self).get(option, default=None)
 		if not value:
-			value = global_settings(self.rhandler, self.inifile, self.section).get(option, default=None)
+			value = global_settings(self.requestHandler, self.section).get(option, default=None)
 		if not value:
-			value = global_settings(self.rhandler, self.inifile).get(option, default=None)
+			value = global_settings(self.requestHandler).get(option, default=None)
 		if not value:
 			value = default
 		return value
 
 	def libraries(self, values):
-		gs = global_settings(self.rhandler, self.inifile).items() or {}
+		gs = global_settings(self.requestHandler).items() or {}
 		for item in gs:
 			if item[0] == settings.LIB_KEY_NAME:
 				glibs = item[1]
@@ -195,8 +186,8 @@ class context(global_settings):
 
 	def items(self):
 		values = {}
-		values.update( global_settings(self.rhandler, self.inifile).items() or {} )
-		values.update( global_settings(self.rhandler, self.inifile, self.section).items() or {} )
+		values.update( global_settings(self.requestHandler).items() or {} )
+		values.update( global_settings(self.requestHandler, self.section).items() or {} )
 		values.update( super(context, self).items(values) or {} )
 		self.libraries(values)
 		return values.items()
