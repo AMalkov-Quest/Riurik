@@ -1,4 +1,4 @@
-Installing Django with Apache on Ubuntu
+Configuring Riurik with Apache on Ubuntu
 =======
 
 ### Quick start
@@ -9,7 +9,7 @@ Install Apache and mod_wsgi
 Configure Apache
 
     sudo vim /etc/apache2/httpd.conf
-	sudo vim ~/Riurik/riurik.wsgi
+    sudo vim ~/Riurik/riurik.wsgi
 
 Restart Apache
 
