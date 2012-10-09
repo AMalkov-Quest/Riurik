@@ -219,7 +219,12 @@ def runSuite(request, RequestHandler):
 	log.info('target of suite %s is %s' % (clean_path, target))
 
 	saveLocalContext(fullpath, contextjs)
-	url = "http://%s/%s?server=%s&path=/%s" % ( target, settings.EXEC_TESTS_CMD, server, path )
+
+	engine = 'qunit'
+	if cucumber(ctx):
+		engine = 'cucumber'
+
+	url = "http://%s/%s?server=%s&engine=%s&path=/%s" % ( target, settings.EXEC_TESTS_CMD, server, engine, path )
 	log.info("redirect to run suite %s" % url)
 	return HttpResponseRedirect( url )
 
@@ -257,12 +262,20 @@ def runTest(request, RequestHandler):
 	saveLocalContext(fullpath, contextjs)
 	if coffee(path):
 		path = coffeescript.compile2js(test_content, path, fullpath)
-	url = "http://%s/%s?server=%s&path=/%s" % (target, settings.EXEC_TESTS_CMD, server, path)
+
+	engine = 'qunit'
+	if cucumber(ctx):
+		engine = 'cucumber'
+
+	url = "http://%s/%s?server=%s&engine=%s&path=/%s" % (target, settings.EXEC_TESTS_CMD, server, engine, path)
 	log.info("redirect to run test %s" % url)
 	return HttpResponseRedirect(url)
 
 def coffee(path):
 	return path.endswith('.coffee')
+
+def cucumber(ctx):
+	return ctx.get('cucumber', None) != None
 
 def saveLocalContext(fullpath, contextjs):
 	if os.path.isdir(fullpath):

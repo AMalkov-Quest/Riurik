@@ -6,7 +6,7 @@ QUnit.setup ->
   
 asyncTest 'suite is executed', ->
   $.when( frame.go context.url ).then ->
-    $.wait( frameTestsAreDone ).then ->
+    $.waitFor.condition( -> frameTestsAreDone() ).then ->
       ok typeof frame.window().context != 'undefined', 'context is generated'
       ok _$('#qunit-testresult').length == 1, 'test result is present'
       equal _$('.test-name').length, 5, 'all tests are ran'

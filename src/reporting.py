@@ -27,7 +27,8 @@ class TestResult(TestBase):
 			'duration': result['duration'],
 			'testId': int(result['id']),
 			'htmlChunkId': -1,
-			'html': ''
+			'html': '',
+			'engine': result['engine']
 		}
 
 class TestHtml(TestBase):
@@ -48,7 +49,7 @@ class TestInfo(TestBase):
 		self.result = {
 			'date': result['date'],
 			'path': result['path'],
-			'context': result['context'],
+			'context': result['context']
 		}
 
 def getTestsResultRoot():

@@ -7,3 +7,12 @@ asyncTest('should not hang a suite', function() {
     start();
   });
 });
+
+asyncTest('should not hang a suite', function() {
+  $.when(frame.go('')).then(function(_$) {
+    setTimeout(function () {
+      _$('').trim();
+      start();
+    }, 100);
+  });
+});
