@@ -38,6 +38,7 @@ urlpatterns = patterns('',
 
 urlpatterns += patterns('',
 	(r'^search', include('plugins.search.urls')),
+	(r'^readme', include('plugins.help.urls')),
 )
 
 urlpatterns += patterns('',
