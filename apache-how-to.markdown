@@ -10,7 +10,7 @@ Configure Apache
 
     sudo vim /etc/apache2/httpd.conf
 
-Content should be
+
 
     User ubuntu
 
