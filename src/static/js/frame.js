@@ -9,10 +9,16 @@
 			}
 
 			if( !(cache === true) ) {
+				var randurl;
 				if (url.indexOf('?') != -1) {
-					url += '&_=' + Math.random().toString();
+					randurl = '&_=' + Math.random().toString();
 				}else{
-					url += '?_=' + Math.random().toString();
+					randurl = '?_=' + Math.random().toString();
+				}
+				if (url.indexOf('#') != -1) {
+					url = url.split( '#' ).join( randurl+'#' )
+				} else {
+					url += randurl
 				}
 			}
 			
@@ -60,7 +66,9 @@
 			$('#frame').unbind('load');
 			$('#frame').load(function() {
 				riurik.log("Frame loaded.")
-				dfd.resolve(window.frames[0].window.jQuery);
+				var __frame = window.frames[0];
+				__frame.window.onerror = riurik.wrapErrorHandler( __frame.window.onerror, riurik.onErrorHandler );
+				dfd.resolve(__frame.window.jQuery);
 			});
 
 			return dfd.promise();
