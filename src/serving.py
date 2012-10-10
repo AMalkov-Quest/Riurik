@@ -16,8 +16,10 @@ def oAuth(request):
 
 def factory(request, path):
 	if oAuth(request):
+		log.debug('factory git')
 		return GitHandler(request, path)
 	else:
+		log.debug('factory def')
 		return DefaultHandler(request, path)
 
 def response(request, path):
@@ -46,7 +48,7 @@ class BaseHandler:
 	def serve(self, request):
 		document_root = self.get_document_root()
 		fullpath = self.get_full_path()
-
+		log.debug('serve full path %s' % fullpath)
 		if os.path.isdir(fullpath):
 			if 'history' in request.REQUEST:
 				return get_history(request, self.path)
@@ -55,7 +57,7 @@ class BaseHandler:
 				return HttpResponseRedirect(request.path + '/')
 
 			template = load_index_template()
-			descriptor = self.get_dir_index(document_root, fullpath)
+			descriptor = self.get_dir_index(document_root, fullpath, request)
 			return HttpResponse(template.render(descriptor))
 	
 		log.debug('show index of %s(%s %s)' % (fullpath, document_root, self.path))
@@ -106,7 +108,7 @@ class BaseHandler:
 
 		return result
 
-	def get_dir_index(self, document_root, fullpath):
+	def get_dir_index(self, document_root, fullpath, request):
 		files = []
 		dirs = []
 
@@ -150,7 +152,8 @@ class BaseHandler:
 			'dir_list'  : dirs,
 			'contexts'  : contexts,
 			'favicon'   : favicon,
-			'spec'	: get_spec(self.path, fullpath),
+			'spec'      : get_spec(self.path, fullpath),
+			'githref'   : gitware.get_oauth_href(request)
 		})
 
 class GitHandler(BaseHandler):

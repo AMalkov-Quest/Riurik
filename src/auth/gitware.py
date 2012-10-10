@@ -2,10 +2,30 @@ import os
 from github import Github
 import shlex
 from subprocess import Popen, PIPE
+from logger import log
 
 repo_title = 'Repo added through Riurik Framework'
 key_title = 'Key added through Riurik Framework'
 #git = Github('Riurik', 'riurik862879')
+
+client_id = {
+	'www.riurik.com' : 'cea1f31118f8468d79d8',
+	'www.riurik.com:8000' : '26e2af67a56e633c8426'
+}
+
+client_secret = {
+	'www.riurik.com' : 'ebac30752e5a75df37d8386d192ac4bcabdc7546',
+	'www.riurik.com:8000' : '03d9bdc160d7364f31e5afefda6747658cdf12ab'
+}
+
+github_auth_url = 'https://github.com/login/oauth/authorize'
+github_access_url = 'https://github.com/login/oauth/access_token'
+scope = 'repo'
+
+def get_oauth_href(request):
+	host = request.META['HTTP_HOST']
+	url = 'http://%s/login' % host
+	return '%s?client_id=%s&scope=%s&redirect_url=%s' % (github_auth_url, client_id[host], scope, url) 
 
 def get_keys(obj):
 	try:
@@ -24,7 +44,7 @@ def create_repo(user, name):
 	return user.create_repo(name, repo_title)	
 
 def get_rsa_path(user):
-	return '%s/.ssh/%s_rsa' % (os.getenv('HOME'), user.login)
+	return '%s/.ssh/%s_rsa' % (get_repos_root(), user.login)
 
 def get_rsa_pub_path(user):
 	return '%s.pub' % get_rsa_path(user)
@@ -127,10 +147,12 @@ def get_riurik_repo(user):
 	return repo
 
 def get_abspath(path=None):
+	home = get_repos_root()
 	if not path:
-		return os.getenv('HOME')
-
-	return os.path.join(os.getenv('HOME'), path)
+		return home
+	log.debug(home)
+	log.debug(os.path.join(home, path))
+	return os.path.join(home, path)
 
 def get_document_root(user, repo):
 	user_dir = get_user_dir(user.login, repo.id)
@@ -140,3 +162,7 @@ def get_full_path(user, repo, path):
 	user_dir = get_user_dir(user.login, repo.id)
 	full_path = os.path.join(user_dir, path.strip('/'))
 	return get_abspath(full_path)
+
+def get_repos_root():
+	#return os.getenv('HOME')
+	return '/home/ubuntu'
