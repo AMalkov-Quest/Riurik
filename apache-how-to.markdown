@@ -10,6 +10,7 @@ Configure Apache
 
     sudo vim /etc/apache2/httpd.conf
 
+Content should be
 
     User ubuntu
 
@@ -41,6 +42,8 @@ Configure Apache
     </VirtualHost>
 
     sudo vim ~/Riurik/riurik.wsgi
+
+Content should be
 
     import os, sys
     
