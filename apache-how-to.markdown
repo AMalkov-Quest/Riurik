@@ -8,8 +8,6 @@ Install Apache and mod_wsgi
 
 Configure Apache
 
-Open httpd.conf
-
     sudo vim /etc/apache2/httpd.conf
 
 it should contain this
