@@ -9,6 +9,36 @@ Install Apache and mod_wsgi
 Configure Apache
 
     sudo vim /etc/apache2/httpd.conf
+
+    User ubuntu
+
+    LoadModule deflate_module modules/mod_deflate.so
+    
+    <VirtualHost *:80>
+    
+    WSGIScriptAlias / /home/ubuntu/Riurik/riurik.wsgi
+    
+    AddOutputFilterByType DEFLATE application/javascript text/javascript text/css text/html text/plain
+    BrowserMatch ^Mozilla/4 gzip-only-text/html
+    BrowserMatch ^Mozilla/4\.0[678] no-gzip
+    BrowserMatch \bMSIE !no-gzip !gzip-only-text/html
+    #Header append Vary User-Agent env=!dont-vary
+    
+    ServerAdmin andrey.malkov@gmail.com
+    ServerName www.riurik.com
+    
+    Alias /static/ "/home/ubuntu/Riurik/src/static/"
+    
+    <Location '/static/'>
+        SetHandler None
+    </Location>
+    
+    ErrorLog "/home/ubuntu/Riurik/logs/httpd.log"
+    LogLevel error
+    DefaultType text/plain
+    
+    </VirtualHost>
+
     sudo vim ~/Riurik/riurik.wsgi
 
 Add the ubuntu user to the www-data group
