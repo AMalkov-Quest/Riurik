@@ -10,6 +10,7 @@ Configure Apache
 
     sudo vim /etc/apache2/httpd.conf
 
+
     User ubuntu
 
     LoadModule deflate_module modules/mod_deflate.so
