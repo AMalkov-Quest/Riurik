@@ -198,7 +198,8 @@ riurik.Waits.prototype.wait = function(condition, timeout, getArgs) {
 			riurik.util.log('waiting for ' + condition + ' is resolved');
 			if(getArgs) {
 				var args = getArgs();
-				dfd.resolve.apply(true, args);
+				//dfd.resolve.apply(true, args);
+				dfd.resolve(args);
 			}else{
 				dfd.resolve();
 			}
@@ -249,7 +250,7 @@ riurik.Waits.prototype.condition = function(condition, timeout) {
 	this.timeoutMessage = 'wait timeout for ' + condition + ' is exceeded';
 	return this.wait(condition, timeout);
 };
-
+	
 /**
  * Waits for given event to occure
  *
@@ -279,6 +280,30 @@ riurik.Waits.prototype.event = function(event_name, target, timeout) {
 	};
 
 	return this.wait(condition, timeout, getEventArgs);
+};
+
+riurik.Waits.prototype.frame = function(timeout) {
+	this.timeoutMessage = 'wait timeout for the frame loading is exceeded';
+	var frameLoaded = false;
+	var frameJQuery = null;
+
+	$('#frame').unbind('load');
+	$('#frame').load(function() {
+		frame.init(function(_$) {
+			frameJQuery = _$;
+			frameLoaded = true;
+		});
+	});
+
+	var condition = function() {
+		return frameLoaded;
+	};
+	
+	var getFrameJQuery = function() {
+		return frameJQuery;
+	};
+
+	return this.wait(condition, timeout, getFrameJQuery);
 };
 
 riurik.Waits.prototype.then = function(doneCallback, failCallback) {
