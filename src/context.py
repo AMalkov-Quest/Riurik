@@ -25,8 +25,8 @@ def get_URL(instance, resolve=False):
 		url =  'http://%s:%s' % (host, instance.get('port'))
 	return url
 
-def render(path, ctx, riurik_url, ctxname):
-	ctxitems = patch(path, ctx, riurik_url, ctxname)
+def render(RequestHandler, ctx, riurik_url, ctxname):
+	ctxitems = patch(RequestHandler, ctx, riurik_url, ctxname)
 	t = Template("""{% load json_tags %}
 		var context = {
 			{% for option in options %}
@@ -40,8 +40,8 @@ def render(path, ctx, riurik_url, ctxname):
 		c['options'] += [ (name, value,), ]
 	return t.render(c)
 
-def render_ini(path, ctx, riurik_url, section_name='default'):
-	ctxitems = patch(path, ctx, riurik_url)
+def render_ini(RequestHandler, ctx, riurik_url, section_name='default'):
+	ctxitems = patch(RequestHandler, ctx, riurik_url)
 	t = Template("""{% load json_tags %}
 [{{ section }}]
 {% for option in options %}{{ option.0 }} = {{ option.1|tojson }}{% if option.2 %} ; {{ option.2 }}{% endif %}

@@ -70,21 +70,6 @@ def enumerate_suites(request):
 		return HttpResponse(json.dumps(suites))
 	return HttpResponse(str(suites).replace('[','').replace(']','').rstrip(',').replace('\'',''))
 
-def show_context(request, path):
-	document_root = contrib.get_document_root(path)
-	fullpath = contrib.get_full_path(document_root, path)
-	log.debug('show context of %s (%s %s)' % (fullpath, document_root, path))
-
-	result = ""
-
-	sections = config.sections(context.get(fullpath).inifile)
-	for section_name in sections:
-		ctx = context.get(fullpath, section=section_name)
-		context_ini = context.render_ini(path, ctx, request.get_host(), section_name)
-		result += context_ini
-
-	return HttpResponse(result)
-
 def get_path(request):
 	if request.POST and 'path' in request.POST:
 		return request.POST['path']
@@ -133,6 +118,21 @@ def log_errors(fn):
 			raise
 		return result
 	return log_it
+
+def show_context(request, path):
+	RequestHandler = serving.factory(request, path)
+	fullpath = RequestHandler.get_full_path()
+	log.debug('show context of %s (%s)' % (fullpath, path))
+
+	result = ""
+
+	sections = config.sections(context.get(RequestHandler).inifile)
+	for section_name in sections:
+		ctx = context.get(RequestHandler, section=section_name)
+		context_ini = context.render_ini(RequestHandler, ctx, request.get_host(), section_name)
+		result += context_ini
+
+	return HttpResponse(result)
 
 @add_fullpath
 def createFolder(request, RequestHandler):
