@@ -183,7 +183,7 @@ class DefaultHandler(BaseHandler):
 	def get_document_root(self):
 		return contrib.get_document_root(self.path)
 
-	def get_full_path(self):
+	def get_full_path(self, path=None):
 		document_root = contrib.get_document_root(self.path)
 		path = self.path if not path else path
 		return contrib.get_full_path(document_root, path)

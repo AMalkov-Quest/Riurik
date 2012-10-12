@@ -64,7 +64,7 @@ def gen_repo_name(user):
 	return 'riurik-for-%s' % user.login
 
 def init_repo(user, repo):
-	from gitssh import GitSSH
+	from plugins.git.gitssh import GitSSH
 	user_dir = get_user_dir(user.login, repo.id)
 	if not os.path.exists( get_abspath(user_dir) ):
 		with GitSSH(get_abspath(), get_rsa_path(user), get_rsa_pub_path(user)) as call:
@@ -150,8 +150,7 @@ def get_abspath(path=None):
 	home = get_repos_root()
 	if not path:
 		return home
-	log.debug(home)
-	log.debug(os.path.join(home, path))
+
 	return os.path.join(home, path)
 
 def get_document_root(user, repo):
