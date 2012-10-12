@@ -31,8 +31,8 @@ class BaseHandler:
 	def get_path(self):
 		return self.path
 
-	def get_context_path(self):
-		fullpath = self.get_full_path()
+	def get_context_path(self, path):
+		fullpath = self.get_full_path(path)
 		if os.path.isdir(fullpath):
 			return os.path.join(fullpath, settings.TEST_CONTEXT_FILE_NAME)
 		else:
@@ -114,7 +114,7 @@ class BaseHandler:
 
 		def get_descriptor(title):
 			abspath = os.path.join(self.path, title)
-			fullpath = self.get_another_full_path(abspath)
+			fullpath = self.get_full_path(abspath)
 			return { 'title': title, 'type': self.get_type(fullpath) }
 
 		if not document_root:
@@ -168,10 +168,8 @@ class GitHandler(BaseHandler):
 	def get_document_root(self):
 		return gitware.get_document_root(self.user, self.repo)
 
-	def get_full_path(self):
-		return gitware.get_full_path(self.user, self.repo, self.path)
-
-	def get_another_full_path(self, path):
+	def get_full_path(self, path=None):
+		path = self.path if not path else path
 		return gitware.get_full_path(self.user, self.repo, path)
 
 	def get_virtual_root(self):
@@ -187,10 +185,7 @@ class DefaultHandler(BaseHandler):
 
 	def get_full_path(self):
 		document_root = contrib.get_document_root(self.path)
-		return contrib.get_full_path(document_root, self.path)
-
-	def get_another_full_path(self, path):
-		document_root = contrib.get_document_root(self.path)
+		path = self.path if not path else path
 		return contrib.get_full_path(document_root, path)
 
 	def get_virtual_root(self):

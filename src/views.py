@@ -17,6 +17,17 @@ import distributor
 import coffeescript
 import inuse, serving
 
+def add_request_handler(fn):
+	def patch(request):
+		path = get_path(request)
+		if path:
+			RequestHandler = serving.factory(request, path)
+			full_path = RequestHandler.get_full_path()
+			log.debug('added request handler for %s path: %s , fullpath: %s' % (fn, path, full_path))
+			return fn(request, RequestHandler)
+		return fn(request)
+	return patch
+
 def serve(request, path, show_indexes=False):
 	return serving.response(request, path)
 
@@ -39,36 +50,39 @@ def error_handler(fn):
 		return response
 	return _f
 
-def enumerate_suites(request):
+@add_request_handler
+def enumerate_suites(request, RequestHandler):
 	"""
 	Return a list of suite names.
 	Arguments:
 		ctx	(optional)	- filter suites containing supplied ctx name
 		json 	(optional)	- return result in JSON format
 	"""
-	ctx_name = request.REQUEST.get('context', None)
+	ctx_name = request.REQUEST.get('context')
 	as_json = request.REQUEST.get('json', False)
-	target = request.REQUEST.get('target', False)
-
-	suites = []
-	root = contrib.get_document_root(target)
+	path = request.REQUEST.get('path', '/')
+	
+	root = RequestHandler.get_document_root()
+	log.debug('enum suites in %s' % root)
 	contextini = settings.TEST_CONTEXT_FILE_NAME
-
+	suites = []
 	for dirpath, dirnames, filenames in os.walk(root, followlinks=True):
-		if not ( contextini in filenames ):
-			continue
-		if ctx_name:
-			contextfile = os.path.join(dirpath, contextini)
-			ctx = context.get(contextfile)
+		if contextini in filenames:
+			relpath = os.path.relpath(dirpath, root)
+			ctx = context.get(RequestHandler, relpath )
 			ctx_sections = ctx.sections()
 			if not ctx_name in ctx_sections:
 				continue
 
-			suites += [ dirpath.replace(root, '').replace('\\','/').lstrip('/') ]
+			suites += [ os.path.relpath(relpath, path) ]
 
 	if as_json:
-		return HttpResponse(json.dumps(suites))
-	return HttpResponse(str(suites).replace('[','').replace(']','').rstrip(',').replace('\'',''))
+		reply = json.dumps(suites)
+	else:
+		reply = ','.join(suites)
+
+	#return HttpResponse(str(suites).replace('[','').replace(']','').rstrip(',').replace('\'',''))
+	return HttpResponse( reply )
 
 def get_path(request):
 	if request.POST and 'path' in request.POST:
@@ -79,17 +93,6 @@ def get_path(request):
 		return request.GET['suite']
 	else:
 		return None
-
-def add_fullpath(fn):
-	def patch(request):
-		path = get_path(request)
-		if path:
-			RequestHandler = serving.factory(request, path)
-			full_path = RequestHandler.get_full_path()
-			log.debug('added request handler for %s path: %s , fullpath: %s' % (fn, path, full_path))
-			return fn(request, RequestHandler)
-		return fn(request)
-	return patch
 
 def log_errors(fn):
 	""" Catch errors and write it into logs then raise it up.
@@ -134,7 +137,7 @@ def show_context(request, path):
 
 	return HttpResponse(result)
 
-@add_fullpath
+@add_request_handler
 def createFolder(request, RequestHandler):
 	fullpath = RequestHandler.get_full_path()
 	result = tools.mkdir(fullpath, request.POST["object-name"])
@@ -144,7 +147,7 @@ def createFolder(request, RequestHandler):
 
 	return response
 
-@add_fullpath
+@add_request_handler
 def removeObject(request, RequestHandler):
 	fullpath = RequestHandler.get_full_path()
 	log.debug('removeObject: ' + fullpath)
@@ -152,7 +155,7 @@ def removeObject(request, RequestHandler):
 	redirect = '/' + request.POST["url"].lstrip('/')
 	return HttpResponseRedirect(redirect)
 
-@add_fullpath
+@add_request_handler
 def createSuite(request, RequestHandler):
 	fullpath = RequestHandler.get_full_path()
 	result = {}
@@ -163,7 +166,7 @@ def createSuite(request, RequestHandler):
 
 	return response
 
-@add_fullpath
+@add_request_handler
 def editSuite(request, RequestHandler):
 	fullpath = RequestHandler.get_full_path()
 	log.debug('edit context %s' % fullpath)
@@ -172,7 +175,7 @@ def editSuite(request, RequestHandler):
 	redirect = '/' + request.GET['path'] + '/' + settings.TEST_CONTEXT_FILE_NAME + '?editor'
 	return HttpResponseRedirect(redirect)
 
-@add_fullpath
+@add_request_handler
 def createTest(request, RequestHandler):
 	fullpath = RequestHandler.get_full_path()
 	log.debug('createTest: '+ request.POST["object-name"])
@@ -185,7 +188,7 @@ def createTest(request, RequestHandler):
 
 	return response
 
-@add_fullpath
+@add_request_handler
 def saveTest(request, RequestHandler):
 	fullpath = RequestHandler.get_full_path()
 	if fullpath == 'settings':
@@ -201,7 +204,7 @@ def submitTest(request):
 def submitSuite(request):
 	return _render_to_response( "runsuite.html", request.POST )
 
-@add_fullpath
+@add_request_handler
 @error_handler
 def runSuite(request, RequestHandler):
 	fullpath = RequestHandler.get_full_path()
@@ -239,7 +242,7 @@ def compileSuiteCoffee(path, suite_path):
 		path = coffeescript.compile2js(None, None, fullpath)
 		log.info(path)
 
-@add_fullpath
+@add_request_handler
 @error_handler
 def runTest(request, RequestHandler):
 	fullpath = RequestHandler.get_full_path()

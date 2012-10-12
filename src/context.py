@@ -11,8 +11,8 @@ def host(instance, resolve=True):
 		return contrib.resolveRemoteAddr(instance.get(key), cache)
 	return instance.get(key)
 
-def get(RequestHandler, section='default'):
-	return context(RequestHandler, section)
+def get(RequestHandler, path=None, section='default'):
+	return context(RequestHandler, path, section)
 
 def get_URL(instance, resolve=False):
 	url = instance.get('url')
@@ -158,9 +158,9 @@ class global_settings(object):
 class context(global_settings):
 	comment = 'context.ini'
 
-	def __init__(self, RequestHandler, section='DEFAULT'):
+	def __init__(self, RequestHandler, path, section='DEFAULT'):
 		self.requestHandler = RequestHandler
-		self.inifile = RequestHandler.get_context_path()
+		self.inifile = RequestHandler.get_context_path(path)
 		self.section = section
 		log.debug('context: %s, section: %s' % (self.inifile, self.section))
 
