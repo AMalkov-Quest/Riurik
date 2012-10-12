@@ -63,10 +63,11 @@ def enumerate_suites(request, RequestHandler):
 	path = request.REQUEST.get('path', '/')
 	
 	root = RequestHandler.get_document_root()
+	fullpath = RequestHandler.get_full_path()
 	log.debug('enum suites in %s' % root)
 	contextini = settings.TEST_CONTEXT_FILE_NAME
 	suites = []
-	for dirpath, dirnames, filenames in os.walk(root, followlinks=True):
+	for dirpath, dirnames, filenames in os.walk(fullpath, followlinks=True):
 		if contextini in filenames:
 			relpath = os.path.relpath(dirpath, root)
 			ctx = context.get(RequestHandler, relpath )
