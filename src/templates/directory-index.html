@@ -23,6 +23,10 @@
     <script type="text/javascript" src="/static/js/jquery.contextMenu.js"></script>
     <script type="text/javascript" src="/static/js/dir-index-ctxmenu.js"></script>
     <script type="text/javascript" src="/static/js/dir-index-tools.js"></script>
+
+	<link type='text/css' href='/static/css/git-console.css' rel='stylesheet' media='screen' />
+	<script type='text/javascript' src='/static/js/jquery.simplemodal.js'></script>
+	<script type='text/javascript' src='/static/js/git-console.js'></script>
 	    
     <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
     <meta http-equiv="Content-Language" content="en-us" />
@@ -39,6 +43,7 @@
 
 {% include "dir-index-tools.html" %}
 {% include "dir-index-menu.html" %}
+{% include "git-console.html" %}
 
 <body>
 	{% block body %}
@@ -85,7 +90,8 @@
 				{% else %}
 					<li><a id="configure" href="/settings" >{% trans "Configure" %}</a></li>
 					<li>
-					<a id="github" href="{{ githref }}" >{% trans "Login with github" %}</a>
+					<!--<a id="github" href="{{ githref }}" >{% trans "Login with github" %}</a>-->
+					<a id="github" href="javascript:void(0)" class="github" >{% trans "Login with github" %}</a>
 					</li>
 					
 				{% endif %}

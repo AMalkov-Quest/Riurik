@@ -15,10 +15,10 @@ jQuery(function ($) {
 	var OSX = {
 		container: null,
 		init: function () {
-			$("input.osx, a.osx").click(function (e) {
+			$("a.github").click(function (e) {
 				e.preventDefault();	
 
-				$("#osx-modal-content").modal({
+				$("#git-console").modal({
 					overlayId: 'osx-overlay',
 					containerId: 'osx-container',
 					closeHTML: null,
@@ -30,17 +30,22 @@ jQuery(function ($) {
 					onClose: OSX.close
 				});
 			});
+
+			/*$("button.agree").click(function (e) {
+				e.preventDefault();	
+				window.location = ;
+			});*/
 		},
 		open: function (d) {
 			var self = this;
 			self.container = d.container[0];
 			d.overlay.fadeIn('slow', function () {
-				$("#osx-modal-content", self.container).show();
-				var title = $("#osx-modal-title", self.container);
+				$("#git-console", self.container).show();
+				var title = $("#git-console-title", self.container);
 				title.show();
 				d.container.slideDown('slow', function () {
 					setTimeout(function () {
-						var h = $("#osx-modal-data", self.container).height()
+						var h = $("#git-console-data", self.container).height()
 							+ title.height()
 							+ 20; // padding
 						d.container.animate(
@@ -48,7 +53,7 @@ jQuery(function ($) {
 							200,
 							function () {
 								$("div.close", self.container).show();
-								$("#osx-modal-data", self.container).show();
+								$("#git-console-data", self.container).show();
 							}
 						);
 					}, 300);
