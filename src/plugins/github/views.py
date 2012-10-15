@@ -4,7 +4,6 @@ from django.shortcuts import render_to_response as _render_to_response
 from django.http import HttpResponseRedirect
 from django.conf import settings
 import httplib, urllib, json
-from github import Github
 import gitware
 
 def signin(req):
@@ -12,11 +11,7 @@ def signin(req):
 	variables.update(globals())
 	return _render_to_response("signin.html", variables)
 
-def login(req):
-	code = req.GET.get('code')
-	state = req.GET.get('state')
-	host = req.META['HTTP_HOST']
-	
+def authorize(code, host):
 	params = urllib.urlencode({
 		'code': code.encode('utf-8'),
 		'client_id': gitware.client_id[host],
@@ -27,13 +22,20 @@ def login(req):
 	conn.request('POST', gitware.github_access_url, params, { 'Accept': 'application/json' })
 	resp = conn.getresponse()
 	token = json.loads(resp.read())
+	return token['access_token']
 
-	req.session['token'] = token['access_token']
+def login(req):
+	code = req.GET.get('code')
+	state = req.GET.get('state')
+	host = req.META['HTTP_HOST']
+	
+	token = authorize(code, host)
+	req.session['token'] = token
 
-	return HttpResponseRedirect('/')
-
-def github_test(req):
-	git = Github( req.session['token'] )
-	user = git.get_user()
-	git = user.login
-	return _render_to_response("test.html", locals())
+	github = gitware.Github(token)
+	user = github.get_user()
+	repos = gitware.get_repos(user)
+	if repos:
+		return HttpResponseRedirect('/')
+	else:
+		return _render_to_response("signin.html", variables)

@@ -30,9 +30,6 @@ urlpatterns = patterns('',
 	(r'^report_callback/$', 'views.report_callback'),
 	(r'^report/status$', 'views.tests_status'),
 	(r'^report/progress$', 'views.tests_progress'),
-	(r'^signin[/]?$', 'auth.views.signin'),
-	(r'^login[/]?$', 'auth.views.login'),
-	(r'^gh[/]?$', 'auth.views.github_test')
 
 )
 
@@ -40,6 +37,7 @@ urlpatterns += patterns('',
 	(r'^search', include('plugins.search.urls')),
 	(r'^readme', include('plugins.help.urls')),
 	(r'^git/(?P<cmd>.*)$', include('plugins.git.urls')),
+	(r'^github/', include('plugins.github.urls')),
 )
 
 urlpatterns += patterns('',

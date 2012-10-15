@@ -24,7 +24,7 @@ scope = 'repo'
 
 def get_oauth_href(request):
 	host = request.META['HTTP_HOST']
-	url = 'http://%s/login' % host
+	url = 'http://%s/github/login' % host
 	return '%s?client_id=%s&scope=%s&redirect_url=%s' % (github_auth_url, client_id[host], scope, url) 
 
 def get_keys(obj):

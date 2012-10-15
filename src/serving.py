@@ -9,7 +9,7 @@ import settings
 from logger import log
 import dir_index_tools as tools
 import context, contrib, inuse, spec
-from auth import gitware 
+from plugins.github import gitware
 
 def oAuth(request):
 	return request.session.get('token')
