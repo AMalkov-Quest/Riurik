@@ -11,7 +11,7 @@
  * Revision: $Id: osx.css 254 2010-07-23 05:14:44Z emartin24 $
  */
 
-#git-console-content, #git-console-data, #git-console-title, .close {display:none;}
+#git-console {display:none;}
 
 /* Overlay */
 #osx-overlay {background-color:#000; cursor:wait;}
@@ -23,7 +23,7 @@
 #osx-container .close {display:none; position:absolute; right:0; top:0;}
 #osx-container .close a {display:block; color:#777; font-weight:bold; padding:6px 12px 0; text-decoration:none; text-shadow:0 1px 0 #f4f4f4;}
 #osx-container .close a:hover {color:#000;}
-#osx-container #git-console-data {font-size:12px; padding:6px 12px;}
+#osx-container #git-console {font-size:12px; padding:6px 12px;}
 #osx-container h2 {margin:10px 0 6px;}
 #osx-container p {margin-bottom:10px;}
 #osx-container span {color:#777;}
