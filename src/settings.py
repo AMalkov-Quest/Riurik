@@ -86,7 +86,7 @@ ROOT_URLCONF = 'urls'
 TEMPLATE_DIRS = (
 
     os.path.join(os.path.dirname( __file__ ), 'templates'),
-    os.path.join(os.path.dirname( __file__ ), 'auth', 'templates'),
+    os.path.join(os.path.dirname( __file__ ), 'plugins', 'github', 'templates'),
 )
 
 TEMPLATE_CONTEXT_PROCESSORS = (

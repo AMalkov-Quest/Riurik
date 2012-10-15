@@ -1,0 +1,12 @@
+{% extends 'directory-index.html' %}
+
+{% block javascripts %}
+	{{ block.super }}
+	<script type="text/javascript">
+	jQuery(function ($) {
+		setTimeout( function() {
+			OSX.modal();		
+		}, 1000);
+	});
+	</script>
+{% endblock %}

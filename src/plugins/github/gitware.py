@@ -129,20 +129,21 @@ def get_repos(user):
 def ensure_riurik_repo(user):
 	repo_name = gen_repo_name(user)
 	repo = get_repo_by_name(user, repo_name)
-	if not repo:
-		repo = create_repo(user, repo_name)
+	#if not repo:
+	#	repo = create_repo(user, repo_name)
 		
 	return repo
 
 def get_riurik_repo(user):
 	repos = get_repos(user)
 	if not repos:
-		repo = ensure_riurik_repo(user)
-		ensure_deploy_key(user, repo)
+		#repo = ensure_riurik_repo(user)
+		#ensure_deploy_key(user, repo)
+		repo = None
 	else:
 		repo = repos[0]
 	
-	init_repo(user, repo)
+	#init_repo(user, repo)
 
 	return repo
 
@@ -155,7 +156,9 @@ def get_abspath(path=None):
 
 def get_document_root(user, repo):
 	user_dir = get_user_dir(user.login, repo.id)
-	return get_abspath(user_dir)
+	document_root = get_abspath(user_dir)
+	if os.path.exists(document_root):
+		return document_root
 
 def get_full_path(user, repo, path):
 	user_dir = get_user_dir(user.login, repo.id)

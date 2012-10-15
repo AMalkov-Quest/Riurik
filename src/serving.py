@@ -17,7 +17,11 @@ def oAuth(request):
 def factory(request, path):
 	if oAuth(request):
 		log.debug('factory git')
-		return GitHandler(request, path)
+		handler = GitHandler(request, path)
+		if handler.get_document_root():
+			return handler
+		else:
+			return GitInitHandler(request, path)
 	else:
 		log.debug('factory def')
 		return DefaultHandler(request, path)
@@ -174,6 +178,22 @@ class GitHandler(BaseHandler):
 
 	def get_virtual_root(self):
 		return '' 
+
+class GitInitHandler(GitHandler):
+
+	def serve(self, request):
+		log.debug('initialize gir repo fo %s' % ('user'))
+		descriptor = Context({
+			'directory' : '/',
+			'type'		: 'virtual',
+			'file_list' : [],
+			'dir_list'  : [],
+			'contexts'  : [],
+			'favicon'   : None,
+			'spec'      : None,
+			'githref'   : gitware.get_oauth_href(request)
+		})
+		return _render_to_response('git-init.html', descriptor)
 
 class DefaultHandler(BaseHandler):
 	
