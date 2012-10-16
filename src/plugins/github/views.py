@@ -1,9 +1,12 @@
 # coding: utf-8
 
 from django.shortcuts import render_to_response as _render_to_response
+from django.template import Context
 from django.http import HttpResponseRedirect
-from django.conf import settings
+import settings
 import httplib, urllib, json
+from logger import log
+import serving
 import gitware
 
 def signin(req):
@@ -39,3 +42,70 @@ def login(req):
 		return HttpResponseRedirect('/')
 	else:
 		return _render_to_response("signin.html", variables)
+
+def oAuth(request):
+	return request.session.get('token')
+
+def plugin(request, path):
+	if settings.appInstalled('src.plugins.github') and not path or path == '/':
+		return GitFronPageHandler(request, path)
+
+	if oAuth(request):
+		handler = GitHandler(request, path)
+		if handler.get_document_root():
+			return handler
+		else:
+			return GitInitHandler(request, path)
+
+class GitHandler(serving.BaseHandler):
+
+	def __init__(self, request, path):
+		self.path = path
+		token = request.session.get('token')
+		ghub = gitware.Github(token)
+		self.user = ghub.get_user()
+		self.repo = gitware.get_riurik_repo(self.user)
+
+	def get_document_root(self):
+		return gitware.get_document_root(self.user, self.repo)
+
+	def get_full_path(self, path=None):
+		path = self.path if not path else path
+		return gitware.get_full_path(self.user, self.repo, path)
+
+	def get_virtual_root(self):
+		return '' 
+
+class GitFronPageHandler(GitHandler):
+
+	def __init__(self, request, path):
+		pass
+
+	def serve(self, request):
+		log.debug('show git front page')
+		descriptor = Context({
+			'directory' : '/',
+			'type'		: 'front-page',
+			'file_list' : [],
+			'dir_list'  : [],
+			'contexts'  : [],
+			'favicon'   : None,
+			'spec'      : None,
+			'githref'   : gitware.get_oauth_href(request)
+		})
+		return _render_to_response('git-front-page.html', descriptor)
+
+class GitInitHandler(GitHandler):
+
+	def serve(self, request):
+		log.debug('initialize git repo fo %s' % ('user'))
+		descriptor = Context({
+			'directory' : '/',
+			'type'		: 'virtual',
+			'file_list' : [],
+			'dir_list'  : [],
+			'contexts'  : [],
+			'favicon'   : None,
+			'spec'      : None,
+		})
+		return _render_to_response('git-init.html', descriptor)

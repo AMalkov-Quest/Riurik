@@ -78,7 +78,6 @@ CACHE_MIDDLEWARE_SECONDS = 600
 
 MIDDLEWARE_CLASSES = (
 	'django.contrib.sessions.middleware.SessionMiddleware',
-	#'src.auth.middleware.GitHubAuth',
 )
 
 ROOT_URLCONF = 'urls'
@@ -104,7 +103,12 @@ INSTALLED_APPS = (
 	'django.contrib.messages',
 	'src',
 	'src.plugins.search',
+	'src.plugins.git',
+	'src.plugins.github',
 )
+
+def appInstalled(app_name):
+	return app_name in INSTALLED_APPS
 
 if platform.system() == 'Windows':
 	nodejs = os.path.join(os.environ['ProgramFiles'], 'nodejs', 'node.exe')

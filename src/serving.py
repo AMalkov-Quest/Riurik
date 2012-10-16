@@ -9,28 +9,29 @@ import settings
 from logger import log
 import dir_index_tools as tools
 import context, contrib, inuse, spec
-from plugins.github import gitware
 
-def oAuth(request):
-	return request.session.get('token')
+def getGitHub(request, path):
+	try:
+		from plugins.github.views import plugin
+		return plugin(request, path)
+	except Exception, e:
+		log.debug(e)
 
 def factory(request, path):
-	if oAuth(request):
-		log.debug('factory git')
-		handler = GitHandler(request, path)
-		if handler.get_document_root():
-			return handler
-		else:
-			return GitInitHandler(request, path)
+	log.debug('serving: select handler')
+	gHandler = getGitHub(request, path) 
+	if gHandler:
+		log.debug('github handler is selected')
+		return gHandler
 	else:
-		log.debug('factory def')
+		log.debug('default handler is selected')
 		return DefaultHandler(request, path)
 
 def response(request, path):
 	handler = factory(request, path)
 	return handler.serve(request)
 
-class BaseHandler:
+class BaseHandler(object):
 
 	def get_path(self):
 		return self.path
@@ -107,8 +108,8 @@ class BaseHandler:
 
 	def get_type(self, fullpath):
 		result = tools.get_type(fullpath)
-		if result == 'folder' and self.is_document_root( fullpath.rstrip('/').rstrip('\\') ):
-				return 'virtual'
+		#if result == 'folder' and self.is_document_root( fullpath.rstrip('/').rstrip('\\') ):
+		#	return 'virtual'
 
 		return result
 
@@ -157,43 +158,7 @@ class BaseHandler:
 			'contexts'  : contexts,
 			'favicon'   : favicon,
 			'spec'      : get_spec(self.path, fullpath),
-			'githref'   : gitware.get_oauth_href(request)
 		})
-
-class GitHandler(BaseHandler):
-
-	def __init__(self, request, path):
-		self.path = path
-		token = request.session.get('token')
-		ghub = gitware.Github(token)
-		self.user = ghub.get_user()
-		self.repo = gitware.get_riurik_repo(self.user)
-
-	def get_document_root(self):
-		return gitware.get_document_root(self.user, self.repo)
-
-	def get_full_path(self, path=None):
-		path = self.path if not path else path
-		return gitware.get_full_path(self.user, self.repo, path)
-
-	def get_virtual_root(self):
-		return '' 
-
-class GitInitHandler(GitHandler):
-
-	def serve(self, request):
-		log.debug('initialize gir repo fo %s' % ('user'))
-		descriptor = Context({
-			'directory' : '/',
-			'type'		: 'virtual',
-			'file_list' : [],
-			'dir_list'  : [],
-			'contexts'  : [],
-			'favicon'   : None,
-			'spec'      : None,
-			'githref'   : gitware.get_oauth_href(request)
-		})
-		return _render_to_response('git-init.html', descriptor)
 
 class DefaultHandler(BaseHandler):
 	

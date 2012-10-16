@@ -9,20 +9,12 @@
 	{{ block.super }}
 	<script type='text/javascript' src='/static/js/jquery.simplemodal.js'></script>
 	<script type='text/javascript' src='/static/js/git-console.js'></script>
-	<script type="text/javascript">
-	jQuery(function ($) {
-		setTimeout( function() {
-			OSX.modal();		
-		}, 1000);
-	});
-	</script>
-
-{% endblock javascript%}
+{% endblock %}
 
 {% block body %}
 {{ block.super }}
 <div id="git-console" align="right">
-	<p>Are you ready to create new repository for the Riurik framework?
+	<p>You are about to log on the Riurik with you existing github account.
 	Press OK to proceed or ESC to cancel.</p>
 	<input type=button class="agree" onClick="window.location='{{ githref }}'" value="OK">
 </div>
