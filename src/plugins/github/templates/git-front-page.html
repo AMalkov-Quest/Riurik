@@ -1,18 +1,22 @@
-{% extends 'directory-index.html' %}
-
-{% block styles %}
-	{{ block.super }}
-	<link type='text/css' href='/static/css/git-console.css' rel='stylesheet' media='screen' />
-{% endblock styles %}
+{% extends 'git-base.html' %}
 
 {% block javascripts %}
 	{{ block.super }}
-	<script type='text/javascript' src='/static/js/jquery.simplemodal.js'></script>
-	<script type='text/javascript' src='/static/js/git-console.js'></script>
+
+	<script type="text/javascript">
+	jQuery(function ($) {
+		$("a.github").click(function (e) {
+			e.preventDefault();	
+			OSX.modal();	
+		});		
+	});
+	</script>
+
 {% endblock %}
 
 {% block body %}
 {{ block.super }}
+
 <div id="git-console" align="right">
 	<p>You are about to log on the Riurik with you existing github account.
 	Press OK to proceed or ESC to cancel.</p>

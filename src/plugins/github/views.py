@@ -47,15 +47,15 @@ def oAuth(request):
 	return request.session.get('token')
 
 def plugin(request, path):
-	if settings.appInstalled('src.plugins.github') and not path or path == '/':
-		return GitFronPageHandler(request, path)
-
-	if oAuth(request):
-		handler = GitHandler(request, path)
-		if handler.get_document_root():
-			return handler
+	if settings.appInstalled('src.plugins.github'):
+		if oAuth(request):
+			handler = GitHandler(request, path)
+			if handler.get_document_root():
+				return handler
+			else:
+				return GitInitHandler(request, path)
 		else:
-			return GitInitHandler(request, path)
+			return GitFronPageHandler(request, path)
 
 class GitHandler(serving.BaseHandler):
 
