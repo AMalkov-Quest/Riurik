@@ -1,6 +1,5 @@
 import os, inspect, minimock
 import __builtin__
-#from minimock import mock, Printer, lookup_by_name
  
 def stub(name, **kw):
 	kw['tracker'] = minimock.Printer(open(os.devnull, "w"))
@@ -14,3 +13,7 @@ def stub(name, **kw):
 
 def restore():
 	minimock.restore()
+
+class mockObj(dict):
+	__getattr__ = dict.__getitem__
+	__setattr__ = dict.__setitem__

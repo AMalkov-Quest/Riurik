@@ -1,7 +1,7 @@
 import os
 from django.http import HttpResponse
 import plugins.git.gitssh as gitssh
-import auth.gitware as gitware
+import plugins.github.gitware as gitware
 from logger import log
 
 def command(token, cmdline):

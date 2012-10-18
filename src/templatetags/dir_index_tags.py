@@ -44,12 +44,16 @@ def current(path):
 @register.filter
 def breadcrumbs(path, pagetype):
 	"""
-	>>> breadcrumbs('')
+	>>> breadcrumbs('', 'front-page')
 	''
-	>>> breadcrumbs('/')
+	>>> breadcrumbs('', 'virtual')
 	''
-	>>> breadcrumbs('/path1/')
+	>>> breadcrumbs('/path1/', 'suite')
 	'<a href="/">&#8226;</a>&nbsp;&nbsp;<a>path1</a>&nbsp;&nbsp;<a href="//"><img height="11" src="/static/img/up.png" /></a>'
+	>>> breadcrumbs('/path1/path2', 'suite')
+	'<a href="/">&#8226;</a>&nbsp;&nbsp;<a href="/path1/">path1</a>&nbsp;&nbsp;&#8227;&nbsp;&nbsp;<a>path2</a>&nbsp;&nbsp;<a href="//path1/"><img height="11" src="/static/img/up.png" /></a>'
+	>>> breadcrumbs('/path1/test1.js', 'test')
+	'<a href="/">&#8226;</a>&nbsp;&nbsp;<a href="/path1/">path1</a>&nbsp;&nbsp;&#8227;&nbsp;&nbsp;<a>test1.js</a>&nbsp;&nbsp;'
 	"""
 	path = path.replace('\\','/')
 	if not pagetype in ('front-page', 'virtual') :
