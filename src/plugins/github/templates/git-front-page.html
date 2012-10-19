@@ -26,7 +26,8 @@
 	<p>{% trans "The Riurik framework does not provide any storage service. But it uses GitHub for it. Any artifacts those are going to be created here will be stored in your GitHub repository. So to start using Riurik it is necessary to login with your existing GitHub account. GitHub requires to specify level of access that you are agree to grant to Riurik over your account. We recommend to allow Riurik updating your public repository in order to automate creating and configuring it. But of course you can select another read-only option and do all the required actions manually." %}</p>
 	<div align="right">
 		<select id="scope">
-			<option value="public_repo" selected>Update your public repositories</option>
+			<option value="repo" selected>Update your public and private repositories</option>
+			<option value="public_repo">Update your public repositories</option>
 			<option value="">Read your public information</option>	
 		</select>
 		<input type=button class="agree" onClick="javascript:LogInWithGithub()" value="OK">

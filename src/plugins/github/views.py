@@ -8,6 +8,7 @@ import httplib, urllib, json
 from logger import log
 import serving
 import gitware
+from plugins.git import gitssh
 
 def signin(req):
 	variables = { 'RIURIK_URL': 'http://'+req.META['HTTP_HOST']+'/login' }
@@ -55,6 +56,9 @@ def mkrepo(request):
 	user = gitware.get_user_by_token(token)
 	repo = gitware.mkrepo_for_riurik(user)
 	gitware.init_repo(user, repo)
+	gitware.init_gitignore(user, repo)
+	gitssh.command(token, "git commit -a -m 'initial commit'")
+	gitssh.command(token, "git push")
 
 	return HttpResponseRedirect('/')
 
@@ -99,6 +103,8 @@ class GitInitHandler(GitHandler):
 
 	def serve(self, request):
 		log.debug('initialize git repo fo %s' % (self.user.login))
+
+		repo_name = gitware.gen_repo_name(self.user)
 		descriptor = Context({
 			'directory' : '/',
 			'type'		: 'virtual',
@@ -107,5 +113,7 @@ class GitInitHandler(GitHandler):
 			'contexts'  : [],
 			'favicon'   : None,
 			'spec'      : None,
+			'login'     : self.user.login,
+			'repo_name' : repo_name,
 		})
 		return _render_to_response('git-init.html', descriptor)

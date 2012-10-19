@@ -7,6 +7,7 @@ from logger import log
 repo_title = 'Repo added through Riurik Framework'
 key_title = 'Key added through Riurik Framework'
 #git = Github('Riurik', 'riurik862879')
+gitignore = '.gitignore'
 
 client_id = {
 	'www.riurik.com' : 'cea1f31118f8468d79d8',
@@ -150,6 +151,12 @@ def get_riurik_repo(user):
 	#init_repo(user, repo)
 
 	return repo
+
+def init_gitignore(user, repo):
+	git_ignore_path = get_full_path(user, repo, gitignore)
+	f = open(git_ignore_path, 'w')
+	f.write('.*.js')
+	f.close()
 
 def mkrepo_for_riurik(user):
 	repo_name = gen_repo_name(user)
