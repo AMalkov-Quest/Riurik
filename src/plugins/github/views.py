@@ -34,36 +34,36 @@ def login(req):
 	
 	token = authorize(code, host)
 	req.session['token'] = token
-
-	github = gitware.Github(token)
-	user = github.get_user()
-	repos = gitware.get_repos(user)
-	if repos:
-		return HttpResponseRedirect('/')
-	else:
-		return _render_to_response("signin.html", variables)
+	return HttpResponseRedirect('/')
 
 def oAuth(request):
-	return request.session.get('token')
+	return request.session.get('token', None)
 
 def plugin(request, path):
 	if settings.appInstalled('src.plugins.github'):
 		if oAuth(request):
 			handler = GitHandler(request, path)
-			if handler.get_document_root():
+			if handler.repo:
 				return handler
 			else:
 				return GitInitHandler(request, path)
 		else:
 			return GitFronPageHandler(request, path)
 
+def mkrepo(request):
+	token = oAuth(request)
+	user = gitware.get_user_by_token(token)
+	repo = gitware.mkrepo_for_riurik(user)
+	gitware.init_repo(user, repo)
+
+	return HttpResponseRedirect('/')
+
 class GitHandler(serving.BaseHandler):
 
 	def __init__(self, request, path):
 		self.path = path
-		token = request.session.get('token')
-		ghub = gitware.Github(token)
-		self.user = ghub.get_user()
+		token = oAuth(request)
+		self.user = gitware.get_user_by_token(token)
 		self.repo = gitware.get_riurik_repo(self.user)
 
 	def get_document_root(self):
@@ -98,7 +98,7 @@ class GitFronPageHandler(GitHandler):
 class GitInitHandler(GitHandler):
 
 	def serve(self, request):
-		log.debug('initialize git repo fo %s' % ('user'))
+		log.debug('initialize git repo fo %s' % (self.user.login))
 		descriptor = Context({
 			'directory' : '/',
 			'type'		: 'virtual',

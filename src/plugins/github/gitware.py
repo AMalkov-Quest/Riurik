@@ -20,12 +20,12 @@ client_secret = {
 
 github_auth_url = 'https://github.com/login/oauth/authorize'
 github_access_url = 'https://github.com/login/oauth/access_token'
-scope = 'repo'
+scope = 'public_repo'
 
 def get_oauth_href(request):
 	host = request.META['HTTP_HOST']
 	url = 'http://%s/github/login' % host
-	return '%s?client_id=%s&scope=%s&redirect_url=%s' % (github_auth_url, client_id[host], scope, url) 
+	return '%s?client_id=%s&redirect_url=%s&scope=' % (github_auth_url, client_id[host], url) 
 
 def get_keys(obj):
 	try:
@@ -57,6 +57,9 @@ def download_deploy_key(user, repo):
 		f.write(key.key)
 		f.close()
 
+def get_user_by_token(token):
+	return Github(token).get_user()
+
 def get_user_dir(login, repo_id):
 	return '%s-%s' % (login, repo_id)
 
@@ -72,6 +75,7 @@ def init_repo(user, repo):
 			out, error, code = call(cmd)
 
 def ssh_key_gen(user):
+	log.debug('generate ssh keys for %s' % user.login)
 	rsa_path = get_rsa_path(user)
 	args = shlex.split("ssh-keygen -q -t rsa -N '' -f")
 	args.append( rsa_path )
@@ -147,6 +151,17 @@ def get_riurik_repo(user):
 
 	return repo
 
+def mkrepo_for_riurik(user):
+	repo_name = gen_repo_name(user)
+	log.debug("create the '%s' repo for the '%s' user" % (repo_name, user.login))
+	repo = create_repo(user, repo_name)
+	
+	key = ssh_key_gen(user)
+	log.debug('create a deploy key in the %s repo' % repo_name)
+	repo.create_key(key_title, key)
+
+	return repo
+
 def get_abspath(path=None):
 	home = get_repos_root()
 	if not path:
@@ -155,6 +170,13 @@ def get_abspath(path=None):
 	return os.path.join(home, path)
 
 def get_document_root(user, repo):
+	"""
+	>>> from test import mockObj
+	>>> user = mockObj(login='riurik')
+	>>> repo = mockObj(id='12345')
+	>>> get_document_root(user, repo)
+	''	
+	"""
 	user_dir = get_user_dir(user.login, repo.id)
 	document_root = get_abspath(user_dir)
 	if os.path.exists(document_root):
