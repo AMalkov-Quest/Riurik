@@ -57,8 +57,12 @@ def mkrepo(request):
 	repo = gitware.mkrepo_for_riurik(user)
 	gitware.init_repo(user, repo)
 	gitware.init_gitignore(user, repo)
+
+	gitssh.command(token, "git config user.name '%s'" % user.login)
+	gitssh.command(token, "git config user.email %s" % user.email)
+	gitssh.command(token, "git add .")
 	gitssh.command(token, "git commit -a -m 'initial commit'")
-	gitssh.command(token, "git push")
+	gitssh.command(token, "git push -u origin master")
 
 	return HttpResponseRedirect('/')
 
