@@ -51,7 +51,20 @@ var load_remote_style = function(url){
 	document.body.appendChild( style );
 };
 
-riurikldr.loader().queue('/static/js/jquery.min.js', function(){
+riurikldr.loader().queue(riurikldr.args.cwd + '/.context.js', function(){
+	document.title = /\/([^\/]*)\/*$/.exec(riurikldr.args.path)[1];
+	riurikldr.loader()
+	.queue('/static/testLoader.js')
+	.then(function() {
+		var engine = riurikldr.TryGetArgument('engine') || 'qunit';
+		riurik.load_test_engine( engine );
+	});
+
+	load_remote_style('/static/css/loader.css');
+	load_remote_style('/static/jquery-ui/css/redmond/jquery-ui.custom.css');
+});
+
+/*riurikldr.loader().queue('/static/js/jquery.min.js', function(){
 	document.title = /\/([^\/]*)\/*$/.exec(riurikldr.args.path)[1];
 	riurikldr.loader()
 	.queue('/static/js/tools.js')
@@ -71,4 +84,4 @@ riurikldr.loader().queue('/static/js/jquery.min.js', function(){
 
 	load_remote_style('/static/css/loader.css');
 	load_remote_style('/static/jquery-ui/css/redmond/jquery-ui.custom.css');
-});
+});*/

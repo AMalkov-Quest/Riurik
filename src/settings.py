@@ -103,8 +103,8 @@ INSTALLED_APPS = (
 	'django.contrib.messages',
 	'src',
 	'src.plugins.search',
-	'src.plugins.git',
-	'src.plugins.github',
+	#'src.plugins.git',
+	#'src.plugins.github',
 )
 
 def appInstalled(app_name):
@@ -146,8 +146,16 @@ STATIC_MANAGEMENT_VERSIONER = 'plugins.static_management.versioners.SHA1Sum'
 STATIC_MANAGEMENT = {
 	'js': {
 		'testLoader.js': [
-			'static/js/jquery.min.js',
-			'static/js/tools.js'
+			'js/jquery.json.min.js',
+			'jquery-ui/js/jquery-ui.custom.min.js',
+			'js/qunit.js',
+			'js/dates.js',
+			'js/tools.js',
+			'js/riurik.js',
+			'engines/engines.js',
+			'js/reporting.js',
+			'js/frame.js',
+			'js/errors.js'
 		]
 	},
 	'css': {
