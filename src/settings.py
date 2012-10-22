@@ -139,3 +139,17 @@ EXCLUDE_KEY = 'exclude'
 SUITE_SETUP = 'suite_setup'
 PRODUCT_CODE_PATH = 'product_code_path'
 PRODUCT_CODE_ALIAS = 'product_code_alias'
+
+STATIC_MANAGEMENT_ASSET_PATHS = []
+STATIC_MANAGEMENT_HOSTNAMES = ['http://www.riurik.com']
+STATIC_MANAGEMENT_VERSIONER = 'plugins.static_management.versioners.SHA1Sum'
+STATIC_MANAGEMENT = {
+	'js': {
+		'testLoader.js': [
+			'static/js/jquery.min.js',
+			'static/js/tools.js'
+		]
+	},
+	'css': {
+	}
+}
