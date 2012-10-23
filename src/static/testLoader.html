@@ -4,11 +4,10 @@
 		<title></title>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 		<script type="text/javascript">
-			//Top level namespace for Riurik
+			//Bootstrap namespace for Riurik
 			var riurikldr = {};
 
 			riurikldr.src = {};
-			riurikldr.src.jquery = '/static/js/jquery.min.js';
 			riurikldr.src.bootstrap = '/static/js/bootstrap.js';
 
 			riurikldr.TryGetArgument = function( name ) {
@@ -36,41 +35,17 @@
 				return /(.*?)\/[^\/]*$/.exec(path)[1];
 			};
 			
-			riurikldr.LoadScript = function(url, callback){
-				var url = riurikldr.BuildHttpUri( url );
-				var script = document.createElement( 'script' );
-				script.type = 'text/javascript';
-				script.src = url + '?_=' + Math.random().toString();
-				var timeout = setTimeout(function(){
-					onload(true);
-				}, 10000);
-				var onload = function(failed) {
-					if ( typeof callback == 'function' ) callback();
-					callback = function(){};
-					clearTimeout(timeout);
-				};
-				if ((typeof jQuery != 'undefined' && jQuery.browser.msie)||(/msie/i.exec(navigator.userAgent))) {
-					script.onreadystatechange = function() {
-						if (script.readyState == 'loaded' || script.readyState == 'complete') {
-							script.onreadystatechange = null;
-							onload();
-						};
-					};
-				}else{
-					script.onload = onload;
-				}
-				document.body.appendChild( script );
-			};
-
 			riurikldr.args = {};
 			riurikldr.args.server = riurikldr.GetArgument('server');
 			riurikldr.args.path = riurikldr.GetArgument('path');
 			riurikldr.args.cwd = riurikldr.GetCwd(riurikldr.args.path);
 
 			window.onload = function(){
-				riurikldr.LoadScript(riurikldr.src.jquery, function(){
-					riurikldr.LoadScript(riurikldr.src.bootstrap);
-				});
+				var url = riurikldr.BuildHttpUri( riurikldr.src.bootstrap );
+				var script = document.createElement( 'script' );
+				script.type = 'text/javascript';
+				script.src = url + '?_=' + Math.random().toString();
+				document.body.appendChild( script );
 			};
 		</script>
 	</head>

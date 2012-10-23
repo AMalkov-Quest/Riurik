@@ -2,6 +2,32 @@ if ( typeof console == 'undefined' || typeof console.log == 'undefined' ) {
 	var console = { log: function(){} };
 }
 
+riurikldr.LoadScript = function(scriptName, callback){
+	var url = riurikldr.BuildHttpUri( scriptName );
+	var script = document.createElement( 'script' );
+	script.type = 'text/javascript';
+	script.src = url + '?_=' + Math.random().toString();
+	var timeout = setTimeout(function(){
+		onload(true);
+	}, 10000);
+	var onload = function(failed) {
+		if ( typeof callback == 'function' ) callback();
+		callback = function(){};
+		clearTimeout(timeout);
+	};
+	if ((typeof jQuery != 'undefined' && jQuery.browser.msie)||(/msie/i.exec(navigator.userAgent))) {
+		script.onreadystatechange = function() {
+			if (script.readyState == 'loaded' || script.readyState == 'complete') {
+				script.onreadystatechange = null;
+				onload();
+			};
+		};
+	}else{
+		script.onload = onload;
+	}
+	document.body.appendChild( script );
+};
+
 riurikldr.loader = function() {
 	var queue = [];
 	var callbacks = [];
@@ -63,25 +89,3 @@ riurikldr.loader().queue(riurikldr.args.cwd + '/.context.js', function(){
 	load_remote_style('/static/css/loader.css');
 	load_remote_style('/static/jquery-ui/css/redmond/jquery-ui.custom.css');
 });
-
-/*riurikldr.loader().queue('/static/js/jquery.min.js', function(){
-	document.title = /\/([^\/]*)\/*$/.exec(riurikldr.args.path)[1];
-	riurikldr.loader()
-	.queue('/static/js/tools.js')
-	.queue('/static/js/jquery.json.min.js')
-	.queue('/static/jquery-ui/js/jquery-ui.custom.min.js')
-	.queue('/static/js/dates.js')
-	.queue(riurikldr.args.cwd + '/.context.js')
-	.queue('/static/js/riurik.js')
-	.queue('/static/engines/engines.js')
-	.queue('/static/js/reporting.js')
-	.queue('/static/js/frame.js')
-	.queue('/static/js/errors.js')
-	.then(function() {
-		var engine = riurikldr.TryGetArgument('engine') || 'qunit';
-		riurik.load_test_engine( engine );
-	});
-
-	load_remote_style('/static/css/loader.css');
-	load_remote_style('/static/jquery-ui/css/redmond/jquery-ui.custom.css');
-});*/
