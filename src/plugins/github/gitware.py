@@ -178,11 +178,8 @@ def get_abspath(path=None):
 
 def get_document_root(user, repo):
 	"""
-	>>> from test import mockObj
-	>>> user = mockObj(login='riurik')
-	>>> repo = mockObj(id='12345')
-	>>> get_document_root(user, repo)
-	''	
+	>>> get_document_root('riurik', '12345')
+		
 	"""
 	user_dir = get_user_dir(user, repo)
 	document_root = get_abspath(user_dir)

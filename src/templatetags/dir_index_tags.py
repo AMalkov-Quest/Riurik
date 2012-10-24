@@ -48,6 +48,8 @@ def breadcrumbs(path, pagetype):
 	''
 	>>> breadcrumbs('', 'virtual')
 	''
+	>>> breadcrumbs('/', 'folder')
+	'<a href="/">&#8226;</a>&nbsp;&nbsp;'
 	>>> breadcrumbs('/path1/', 'suite')
 	'<a href="/">&#8226;</a>&nbsp;&nbsp;<a>path1</a>&nbsp;&nbsp;<a href="//"><img height="11" src="/static/img/up.png" /></a>'
 	>>> breadcrumbs('/path1/path2', 'suite')
@@ -56,22 +58,23 @@ def breadcrumbs(path, pagetype):
 	'<a href="/">&#8226;</a>&nbsp;&nbsp;<a href="/path1/">path1</a>&nbsp;&nbsp;&#8227;&nbsp;&nbsp;<a>test1.js</a>&nbsp;&nbsp;'
 	"""
 	path = path.replace('\\','/')
-	if not pagetype in ('front-page', 'virtual') :
-		html = '<a href="/">&#8226;</a>&nbsp;&nbsp;'
-		root = '/'
-		lastpath = root
-		i = 0
-		crumbs = path.rstrip('/').split('/')
-		for p in crumbs:
-			i += 1
-			if p:
-				lastpath += p 
-				lastpath += '/'
-				if i < len(crumbs):
-					html += '<a href="%s">%s</a>&nbsp;&nbsp;&#8227;&nbsp;&nbsp;' % ( lastpath, p )
-				else:
-					html += '<a>%s</a>&nbsp;&nbsp;' % ( p )
-				
+	head = '<a href="/">&#8226;</a>&nbsp;&nbsp;'
+	html = head
+	root = '/'
+	lastpath = root
+	i = 0
+	crumbs = path.rstrip('/').split('/')
+	for p in crumbs:
+		i += 1
+		if p:
+			lastpath += p 
+			lastpath += '/'
+			if i < len(crumbs):
+				html += '<a href="%s">%s</a>&nbsp;&nbsp;&#8227;&nbsp;&nbsp;' % ( lastpath, p )
+			else:
+				html += '<a>%s</a>&nbsp;&nbsp;' % ( p )
+			
+	if html != head:
 		if pagetype != 'test':
 			html += '<a href="%s%s"><img height="11" src="/static/img/up.png" /></a>' % (root, above(path))
 	else:

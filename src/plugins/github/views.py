@@ -85,7 +85,6 @@ class GitHandler(serving.BaseHandler):
 
 	def __init__(self, request, path):
 		self.path = path
-		#token = oAuth(request)
 		token, login, repoid = get_auth(request)
 		self.user = login if login else gitware.get_user_by_token(token).login
 		self.repo = repoid if repoid else gitware.get_riurik_repo(self.user).id
