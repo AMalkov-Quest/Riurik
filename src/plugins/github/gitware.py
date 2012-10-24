@@ -65,7 +65,7 @@ def get_user_dir(login, repo_id):
 	return '%s-%s' % (login, repo_id)
 
 def gen_repo_name(user):
-	return 'riurik-for-%s' % user.login
+	return 'riurik-for-%s' % user
 
 def init_repo(user, repo):
 	from plugins.git.gitssh import GitSSH
@@ -184,13 +184,13 @@ def get_document_root(user, repo):
 	>>> get_document_root(user, repo)
 	''	
 	"""
-	user_dir = get_user_dir(user.login, repo.id)
+	user_dir = get_user_dir(user, repo)
 	document_root = get_abspath(user_dir)
 	if os.path.exists(document_root):
 		return document_root
 
 def get_full_path(user, repo, path):
-	user_dir = get_user_dir(user.login, repo.id)
+	user_dir = get_user_dir(user, repo)
 	full_path = os.path.join(user_dir, path.strip('/'))
 	return get_abspath(full_path)
 

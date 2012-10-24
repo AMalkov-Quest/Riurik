@@ -28,13 +28,28 @@ def authorize(code, host):
 	token = json.loads(resp.read())
 	return token['access_token']
 
+def store_auth(request, token):
+	request.session['token'] = token
+	user = gitware.get_user_by_token(token)
+	request.session['login'] = user.login
+	repo = gitware.get_riurik_repo(user)
+	request.session['repoid'] = repo.id
+
+def get_auth(request):
+	return (
+		request.session.get('token', None),
+		request.session.get('login', None),
+		request.session.get('repoid', None)
+	)
+
 def login(req):
 	code = req.GET.get('code')
 	state = req.GET.get('state')
 	host = req.META['HTTP_HOST']
 	
 	token = authorize(code, host)
-	req.session['token'] = token
+	store_auth(req, token)
+
 	return HttpResponseRedirect('/')
 
 def oAuth(request):
@@ -70,9 +85,10 @@ class GitHandler(serving.BaseHandler):
 
 	def __init__(self, request, path):
 		self.path = path
-		token = oAuth(request)
-		self.user = gitware.get_user_by_token(token)
-		self.repo = gitware.get_riurik_repo(self.user)
+		#token = oAuth(request)
+		token, login, repoid = get_auth(request)
+		self.user = login if login else gitware.get_user_by_token(token).login
+		self.repo = repoid if repoid else gitware.get_riurik_repo(self.user).id
 
 	def get_document_root(self):
 		return gitware.get_document_root(self.user, self.repo)
