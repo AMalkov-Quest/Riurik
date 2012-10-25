@@ -1,7 +1,8 @@
 module('enumirate suites');
 
 QUnit.setup(function() {
-  context.URL = contexter.URL(context, context.emum_url.concat(context.root, '&context=', context.suite));
+  context.URL = $.URI(context, context.emum_url.concat(context.root, '&context=', context.suite));
+  QUnit.log(context.URL);
   var content = '[' + context.suite + ']';
   context.suites_list = '';
   
@@ -57,7 +58,7 @@ asyncTest('should return only suites those match with given context', function()
 });
 
 asyncTest('should not return suites if no context', function() {
-  var URL = contexter.URL(context, context.emum_url.concat(context.root, '&json=true'));
+  var URL = $.URI(context, context.emum_url.concat(context.root, '&json=true'));
   enum_suites(URL, function(result){
     result = $.parseJSON(result);
     equal(result.length, 0, 'result is empty');

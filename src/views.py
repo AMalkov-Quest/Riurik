@@ -75,7 +75,12 @@ def enumerate_suites(request, RequestHandler):
 			if not ctx_name in ctx_sections:
 				continue
 
-			suites += [ os.path.relpath(relpath, path) ]
+			if path in relpath:
+				suite_name = os.path.relpath(relpath, path)
+			else:
+				suite_name = relpath
+				
+			suites += [ suite_name ]
 
 	if as_json:
 		reply = json.dumps(suites)
