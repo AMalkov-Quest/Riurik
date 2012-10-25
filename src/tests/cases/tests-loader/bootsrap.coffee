@@ -3,7 +3,6 @@ module 'bootstrap'
 test 'environmen variables should be defined', ->
   ok riurik?, 'Top level namespace for Riurik is defined'
     
-  equal riurik.src.jquery, '/static/js/jquery.min.js', 'jquery source'
   equal riurik.src.bootstrap, '/static/js/bootstrap.js', 'bootsrtap script source'
   equal riurik.args.server, riurik.GetArgument 'server', 'Riurik server URL'
   equal riurik.args.path, riurik.GetArgument 'path', 'current executed test or suite path'
@@ -41,22 +40,22 @@ test 'init should check if QUnit is loaded', ->
   sinon.stub riurik, "getQUnit"
   sinon.stub window, "alert"
   
-  riurik.init()
+  riurik.trigger( "riurik.engine.loaded" )
   
   ok window.alert.withArgs("QUnit should be preliminary loaded").calledOnce, 'warning alert is called'
   window.alert.restore()
   riurik.getQUnit.restore()
-  
+
 test 'init should check if context is loaded', ->
   sinon.stub riurik, "getContext"
   sinon.stub window, "alert"
   
-  riurik.init()
+  riurik.trigger( "riurik.inited" )
   
   ok window.alert.withArgs("context should be preliminary loaded").calledOnce, 'warning alert is called'
   window.alert.restore()
   riurik.getContext.restore()
-  
+###  
 test 'init should create the Waits object with context.timeout', ->
   riurik.init()
   
@@ -70,3 +69,4 @@ test 'init should create the QUnit namespace', ->
   equal riurik.QUnit.status, 'started'
   ok riurik.QUnit.current.module
   ok riurik.QUnit.current.test
+###

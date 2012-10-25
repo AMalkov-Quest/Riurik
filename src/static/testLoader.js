@@ -913,10 +913,6 @@ riurik.on( "riurik.engine.loaded", function(){
 	});
 });
 
-riurik.on( "riurik.inited", function(){
-	riurik.load_tests();
-});
-
 riurik.init = function() {
 	riurik.trigger( "riurik.initing" );
 
@@ -932,6 +928,7 @@ riurik.on("riurik.inited", function(){
 		alert('context should be preliminary loaded');
 		return;
 	}
+	riurik.load_tests();
 });
 
 riurik.on("riurik.error", function(e, msg, url, line){
@@ -1055,7 +1052,8 @@ riurik.matchers.substring = function(actual, expected, message) {
 	alert('Test Engine substring is not implemented');
 };
 
-jQuery.extend(riurik.exports, riurik.matchers);
+//this should be done in the engine
+//jQuery.extend(riurik.exports, riurik.matchers);
 
 /**
  * Waits is a class to wait for a certain condition to occur before proceeding 
@@ -1191,7 +1189,8 @@ riurik.Waits.prototype.fail = function(callback) {
 
 riurik.exports.waitFor = new riurik.Waits(context.timeout);
 
-$.extend(riurik.exports);
+//this should be done in appropriate engine
+//$.extend(riurik.exports);
 
 
 riurik.__log_storage = new Array(); // storage for riurik.log messages

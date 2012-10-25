@@ -20,6 +20,8 @@ riurik.on("riurik.tests.loaded", function(){
 	QUnit.load();
 });
 
+//QUnit test matchers
+
 riurik.matchers.pass = function(message) {
 	QUnit.ok(true, message || '');
 };
@@ -41,6 +43,8 @@ riurik.matchers.substring = function(actual, expected, message) {
 
 	QUnit.push(i >= 0, actual, expected, message);
 };
+
+jQuery.extend(riurik.exports, riurik.matchers);
 
 riurik.on("riurik.engine.loaded", function(){
 	/* Riurik relies on QUnit, so it should be preliminary loaded */
@@ -122,3 +126,5 @@ connect = function() {
 		return encodeURIComponent( out );
 	};
 };
+
+$.extend(riurik.exports);

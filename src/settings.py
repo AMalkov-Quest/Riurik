@@ -85,6 +85,7 @@ ROOT_URLCONF = 'urls'
 TEMPLATE_DIRS = (
 
     os.path.join(os.path.dirname( __file__ ), 'templates'),
+	os.path.join(os.path.dirname( __file__ ), 'plugins', 'search', 'templates'),
     os.path.join(os.path.dirname( __file__ ), 'plugins', 'github', 'templates'),
 )
 
@@ -103,8 +104,8 @@ INSTALLED_APPS = (
 	'django.contrib.messages',
 	'src',
 	'src.plugins.search',
-	'src.plugins.git',
-	'src.plugins.github',
+	#'src.plugins.git',
+	#'src.plugins.github',
 )
 
 def appInstalled(app_name):
