@@ -1,6 +1,11 @@
 /* Top level namespace for Riurik */
 var riurik = {}
 
+/* This should be implemented in appropriate engine */
+riurik.engine.config = function(message) {
+	alert('Test Engine config is not implemented');
+};
+
 /* Namespace for exposing api in the jQuery namespace */
 riurik.exports = {}
 
@@ -15,10 +20,6 @@ riurik.trigger = function(event){
 riurik.on = function( event, handler ){
 	//console.log( 'riurik.on', event, 'registering', handler );
 	$(riurik).on.apply( $( riurik ), $.makeArray(arguments) );
-}
-
-riurik.getContext = function() {
-	return context;
 }
 
 riurik.on( "riurik.engine.loaded", function(){
@@ -38,11 +39,6 @@ riurik.init = function() {
 }
 
 riurik.on("riurik.inited", function(){
-	/* context is object that holds environment for tests, so it should be preliminary loaded */
-	if (!riurik.getContext()) {
-		alert('context should be preliminary loaded');
-		return;
-	}
 	riurik.load_tests();
 });
 
@@ -77,6 +73,12 @@ riurik.on("riurik.tests.test.done", function(e, test){
 
 riurik.load_tests = function(){
 	riurik.trigger( "riurik.tests.loading" );
+
+	if ( typeof window.context == 'undefined' ) {
+		alert('context should be preliminary loaded');
+		return;
+	}
+
 	var l = riurikldr.loader();
 	$.each(context.libraries || [],function(i,url){
 		l.queue( '/' + url, function(){ 

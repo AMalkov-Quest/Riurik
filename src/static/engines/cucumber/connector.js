@@ -4,9 +4,9 @@ riurik.engine.init = function( next ){
 		riurikldr.loader()
 		.queue('/static/engines/cucumber/cucumber.js')
 		.then(function() {
-				connect()
+				riurik.engine.config();
 				riurik.trigger( "riurik.engine.inited" );
-				next()
+				next();
 		}); 
 
 		load_remote_style('/static/engines/cucumber/cucumber.css');
@@ -211,7 +211,6 @@ function RunCucumber() {
 			var _fn = successExtraction( stepDefinition[1] );
 			this.defineStep.apply(this.defineStep, [_regexp, _fn]);
 		}
-		console.log( '!!!', this )
 	};
 
 	var _Spec = riurik.specs.join('\n\n');
@@ -232,6 +231,6 @@ function RunCucumber() {
 	});
 };
 
-var connect = function() {
+riurik.engine.config = function() {
 	Gherkin = { Lexer: function() { return Lexer; } };
 };

@@ -6,9 +6,9 @@ riurik.engine.init = function( next ){
 	.queue('/static/engines/qunit/qunit.js')
 	.queue('/static/engines/qunit/qunit.extentions.js')
 	.then(function() {
-		connect()
+		riurik.engine.config();
 		riurik.trigger( "riurik.engine.inited" );
-		next()
+		next();
 	});
 
 	load_remote_style('/static/engines/qunit/qunit.css');
@@ -46,16 +46,14 @@ riurik.matchers.substring = function(actual, expected, message) {
 
 jQuery.extend(riurik.exports, riurik.matchers);
 
-riurik.on("riurik.engine.loaded", function(){
-	/* Riurik relies on QUnit, so it should be preliminary loaded */
-	if (!riurik.getQUnit()) {
-		alert('QUnit should be preliminary loaded');
-	}
-});
-
 riurik.reporter.engine = 'qunit';
 
-connect = function() {
+riurik.engine.config = function() {
+	if ( typeof window.QUnit == 'undefined' ) {
+		alert('QUnit should be preliminary loaded');
+		return;
+	}
+
 	QUnit.config.autostart = false;
 	QUnit.config.autorun = false;
 	QUnit.config.reorder = false;
@@ -94,15 +92,6 @@ connect = function() {
 
 	QUnit.testDone = function(test) {
 		riurik.trigger("riurik.tests.test.done", test.name, test.passed, test.failed, test.total);
-	}
-
-	/* TODO:
-	 * these two methods are just for testability
-	 * because I was not able to mock the window object
-	 * it would be great to get rid of them ASAP
-	 * */
-	riurik.getQUnit = function() {
-		return QUnit;
 	}
 
 	QUnit.log = riurik.log;

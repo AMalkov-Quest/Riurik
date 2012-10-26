@@ -30,43 +30,37 @@ test 'GetCwd should return a test parent dir if executed target is test', ->
   parentDir = '/riurik-inner-tests/tests-loader'
   equal riurik.GetCwd("#{parentDir}/bootsrap.js"), parentDir
   
-test 'getQUnit should return QUnit', ->
-  equal riurik.getQUnit(), QUnit
-  
 test 'getContext should return context', ->
   equal riurik.getContext(), context
   
-test 'init should check if QUnit is loaded', ->
-  sinon.stub riurik, "getQUnit"
+test 'it should be checked if QUnit is loaded', ->
+  QUnit = window.QUnit
+  window.QUnit = QUnit.not
   sinon.stub window, "alert"
   
-  riurik.trigger( "riurik.engine.loaded" )
+  riurik.engine.config();
   
   ok window.alert.withArgs("QUnit should be preliminary loaded").calledOnce, 'warning alert is called'
   window.alert.restore()
-  riurik.getQUnit.restore()
+  window.QUnit = QUnit
 
-test 'init should check if context is loaded', ->
-  sinon.stub riurik, "getContext"
+test 'it should be checked if context is loaded', ->
+  Context = window.context
+  window.context = context.not
   sinon.stub window, "alert"
   
   riurik.trigger( "riurik.inited" )
   
   ok window.alert.withArgs("context should be preliminary loaded").calledOnce, 'warning alert is called'
   window.alert.restore()
-  riurik.getContext.restore()
-###  
-test 'init should create the Waits object with context.timeout', ->
-  riurik.init()
+  window.context = Context
   
+test 'the Waits object should be exported with context.timeout', ->
   ok riurik.exports.waitFor?, 'object is created'
   equal riurik.exports.waitFor.timeout, context.timeout, 'timeout is fine'
-  
-test 'init should create the QUnit namespace', ->
-  riurik.init()
-  
+
+test 'the QUnit engine should be loaded and configured properly', ->
   ok riurik.QUnit?, 'object is created'
   equal riurik.QUnit.status, 'started'
   ok riurik.QUnit.current.module
   ok riurik.QUnit.current.test
-###
