@@ -117,3 +117,6 @@ asyncTest 'the event method should fail a test with a particular message', ->
   waits.event( eName, $(window.document), 1 ).fail ->
     equal waits.timeoutMessage, "wait timeout for the #{eName} event is exceeded"
     start()
+    
+asyncTest 'the frame method should wait for the frame to load', ->
+  $.fail('TODO')

@@ -902,10 +902,6 @@ riurik.on = function( event, handler ){
 	$(riurik).on.apply( $( riurik ), $.makeArray(arguments) );
 }
 
-riurik.getContext = function() {
-	return context;
-}
-
 riurik.on( "riurik.engine.loaded", function(){
 	/* Wait until DOM.ready and init Ruirik */
 	$(function() {
@@ -923,11 +919,6 @@ riurik.init = function() {
 }
 
 riurik.on("riurik.inited", function(){
-	/* context is object that holds environment for tests, so it should be preliminary loaded */
-	if (!riurik.getContext()) {
-		alert('context should be preliminary loaded');
-		return;
-	}
 	riurik.load_tests();
 });
 
@@ -962,6 +953,12 @@ riurik.on("riurik.tests.test.done", function(e, test){
 
 riurik.load_tests = function(){
 	riurik.trigger( "riurik.tests.loading" );
+
+	if ( typeof window.context == 'undefined' ) {
+		alert('context should be preliminary loaded');
+		return;
+	}
+
 	var l = riurikldr.loader();
 	$.each(context.libraries || [],function(i,url){
 		l.queue( '/' + url, function(){ 
@@ -1086,6 +1083,7 @@ riurik.Waits.prototype.wait = function(condition, timeout, getArgs) {
 			if(getArgs) {
 				var args = getArgs();
 				dfd.resolve.apply(true, args);
+				//dfd.resolve(args);
 			}else{
 				dfd.resolve();
 			}
@@ -1136,7 +1134,7 @@ riurik.Waits.prototype.condition = function(condition, timeout) {
 	this.timeoutMessage = 'wait timeout for ' + condition + ' is exceeded';
 	return this.wait(condition, timeout);
 };
-
+	
 /**
  * Waits for given event to occure
  *
@@ -1166,6 +1164,30 @@ riurik.Waits.prototype.event = function(event_name, target, timeout) {
 	};
 
 	return this.wait(condition, timeout, getEventArgs);
+};
+
+riurik.Waits.prototype.frame = function(timeout) {
+	this.timeoutMessage = 'wait timeout for the frame loading is exceeded';
+	var frameLoaded = false;
+	var frameJQuery = null;
+
+	$('#frame').unbind('load');
+	$('#frame').load(function() {
+		frame.init(function(_$) {
+			frameJQuery = _$;
+			frameLoaded = true;
+		});
+	});
+
+	var condition = function() {
+		return frameLoaded;
+	};
+	
+	var getFrameJQuery = function() {
+		return frameJQuery;
+	};
+
+	return this.wait(condition, timeout, getFrameJQuery);
 };
 
 riurik.Waits.prototype.then = function(doneCallback, failCallback) {
@@ -1240,6 +1262,11 @@ riurik.engine = {}
 riurik.engine.init = function(){
 	alert('No engine assigned to init');
 }
+
+/* This should be implemented in appropriate engine */
+riurik.engine.config = function(message) {
+	alert('Test Engine config is not implemented');
+};
 
 riurik.load_test_engine = function( engine ){
 	riurik.trigger( "riurik.engine.loading", engine );
@@ -1442,45 +1469,29 @@ riurik.on("riurik.tests.test.done", riurik.reporter.testDone);
 			}
 
 			if( !(cache === true) ) {
+				var randurl;
 				if (url.indexOf('?') != -1) {
-					url += '&_=' + Math.random().toString();
+					randurl = '&_=' + Math.random().toString();
 				}else{
-					url += '?_=' + Math.random().toString();
+					randurl = '?_=' + Math.random().toString();
+				}
+				if (url.indexOf('#') != -1) {
+					url = url.split( '#' ).join( randurl+'#' )
+				} else {
+					url += randurl
 				}
 			}
 			
 			if( window.frames[0].window ) {
 				window.frames[0].window.onerror = function(){};
 			}
-			riurik.log("Frame loading "+url+" ...")
+			riurik.log("Frame is loading " + url + " ...");
 			$('#frame').attr('src', url);
 			$('#frame-url').html('<a href="'+url+'">'+url+'</a>');
 			$('#frame').unbind('load');
 			$('#frame').load(function() {
-				riurik.log("Frame loaded "+url+".")
-				var __frame = window.frames[0];
-				__frame.window.onerror = riurik.wrapErrorHandler( __frame.window.onerror, riurik.onErrorHandler );
-
-				if( ! __frame.window.jQuery ) {
-					// inject one
-					var d = __frame.document;
-					var j = d.createElement('script');
-					j.type='text/javascript';
-					j.src = riurik.src.jquery;
-					d.head.appendChild(j);
-				}
-
-				$.waitFor.condition( 
-					function () { return typeof __frame.window.jQuery != 'undefined'; } ,
-					5*1000
-				).then(function(){
-					window._$ = __frame.window.jQuery;
-					if( __frame.window.jQuery ) {
-						__frame.window.jQuery.extend(riurik.exports);
-					} else {
-						riurik.matchers.fail('there is no JQuery and it\'s not injected');
-					}
-					dfd.resolve(__frame.window.jQuery);
+				frame.init(function(_$) {
+					dfd.resolve(_$);
 				});
 			});
 
@@ -1489,14 +1500,49 @@ riurik.on("riurik.tests.test.done", riurik.reporter.testDone);
 
 		load: function() {
 			var dfd = $.Deferred();
-			riurik.log("Frame loading awaiting...")
+			riurik.log("The Frame loading awaiting ...")
 			$('#frame').unbind('load');
+			
+			var frame_timeout = setTimeout( function(){
+				riurik.log('Wait timeout for the Frame loading is exceeded');
+				dfd.reject();
+			}, 20000);
+			
 			$('#frame').load(function() {
-				riurik.log("Frame loaded.")
-				dfd.resolve(window.frames[0].window.jQuery);
+				clearTimeout(frame_timeout);
+				frame.init(function(_$) {
+					dfd.resolve(_$);
+				});
 			});
 
 			return dfd.promise();
+		},
+		
+		init: function(callback) {
+			var __frame = window.frames[0];
+			riurik.log("Frame is loaded for " + __frame.window.location);
+			__frame.window.onerror = riurik.wrapErrorHandler( __frame.window.onerror, riurik.onErrorHandler );
+
+			if( ! __frame.window.jQuery ) {
+				var doc = __frame.document;
+				var el = doc.createElement('script');
+				el.type='text/javascript';
+				el.src = riurik.src.jquery;
+				doc.head.appendChild(el);
+			}
+
+			$.waitFor.condition( 
+				function () { return typeof __frame.window.jQuery != 'undefined'; } ,
+				5*1000
+			).then(function(){
+				window._$ = __frame.window.jQuery;
+				if( __frame.window.jQuery ) {
+					__frame.window.jQuery.extend(riurik.exports);
+				} else {
+					riurik.matchers.fail('there is no JQuery and it\'s not injected');
+				}
+				callback(__frame.window.jQuery);
+			});
 		},
 
 		println: function(message) {

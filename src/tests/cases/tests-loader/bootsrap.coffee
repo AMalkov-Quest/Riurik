@@ -30,9 +30,6 @@ test 'GetCwd should return a test parent dir if executed target is test', ->
   parentDir = '/riurik-inner-tests/tests-loader'
   equal riurik.GetCwd("#{parentDir}/bootsrap.js"), parentDir
   
-test 'getContext should return context', ->
-  equal riurik.getContext(), context
-  
 test 'it should be checked if QUnit is loaded', ->
   QUnit = window.QUnit
   window.QUnit = QUnit.not
