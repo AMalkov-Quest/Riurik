@@ -416,18 +416,21 @@ def get_relative_clean_path(path):
 	'main'
 	>>> get_relative_clean_path('/')
 	''
+	>>> get_relative_clean_path(r'\\\\')
+	''
 	>>> get_relative_clean_path('')
 	''
 	>>> get_relative_clean_path('main/case-1')
-	''
+	'main/case-1'
 	"""
 	if path:
-		parts = path.replace('\\', '/').strip('/').split('/', 1)
+		normpath = path.replace('\\', '/').strip('/')
+		parts = normpath.split('/', 1)
 		if parts[0] in get_virtual_paths():
 			if len(parts) > 1:
 				return parts[1].strip('/')
 		else:
-			return path
+			return normpath
 
 	return ''
 

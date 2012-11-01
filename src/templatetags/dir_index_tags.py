@@ -48,8 +48,6 @@ def breadcrumbs(path, pagetype):
 	''
 	>>> breadcrumbs('', 'virtual')
 	''
-	>>> breadcrumbs('/', 'folder')
-	'<a href="/">&#8226;</a>&nbsp;&nbsp;'
 	>>> breadcrumbs('/path1/', 'suite')
 	'<a href="/">&#8226;</a>&nbsp;&nbsp;<a>path1</a>&nbsp;&nbsp;<a href="//"><img height="11" src="/static/img/up.png" /></a>'
 	>>> breadcrumbs('/path1/path2', 'suite')
@@ -67,7 +65,7 @@ def breadcrumbs(path, pagetype):
 	for p in crumbs:
 		i += 1
 		if p:
-			lastpath += p 
+			lastpath += p
 			lastpath += '/'
 			if i < len(crumbs):
 				html += '<a href="%s">%s</a>&nbsp;&nbsp;&#8227;&nbsp;&nbsp;' % ( lastpath, p )
