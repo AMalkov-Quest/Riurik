@@ -16,17 +16,7 @@ import codecs, time
 import distributor
 import coffeescript
 import inuse, serving
-
-def add_request_handler(fn):
-	def patch(request):
-		path = get_path(request)
-		if path:
-			RequestHandler = serving.factory(request, path)
-			full_path = RequestHandler.get_full_path()
-			log.debug('added request handler for %s path: %s , fullpath: %s' % (fn, path, full_path))
-			return fn(request, RequestHandler)
-		return fn(request)
-	return patch
+from serving import add_request_handler
 
 def serve(request, path, show_indexes=False):
 	return serving.response(request, path)
@@ -89,16 +79,6 @@ def enumerate_suites(request, RequestHandler):
 
 	#return HttpResponse(str(suites).replace('[','').replace(']','').rstrip(',').replace('\'',''))
 	return HttpResponse( reply )
-
-def get_path(request):
-	if request.POST and 'path' in request.POST:
-		return request.POST['path']
-	elif request.GET and 'path' in request.GET:
-		return request.GET['path']
-	elif request.GET and 'suite' in request.GET:
-		return request.GET['suite']
-	else:
-		return None
 
 def log_errors(fn):
 	""" Catch errors and write it into logs then raise it up.

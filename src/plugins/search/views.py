@@ -3,17 +3,21 @@ from django.template import loader, RequestContext, Context, Template, TemplateD
 from django.http import Http404, HttpResponse, HttpResponseRedirect, HttpResponseNotModified, HttpRequest
 import os, json
 import libsearch
-import contrib
 from logger import log
+import serving
 
 def search_view(request, path=None, search_pattern=None, as_json=False, global_search=True):
 	path = request.GET.get('path', path)
 	search_pattern = request.GET.get('search_pattern',search_pattern)
 	as_json = request.GET.get('as_json', as_json)
-	document_root = contrib.get_document_root(path)
+	RequestHandler = serving.factory(request, path)
+	#document_root = RequestHandler.get_document_root()
 	if global_search:
-		path = contrib.get_virtual_root(path)
-		full_path = contrib.get_full_path(document_root, path)
+		#path = contrib.get_virtual_root(path)
+		#full_path = contrib.get_full_path(document_root, path)
+		full_path = RequestHandler.get_document_root()
+	else:
+		full_path = RequestHandler.get_full_path()
 
 	folder = full_path
 	log.debug(locals())

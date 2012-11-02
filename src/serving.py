@@ -10,6 +10,27 @@ from logger import log
 import dir_index_tools as tools
 import context, contrib, inuse, spec
 
+def get_path(request):
+	if request.POST and 'path' in request.POST:
+		return request.POST['path']
+	elif request.GET and 'path' in request.GET:
+		return request.GET['path']
+	elif request.GET and 'suite' in request.GET:
+		return request.GET['suite']
+	else:
+		return None
+
+def add_request_handler(fn):
+	def patch(request):
+		path = get_path(request)
+		if path:
+			RequestHandler = factory(request, path)
+			full_path = RequestHandler.get_full_path()
+			log.debug('added request handler for %s path: %s , fullpath: %s' % (fn, path, full_path))
+			return fn(request, RequestHandler)
+		return fn(request)
+	return patch
+
 def getGitHub(request, path):
 	try:
 		from plugins.github.views import plugin
