@@ -216,15 +216,18 @@ def debug(path, context, date, text, mode='a'):
 def done(data):
 	done = TestInfo(data)
 	with mutex:
-		fileName = getProgressFile(done.path, done.context, done.date)
+		fileName = getDoneFile(done.path, done.context, done.date)
 		if not os.path.exists(fileName):
-			fileName = getBeginFile(done.path, done.context, done.date)
-		os.rename(
-			fileName,
-			getDoneFile(done.path, done.context, done.date)
-		)
-		
-	debug(done.path, done.context, done.date, 'suite is done')
+			fileName = getProgressFile(done.path, done.context, done.date)
+			if not os.path.exists(fileName):
+				fileName = getBeginFile(done.path, done.context, done.date)
+			os.rename(
+				fileName,
+				getDoneFile(done.path, done.context, done.date)
+			)
+			debug(done.path, done.context, done.date, 'suite is done')
+		else:
+			debug(done.path, done.context, done.date, 'suite is already done')
 		
 def status(path, context):
 	def mkstatus(status, date):
