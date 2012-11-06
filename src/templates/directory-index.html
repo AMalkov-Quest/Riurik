@@ -74,11 +74,11 @@
 						<li><a id="spec-link" href="{{ spec }}" target="_blank" >{% trans "Spec" %}</a></li>
 						<li><a id="new-test" href="javascript:void(0);" onClick="javascript:createTest();">{% trans "Create Test" %}</a></li>
 					{% else %}
-						{% ifequal type 'virtual' %}
+						{% ifequal type 'root' %}
 						<li><a id="virtual-settings" href=".settings.ini?editor">{% trans "Settings" %}</a></li>
 						{% endifequal %}
 						<li><a id="new-suite" href="javascript:void(0);" onClick="javascript:createFolder();">{% trans "Create Suite" %}</a></li>
-						{% ifnotequal type 'virtual' %}
+						{% ifnotequal type 'root' %}
 						<li><a id="new-test" href="javascript:void(0);" onClick="javascript:createTest();">{% trans "Create Script" %}</a></li>
 						{% endifnotequal %}
 					{% endifequal %}

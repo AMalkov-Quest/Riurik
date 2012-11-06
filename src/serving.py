@@ -35,8 +35,8 @@ def getGitHub(request, path):
 	try:
 		from plugins.github.views import plugin
 		return plugin(request, path)
-	except Exception, e:
-		log.debug(e)
+	except ImportError, e:
+		log.exception(e)
 
 def factory(request, path):
 	log.debug('serving: select handler')
@@ -129,8 +129,8 @@ class BaseHandler(object):
 
 	def get_type(self, fullpath):
 		result = tools.get_type(fullpath)
-		#if result == 'folder' and self.is_document_root( fullpath.rstrip('/').rstrip('\\') ):
-		#	return 'virtual'
+		if result == 'folder' and self.is_document_root( fullpath.rstrip('/').rstrip('\\') ):
+			return 'root'
 
 		return result
 

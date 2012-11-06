@@ -8,15 +8,15 @@ import serving
 
 def search_view(request, path=None, search_pattern=None, as_json=False, global_search=True):
 	path = request.GET.get('path', path)
-	search_pattern = request.GET.get('search_pattern',search_pattern)
+	search_pattern = request.GET.get('search_pattern', search_pattern)
+	global_search = bool(request.GET.get('global_search', True))
+	log.debug('global_search %s' % global_search)
 	as_json = request.GET.get('as_json', as_json)
 	RequestHandler = serving.factory(request, path)
-	#document_root = RequestHandler.get_document_root()
 	if global_search:
-		#path = contrib.get_virtual_root(path)
-		#full_path = contrib.get_full_path(document_root, path)
 		full_path = RequestHandler.get_document_root()
 	else:
+		#this code is not used and tested
 		full_path = RequestHandler.get_full_path()
 
 	folder = full_path
