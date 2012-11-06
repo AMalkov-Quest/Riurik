@@ -144,7 +144,7 @@ def appendResults(fileName, test):
 		results.append(test.toDict())
 		dump(fileName, results)
 
-def appendHtml(fileName, data):
+def debug_appendHtml(fileName, data):
 	with mutex:
 		results = getPrevResults(fileName)
 		#just for debugging
@@ -164,6 +164,12 @@ def appendHtml(fileName, data):
 		#just for debugging		
 		results[-1]['html'] += data.html
 		dump(fileName, results)
+		
+def appendHtml(fileName, data):
+	with mutex:
+		results = getPrevResults(fileName)
+		results[-1]['html'] += data.html
+		dump(fileName, results)
 
 def saveProgress(test):
 	fileName = getProgressFile(test.path, test.context, test.date)
@@ -174,12 +180,13 @@ def saveProgress(test):
 
 def saveResults(test):
 	fileName = getResultsFile(test.path, test.context, test.date)
-	log.exception('recieved new %d test' % (test.testId))
 	appendResults(fileName, test)
+	debug(test.path, test.context, test.date, 'recieved new %d test' % (test.testId))
 
 def saveHtml(data):
 	fileName = getResultsFile(data.path, data.context, data.date)
 	appendHtml(fileName, data)
+	debug(data.path, data.context, data.date, 'recieved new %d html chunk' % (data.chunkId))
 
 def save(result):
 	test = TestResult(result)
@@ -200,6 +207,11 @@ def start(data):
 	
 	fileName = getBeginFile(start.path, start.context, start.date)
 	dump(fileName, [])
+	debug(start.path, start.context, start.date, 'suite is started', 'w')
+	
+def debug(path, context, date, text, mode='a'):
+	log = getFileName(path, context, date, 'log')
+	proceed(log, mode, lambda f: f.write(text + '\n'))
 
 def done(data):
 	done = TestInfo(data)
@@ -211,6 +223,8 @@ def done(data):
 			fileName,
 			getDoneFile(done.path, done.context, done.date)
 		)
+		
+	debug(done.path, done.context, done.date, 'suite is done')
 		
 def status(path, context):
 	def mkstatus(status, date):

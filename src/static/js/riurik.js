@@ -198,8 +198,8 @@ riurik.Waits.prototype.wait = function(condition, timeout, getArgs) {
 			riurik.util.log('waiting for ' + condition + ' is resolved');
 			if(getArgs) {
 				var args = getArgs();
-				//dfd.resolve.apply(true, args);
-				dfd.resolve(args);
+				dfd.resolve.apply(true, args);
+				//dfd.resolve(args);
 			}else{
 				dfd.resolve();
 			}
