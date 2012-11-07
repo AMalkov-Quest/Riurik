@@ -34,9 +34,13 @@ riurik.reporter.done = function () {
 		});
 	});
 
-	riurik.reporter.queue.push({ 
-		'event': 'done'
-	});
+	//trick to prevent suite hanging, i.e. report done while browser window is not closed
+	(function done(){
+		riurik.reporter.queue.push({ 
+			'event': 'done'
+		});
+		setTimeout(done, 3000);
+	})();
 };
 
 riurik.reporter.suiteStart = function(e, suite) {

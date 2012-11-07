@@ -29,6 +29,7 @@ riurik.init = function() {
 
 	$("#tabs").tabs();
 	riurik.context = clone(context);
+	riurik.onerror();
 
 	riurik.trigger( "riurik.inited" );
 }
