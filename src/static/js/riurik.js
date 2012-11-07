@@ -167,7 +167,8 @@ riurik.matchers.substring = function(actual, expected, message) {
 	alert('Test Engine substring is not implemented');
 };
 
-jQuery.extend(riurik.exports, riurik.matchers);
+//this should be done in the engine
+//jQuery.extend(riurik.exports, riurik.matchers);
 
 /**
  * Waits is a class to wait for a certain condition to occur before proceeding 
@@ -328,8 +329,8 @@ riurik.Waits.prototype.fail = function(callback) {
 
 riurik.exports.waitFor = new riurik.Waits(context.timeout);
 
-$.extend(riurik.exports);
-
+//this should be done in appropriate engine 
+//$.extend(riurik.exports);
 
 riurik.__log_storage = new Array(); // storage for riurik.log messages
 riurik.__log = function() {
