@@ -1,4 +1,4 @@
-import os, re
+import os, re, json
 from logger import log
 import settings, config, contrib
 from django.template import Context, Template
@@ -57,7 +57,7 @@ def patch_libraries(RequestHandler, ctximpl, ctx):
 	libraries = contrib.get_libraries_impl(RequestHandler, ctximpl.as_list(), ctx)
 	log.info('libs are %s' % libraries)
 	if libraries != None:
-		ctximpl.replace(settings.LIB_KEY_NAME, str(libraries).replace('\'','\"'))
+		ctximpl.replace(settings.LIB_KEY_NAME, json.dumps(libraries).replace('\'','\"'))
 
 def add_start_time(ctximpl):
 	import time
