@@ -645,6 +645,7 @@ def report_callback(req):
 			log.exception('Unsupported event on tests callback')
 	except Exception, e:
 		log.exception(e)
+		log.debug(req.GET)
 		return HttpResponseServerError(e)
 		
 	return HttpResponse('')

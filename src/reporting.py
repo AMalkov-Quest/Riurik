@@ -208,6 +208,7 @@ def start(data):
 	fileName = getBeginFile(start.path, start.context, start.date)
 	dump(fileName, [])
 	debug(start.path, start.context, start.date, 'suite is started', 'w')
+	debug(start.path, start.context, start.date, start, 'a')
 	
 def debug(path, context, date, text, mode='a'):
 	log = getFileName(path, context, date, 'log')
