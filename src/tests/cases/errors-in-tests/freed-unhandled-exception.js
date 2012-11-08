@@ -1,6 +1,10 @@
 module('freed unhandled exception');
 
 QUnit.asyncSetup( function() {
+  setTimeout(function () {
+      start();
+  }, 5000);
+  
   sinon.stub( riurik.matchers, "fail", function(){ start(); } );
     
   $.when(frame.go('')).then(function(_$) {
