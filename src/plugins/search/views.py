@@ -15,18 +15,17 @@ def search_view(request, path=None, search_pattern=None, as_json=False, global_s
 	RequestHandler = serving.factory(request, path)
 	if global_search:
 		full_path = RequestHandler.get_document_root()
-		path = ''
+		path = RequestHandler.get_virtual_root()
 	else:
 		#this code is not used and tested
 		full_path = RequestHandler.get_full_path()
 
-	folder = full_path
-	log.debug(locals())
+	root = full_path
 	if os.path.isfile(full_path):
-		folder = os.path.dirname(full_path)
+		root = os.path.dirname(full_path)
 		path = os.path.dirname( path )
 	
-	searches = libsearch.search(folder, path, search_pattern)
+	searches = libsearch.search(root, path, search_pattern)
 
 	for filepath, search in searches.items():
 		_search = []
