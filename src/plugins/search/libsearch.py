@@ -10,7 +10,7 @@ def listfiles(folder):
 			if not contrib.ishidden(fname):
 				yield os.path.join(root, fname)
 
-def search(folder, path, search_pattern):
+def search(root, path, search_pattern):
 	"""
 	>>> from tl.testing.fs import new_sandbox
 	>>> new_sandbox('''\\
@@ -29,11 +29,15 @@ def search(folder, path, search_pattern):
 	>>> 'cases/test-3.js' in result
 	False
 	"""
+	log.debug('root %s' % root)
+	log.debug('path %s' % path)
 	searches = {}
-	for filepath in listfiles(folder):
+	for filepath in listfiles(root):
 		result = find( filepath,  search_pattern)
 		if result:
-			filepath = filepath.replace(folder, path).replace('\\', '/').replace('//', '/')
+			log.debug('filepath %s' % filepath)
+			filepath = filepath.replace(root, path).replace('\\', '/').replace('//', '/')
+			log.debug('filepath %s' % filepath)
 			searches[filepath] = result
 	
 	return searches

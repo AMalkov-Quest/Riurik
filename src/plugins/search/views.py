@@ -15,6 +15,7 @@ def search_view(request, path=None, search_pattern=None, as_json=False, global_s
 	RequestHandler = serving.factory(request, path)
 	if global_search:
 		full_path = RequestHandler.get_document_root()
+		path = ''
 	else:
 		#this code is not used and tested
 		full_path = RequestHandler.get_full_path()
