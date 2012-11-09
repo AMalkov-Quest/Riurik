@@ -4,15 +4,11 @@ from logger import log
 
 git_ssh_cmd = os.path.abspath( os.path.join( os.path.dirname( os.path.join( __file__ ) ), 'git-ssh.sh' ) )
 
-def command(token, cmdline):
-	log.debug('git execute %s' % cmdline)
+def command(login, repoid, cmdline):
+	root = gitware.get_document_root(login, repoid)
+	log.debug('git executes %s in %s' % (cmdline, root))
 
-	ghub = gitware.Github(token)
-	user = ghub.get_user()
-	repo = gitware.get_riurik_repo(user)
-	root = gitware.get_document_root(user, repo)
-
-	with GitSSH(root, gitware.get_rsa_path(user), gitware.get_rsa_pub_path(user)) as call:
+	with GitSSH(root, gitware.get_rsa_path(login), gitware.get_rsa_pub_path(login)) as call:
 		out, err, code = call(cmdline)
 
 		if not out:
