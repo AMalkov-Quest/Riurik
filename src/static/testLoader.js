@@ -1083,7 +1083,9 @@ riurik.Waits.prototype.wait = function(condition, timeout, getArgs) {
 			riurik.util.log('waiting for ' + condition + ' is resolved');
 			if(getArgs) {
 				var args = getArgs();
-				dfd.resolve.apply(true, args);
+				console.log(condition);
+				console.log(args)
+				dfd.resolve.apply(this, $.makeArray(args));
 				//dfd.resolve(args);
 			}else{
 				dfd.resolve();
@@ -1319,12 +1321,15 @@ riurik.reporter.done = function () {
 	});
 
 	//trick to prevent suite hanging, i.e. report done while browser window is not closed
-	(function done(){
+	/*(function done(){
 		riurik.reporter.queue.push({ 
 			'event': 'done'
 		});
 		setTimeout(done, 3000);
-	})();
+	})();*/
+	riurik.reporter.queue.push({ 
+		'event': 'done'
+	});
 };
 
 riurik.reporter.suiteStart = function(e, suite) {
@@ -1528,7 +1533,8 @@ riurik.on("riurik.tests.test.done", riurik.reporter.testDone);
 			riurik.log("Frame is loaded for " + __frame.window.location);
 			__frame.window.onerror = riurik.wrapErrorHandler( __frame.window.onerror, riurik.onErrorHandler );
 
-			if( ! __frame.window.jQuery ) {
+			//if( ! __frame.window.jQuery ) {
+			if( typeof __frame.window.jQuery == 'undefined' ) {
 				var doc = __frame.document;
 				var el = doc.createElement('script');
 				el.type='text/javascript';

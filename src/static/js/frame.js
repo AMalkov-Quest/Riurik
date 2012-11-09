@@ -63,7 +63,8 @@
 			riurik.log("Frame is loaded for " + __frame.window.location);
 			__frame.window.onerror = riurik.wrapErrorHandler( __frame.window.onerror, riurik.onErrorHandler );
 
-			if( ! __frame.window.jQuery ) {
+			//if( ! __frame.window.jQuery ) {
+			if( typeof __frame.window.jQuery == 'undefined' ) {
 				var doc = __frame.document;
 				var el = doc.createElement('script');
 				el.type='text/javascript';
