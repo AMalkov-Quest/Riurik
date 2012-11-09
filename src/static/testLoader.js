@@ -1083,10 +1083,7 @@ riurik.Waits.prototype.wait = function(condition, timeout, getArgs) {
 			riurik.util.log('waiting for ' + condition + ' is resolved');
 			if(getArgs) {
 				var args = getArgs();
-				console.log(condition);
-				console.log(args)
 				dfd.resolve.apply(this, $.makeArray(args));
-				//dfd.resolve(args);
 			}else{
 				dfd.resolve();
 			}
@@ -1110,7 +1107,7 @@ riurik.Waits.prototype.wait = function(condition, timeout, getArgs) {
  * Delays execution for give period of time 
  *
  * Note: <b>It's bad idea</b> to use sleep in tests. But it can be very usefull during the
- * developing phase. So get rid of sleep in a test ASAP.
+ * developing phase. So just get rid of the sleep calls in your tests ASAP.
  *
  * @param {Number} milliseconds to delay
  */
@@ -1147,6 +1144,10 @@ riurik.Waits.prototype.condition = function(condition, timeout) {
  * @param {String} name of event to occur before proceeding to the next block
  * @param {jQuery Object} element that the event is bound on
  * @param {Number} timeout milliseconds to wait
+ * 
+ * Note: as far as in tests it's necessary to wait for events those happen inside
+ * a system under test, particularly for riurik in most cases element that the event
+ * is bound on is $(frame.window()) 
  */
 riurik.Waits.prototype.event = function(event_name, target, timeout) {
 	this.timeoutMessage = 'wait timeout for the ' + event_name + ' event is exceeded';
@@ -1212,6 +1213,11 @@ riurik.Waits.prototype.fail = function(callback) {
 	return this.promise.fail(callback);
 };
 
+/*
+ * Instantiate the Waits class and make it visible in the global namespace.
+ * The context.timeout value is used in order to provide generic way to
+ * manage timeouts in tests.
+ * */
 riurik.exports.waitFor = new riurik.Waits(context.timeout);
 
 //this should be done in appropriate engine
@@ -1477,6 +1483,7 @@ riurik.on("riurik.tests.test.done", riurik.reporter.testDone);
 			if(!regex.test(url)) {
 				url = 'http://' + context.host + ':' + context.port + '/' + path;
 			}
+			window.frame.location = url;
 
 			if( !(cache === true) ) {
 				var randurl;
@@ -1492,9 +1499,6 @@ riurik.on("riurik.tests.test.done", riurik.reporter.testDone);
 				}
 			}
 			
-			if( window.frames[0].window ) {
-				window.frames[0].window.onerror = function(){};
-			}
 			riurik.log("Frame is loading " + url + " ...");
 			$('#frame').attr('src', url);
 			$('#frame-url').html('<a href="'+url+'">'+url+'</a>');
@@ -1507,7 +1511,7 @@ riurik.on("riurik.tests.test.done", riurik.reporter.testDone);
 
 			return dfd.promise();
 		},
-
+		// this should be removed, instead use waitFor.frame
 		load: function() {
 			var dfd = $.Deferred();
 			riurik.log("The Frame loading awaiting ...")
@@ -1529,30 +1533,27 @@ riurik.on("riurik.tests.test.done", riurik.reporter.testDone);
 		},
 		
 		init: function(callback) {
-			var __frame = window.frames[0];
-			riurik.log("Frame is loaded for " + __frame.window.location);
-			__frame.window.onerror = riurik.wrapErrorHandler( __frame.window.onerror, riurik.onErrorHandler );
+			var _frame = window.frames[0];
+			riurik.log("Frame is loaded for " + window.frame.location);
+			_frame.window.onerror = riurik.wrapErrorHandler( _frame.window.onerror, riurik.onErrorHandler );
 
-			//if( ! __frame.window.jQuery ) {
-			if( typeof __frame.window.jQuery == 'undefined' ) {
-				var doc = __frame.document;
-				var el = doc.createElement('script');
-				el.type='text/javascript';
-				el.src = riurik.src.jquery;
-				doc.head.appendChild(el);
-			}
-
-			$.waitFor.condition( 
-				function () { return typeof __frame.window.jQuery != 'undefined'; } ,
-				5*1000
-			).then(function(){
-				window._$ = __frame.window.jQuery;
-				if( __frame.window.jQuery ) {
-					__frame.window.jQuery.extend(riurik.exports);
+			function done() {
+				if( _frame.window.jQuery ) {
+					_frame.window.jQuery.extend(riurik.exports);
+					window._$ = _frame.window.jQuery;
 				} else {
 					riurik.matchers.fail('there is no JQuery and it\'s not injected');
 				}
-				callback(__frame.window.jQuery);
+				callback(_frame.window.jQuery);
+			}
+
+			function jQueryIsLoaded() {
+				return typeof _frame.window.jQuery != 'undefined';
+			}
+
+			$.waitFor.condition( jQueryIsLoaded, 1000 )
+			.then(done, function() {
+				riurikldr.LoadScript( riurik.src.jquery, done, _frame.document );				
 			});
 		},
 
@@ -1584,6 +1585,9 @@ riurik.on("riurik.tests.test.done", riurik.reporter.testDone);
 		},
 		window: function(){
 			return window.frames[0].window;
+		},
+		location: function(){
+			return self.location;
 		}
 	};
 })();

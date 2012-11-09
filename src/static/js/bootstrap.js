@@ -2,9 +2,12 @@ if ( typeof console == 'undefined' || typeof console.log == 'undefined' ) {
 	var console = { log: function(){} };
 }
 
-riurikldr.LoadScript = function(scriptName, callback){
+riurikldr.LoadScript = function(scriptName, callback, target){
+	if( typeof target == 'undefined') {
+		target = document;
+	}
 	var url = riurikldr.BuildHttpUri( scriptName );
-	var script = document.createElement( 'script' );
+	var script = target.createElement( 'script' );
 	script.type = 'text/javascript';
 	script.src = url + '?_=' + Math.random().toString();
 	var timeout = setTimeout(function(){
@@ -25,7 +28,7 @@ riurikldr.LoadScript = function(scriptName, callback){
 	}else{
 		script.onload = onload;
 	}
-	document.body.appendChild( script );
+	target.head.appendChild( script );
 };
 
 riurikldr.loader = function() {
