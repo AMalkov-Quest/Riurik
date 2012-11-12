@@ -928,11 +928,12 @@ riurik.on("riurik.error", function(e, msg, url, line){
 });
 
 riurik.on("riurik.tests.begin", function(){
-	riurik.log("Tests begins");
+	riurik.log('tests are begun');
 });
 
 riurik.on("riurik.tests.end", function(){
-	riurik.log("Tests ends");
+	riurik.log('tests are done');
+	return true;
 });
 
 riurik.on("riurik.tests.suite.start", function(e, suite){

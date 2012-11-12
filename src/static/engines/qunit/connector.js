@@ -62,12 +62,10 @@ riurik.engine.config = function() {
 	riurik.QUnit.status = 'started';
 
 	QUnit.begin = function() {
-		riurik.log('tests are begun');
 		riurik.trigger("riurik.tests.begin");
 	}
 
 	QUnit.done = function(result) {
-		riurik.log('tests are done');
 		riurik.QUnit.status = 'done';
 		if( result.total == 0 ) {
 			document.title = [
