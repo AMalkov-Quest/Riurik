@@ -10,3 +10,17 @@ sudo pip install PyGithub
 sudo pip install markdown
 
 sudo apt-get install coffeescript
+
+#cucumber-js
+sudo apt-get install nodejs
+#or
+sudo apt-get install build-essential
+curl -O http://nodejs.org/dist/v0.8.14/node-v0.8.14.tar.gz
+tar xzvf node-v0.8.14.tar.gz
+cd node-v0.8.14
+sudo ./configure
+sudo make
+sudo make install
+
+sudo apt-get install npm
+sudo npm install cucumber
