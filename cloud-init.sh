@@ -9,6 +9,11 @@ sudo pip install tl.testing
 sudo pip install PyGithub
 sudo pip install markdown
 
+#git
+sudo apt-get install git
+git config --global user.name
+git congig --global user.email
+
 sudo apt-get install coffeescript
 
 #cucumber-js
@@ -24,3 +29,5 @@ sudo make install
 
 sudo apt-get install npm
 sudo npm install cucumber
+cd node_modules/cucumber
+sudo npm link
