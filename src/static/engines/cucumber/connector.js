@@ -234,3 +234,5 @@ function RunCucumber() {
 riurik.engine.config = function() {
 	Gherkin = { Lexer: function() { return Lexer; } };
 };
+
+$.extend(riurik.exports);

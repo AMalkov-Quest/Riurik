@@ -114,7 +114,8 @@ class GitFronPageHandler(GitHandler):
 			'contexts'  : [],
 			'favicon'   : None,
 			'spec'      : None,
-			'githref'   : gitware.get_oauth_href(request)
+			'githref'   : gitware.get_oauth_href(request),
+			'login'     : self.user
 		})
 		return _render_to_response('git-front-page.html', descriptor)
 
@@ -132,7 +133,7 @@ class GitInitHandler(GitHandler):
 			'contexts'  : [],
 			'favicon'   : None,
 			'spec'      : None,
-			'login'     : self.user.login,
+			'login'     : self.user,
 			'repo_name' : repo_name,
 		})
 		return _render_to_response('git-init.html', descriptor)

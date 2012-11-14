@@ -54,6 +54,9 @@ def response(request, path):
 
 class BaseHandler(object):
 
+	def __init__(self, request, path):
+		self.user = ''
+
 	def get_path(self):
 		return self.path
 
@@ -118,6 +121,7 @@ class BaseHandler(object):
 			'favicon'   : 'dir-index-test.gif',
 			'filetype':  self.get_type(fullpath),
 			'spec'		: get_spec(self.path, fullpath),
+			'login'     : self.user
 		}
 
 	def is_document_root(self, fullpath):
@@ -179,6 +183,7 @@ class BaseHandler(object):
 			'contexts'  : contexts,
 			'favicon'   : favicon,
 			'spec'      : get_spec(self.path, fullpath),
+			'login'     : self.user
 		})
 
 class DefaultHandler(BaseHandler):
