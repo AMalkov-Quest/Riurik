@@ -5,9 +5,9 @@ riurik.engine.init = function( next ){
 	
 	riurik.engine.config();
 	riurik.trigger( "riurik.engine.inited" );
-	next();
-
 	load_remote_style('/static/engines/qunit/qunit.css');
+
+	next();
 };
 
 riurik.on("riurik.tests.loaded", function(){

@@ -110,12 +110,19 @@ function createTest() {
 	createAndEdit($('#new-test'), "/actions/test/create/");
 }
 
+function rename(target) {
+	$("#create-dir-index-dialog span").text($("#rename-tip").text())
+	$("input#full-path").val(target);
+	$("input#object-name").val();
+	createAndEdit($('li.rename'), "/actions/rename/");
+}
+
 function createAndEdit(srcObject, url) {
 	$("#create-dir-index-dialog").dialog({
 		title: srcObject.text(),
 		resizable: false,
 		buttons: {
-			"create": function() {
+			"OK": function() {
 				$(this).dialog("close");
 				$.post(
 					url, 

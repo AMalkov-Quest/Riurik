@@ -144,7 +144,7 @@ PRODUCT_CODE_ALIAS = 'product_code_alias'
 STATIC_MANAGEMENT_ASSET_PATHS = []
 STATIC_MANAGEMENT_HOSTNAMES = ['http://www.riurik.com']
 STATIC_MANAGEMENT_VERSIONER = 'plugins.static_management.versioners.SHA1Sum'
-Q_STATIC_MANAGEMENT = {
+STATIC_MANAGEMENT = {
 	'js': {
 		'qunit.testLoader.js': [
 			'js/jquery.min.js',
@@ -163,10 +163,15 @@ Q_STATIC_MANAGEMENT = {
 		]
 	},
 	'css': {
+		'qunit.testLoader.css':[
+			'css/loader.css',
+			'jquery-ui/css/redmond/jquery-ui.custom.css',
+			'engines/qunit/qunit.css'
+		]
 	}
 }
 
-STATIC_MANAGEMENT = {
+CUC_STATIC_MANAGEMENT = {
 	'js': {
 		'cucumber.testLoader.js': [
 			'js/jquery.min.js',
@@ -183,5 +188,10 @@ STATIC_MANAGEMENT = {
 		]
 	},
 	'css': {
+		'cucumber.testLoader.css':[
+			'css/loader.css',
+			'jquery-ui/css/redmond/jquery-ui.custom.css',
+			''
+		]
 	}
 }
