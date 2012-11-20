@@ -115,7 +115,6 @@ class GitFronPageHandler(GitHandler):
 			'favicon'   : None,
 			'spec'      : None,
 			'githref'   : gitware.get_oauth_href(request),
-			'login'     : self.user
 		})
 		return _render_to_response('git-front-page.html', descriptor)
 

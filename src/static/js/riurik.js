@@ -173,10 +173,16 @@ riurik.matchers.substring = function(actual, expected, message) {
  * Waits is a class to wait for a certain condition to occur before proceeding 
  * further in the test code.
  */
-riurik.Waits = function(timeout) { 
+riurik.Waits = function(timeout, checkEvery) { 
 
-	this.timeout = timeout || 1000;	//default timeout in milliseconds to stop waiting
-	this.checkEvery = 100;			//check condition every given milliseconds
+	this.timeout = timeout || 1000; //default timeout in milliseconds to stop waiting
+	this.checkEvery = checkEvery || 100; //check condition every given milliseconds
+};
+
+riurik.Waits.prototype.checkEvery = function(time) { 
+
+	this.checkEvery = time;			//check condition every given milliseconds
+	return this;
 };
 
 /**
@@ -334,7 +340,7 @@ riurik.Waits.prototype.fail = function(callback) {
  * The context.timeout value is used in order to provide generic way to
  * manage timeouts in tests.
  * */
-riurik.exports.waitFor = new riurik.Waits(context.timeout);
+riurik.exports.waitFor = new riurik.Waits(context.timeout, context.check_every);
 
 //this should be done in appropriate engine
 //$.extend(riurik.exports);

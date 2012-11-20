@@ -49,9 +49,9 @@ a.logo {
 	color: white;
 	cursor: default;
 	float: left;
-	font-family: arial, serif;
+	font-family: arial, serif, bold;
 	font-size: 16px;
-	padding: 6px 0px 0px 121px;
+	padding: 6px 0px 0px 10px;
 }
 
 .content {

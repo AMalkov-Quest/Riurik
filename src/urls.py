@@ -30,6 +30,7 @@ urlpatterns = patterns('',
 	(r'^report_callback/$', 'views.report_callback'),
 	(r'^report/status$', 'views.tests_status'),
 	(r'^report/progress$', 'views.tests_progress'),
+	(r'^report/purge$', 'views.reporting_purge'),
 
 )
 

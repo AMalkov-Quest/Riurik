@@ -144,20 +144,42 @@ PRODUCT_CODE_ALIAS = 'product_code_alias'
 STATIC_MANAGEMENT_ASSET_PATHS = []
 STATIC_MANAGEMENT_HOSTNAMES = ['http://www.riurik.com']
 STATIC_MANAGEMENT_VERSIONER = 'plugins.static_management.versioners.SHA1Sum'
-STATIC_MANAGEMENT = {
+Q_STATIC_MANAGEMENT = {
 	'js': {
-		'testLoader.js': [
+		'qunit.testLoader.js': [
 			'js/jquery.min.js',
 			'js/jquery.json.min.js',
 			'jquery-ui/js/jquery-ui.custom.min.js',
-			'js/qunit.js',
 			'js/dates.js',
 			'js/tools.js',
 			'js/riurik.js',
-			'engines/engines.js',
 			'js/reporting.js',
 			'js/frame.js',
-			'js/errors.js'
+			'js/errors.js',
+			'engines/qunit/connector.js',
+			'engines/qunit/qunit.html.js',
+			'engines/qunit/qunit.js',
+			'engines/qunit/qunit.extentions.js'
+		]
+	},
+	'css': {
+	}
+}
+
+STATIC_MANAGEMENT = {
+	'js': {
+		'cucumber.testLoader.js': [
+			'js/jquery.min.js',
+			'js/jquery.json.min.js',
+			'jquery-ui/js/jquery-ui.custom.min.js',
+			'js/dates.js',
+			'js/tools.js',
+			'js/riurik.js',
+			'js/reporting.js',
+			'js/frame.js',
+			'js/errors.js',
+			'engines/cucumber/connector.js',
+			'engines/cucumber/cucumber.js',
 		]
 	},
 	'css': {

@@ -450,3 +450,15 @@ def tests_progress(request):
 	except Exception, e:
 		log.exception(e)
 		return HttpResponseServerError(e)
+
+def reporting_purge(request):
+	try:
+		import reporting
+		path = request.GET.get('path')
+		context = request.GET.get('context')
+		date = request.GET.get('date', )
+		reporting.purge(date, path, context)
+		return HttpResponse()
+	except Exception, e:
+		log.exception(e)
+		return HttpResponseServerError(e)

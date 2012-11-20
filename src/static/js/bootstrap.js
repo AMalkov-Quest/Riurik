@@ -82,6 +82,23 @@ var load_remote_style = function(url){
 
 riurikldr.loader().queue(riurikldr.args.cwd + '/.context.js', function(){
 	document.title = /\/([^\/]*)\/*$/.exec(riurikldr.args.path)[1];
+	var engine = riurikldr.TryGetArgument('engine') || 'qunit';
+	//riurik.trigger( "riurik.engine.loading", engine );
+
+	riurikldr.loader()
+	.queue('/static/'+engine+'.testLoader.js')
+	.then(function() {
+		riurik.engine.init(function(){
+			riurik.trigger( "riurik.engine.loaded" );
+		});
+	});
+
+	load_remote_style('/static/css/loader.css');
+	load_remote_style('/static/jquery-ui/css/redmond/jquery-ui.custom.css');
+});
+
+/*riurikldr.loader().queue(riurikldr.args.cwd + '/.context.js', function(){
+	document.title = /\/([^\/]*)\/*$/.exec(riurikldr.args.path)[1];
 	riurikldr.loader()
 	.queue('/static/testLoader.js')
 	.then(function() {
@@ -91,4 +108,4 @@ riurikldr.loader().queue(riurikldr.args.cwd + '/.context.js', function(){
 
 	load_remote_style('/static/css/loader.css');
 	load_remote_style('/static/jquery-ui/css/redmond/jquery-ui.custom.css');
-});
+});*/

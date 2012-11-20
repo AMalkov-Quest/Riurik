@@ -1,5 +1,6 @@
 import os, json, re
 import threading
+import shutil
 from logger import log
 import contrib
 
@@ -278,3 +279,8 @@ def getResults(path, context, date):
 	fileName = getResultsFile(path, context, date)
 	results = load(fileName)
 	return results
+
+def purge(date, path, context):
+	historyDir = getTestResultDir(path, context)
+	if os.path.exists(historyDir):
+		shutil.rmtree(historyDir)
