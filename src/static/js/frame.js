@@ -90,15 +90,13 @@
 
 		console_complete: function(){
 			frame.__console_timeout = setTimeout(function(){
-				$('#tabs-2-loading').hide();
+				$('#status-text').removeClass('in-progress');
 			}, 500);
-			$('#tabs-2').parent().attr('title', '');
 		},
 
 		console_working: function(title){
 			if ( frame.__console_timeout ) { clearTimeout(frame.__console_timeout) }
-			$('#tabs-2').parent().attr('title', title);
-			$('#tabs-2-loading').show();
+			$('#status-text').addClass('in-progress');
 		},
 
 		jQuery: function() {
