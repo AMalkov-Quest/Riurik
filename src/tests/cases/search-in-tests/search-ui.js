@@ -13,7 +13,7 @@ asyncTest( 'root page should not have search', function() {
     start();
   });
 });
-/*
+
 asyncTest( 'search is available inside virtual folder', function() {
 
   context.url = $.URI( context, context.virtual_root );
@@ -44,4 +44,3 @@ asyncTest( 'search is available inside virtual folder', function() {
     });
   });
 });
-*/

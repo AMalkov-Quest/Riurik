@@ -119,4 +119,8 @@ asyncTest 'the event method should fail a test with a particular message', ->
     start()
     
 asyncTest 'the frame method should wait for the frame to load', ->
-  $.fail('TODO')
+  waits = new riurik.Waits()
+  frame.go ''
+  waits.frame(5000).then (_$)->
+    ok _$?, 'the frame jQuery object should be passed'
+    start()
