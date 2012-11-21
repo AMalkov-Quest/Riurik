@@ -7,3 +7,6 @@ QUnit.asyncSetup ->
     set_context(@suite_path, "[#{@cws}]")
     $.when( frame.go( "#{@root}/#{@cws}" ) ).then ->
       start()
+      
+QUnit.teardown ->
+  delete_folder context.suite_path

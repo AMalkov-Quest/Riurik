@@ -55,6 +55,7 @@ def response(request, path):
 class BaseHandler(object):
 
 	def __init__(self, request, path):
+		self.path = path
 		self.user = ''
 
 	def get_path(self):
@@ -188,9 +189,6 @@ class BaseHandler(object):
 
 class DefaultHandler(BaseHandler):
 	
-	def __init__(self, request, path):
-		self.path = path
-
 	def get_document_root(self):
 		return contrib.get_document_root(self.path)
 

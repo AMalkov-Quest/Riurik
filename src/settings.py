@@ -1,15 +1,14 @@
 #######################################################################################
 # Django settings for web_reports project.
-import os, sys, platform, socket
+import os, platform
 
 working_dir = os.path.dirname(os.path.abspath(__file__))
 root = os.path.normpath(os.path.dirname(working_dir))
 
-from oldsettings import *
 try:
 	import virtual_paths
 	virtual_paths_py = 'virtual_paths.py'
-except:
+except Exception:
 	import virtual_paths_default as virtual_paths
 	virtual_paths_py = 'virtual_paths_default.py'
 
@@ -120,7 +119,6 @@ elif platform.system() == 'Linux':
 else:
 	COFFEESCRIPT_EXECUTABLE = None
 
-UPLOAD_TESTS_CMD='testsrc/upload'
 EXEC_TESTS_CMD='static/testLoader.html'
 SUITE_SETUP_FILE_NAME = 'suite-setup.js'
 SPEC_URL_FILE_NAME = '.specification.ini'
@@ -163,11 +161,7 @@ STATIC_MANAGEMENT = {
 		]
 	},
 	'css': {
-		'qunit.testLoader.css':[
-			'css/loader.css',
-			'jquery-ui/css/redmond/jquery-ui.custom.css',
-			'engines/qunit/qunit.css'
-		]
+		
 	}
 }
 
@@ -188,10 +182,6 @@ CUC_STATIC_MANAGEMENT = {
 		]
 	},
 	'css': {
-		'cucumber.testLoader.css':[
-			'css/loader.css',
-			'jquery-ui/css/redmond/jquery-ui.custom.css',
-			''
-		]
+		
 	}
 }

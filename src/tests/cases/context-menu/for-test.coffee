@@ -10,12 +10,11 @@ QUnit.asyncSetup ->
       
 test 'should have appropriate actions', ->
   using context, ->
-    equal _$("#{@menu_locator}").length, 6, 'there are context menu items'
+    equal _$("#{@menu_locator}").length, 5, 'there are context menu items'
     equal _$("#{@menu_locator} a:contains('Context')").attr('href'), '#editctx', 'Edit context'
     equal _$("#{@menu_locator} a:contains('Specification')").attr('href'), '#editspec', 'Edit specification'
     equal _$("#{@menu_locator} a:contains('Delete')").attr('href'), '#remove', 'Remove a suite or a test'
     equal _$("#{@menu_locator} a:contains('Rename')").attr('href'), '#rename', 'Rename a suite or a test'
-    equal _$("#{@menu_locator} a:contains('Move')").attr('href'), '#move', 'Move a suite or a test'
     equal _$("#{@menu_locator} a:contains('Run')").attr('href'), '#run', 'Execute a suite or a test'
         
 asyncTest 'Edit context should open context for editing', ->
