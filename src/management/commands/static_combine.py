@@ -49,7 +49,7 @@ class Command(BaseCommand):
         # Do the get_versions for everything except the CSS
         self.get_versions()
         self.combine_css()
-        map(self.replace_css, self.css_files)
+        #map(self.replace_css, self.css_files)
         # Do the CSS get_versions only after having replaced all references in the CSS.
         self.get_versions(css_only=True)
         self.write_versions()
@@ -91,7 +91,8 @@ class Command(BaseCommand):
                     asset = relpath(asset_path, settings.MEDIA_ROOT)
                     asset_version = 'url(%s%s)' % (self.abs_versions[asset], grp.get('fragment') or '')
                     matches.append((grp['url'], asset_version))
-                except KeyError:
+                except KeyError, e:
+                    print e
                     print "Failed to find %s in version map. Is it an absolute path?" % asset
                     raise SystemExit(1)
             for old, new in matches:

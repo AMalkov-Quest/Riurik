@@ -117,6 +117,18 @@ def mkscript(path, name, template_name=None):
 	
 	return (True, name)
 
+def rename(path, new_name):
+	try:
+		fullpath = os.path.join(path)
+		if os.path.exists(fullpath):
+			new_fullpath = os.path.join(os.path.dirname(fullpath), new_name)
+			os.rename(fullpath, new_fullpath)
+	except Exception, e:
+		log.exception(e)
+		return (False, str(e))
+	
+	return (True, '')
+
 def savetmptest(content, fullpath):
 	try:
 		if not os.path.exists(os.path.dirname(fullpath)):

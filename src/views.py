@@ -142,6 +142,19 @@ def removeObject(request, RequestHandler):
 	return HttpResponseRedirect(redirect)
 
 @add_request_handler
+def renameObject(request, RequestHandler):
+	fullpath = RequestHandler.get_full_path()
+	new_name = request.POST["object-name"]
+	log.debug('renameObject: ' + fullpath)
+	result = {}
+	result['success'], result['result'] = tools.rename(fullpath, new_name)
+
+	response = HttpResponse(mimetype='text/json')
+	response.write(json.dumps(result))
+
+	return response
+
+@add_request_handler
 def createSuite(request, RequestHandler):
 	fullpath = RequestHandler.get_full_path()
 	result = {}
@@ -447,6 +460,18 @@ def tests_progress(request):
 		date = request.GET.get('date')
 		progress = reporting.progress(date, path, context)
 		return HttpResponse(progress)
+	except Exception, e:
+		log.exception(e)
+		return HttpResponseServerError(e)
+
+def reporting_purge(request):
+	try:
+		import reporting
+		path = request.GET.get('path')
+		context = request.GET.get('context')
+		date = request.GET.get('date', )
+		reporting.purge(date, path, context)
+		return HttpResponse()
 	except Exception, e:
 		log.exception(e)
 		return HttpResponseServerError(e)

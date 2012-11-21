@@ -44,15 +44,15 @@ def get_deploy_key(repo):
 def create_repo(user, name):
 	return user.create_repo(name, repo_title)	
 
-def get_rsa_path(user):
-	return '%s/.ssh/%s_rsa' % (get_repos_root(), user.login)
+def get_rsa_path(login):
+	return '%s/.ssh/%s_rsa' % (get_repos_root(), login)
 
-def get_rsa_pub_path(user):
-	return '%s.pub' % get_rsa_path(user)
+def get_rsa_pub_path(login):
+	return '%s.pub' % get_rsa_path(login)
 
 def download_deploy_key(user, repo):
 	key = get_deploy_key(repo)
-	rsa_path = get_rsa_path(user)
+	rsa_path = get_rsa_path(user.login)
 	if not os.path.exists(rsa_path):
 		f = open(rsa_path, 'w')
 		f.write(key.key)
@@ -71,13 +71,13 @@ def init_repo(user, repo):
 	from plugins.git.gitssh import GitSSH
 	user_dir = get_user_dir(user.login, repo.id)
 	if not os.path.exists( get_abspath(user_dir) ):
-		with GitSSH(get_abspath(), get_rsa_path(user), get_rsa_pub_path(user)) as call:
+		with GitSSH(get_abspath(), get_rsa_path(user.login), get_rsa_pub_path(user.login)) as call:
 			cmd = 'git clone %s %s' % (repo.ssh_url, user_dir)
 			out, error, code = call(cmd)
 
 def ssh_key_gen(user):
 	log.debug('generate ssh keys for %s' % user.login)
-	rsa_path = get_rsa_path(user)
+	rsa_path = get_rsa_path(user.login)
 	args = shlex.split("ssh-keygen -q -t rsa -N '' -f")
 	args.append( rsa_path )
 	p = Popen(args, stdout=PIPE)
@@ -85,7 +85,7 @@ def ssh_key_gen(user):
 	return get_pub_key(user)
 
 def get_pub_key(user):
-	rsa_path = get_rsa_path(user)
+	rsa_path = get_rsa_path(user.login)
 	if os.path.exists(rsa_path):
 		args = shlex.split("ssh-keygen -y -f")
 		args.append( rsa_path )
@@ -104,12 +104,12 @@ def ensure_deploy_key(user, repo):
 		repo.create_key(key_title, key)
 
 def get_rsa_key(user):
-	rsa_path = get_rsa_path(user)
+	rsa_path = get_rsa_path(user.login)
 	if os.path.exists(rsa_path):
 		return get_pub_key(user)
 
 def ensure_rsa_key(user):
-	rsa_path = get_rsa_path(user)
+	rsa_path = get_rsa_path(user.login)
 	if not os.path.exists(rsa_path):
 		key = ssh_key_gen(user)
 	else:
@@ -182,6 +182,7 @@ def get_document_root(user, repo):
 		
 	"""
 	user_dir = get_user_dir(user, repo)
+	log.debug(user_dir)
 	document_root = get_abspath(user_dir)
 	if os.path.exists(document_root):
 		return document_root

@@ -1,17 +1,13 @@
+riurik.engine = {}
+
 riurik.engine.init = function( next ){
 	riurik.trigger( "riurik.engine.initing" );
 	
-	riurikldr.loader()
-	.queue('/static/engines/qunit/qunit.html.js')
-	.queue('/static/engines/qunit/qunit.js')
-	.queue('/static/engines/qunit/qunit.extentions.js')
-	.then(function() {
-		riurik.engine.config();
-		riurik.trigger( "riurik.engine.inited" );
-		next();
-	});
-
+	riurik.engine.config();
+	riurik.trigger( "riurik.engine.inited" );
 	load_remote_style('/static/engines/qunit/qunit.css');
+
+	next();
 };
 
 riurik.on("riurik.tests.loaded", function(){
@@ -62,12 +58,10 @@ riurik.engine.config = function() {
 	riurik.QUnit.status = 'started';
 
 	QUnit.begin = function() {
-		riurik.log('tests are begun');
 		riurik.trigger("riurik.tests.begin");
 	}
 
 	QUnit.done = function(result) {
-		riurik.log('tests are done');
 		riurik.QUnit.status = 'done';
 		if( result.total == 0 ) {
 			document.title = [

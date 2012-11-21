@@ -7,6 +7,7 @@
 			if(!regex.test(url)) {
 				url = 'http://' + context.host + ':' + context.port + '/' + path;
 			}
+			window.frame.location = url;
 
 			if( !(cache === true) ) {
 				var randurl;
@@ -22,9 +23,6 @@
 				}
 			}
 			
-			if( window.frames[0].window ) {
-				window.frames[0].window.onerror = function(){};
-			}
 			riurik.log("Frame is loading " + url + " ...");
 			$('#frame').attr('src', url);
 			$('#frame-url').html('<a href="'+url+'">'+url+'</a>');
@@ -37,7 +35,7 @@
 
 			return dfd.promise();
 		},
-
+		// this should be removed, instead use waitFor.frame
 		load: function() {
 			var dfd = $.Deferred();
 			riurik.log("The Frame loading awaiting ...")
@@ -59,29 +57,27 @@
 		},
 		
 		init: function(callback) {
-			var __frame = window.frames[0];
-			riurik.log("Frame is loaded for " + __frame.window.location);
-			__frame.window.onerror = riurik.wrapErrorHandler( __frame.window.onerror, riurik.onErrorHandler );
+			var _frame = window.frames[0];
+			riurik.log("Frame is loaded for " + window.frame.location);
+			_frame.window.onerror = riurik.wrapErrorHandler( _frame.window.onerror, riurik.onErrorHandler );
 
-			if( ! __frame.window.jQuery ) {
-				var doc = __frame.document;
-				var el = doc.createElement('script');
-				el.type='text/javascript';
-				el.src = riurik.src.jquery;
-				doc.head.appendChild(el);
-			}
-
-			$.waitFor.condition( 
-				function () { return typeof __frame.window.jQuery != 'undefined'; } ,
-				5*1000
-			).then(function(){
-				window._$ = __frame.window.jQuery;
-				if( __frame.window.jQuery ) {
-					__frame.window.jQuery.extend(riurik.exports);
+			function done() {
+				if( _frame.window.jQuery ) {
+					_frame.window.jQuery.extend(riurik.exports);
+					window._$ = _frame.window.jQuery;
 				} else {
 					riurik.matchers.fail('there is no JQuery and it\'s not injected');
 				}
-				callback(__frame.window.jQuery);
+				callback(_frame.window.jQuery);
+			}
+
+			function jQueryIsLoaded() {
+				return typeof _frame.window.jQuery != 'undefined';
+			}
+
+			$.waitFor.condition( jQueryIsLoaded, 1000 )
+			.then(done, function() {
+				riurikldr.LoadScript( riurik.src.jquery, done, _frame.document );				
 			});
 		},
 
@@ -113,6 +109,9 @@
 		},
 		window: function(){
 			return window.frames[0].window;
+		},
+		location: function(){
+			return self.location;
 		}
 	};
 })();

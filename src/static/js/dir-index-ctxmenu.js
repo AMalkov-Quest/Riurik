@@ -24,12 +24,22 @@ var ctxMenuActions = {
 		};
 	},
 
+	rename: function (target, context) {
+		var fullPath = ctxMenuActions.get_fullpath(target);
+		rename(fullPath)
+	},
+
 	removeimpl: function(target) {
 		var currentDir = $('#context-action > input[name=url]').val();
 		var fullPath = currentDir + target;
 		$('#context-action').attr('action', '/actions/remove/');
 		$('#context-action > input[name=path]').val(fullPath);
 		$('#context-action').submit();
+	},
+
+	get_fullpath: function(target) {
+		var currentDir = $('#context-action > input[name=url]').val();
+		return currentDir + target;
 	},
 	
 	run: function (target, context, context_names) {
@@ -63,8 +73,6 @@ var ctxMenuActions = {
 };
 
 $(document).ready(function() {
-	
-	$('#dir-index-menu').disableContextMenuItems('move');
 	
 	$("#dir-index-id UL LI").contextMenu({
 	        menu: 'dir-index-menu'

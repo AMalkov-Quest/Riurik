@@ -43,11 +43,12 @@ riurik.on("riurik.error", function(e, msg, url, line){
 });
 
 riurik.on("riurik.tests.begin", function(){
-	riurik.log("Tests begins");
+	riurik.log('tests are begun');
 });
 
 riurik.on("riurik.tests.end", function(){
-	riurik.log("Tests ends");
+	riurik.log('tests are done');
+	return true;
 });
 
 riurik.on("riurik.tests.suite.start", function(e, suite){
@@ -172,10 +173,16 @@ riurik.matchers.substring = function(actual, expected, message) {
  * Waits is a class to wait for a certain condition to occur before proceeding 
  * further in the test code.
  */
-riurik.Waits = function(timeout) { 
+riurik.Waits = function(timeout, checkEvery) { 
 
-	this.timeout = timeout || 1000;	//default timeout in milliseconds to stop waiting
-	this.checkEvery = 100;			//check condition every given milliseconds
+	this.timeout = timeout || 1000; //default timeout in milliseconds to stop waiting
+	this.checkEvery = checkEvery || 100; //check condition every given milliseconds
+};
+
+riurik.Waits.prototype.checkEvery = function(time) { 
+
+	this.checkEvery = time;			//check condition every given milliseconds
+	return this;
 };
 
 /**
@@ -198,8 +205,7 @@ riurik.Waits.prototype.wait = function(condition, timeout, getArgs) {
 			riurik.util.log('waiting for ' + condition + ' is resolved');
 			if(getArgs) {
 				var args = getArgs();
-				dfd.resolve.apply(true, args);
-				//dfd.resolve(args);
+				dfd.resolve.apply(this, $.makeArray(args));
 			}else{
 				dfd.resolve();
 			}
@@ -223,7 +229,7 @@ riurik.Waits.prototype.wait = function(condition, timeout, getArgs) {
  * Delays execution for give period of time 
  *
  * Note: <b>It's bad idea</b> to use sleep in tests. But it can be very usefull during the
- * developing phase. So get rid of sleep in a test ASAP.
+ * developing phase. So just get rid of the sleep calls in your tests ASAP.
  *
  * @param {Number} milliseconds to delay
  */
@@ -260,6 +266,10 @@ riurik.Waits.prototype.condition = function(condition, timeout) {
  * @param {String} name of event to occur before proceeding to the next block
  * @param {jQuery Object} element that the event is bound on
  * @param {Number} timeout milliseconds to wait
+ * 
+ * Note: as far as in tests it's necessary to wait for events those happen inside
+ * a system under test, particularly for riurik in most cases element that the event
+ * is bound on is $(frame.window()) 
  */
 riurik.Waits.prototype.event = function(event_name, target, timeout) {
 	this.timeoutMessage = 'wait timeout for the ' + event_name + ' event is exceeded';
@@ -325,7 +335,12 @@ riurik.Waits.prototype.fail = function(callback) {
 	return this.promise.fail(callback);
 };
 
-riurik.exports.waitFor = new riurik.Waits(context.timeout);
+/*
+ * Instantiate the Waits class and make it visible in the global namespace.
+ * The context.timeout value is used in order to provide generic way to
+ * manage timeouts in tests.
+ * */
+riurik.exports.waitFor = new riurik.Waits(context.timeout, context.check_every);
 
 //this should be done in appropriate engine
 //$.extend(riurik.exports);
