@@ -1,4 +1,4 @@
-import os, re
+import os, re, json
 from logger import log
 import settings, config, contrib
 from django.template import Context, Template
@@ -11,8 +11,8 @@ def host(instance, resolve=True):
 		return contrib.resolveRemoteAddr(instance.get(key), cache)
 	return instance.get(key)
 
-def get(name, section='default'):
-	return context(name, section)
+def get(RequestHandler, path=None, section='default'):
+	return context(RequestHandler, path, section)
 
 def get_URL(instance, resolve=False):
 	url = instance.get('url')
@@ -25,8 +25,8 @@ def get_URL(instance, resolve=False):
 		url =  'http://%s:%s' % (host, instance.get('port'))
 	return url
 
-def render(path, ctx, riurik_url, ctxname):
-	ctxitems = patch(path, ctx, riurik_url, ctxname)
+def render(RequestHandler, ctx, riurik_url, ctxname):
+	ctxitems = patch(RequestHandler, ctx, riurik_url, ctxname)
 	t = Template("""{% load json_tags %}
 		var context = {
 			{% for option in options %}
@@ -40,8 +40,8 @@ def render(path, ctx, riurik_url, ctxname):
 		c['options'] += [ (name, value,), ]
 	return t.render(c)
 
-def render_ini(path, ctx, riurik_url, section_name='default'):
-	ctxitems = patch(path, ctx, riurik_url)
+def render_ini(RequestHandler, ctx, riurik_url, section_name='default'):
+	ctxitems = patch(RequestHandler, ctx, riurik_url)
 	t = Template("""{% load json_tags %}
 [{{ section }}]
 {% for option in options %}{{ option.0 }} = {{ option.1|tojson }}{% if option.2 %} ; {{ option.2 }}{% endif %}
@@ -53,11 +53,11 @@ def render_ini(path, ctx, riurik_url, section_name='default'):
 		c['options'] += [ (name, value, hasattr(value, 'comment')), ]
 	return t.render(c)
 
-def patch_libraries(path, ctximpl, ctx):
-	libraries = contrib.get_libraries_impl(path, ctximpl.as_list(), ctx)
+def patch_libraries(RequestHandler, ctximpl, ctx):
+	libraries = contrib.get_libraries_impl(RequestHandler, ctximpl.as_list(), ctx)
 	log.info('libs are %s' % libraries)
 	if libraries != None:
-		ctximpl.replace(settings.LIB_KEY_NAME, str(libraries).replace('\'','\"'))
+		ctximpl.replace(settings.LIB_KEY_NAME, json.dumps(libraries).replace('\'','\"'))
 
 def add_start_time(ctximpl):
 	import time
@@ -107,10 +107,11 @@ def include_tests(path, ctx, ctximpl):
 def patch_suite_setup(ctximpl, path):
 	ctximpl.add(settings.SUITE_SETUP, path)
 
-def patch(path, ctx, riurik_url, ctxname=None):
+def patch(RequestHandler, ctx, riurik_url, ctxname=None):
+	path = RequestHandler.get_path()
 	ctximpl = contrib.context_impl(ctx.items())
 	include_tests(path, ctx, ctximpl)
-	patch_libraries(path, ctximpl, ctx)
+	patch_libraries(RequestHandler, ctximpl, ctx)
 	add_start_time(ctximpl)
 	add_name(ctximpl, ctxname)
 	add_virtual_root(ctximpl, path)
@@ -121,13 +122,10 @@ def patch(path, ctx, riurik_url, ctxname=None):
 class global_settings(object):
 	comment = 'from global settings'
 
-	def __init__(self, path, section='DEFAULT'):
-		log.debug('initing global_settings by from %s, section:%s' % (path, section))
-		self.inifile = None
-		for virtpath in contrib.get_virtual_paths().values():
-			if virtpath in path:
-				self.inifile = os.path.join(virtpath, settings.GLOBAL_CONTEXT_FILE_NAME)
+	def __init__(self, RequestHandler, section='DEFAULT'):
+		self.inifile = RequestHandler.get_global_context_path()
 		self.section = section
+		log.debug('read global settings from %s, section:%s' % (self.inifile, section))
 
 	def get(self, option, default=None):
 		value = config.get(self.inifile, self.section, option)
@@ -160,26 +158,24 @@ class global_settings(object):
 class context(global_settings):
 	comment = 'context.ini'
 
-	def __init__(self, test, section='DEFAULT'):
-		if os.path.isdir(test):
-			self.inifile = os.path.join(test, settings.TEST_CONTEXT_FILE_NAME)
-		else:
-			self.inifile = os.path.join(os.path.dirname(test), settings.TEST_CONTEXT_FILE_NAME)
+	def __init__(self, RequestHandler, path, section='DEFAULT'):
+		self.requestHandler = RequestHandler
+		self.inifile = RequestHandler.get_context_path(path)
 		self.section = section
-		log.debug('context: %s, section: %s, test: %s' % (self.inifile, self.section, test))
+		log.debug('context: %s, section: %s' % (self.inifile, self.section))
 
 	def	get(self, option, default=None):
 		value = super(context, self).get(option, default=None)
 		if not value:
-			value = global_settings(self.inifile, self.section).get(option, default=None)
+			value = global_settings(self.requestHandler, self.section).get(option, default=None)
 		if not value:
-			value = global_settings(self.inifile).get(option, default=None)
+			value = global_settings(self.requestHandler).get(option, default=None)
 		if not value:
 			value = default
 		return value
 
 	def libraries(self, values):
-		gs = global_settings(self.inifile).items() or {}
+		gs = global_settings(self.requestHandler).items() or {}
 		for item in gs:
 			if item[0] == settings.LIB_KEY_NAME:
 				glibs = item[1]
@@ -190,8 +186,8 @@ class context(global_settings):
 
 	def items(self):
 		values = {}
-		values.update( global_settings(self.inifile).items() or {} )
-		values.update( global_settings(self.inifile, self.section).items() or {} )
+		values.update( global_settings(self.requestHandler).items() or {} )
+		values.update( global_settings(self.requestHandler, self.section).items() or {} )
 		values.update( super(context, self).items(values) or {} )
 		self.libraries(values)
 		return values.items()

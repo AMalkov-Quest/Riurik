@@ -2,8 +2,6 @@ from django.shortcuts import render_to_response as _render_to_response
 from django.template.loader import render_to_string
 from django.template import loader, RequestContext, Context, Template, TemplateDoesNotExist
 from django.http import Http404, HttpResponse, HttpResponseRedirect, HttpRequest, HttpResponseServerError
-from django.utils.http import http_date
-from django.core.cache import cache
 import django.views.static
 import os, re
 import dir_index_tools as tools
@@ -13,12 +11,15 @@ import settings
 from logger import log
 import context, config, contrib
 import mimetypes, datetime
-import stat
 import urllib, urllib2
 import codecs, time
 import distributor
 import coffeescript
-import spec
+import inuse, serving
+from serving import add_request_handler
+
+def serve(request, path, show_indexes=False):
+	return serving.response(request, path)
 
 def error_handler(fn):
 	def _f(*args, **kwargs):
@@ -39,217 +40,45 @@ def error_handler(fn):
 		return response
 	return _f
 
-def enumerate_suites(request):
+@add_request_handler
+def enumerate_suites(request, RequestHandler):
 	"""
 	Return a list of suite names.
 	Arguments:
 		ctx	(optional)	- filter suites containing supplied ctx name
 		json 	(optional)	- return result in JSON format
 	"""
-	ctx_name = request.REQUEST.get('context', None)
+	ctx_name = request.REQUEST.get('context')
 	as_json = request.REQUEST.get('json', False)
-	target = request.REQUEST.get('target', False)
-
-	suites = []
-	root = contrib.get_document_root(target)
+	path = request.REQUEST.get('path', '/')
+	
+	root = RequestHandler.get_document_root()
+	fullpath = RequestHandler.get_full_path()
+	log.debug('enum suites in %s' % root)
 	contextini = settings.TEST_CONTEXT_FILE_NAME
-
-	for dirpath, dirnames, filenames in os.walk(root, followlinks=True):
-		if not ( contextini in filenames ):
-			continue
-		if ctx_name:
-			contextfile = os.path.join(dirpath, contextini)
-			ctx = context.get(contextfile)
+	suites = []
+	for dirpath, dirnames, filenames in os.walk(fullpath, followlinks=True):
+		if contextini in filenames:
+			relpath = os.path.relpath(dirpath, root)
+			ctx = context.get(RequestHandler, relpath )
 			ctx_sections = ctx.sections()
 			if not ctx_name in ctx_sections:
 				continue
 
-			suites += [ dirpath.replace(root, '').replace('\\','/').lstrip('/') ]
+			if path in relpath:
+				suite_name = os.path.relpath(relpath, path)
+			else:
+				suite_name = relpath
+				
+			suites += [ suite_name ]
 
 	if as_json:
-		return HttpResponse(json.dumps(suites))
-	return HttpResponse(str(suites).replace('[','').replace(']','').rstrip(',').replace('\'',''))
-
-def show_context(request, path):
-	document_root = contrib.get_document_root(path)
-	fullpath = contrib.get_full_path(document_root, path)
-	log.debug('show context of %s (%s %s)' % (fullpath, document_root, path))
-
-	result = ""
-
-	sections = config.sections(context.get(fullpath).inifile)
-	for section_name in sections:
-		ctx = context.get(fullpath, section=section_name)
-		context_ini = context.render_ini(path, ctx, request.get_host(), section_name)
-		result += context_ini
-
-	return HttpResponse(result)
-
-
-def serve(request, path, show_indexes=False):
-	document_root = contrib.get_document_root(path)
-	fullpath = contrib.get_full_path(document_root, path)
-	log.debug('show index of %s(%s %s)' % (fullpath, document_root, path))
-	if os.path.isdir(fullpath):
-		if 'history' in request.REQUEST:
-			import reporting
-			context = request.REQUEST.get('context')
-			date = request.REQUEST.get('history', None)
-			asxml = request.REQUEST.get('xml', None)
-			asjson = request.REQUEST.get('json', None)
-			if not date:
-				results = reporting.getSuiteHistoryResults(path, context)
-				return  _render_to_response('history_list.html', locals())
-
-			if asxml:
-				tests_list = reporting.getResultsAsXml(path, context, date, request)
-				return HttpResponse(tests_list)
-
-			tests_list = reporting.getResults(path, context, date)
-
-			if asjson:
-				url = reporting.getTestResultsUrl(path, context, date, request)
-				result = { 'url': url, 'data': tests_list }
-				return HttpResponse(json.dumps(result))
-
-			return _render_to_response('history.html', locals())
-
-		if request.path and request.path[-1:] != '/':
-			return HttpResponseRedirect(request.path + '/')
-		if show_indexes:
-			template = load_index_template()
-			descriptor = get_dir_index(document_root, path, fullpath)
-			return HttpResponse(template.render(descriptor))
-
-	if not os.path.exists(fullpath):
-		if 'editor' in request.REQUEST:
-			#open(fullpath, 'w').close() # creating file if not exists by editor opening it first time
-			tools.make(fullpath)
-		else:
-			raise Http404('"%s" does not exist' % fullpath)
-
-	if 'editor' in request.REQUEST:
-		descriptor = get_file_content_to_edit(path, fullpath, is_stubbed(path, request))
-		stub(path, request)
-		return _render_to_response('editor.html', descriptor, context_instance=RequestContext(request))
-
-	return get_file_content(fullpath)
-
-def get_file_content_to_edit(path, fullpath, stubbed):
-	try:
-		contexts = context.get( fullpath ).sections()
-	except Exception, e:
-		log.exception(e)
-		contexts = []
-
-	content = open(fullpath, 'rb').read()
-
-	return {
-		'directory': path,
-		'content': content,
-		'contexts': contexts,
-		'relative_file_path': path,
-		'is_stubbed': stubbed,
-		'favicon'   : 'dir-index-test.gif',
-		'filetype':  tools.get_type(fullpath),
-		'spec'		: get_spec(path, fullpath),
-	}
-
-def get_spec(target, path):
-	spec_url = spec.get_url(path)
-	log.info('spec url: %s' % spec_url)
-	if spec_url:
-		return spec_url
+		reply = json.dumps(suites)
 	else:
-		return '%s?editor' % settings.SPEC_URL_FILE_NAME
+		reply = ','.join(suites)
 
-def get_file_content(fullpath):
-	log.debug('get content of %s' % fullpath)
-	statobj = os.stat(fullpath)
-	mimetype, encoding = mimetypes.guess_type(fullpath)
-	mimetype = mimetype or 'application/octet-stream'
-	content = open(fullpath, 'rb').read()
-	response = HttpResponse(content, mimetype=mimetype)
-	response["Last-Modified"] = http_date(statobj[stat.ST_MTIME])
-	response["Content-Length"] = len(content)
-	if encoding:
-		response["Content-Encoding"] = encoding
-
-	return response
-
-def load_index_template():
-	try:
-		t = loader.select_template(['directory-index.html', 'directory-index'])
-	except TemplateDoesNotExist:
-		t = Template(django.views.static.DEFAULT_DIRECTORY_INDEX_TEMPLATE, name='Default directory index template')
-
-	return t
-
-def get_dir_index(document_root, path, fullpath):
-	files = []
-	dirs = []
-
-	def get_descriptor(title):
-		fullpath = os.path.join(path, title)
-		return { 'title': title, 'type': tools.get_type(contrib.get_full_path(document_root, fullpath)) }
-
-	if not document_root:
-		pagetype = 'front-page'
-		for key in contrib.get_virtual_paths():
-			dir_descriptor = get_descriptor(key)
-			dirs.append(dir_descriptor)
-	else:
-		pagetype = tools.get_type(fullpath)
-		for f in sorted(os.listdir(fullpath)):
-			if not f.startswith('.'):
-				if os.path.isfile(os.path.join(fullpath, f)):
-					files.append(get_descriptor(f))
-				else:
-					f += '/'
-					dirs.append(get_descriptor(f))
-
-	try:
-		if tools.get_type(fullpath) == 'virtual':
-			contexts = context.global_settings(fullpath).sections()
-		else:
-			contexts = context.get(fullpath).sections()
-		log.debug(contexts)
-	except Exception, e:
-		log.error(e)
-		contexts = []
-
-	favicon = 'dir-index-%s.gif' % tools.get_type(fullpath)
-
-	return Context({
-		'directory' : path + '/',
-		'type'		: pagetype,
-		'file_list' : files,
-		'dir_list'  : dirs,
-		'contexts'  : contexts,
-		'favicon'   : favicon,
-		'spec'	: get_spec(path, fullpath),
-	})
-
-def get_path(request):
-	if request.POST and 'path' in request.POST:
-		return request.POST['path']
-	elif request.GET and 'path' in request.GET:
-		return request.GET['path']
-	elif request.GET and 'suite' in request.GET:
-		return request.GET['suite']
-	else:
-		return None
-
-def add_fullpath(fn):
-	def patch(request):
-		path = get_path(request)
-		if path:
-			document_root = contrib.get_document_root(path)
-			full_path = contrib.get_full_path(document_root, path)
-			log.debug('add full path for %s path: %s , fullpath: %s' % (fn, path, full_path))
-			return fn(request, contrib.get_full_path(document_root, path))
-		return fn(request)
-	return patch
+	#return HttpResponse(str(suites).replace('[','').replace(']','').rstrip(',').replace('\'',''))
+	return HttpResponse( reply )
 
 def log_errors(fn):
 	""" Catch errors and write it into logs then raise it up.
@@ -279,8 +108,24 @@ def log_errors(fn):
 		return result
 	return log_it
 
-@add_fullpath
-def createFolder(request, fullpath):
+def show_context(request, path):
+	RequestHandler = serving.factory(request, path)
+	fullpath = RequestHandler.get_full_path()
+	log.debug('show context of %s (%s)' % (fullpath, path))
+
+	result = ""
+
+	sections = config.sections(context.get(RequestHandler).inifile)
+	for section_name in sections:
+		ctx = context.get(RequestHandler, section=section_name)
+		context_ini = context.render_ini(RequestHandler, ctx, request.get_host(), section_name)
+		result += context_ini
+
+	return HttpResponse(result)
+
+@add_request_handler
+def createFolder(request, RequestHandler):
+	fullpath = RequestHandler.get_full_path()
 	result = tools.mkdir(fullpath, request.POST["object-name"])
 
 	response = HttpResponse(mimetype='text/plain')
@@ -288,15 +133,30 @@ def createFolder(request, fullpath):
 
 	return response
 
-@add_fullpath
-def removeObject(request, fullpath):
+@add_request_handler
+def removeObject(request, RequestHandler):
+	fullpath = RequestHandler.get_full_path()
 	log.debug('removeObject: ' + fullpath)
 	tools.remove(fullpath)
 	redirect = '/' + request.POST["url"].lstrip('/')
 	return HttpResponseRedirect(redirect)
 
-@add_fullpath
-def createSuite(request, fullpath):
+@add_request_handler
+def renameObject(request, RequestHandler):
+	fullpath = RequestHandler.get_full_path()
+	new_name = request.POST["object-name"]
+	log.debug('renameObject: ' + fullpath)
+	result = {}
+	result['success'], result['result'] = tools.rename(fullpath, new_name)
+
+	response = HttpResponse(mimetype='text/json')
+	response.write(json.dumps(result))
+
+	return response
+
+@add_request_handler
+def createSuite(request, RequestHandler):
+	fullpath = RequestHandler.get_full_path()
 	result = {}
 	result['success'], result['result'] = tools.mkconfig(fullpath, request.POST["object-name"])
 	result['result'] += '?editor'
@@ -305,16 +165,18 @@ def createSuite(request, fullpath):
 
 	return response
 
-@add_fullpath
-def editSuite(request, fullpath):
+@add_request_handler
+def editSuite(request, RequestHandler):
+	fullpath = RequestHandler.get_full_path()
 	log.debug('edit context %s' % fullpath)
 	if not os.path.exists(os.path.join(fullpath, settings.TEST_CONTEXT_FILE_NAME)):
 		tools.mkconfig(fullpath, settings.TEST_CONTEXT_FILE_NAME)
 	redirect = '/' + request.GET['path'] + '/' + settings.TEST_CONTEXT_FILE_NAME + '?editor'
 	return HttpResponseRedirect(redirect)
 
-@add_fullpath
-def createTest(request, fullpath):
+@add_request_handler
+def createTest(request, RequestHandler):
+	fullpath = RequestHandler.get_full_path()
 	log.debug('createTest: '+ request.POST["object-name"])
 	result = {}
 	result['success'], result['result'] = tools.mktest(fullpath, request.POST["object-name"])
@@ -325,12 +187,13 @@ def createTest(request, fullpath):
 
 	return response
 
-@add_fullpath
-def saveTest(request, fullpath):
+@add_request_handler
+def saveTest(request, RequestHandler):
+	fullpath = RequestHandler.get_full_path()
 	if fullpath == 'settings':
 		fullpath = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'virtual_paths.py')
 	url = request.POST["url"].lstrip('/')
-	stub(url, request)
+	inuse.stub(url, request)
 	tools.savetest(request.POST["content"], fullpath)
 	return HttpResponseRedirect('/' + url + '?editor')
 
@@ -340,24 +203,30 @@ def submitTest(request):
 def submitSuite(request):
 	return _render_to_response( "runsuite.html", request.POST )
 
-@add_fullpath
+@add_request_handler
 @error_handler
-def runSuite(request, fullpath):
+def runSuite(request, RequestHandler):
+	fullpath = RequestHandler.get_full_path()
 	path = contrib.normpath(request.REQUEST["path"])
 	context_name = request.REQUEST["context"]
-	ctx = context.get(fullpath, section=context_name)
+	ctx = context.get(RequestHandler, section=context_name)
 
 	log.info('run suite %s with context %s' % (path, context_name))
 	server = request.get_host();
 	compileSuiteCoffee(path, fullpath)
-	contextjs = context.render(path, ctx, server, context_name)
+	contextjs = context.render(RequestHandler, ctx, server, context_name)
 
 	clean_path = contrib.get_relative_clean_path(path)
 	target = contrib.get_runner_url(ctx, server)
 	log.info('target of suite %s is %s' % (clean_path, target))
 
 	saveLocalContext(fullpath, contextjs)
-	url = "http://%s/%s?server=%s&path=/%s" % ( target, settings.EXEC_TESTS_CMD, server, path )
+
+	engine = 'qunit'
+	if cucumber(ctx):
+		engine = 'cucumber'
+
+	url = "http://%s/%s?server=%s&engine=%s&path=/%s" % ( target, settings.EXEC_TESTS_CMD, server, engine, path )
 	log.info("redirect to run suite %s" % url)
 	return HttpResponseRedirect( url )
 
@@ -372,16 +241,17 @@ def compileSuiteCoffee(path, suite_path):
 		path = coffeescript.compile2js(None, None, fullpath)
 		log.info(path)
 
-@add_fullpath
+@add_request_handler
 @error_handler
-def runTest(request, fullpath):
+def runTest(request, RequestHandler):
+	fullpath = RequestHandler.get_full_path()
 	path = contrib.normpath(request.REQUEST["path"])
 	context_name = request.REQUEST.get("context", None)
-	ctx = context.get(fullpath, section=context_name)
+	ctx = context.get(RequestHandler, section=context_name)
 
 	log.info('run test %s with context %s' % (path, context_name))
 	server = request.get_host()
-	contextjs = context.render(path, ctx, server, context_name)
+	contextjs = context.render(RequestHandler, ctx, server, context_name)
 	log.debug('contextJS: '+ contextjs)
 
 	clean_path = contrib.get_relative_clean_path(path)
@@ -394,12 +264,20 @@ def runTest(request, fullpath):
 	saveLocalContext(fullpath, contextjs)
 	if coffee(path):
 		path = coffeescript.compile2js(test_content, path, fullpath)
-	url = "http://%s/%s?server=%s&path=/%s" % (target, settings.EXEC_TESTS_CMD, server, path)
+
+	engine = 'qunit'
+	if cucumber(ctx):
+		engine = 'cucumber'
+
+	url = "http://%s/%s?server=%s&engine=%s&path=/%s" % (target, settings.EXEC_TESTS_CMD, server, engine, path)
 	log.info("redirect to run test %s" % url)
 	return HttpResponseRedirect(url)
 
 def coffee(path):
 	return path.endswith('.coffee')
+
+def cucumber(ctx):
+	return ctx.get('cucumber', None) != None
 
 def saveLocalContext(fullpath, contextjs):
 	if os.path.isdir(fullpath):
@@ -471,80 +349,6 @@ def getLogRecordsSinceGivenTime(records, format_, sinse_time):
 
 	return result
 
-def is_stubbed(path, request):
-	session_key = request.session.get('stub_key') or None
-	cache_value = cache.get(path)
-	if cache_value:
-		try:
-			cache_session_key = cache_value[0]
-			cache_request_control = cache_value[1]
-		except:
-			cache_session_key = None
-			cache_request_control = False
-
-		return cache_session_key != session_key
-	return False
-
-def stub(path, request):
-	if 'stub_key' in request.session:
-		session_key = request.session['stub_key']
-	else:
-		request.session['stub_key'] = session_key = datetime.datetime.now()
-
-	cache_value = cache.get(path)
-	try:
-		cache_session_key = cache_value[0]
-		cache_request_control = cache_value[1]
-	except:
-		cache_session_key = None
-		cache_request_control = False
-
-	if cache_session_key == session_key:
-		request.session[path] = session_key
-		cache.set(path, (session_key, cache_request_control) , 60)
-		return cache_request_control
-	if cache.add(path, (session_key, cache_request_control), 60):
-		request.session[path] = session_key
-	return cache_request_control
-
-def stubFile(request):
-	request_control = stub(request.GET['path'], request)
-	return HttpResponse(str(request_control))
-
-def getControl(request):
-	path = request.GET['path']
-	cache_value = cache.get(path)
-	session_key = request.session.get('stub_key') or None
-	if cache_value:
-		try:
-			cache_session_key = cache_value[0]
-			cache_request_control = cache_value[1]
-		except:
-			cache_session_key = None
-			cache_request_control = False
-		if cache_session_key != session_key:
-			cache.set(path, (cache_session_key, True), 30)
-		if 'cancel' in request.GET:
-			cache.set(path, (cache_session_key, False), 60)
-	return HttpResponse('')
-
-def getOpenedFiles(request, clean=False):
-	'''
-	returns all scripts those are currently opened in a browser
-	'''
-	files = []
-	if not 'stub_key' in request.session:
-		return files
-	key = str(request.session['stub_key'])
-	for i, v in request.session.items():
-		if i != 'stub_key' and str(v) == key:
-			files += [ i ]
-			try:
-				del request.session[i]
-			except:
-				pass
-	return files
-
 def live_settings_view(request):
 	return _render_to_response(
 			'configure.html',
@@ -555,6 +359,10 @@ def live_settings_view(request):
 def get_virtual_paths_path():
 	root = os.path.dirname(os.path.abspath(__file__))
 	return os.path.join(root, settings.virtual_paths_py)
+
+def stubFile(request):
+	request_control = inuse.stub(request.GET['path'], request)
+	return HttpResponse(str(request_control))
 
 def live_settings_json(request, content=None):
 	settings_fullpath = get_virtual_paths_path()
@@ -574,7 +382,7 @@ def live_settings_json(request, content=None):
 def live_settings_save(request):
 	fullpath = get_virtual_paths_path()
 	url = request.POST["url"].lstrip('/')
-	stub(url, request)
+	inuse.stub(url, request)
 
 	content = request.POST["content"]
 
@@ -652,6 +460,18 @@ def tests_progress(request):
 		date = request.GET.get('date')
 		progress = reporting.progress(date, path, context)
 		return HttpResponse(progress)
+	except Exception, e:
+		log.exception(e)
+		return HttpResponseServerError(e)
+
+def reporting_purge(request):
+	try:
+		import reporting
+		path = request.GET.get('path')
+		context = request.GET.get('context')
+		date = request.GET.get('date', )
+		reporting.purge(date, path, context)
+		return HttpResponse()
 	except Exception, e:
 		log.exception(e)
 		return HttpResponseServerError(e)

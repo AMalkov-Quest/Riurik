@@ -42,38 +42,38 @@ def current(path):
 	return path.rsplit('/')[-1]
 
 @register.filter
-def breadcrumbs(path):
+def breadcrumbs(path, pagetype):
 	"""
-	>>> breadcrumbs('')
+	>>> breadcrumbs('', 'front-page')
 	''
-	>>> breadcrumbs('/')
+	>>> breadcrumbs('', 'virtual')
 	''
-	>>> breadcrumbs('/path1/')
+	>>> breadcrumbs('/path1/', 'suite')
 	'<a href="/">&#8226;</a>&nbsp;&nbsp;<a>path1</a>&nbsp;&nbsp;<a href="//"><img height="11" src="/static/img/up.png" /></a>'
+	>>> breadcrumbs('/path1/path2', 'suite')
+	'<a href="/">&#8226;</a>&nbsp;&nbsp;<a href="/path1/">path1</a>&nbsp;&nbsp;&#8227;&nbsp;&nbsp;<a>path2</a>&nbsp;&nbsp;<a href="//path1/"><img height="11" src="/static/img/up.png" /></a>'
+	>>> breadcrumbs('/path1/test1.js', 'test')
+	'<a href="/">&#8226;</a>&nbsp;&nbsp;<a href="/path1/">path1</a>&nbsp;&nbsp;&#8227;&nbsp;&nbsp;<a>test1.js</a>&nbsp;&nbsp;'
 	"""
 	path = path.replace('\\','/')
-	
-	document_root = contrib.get_document_root(path)
-	fullpath = contrib.get_full_path(document_root, path)
-	type = dir_index_tools.get_type(fullpath)
-	
-	if document_root and document_root != '/':
-		html = '<a href="/">&#8226;</a>&nbsp;&nbsp;'
-		root = '/'
-		lastpath = root
-		i = 0
-		crumbs = path.rstrip('/').split('/')
-		for p in crumbs:
-			i += 1
-			if p:
-				lastpath += p 
-				lastpath += '/'
-				if i < len(crumbs):
-					html += '<a href="%s">%s</a>&nbsp;&nbsp;&#8227;&nbsp;&nbsp;' % ( lastpath, p )
-				else:
-					html += '<a>%s</a>&nbsp;&nbsp;' % ( p )
-				
-		if type != 'test':
+	head = '<a href="/">&#8226;</a>&nbsp;&nbsp;'
+	html = head
+	root = '/'
+	lastpath = root
+	i = 0
+	crumbs = path.rstrip('/').split('/')
+	for p in crumbs:
+		i += 1
+		if p:
+			lastpath += p
+			lastpath += '/'
+			if i < len(crumbs):
+				html += '<a href="%s">%s</a>&nbsp;&nbsp;&#8227;&nbsp;&nbsp;' % ( lastpath, p )
+			else:
+				html += '<a>%s</a>&nbsp;&nbsp;' % ( p )
+			
+	if html != head:
+		if pagetype != 'test':
 			html += '<a href="%s%s"><img height="11" src="/static/img/up.png" /></a>' % (root, above(path))
 	else:
 		html = ''

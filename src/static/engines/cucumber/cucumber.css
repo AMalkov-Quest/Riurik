@@ -1,0 +1,90 @@
+/* html formatter */
+
+#engine .keyword {
+  font-weight: bold;
+}
+
+#engine .description {
+  font-style: italic;
+  margin-left: 20px;
+}
+
+#engine details > section {
+  margin-left: 20px;
+}
+
+#engine ol.steps {
+  list-style-type: none;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+#engine .doc_string {
+  margin: 0 0 0 20px;
+}
+
+#engine table {
+  border-collapse: collapse;
+  border: 1px;
+  border-style: solid;
+}
+
+#engine td, #engine th {
+  border: 1px;
+  border-style: solid;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#engine table {
+  margin-left: 20px;
+}
+
+#engine thead {
+  background-color: #C0C0C0;
+}
+
+#engine .step, #engine .undefined, #engine .pending {
+  background-color: #EAEC2D;
+}
+
+#engine .passed {
+  background-color: #C5D88A;
+}
+
+#engine .skipped {
+  background-color: #2DEAEC;
+}
+
+#engine .failed {
+  background-color: #D88A8A;
+}
+
+#engine .tags {
+  display: inline;
+}
+
+#engine .tag {
+  margin-right: 0.25em;
+  color: #246ac1;
+}
+
+#engine .comments {
+  display: inline;
+}
+
+#engine .comment {
+  margin 0;
+  padding 0;
+}
+
+#engine .error {
+  margin: .2em .75em;
+  padding: .2em;
+  border: 1px solid #900;
+  background-color: #EDBBBB;
+}
+
+#cucumber-templates {
+  display: none;
+}

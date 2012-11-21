@@ -6,16 +6,16 @@ QUnit.setup( function() {
     context.test_path = suite_path + '/' + test_name;
     create_test( test_name, suite_path );
     write_test( test_path, test_content );
+    
+    context.ini_name = '.context.ini'
+    context.jsini_name = 'context.js'
+    context.ini_path = context.suite_path + '/' + context.ini_name;
   }
 });
                  
 asyncTest( 'using just string search pattern', function() {
 
-  context.url_tail = 'search?search_pattern=' + encodeURIComponent( context.search_pattern ) + '&path=' + escape( context.suite_path );
-  context.url = contexter.URL( context, context.url_tail );
-  QUnit.log( 'Search URL: ' + context.url );
-
-  $.when( frame.go( context.url ) ).then( function( _$ ) {
+  $.when( frame.go( get_search_url() ) ).then( function( _$ ) {
 
     expect( context.search_highlights_expected );
     
@@ -28,11 +28,7 @@ asyncTest( 'using just string search pattern', function() {
 
 asyncTest( 'using RegExp search pattern', function() {
 
-  context.url_tail = 'search?search_pattern=' + encodeURIComponent( context.search_regexp_pattern ) + '&path=' + escape( context.suite_path );
-  context.url = contexter.URL( context, context.url_tail );
-  QUnit.log( 'Search URL: ' + context.url );
-
-  $.when( frame.go( context.url ) ).then( function( _$ ) {
+  $.when( frame.go( get_search_url() ) ).then( function( _$ ) {
 
     expect( context.search_highlights_expected );
 
@@ -42,6 +38,39 @@ asyncTest( 'using RegExp search pattern', function() {
 
       start();
   });
+});
+
+asyncTest( 'should show results', function() {
+  $.when( frame.go( get_search_url() ) ).then( function( _$ ) {
+  
+    equal( _$( "div.search h1" ).text(), "Search results for '" + context.search_pattern + "'", 'should be title' );
+    
+    var files = _$( "div.search ul li" );
+    equal( files.length, context.search_results_expected, 'should be list of files' );
+    
+    var link = _$( "a[href$='" + context.ini_name + "']", files);
+    ok( link.length === 1, context.ini_name + ' should be found');
+    equal( link.text(), context.ini_path, 'should show name of file');
+    equal( link.attr('href'), '#' + context.ini_path, 'should have anchor');
+    
+    var link = _$( "a[href$='" + context.test_name + "']", files);
+    ok( link.length === 1, context.test_name + ' should be found');
+    equal( link.text(), context.test_path, 'should show name of file');
+    equal( link.attr('href'), '#' + context.test_path, 'should have anchor');
+    
+    var link = _$( "a[href$='" + context.jsini_name + "']", files);
+    ok( link.length === 0, context.jsini_name + ' should not be found');
+    
+    var contents = _$( "div.filepath" );
+    equal( contents.length, context.search_results_expected, 'should be list of files content' );
+    var link = _$( "a[href$='" + context.test_name + "']", contents);
+    ok( link.length === 1, context.test_name + ' should be link to file');
+    var link = _$( "a[href$='" + context.test_name + "?editor']", contents);
+    ok( link.length === 1, context.test_name + ' should be link to file to edit');
+    
+    start();
+  });
+  
 });
 
 QUnit.teardown( function() {

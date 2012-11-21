@@ -1,15 +1,14 @@
 #######################################################################################
 # Django settings for web_reports project.
-import os, sys, platform, socket
+import os, platform
 
 working_dir = os.path.dirname(os.path.abspath(__file__))
 root = os.path.normpath(os.path.dirname(working_dir))
 
-from oldsettings import *
 try:
 	import virtual_paths
 	virtual_paths_py = 'virtual_paths.py'
-except:
+except Exception:
 	import virtual_paths_default as virtual_paths
 	virtual_paths_py = 'virtual_paths_default.py'
 
@@ -70,15 +69,14 @@ TEMPLATE_LOADERS = (
     'django.template.loaders.app_directories.Loader',
 #     'django.template.loaders.eggs.load_template_source',
 )
-#SESSION_ENGINE = 'django.contrib.sessions.backends.file'
-SESSION_ENGINE = "django.contrib.sessions.backends.cache"
+SESSION_ENGINE = 'django.contrib.sessions.backends.file'
+#SESSION_ENGINE = "django.contrib.sessions.backends.cache"
 CACHE_BACKEND = 'locmem://'
 CACHE_MIDDLEWARE_ANONYMOUS_ONLY = False
 CACHE_MIDDLEWARE_SECONDS = 600
 
 MIDDLEWARE_CLASSES = (
 	'django.contrib.sessions.middleware.SessionMiddleware',
-	'src.auth.middleware.GitHubAuth',
 )
 
 ROOT_URLCONF = 'urls'
@@ -86,7 +84,8 @@ ROOT_URLCONF = 'urls'
 TEMPLATE_DIRS = (
 
     os.path.join(os.path.dirname( __file__ ), 'templates'),
-    os.path.join(os.path.dirname( __file__ ), 'auth', 'templates'),
+	os.path.join(os.path.dirname( __file__ ), 'plugins', 'search', 'templates'),
+    os.path.join(os.path.dirname( __file__ ), 'plugins', 'github', 'templates'),
 )
 
 TEMPLATE_CONTEXT_PROCESSORS = (
@@ -104,7 +103,12 @@ INSTALLED_APPS = (
 	'django.contrib.messages',
 	'src',
 	'src.plugins.search',
+	'src.plugins.git',
+	'src.plugins.github',
 )
+
+def appInstalled(app_name):
+	return app_name in INSTALLED_APPS
 
 if platform.system() == 'Windows':
 	nodejs = os.path.join(os.environ['ProgramFiles'], 'nodejs', 'node.exe')
@@ -115,7 +119,6 @@ elif platform.system() == 'Linux':
 else:
 	COFFEESCRIPT_EXECUTABLE = None
 
-UPLOAD_TESTS_CMD='testsrc/upload'
 EXEC_TESTS_CMD='static/testLoader.html'
 SUITE_SETUP_FILE_NAME = 'suite-setup.js'
 SPEC_URL_FILE_NAME = '.specification.ini'
@@ -135,3 +138,50 @@ EXCLUDE_KEY = 'exclude'
 SUITE_SETUP = 'suite_setup'
 PRODUCT_CODE_PATH = 'product_code_path'
 PRODUCT_CODE_ALIAS = 'product_code_alias'
+
+STATIC_MANAGEMENT_ASSET_PATHS = []
+STATIC_MANAGEMENT_HOSTNAMES = ['http://www.riurik.com']
+STATIC_MANAGEMENT_VERSIONER = 'plugins.static_management.versioners.SHA1Sum'
+STATIC_MANAGEMENT = {
+	'js': {
+		'qunit.testLoader.js': [
+			'js/jquery.min.js',
+			'js/jquery.json.min.js',
+			'jquery-ui/js/jquery-ui.custom.min.js',
+			'js/dates.js',
+			'js/tools.js',
+			'js/riurik.js',
+			'js/reporting.js',
+			'js/frame.js',
+			'js/errors.js',
+			'engines/qunit/connector.js',
+			'engines/qunit/qunit.html.js',
+			'engines/qunit/qunit.js',
+			'engines/qunit/qunit.extentions.js'
+		]
+	},
+	'css': {
+		
+	}
+}
+
+CUC_STATIC_MANAGEMENT = {
+	'js': {
+		'cucumber.testLoader.js': [
+			'js/jquery.min.js',
+			'js/jquery.json.min.js',
+			'jquery-ui/js/jquery-ui.custom.min.js',
+			'js/dates.js',
+			'js/tools.js',
+			'js/riurik.js',
+			'js/reporting.js',
+			'js/frame.js',
+			'js/errors.js',
+			'engines/cucumber/connector.js',
+			'engines/cucumber/cucumber.js',
+		]
+	},
+	'css': {
+		
+	}
+}

@@ -1,7 +1,7 @@
 module 'suite setup'
 
 QUnit.setup ->
-  context.suite_path = "#{context.root}/coffeescript/first-suite"
+  context.suite_path = "#{context.root}/first-suite"
   test1_path = "#{context.suite_path}/first-test.coffee"
   test2_path = "#{context.suite_path}/second-test.coffee"
   ss_path = "#{context.suite_path}/suite-setup.coffee"
@@ -15,7 +15,7 @@ QUnit.setup ->
              
 asyncTest 'should be executed first of all', ->
   $.when( frame.go(context.url) ).then ->
-    $.wait( -> frameTestsAreDone ).then ->
+    $.waitFor.condition( -> frameTestsAreDone() ).then ->
       equal _$('.test-name').length, 3, 'both suite-setup and tests are executed'
       equal _$('#test-output0 .test-name').text(), 'suite setup', 'suite setup is executed first'
       start()

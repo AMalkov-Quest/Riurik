@@ -1,29 +1,42 @@
 import subprocess, tempfile, os, shlex
+import plugins.github.gitware as gitware
+from logger import log
 
 git_ssh_cmd = os.path.abspath( os.path.join( os.path.dirname( os.path.join( __file__ ) ), 'git-ssh.sh' ) )
 
+def command(login, repoid, cmdline):
+	root = gitware.get_document_root(login, repoid)
+	log.debug('git executes %s in %s' % (cmdline, root))
+
+	with GitSSH(root, gitware.get_rsa_path(login), gitware.get_rsa_pub_path(login)) as call:
+		out, err, code = call(cmdline)
+
+		if not out:
+			log.debug('%s (%s)' % (err, code))
+			return err if err else str(code) 
+
+		return out
+
 class GitSSH(object):
 	def __init__(self, repoPath, privateKey, publicKey):
-		h, self.privateFile = tempfile.mkstemp()
-		hPrivate = open(self.privateFile, 'w')
-		hPrivate.write(privateKey)
-		hPrivate.close()
-		self.publicFile = self.privateFile + '.pub'
-		hPublic = open(self.publicFile, 'w')
-		hPublic.write(publicKey)
-		hPublic.close()
+		self.privateFile = privateKey
+		self.publicFile = publicKey
 		self.repository = repoPath
+		log.debug('GitSSH for %s' % repoPath)
 
 	def __enter__(self):
 		return self.popen
 
-	def __exit__(self, exceptionType, value, traceback):
-		os.remove(self.privateFile)
-		os.remove(self.publicFile)
-		print exceptionType, value, traceback
+	def __exit__(self, exceptionType, value, tb):
+		if exceptionType:
+			log.debug('GitSSH catch exception %s' % exceptionType)
+			log.debug(value)
+			import traceback
+			log.debug(traceback.format_exc())
 		return True # The exception was not handled
 
 	def popen(self, cmd, input=None):
+		log.debug('GitSSH command %s' % cmd)
 		params = shlex.split( cmd )
 		env = {}
 		env.update( os.environ )

@@ -2,7 +2,7 @@ module( 'search UI' );
 
 asyncTest( 'root page should not have search', function() {
 
-  context.url = contexter.URL( context, '' );
+  context.url = $.URI( context, '' );
   QUnit.log( 'Root URL: ' + context.url );
 
   $.when( frame.go( context.url ) ).then( function( _$ ) {
@@ -16,7 +16,7 @@ asyncTest( 'root page should not have search', function() {
 
 asyncTest( 'search is available inside virtual folder', function() {
 
-  context.url = contexter.URL( context, context.virtual_root );
+  context.url = $.URI( context, context.virtual_root );
   QUnit.log( 'Virtual folder URL: ' + context.url );
 
   $.when( frame.go( context.url ) ).then( function( _$ ) {
@@ -34,7 +34,7 @@ asyncTest( 'search is available inside virtual folder', function() {
     form.attr( 'target', '' );
     form.submit();
 
-    $.wait( function() {
+    $.waitFor.condition( function() {
 
       return frame.window().jQuery && frame.window().jQuery( "div[class=search]" ).length > 0;
     }).then( function() {
@@ -44,4 +44,3 @@ asyncTest( 'search is available inside virtual folder', function() {
     });
   });
 });
-

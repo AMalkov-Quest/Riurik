@@ -20,9 +20,10 @@ urlpatterns = patterns('',
 	url(r'^actions/test/runlocal/$', 'views.runLocalTest', name='run-local-test'),
 	(r'^actions/test/stub/$', 'views.stubFile'),
 	(r'^actions/test/submit/$', 'views.submitTest'),
-	(r'^actions/test/control/$', 'views.getControl'),
+	(r'^actions/test/control/$', 'inuse.getControl'),
 	(r'^logger/records/recv/$', 'views.recvLogRecords'),
 	(r'^actions/remove/$', 'views.removeObject'),
+	(r'^actions/rename/$', 'views.renameObject'),
 	(r'^actions/suite/enumerate/$', 'views.enumerate_suites'),
 	(r'^(?P<path>.*)/show_context[/]?$', 'views.show_context'),
 	(r'^settings[/]?$', 'views.live_settings_view'),
@@ -30,14 +31,15 @@ urlpatterns = patterns('',
 	(r'^report_callback/$', 'views.report_callback'),
 	(r'^report/status$', 'views.tests_status'),
 	(r'^report/progress$', 'views.tests_progress'),
-	(r'^signin[/]?$', 'auth.views.signin'),
-	(r'^login[/]?$', 'auth.views.login'),
-	(r'^gh[/]?$', 'auth.views.github_test')
+	(r'^report/purge$', 'views.reporting_purge'),
 
 )
 
 urlpatterns += patterns('',
 	(r'^search', include('plugins.search.urls')),
+	(r'^readme', include('plugins.help.urls')),
+	(r'^git/(?P<cmd>.*)$', include('plugins.git.urls')),
+	(r'^github/', include('plugins.github.urls')),
 )
 
 urlpatterns += patterns('',

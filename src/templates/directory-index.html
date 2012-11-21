@@ -26,6 +26,7 @@
 	    
     <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
     <meta http-equiv="Content-Language" content="en-us" />
+	<meta http-equiv="Cache-Control" content="No-Cache" />
     <meta name="robots" content="NONE,NOARCHIVE" />
     <title>{{ directory|current }}</title>
     {% block head %}
@@ -47,7 +48,7 @@
 	</div>
 	<div class="content">
 		{% block title %}
-		<p class="breadcrumbs">{{ directory|breadcrumbs }}</p>
+		<p class="breadcrumbs {{ type }}">{{ directory|breadcrumbs:type }}</p>
 		{% endblock title %}
 		<div id="syntax" style="float:left;padding:15px 0 0 20px;"></div>
 		<div style="float:right;">
@@ -73,19 +74,29 @@
 						<li><a id="spec-link" href="{{ spec }}" target="_blank" >{% trans "Spec" %}</a></li>
 						<li><a id="new-test" href="javascript:void(0);" onClick="javascript:createTest();">{% trans "Create Test" %}</a></li>
 					{% else %}
-						{% ifequal type 'virtual' %}
+						{% ifequal type 'root' %}
 						<li><a id="virtual-settings" href=".settings.ini?editor">{% trans "Settings" %}</a></li>
 						{% endifequal %}
 						<li><a id="new-suite" href="javascript:void(0);" onClick="javascript:createFolder();">{% trans "Create Suite" %}</a></li>
+						{% ifnotequal type 'root' %}
 						<li><a id="new-test" href="javascript:void(0);" onClick="javascript:createTest();">{% trans "Create Script" %}</a></li>
+						{% endifnotequal %}
 					{% endifequal %}
 				{% else %}
+					{% if githref %}
+					<li>
+					<a id="github" href="javascript:void(0)" class="github" >{% trans "Log in with github" %}</a>
+					</li>
+					{% else %}
 					<li><a id="configure" href="/settings" >{% trans "Configure" %}</a></li>
+					{% endif %}
+					
 				{% endif %}
 			</ul>
 			</form>
 			{% endblock controls %}
 			{% block search %}{% include 'search/include/search.html' %}{% endblock search %}
+			{% block user %}{% include 'github-user.html' %}{% endblock user %}
 		</div>
 		<div style="clear:both;"></div>
 		<div class="line">
@@ -110,6 +121,6 @@
 		
     	</div>
     </div>
-    {% endblock body %}
+    {% endblock %}
 </body>
 </html>

@@ -4,24 +4,30 @@
 		<title></title>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 		<script type="text/javascript">
-			//Top level namespace for Riurik
-			var riurik = {};
+			//Bootstrap namespace for Riurik
+			var riurikldr = {};
 
-			riurik.src = {};
-			riurik.src.jquery = '/static/js/jquery.min.js';
-			riurik.src.bootstrap = '/static/js/bootstrap.js';
+			riurikldr.src = {};
+			riurikldr.src.jquery = '/static/js/jquery.min.js';
+			riurikldr.src.bootstrap = '/static/js/bootstrap.js';
 
-			riurik.GetArgument = function( name ) {
+			riurikldr.TryGetArgument = function( name ) {
 				var arg = (new RegExp( name + '=([^&$]+)' )).exec(window.location.href);
 				if ( arg ) return arg[1];
+				return null;
+			};
+
+			riurikldr.GetArgument = function( name ) {
+				var arg = riurikldr.TryGetArgument(name);
+				if ( arg ) return arg;
 				else alert('Can not find argument ' + name);
 			};
 
-			riurik.BuildHttpUri = function(url) {
-				return 'http://'.concat(riurik.args.server, url);
+			riurikldr.BuildHttpUri = function(url) {
+				return 'http://'.concat(riurikldr.args.server, url);
 			};
 
-			riurik.GetCwd = function(path) {
+			riurikldr.GetCwd = function(path) {
 				if ( ! /\.js$/.test(path) ) {
 					//current target is suite, just return it
 					return path;
@@ -30,62 +36,36 @@
 				return /(.*?)\/[^\/]*$/.exec(path)[1];
 			};
 			
-			riurik.LoadScript = function(url, callback){
-				var url = riurik.BuildHttpUri( url );
+			riurikldr.args = {};
+			riurikldr.args.server = riurikldr.GetArgument('server');
+			riurikldr.args.path = riurikldr.GetArgument('path');
+			riurikldr.args.cwd = riurikldr.GetCwd(riurikldr.args.path);
+
+			window.onload = function(){
+				var url = riurikldr.BuildHttpUri( riurikldr.src.bootstrap );
 				var script = document.createElement( 'script' );
 				script.type = 'text/javascript';
 				script.src = url + '?_=' + Math.random().toString();
-				var timeout = setTimeout(function(){
-					onload(true);
-				}, 10000);
-				var onload = function(failed) {
-					if ( typeof callback == 'function' ) callback();
-					callback = function(){};
-					clearTimeout(timeout);
-				};
-				if ((typeof jQuery != 'undefined' && jQuery.browser.msie)||(/msie/i.exec(navigator.userAgent))) {
-					script.onreadystatechange = function() {
-						if (script.readyState == 'loaded' || script.readyState == 'complete') {
-							script.onreadystatechange = null;
-							onload();
-						};
-					};
-				}else{
-					script.onload = onload;
-				}
 				document.body.appendChild( script );
-			};
-
-			riurik.args = {};
-			riurik.args.server = riurik.GetArgument('server');
-			riurik.args.path = riurik.GetArgument('path');
-			riurik.args.cwd = riurik.GetCwd(riurik.args.path);
-
-			window.onload = function(){
-				riurik.LoadScript(riurik.src.jquery, function(){
-					riurik.LoadScript(riurik.src.bootstrap);
-				});
 			};
 		</script>
 	</head>
 	<body>
-		<h1 id="qunit-header">Riurik</h1>
-		<h2 id="qunit-banner"></h2>
-		<div id="qunit-testrunner-toolbar"></div>
-		<h2 id="qunit-userAgent"></h2>
-		<ol id="qunit-tests"></ol>
-		<div id="qunit-fixture">Please, wait until tests loading complete.</div>
-		<div id="results"></div>
-		<div id="tabs">
+		<div id="gif-loader" style="position:absolute; top:50%; left:50%;">
+			<img src="http://www.riurik.com/static/img/ajax-loader.gif">
+		</div>
+		<div id="engine">
+		</div>
+		<div style="display:none" id="tabs">
 			<ul>
 				<li><a href="#tabs-1">Frame</a></li>
 				<li>
-					<a href="#tabs-2">Tools console</a>
+					<a href="#tabs-2">Tools</a>
 					<div style="width:16px; height: 16px; float: left; padding: .5em 0;">
 						<div id="tabs-2-loading"></div>
 					</div>
 					</li>
-				<li><a href="#tabs-3">QUnit console</a></li>
+				<li><a href="#tabs-3">Console</a></li>
 			</ul>
 			<div id="tabs-1">
 				<div id="frame-url"></div>
@@ -103,7 +83,7 @@
 				</div>
 			</div>
 			<div id="tabs-3">
-				<div id="qunit-console">
+				<div id="riurik-console">
 				</div>
 			</div>
 		</div>
