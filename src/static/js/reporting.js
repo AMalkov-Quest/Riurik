@@ -119,8 +119,8 @@ riurik.reporter.getHtmlTestResults = function () {
 
 riurik.reporter.send = function (data, callback) {
 	$(document).unbind('ajaxError');
-	//console.log('send');
-	//console.log(data);
+	console.log('send');
+	console.log(data);
 
 	$.ajax({
 		'url': riurik.reporter.url,
