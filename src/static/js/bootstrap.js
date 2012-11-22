@@ -90,7 +90,7 @@ riurikldr.loader().queue(riurikldr.args.cwd + '/.context.js', function(){
 	.then(function() {
 		riurik.engine.init(function(){
 			riurik.trigger( "riurik.engine.loaded" );
-			$('#tabs').show();
+			$('#frame-container').show();
 			$('#gif-loader').hide();
 
 			console.log('riurik load time:');
@@ -99,6 +99,5 @@ riurikldr.loader().queue(riurikldr.args.cwd + '/.context.js', function(){
 	});
 
 	load_remote_style('/static/css/loader.css');
-	load_remote_style('/static/jquery-ui/css/redmond/jquery-ui.custom.css');
 });
 

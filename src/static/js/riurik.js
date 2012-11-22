@@ -27,7 +27,6 @@ riurik.on( "riurik.engine.loaded", function(){
 riurik.init = function() {
 	riurik.trigger( "riurik.initing" );
 
-	$("#tabs").tabs();
 	riurik.context = clone(context);
 	riurik.onerror();
 
@@ -358,6 +357,7 @@ riurik.__log = function() {
 		while ( riurik.__log_storage.length > 0 ) {
 			var o = riurik.__log_storage.shift();
 			$('#riurik-console').prepend( o.toString()+'<hr/>' );
+            $('#status-text').text( o.toString() );
 		}
 	}
 };
