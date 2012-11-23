@@ -28,7 +28,54 @@ riurikldr.LoadScript = function(scriptName, callback, target){
 	}else{
 		script.onload = onload;
 	}
-	target.head.appendChild( script );
+	
+	target.body.appendChild( script );
+	/*if ( $.browser.msie && $.browser.version == '8.0') {
+		$('head').append( $(script) );
+	}else{
+		target.head.appendChild( script );
+	}*/
+};
+
+riurikldr.newLoadScript = function(scriptName, callback, target){
+	if( typeof target == 'undefined') {
+		target = $('head');
+	}
+	var url = riurikldr.BuildHttpUri( scriptName );
+	//var script = target.createElement( 'script' );
+	//script.type = 'text/javascript';
+	//script.src = url + '?_=' + Math.random().toString();
+	
+	//var script = target.append($('<script></script>'))
+	var script = $('<script />').attr({
+		type: 'text/javascript',
+		src: url + '?_=' + Math.random().toString()
+	});
+	script.appendTo('document');
+	
+	var timeout = setTimeout(function(){
+		onload(true);
+	}, 10000);
+	var onload = function(failed) {
+		if ( typeof callback == 'function' ) callback();
+		callback = function(){};
+		clearTimeout(timeout);
+	};
+	/*if ((typeof jQuery != 'undefined' && jQuery.browser.msie)||(/msie/i.exec(navigator.userAgent))) {
+		script.onreadystatechange = function() {
+			if (script.readyState == 'loaded' || script.readyState == 'complete') {
+				script.onreadystatechange = null;
+				onload();
+			};
+		};
+	}else{
+		script.onload = onload;
+	}*/
+	script.ready(onload);
+	
+	//target.body.appendChild( script );
+	//target.append( script );
+	script.appendTo('head');
 };
 
 riurikldr.loader = function() {
