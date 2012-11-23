@@ -3,7 +3,7 @@ var consoles='developer-consoles',
     status='status-container',
     statusText='status-text',
     consoleLabels='labels',
-    toolsConsole, logConsole;
+    toolsConsole, logConsole, gitConsole;
 
 var initEl = function( id, appendTo, tag ) {
     tag = tag || 'div';
@@ -26,11 +26,22 @@ var initConsole = function(id, name) {
     return e;
 };
 
+var initGitConsole = function( console ) {
+    initEl( 'git-status', console, 'a' ).attr('href', 'void(0)').text('Status').on('click', function(){
+        $.get('/git/status', function(data){
+            console.prepend('<hr/>');
+            console.prepend(data);
+        });
+    }).click();
+};
+
 riurik.on("riurik.initing", function(){
     consoles = initEl(consoles, 'body');
     status = initEl(status, consoles);
     statusText = initEl(statusText, status);
-    consoleLabels = initEl(consoleLabels, status, 'ul');
+    consoleLabels = initEl(consoleLabels, status, 'ul')
+    gitConsole = initConsole( 'git-console', 'Git' );
+    initGitConsole( gitConsole );
     toolsConsole = initConsole( 'powershell-console', 'Tools' );
     logConsole = initConsole( 'riurik-console', 'Logs' );
 });

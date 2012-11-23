@@ -69,7 +69,18 @@ body {
     background: -moz-linear-gradient(top,  #CCC,  #DDD);
     filter:  progid:DXImageTransform.Microsoft.gradient(startColorstr='#CCC', endColorstr='#DDD');
 }
-#powershell-console, #riurik-console {
+
+#git-console {
+    padding-top: 25px;
+}
+
+#git-console #git-status {
+    position: absolute;
+    top: 2px;
+    left: 10px;
+}
+
+#powershell-console, #riurik-console, #git-console {
     height: 200px;
     display: none;
     width: 100%;
@@ -80,10 +91,10 @@ body {
     overflow-x: hidden;
     overflow-y: scroll;
 }
-#powershell-console hr, #riurik-console hr {
+#powershell-console hr, #riurik-console hr, #git-console hr {
 	color: #EEE;
 }
-#powershell-console, #riurik-console,
-#powershell-console *, #riurik-console * {
+#powershell-console, #riurik-console, git-console
+#powershell-console *, #riurik-console *, #git-console * {
 	font-size: 1em;
 }
