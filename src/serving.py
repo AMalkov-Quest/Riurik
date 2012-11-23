@@ -128,7 +128,8 @@ class BaseHandler(object):
 	def is_document_root(self, fullpath):
 		document_root = self.get_document_root()
 		if document_root:
-			return os.path.samefile(fullpath, document_root)
+			#return os.path.samefile(fullpath, document_root)
+			return os.path.normpath(fullpath) == os.path.normpath(document_root)
 		else:
 			return False
 
