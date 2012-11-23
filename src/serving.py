@@ -222,7 +222,7 @@ def get_history(request, path):
 		result = { 'url': url, 'data': tests_list }
 		return HttpResponse(json.dumps(result))
 
-	return _render_to_response('history.html', locals())
+	return _render_to_response('history_qunit.html', locals())
 
 def get_spec(target, path):
 	spec_url = spec.get_url(path)
