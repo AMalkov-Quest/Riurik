@@ -27,7 +27,7 @@ var initConsole = function(id, name) {
 };
 
 var initGitConsole = function( console ) {
-    initEl( 'git-status', console, 'a' ).attr('href', 'void(0)').text('Status').on('click', function(){
+    initEl( 'git-status', console, 'a' ).attr('href', '#').text('Status').on('click', function(){
         $.get('/git/status', function(data){
             console.prepend('<hr/>');
             console.prepend(data);

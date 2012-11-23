@@ -70,16 +70,6 @@ body {
     filter:  progid:DXImageTransform.Microsoft.gradient(startColorstr='#CCC', endColorstr='#DDD');
 }
 
-#git-console {
-    padding-top: 25px;
-}
-
-#git-console #git-status {
-    position: absolute;
-    top: 2px;
-    left: 10px;
-}
-
 #powershell-console, #riurik-console, #git-console {
     height: 200px;
     display: none;
@@ -98,3 +88,16 @@ body {
 #powershell-console *, #riurik-console *, #git-console * {
 	font-size: 1em;
 }
+
+#git-console {
+    padding-top: 25px;
+	height: 175px;
+}
+
+#git-console #git-status {
+    position: absolute;
+    top: 2px;
+    left: 10px;
+}
+
+
