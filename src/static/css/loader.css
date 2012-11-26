@@ -100,4 +100,22 @@ body {
     left: 10px;
 }
 
+#git-console #git-add {
+    position: absolute;
+    top: 2px;
+    left: 55px;
+}
+
+#git-console #git-commit {
+    position: absolute;
+    top: 2px;
+    left: 103px;
+}
+
+#git-console #git-push {
+    position: absolute;
+    top: 2px;
+    left: 160px;
+}
+
 
