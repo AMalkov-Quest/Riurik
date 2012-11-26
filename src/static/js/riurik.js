@@ -27,7 +27,6 @@ riurik.on( "riurik.engine.loaded", function(){
 riurik.init = function() {
 	riurik.trigger( "riurik.initing" );
 
-	$("#tabs").tabs();
 	riurik.context = clone(context);
 	riurik.onerror();
 
@@ -70,7 +69,7 @@ riurik.on("riurik.tests.test.done", function(e, test){
 
 riurik.load_tests = function(){
 	riurik.trigger( "riurik.tests.loading" );
-
+	console.log( "riurik.tests.loading" );
 	if ( typeof window.context == 'undefined' ) {
 		alert('context should be preliminary loaded');
 		return;
@@ -100,6 +99,9 @@ riurik.load_tests = function(){
 		});
 	};
 	l.then(function(){
+		console.log('tests load time:');
+		console.log((new Date() - riurikldr.start)/1000);
+
 		riurik.trigger( "riurik.tests.loaded" );
 	});
 }
@@ -276,7 +278,7 @@ riurik.Waits.prototype.event = function(event_name, target, timeout) {
 	var eventTriggered = false;
 	var eventArgs = null;
 
-	target.bind(event_name, function() {
+	target.on(event_name, function() {
 		eventArgs = arguments;
 		eventTriggered = true;
 	});
@@ -355,6 +357,7 @@ riurik.__log = function() {
 		while ( riurik.__log_storage.length > 0 ) {
 			var o = riurik.__log_storage.shift();
 			$('#riurik-console').prepend( o.toString()+'<hr/>' );
+            $('#status-text').text( o.toString() );
 		}
 	}
 };

@@ -3,7 +3,7 @@ from django.conf.urls.defaults import *
 from django.views.static import serve
 import os
 import settings
-import views
+import views, ci
 from logger import log
 
 urlpatterns = patterns('',
@@ -24,7 +24,7 @@ urlpatterns = patterns('',
 	(r'^logger/records/recv/$', 'views.recvLogRecords'),
 	(r'^actions/remove/$', 'views.removeObject'),
 	(r'^actions/rename/$', 'views.renameObject'),
-	(r'^actions/suite/enumerate/$', 'views.enumerate_suites'),
+	(r'^actions/suite/enumerate/$', 'ci.enumerate_suites'),
 	(r'^(?P<path>.*)/show_context[/]?$', 'views.show_context'),
 	(r'^settings[/]?$', 'views.live_settings_view'),
 	(r'^settings/save[/]?$', 'views.live_settings_save'),

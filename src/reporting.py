@@ -212,7 +212,7 @@ def start(data):
 	
 def debug(path, context, date, text, mode='a'):
 	log = getFileName(path, context, date, 'log')
-	proceed(log, mode, lambda f: f.write(text + '\n'))
+	proceed(log, mode, lambda f: f.write(str(text) + '\n'))
 
 def done(data):
 	done = TestInfo(data)
