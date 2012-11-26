@@ -4,6 +4,7 @@ body {
 }
 #developer-consoles {
     position:fixed;
+    z-index: 99999999999;
     bottom:0;
     left: 0;
     background: #CCC;

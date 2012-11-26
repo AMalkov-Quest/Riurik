@@ -64,7 +64,7 @@ riurik.on("riurik.initing", function(){
     logConsole = initConsole( 'riurik-console', 'Logs' );
 });
 
-riurik.on("riurik.initing.editor", function(){
+riurik.on("riurik.initing-editor", function(){
     consoles = initEl(consoles, 'body');
     status = initEl(status, consoles);
     consoleLabels = initEl(consoleLabels, status, 'ul')
