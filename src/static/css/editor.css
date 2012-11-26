@@ -18,3 +18,12 @@ a.disabled {
 	width: 100%;
 	overflow: visible;
 }
+
+#code {
+    width: 90%;
+    min-height: 70%;
+}
+
+body {
+    padding-bottom: 50px;
+}
