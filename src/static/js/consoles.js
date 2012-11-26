@@ -34,7 +34,7 @@ var initGitConsole = function( console ) {
         });
     }).click();
     initEl( 'git-add', console, 'a' ).attr('href', '#').text('Add all').on('click', function(){
-        $.get('/git/commit', function(data){
+        $.get('/git/add', function(data){
             console.prepend('<hr/>');
             console.prepend(data);
         });
