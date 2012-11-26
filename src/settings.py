@@ -70,6 +70,7 @@ TEMPLATE_LOADERS = (
 #     'django.template.loaders.eggs.load_template_source',
 )
 SESSION_ENGINE = 'django.contrib.sessions.backends.file'
+SESSION_FILE_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'sessions'))
 #SESSION_ENGINE = "django.contrib.sessions.backends.cache"
 CACHE_BACKEND = 'locmem://'
 CACHE_MIDDLEWARE_ANONYMOUS_ONLY = False

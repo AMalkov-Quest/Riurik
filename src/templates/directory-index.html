@@ -10,14 +10,25 @@
 		if (!window.console) {
 			window.console = { log: function() {  } };
 		}
+        if (!window.riurik) {
+            window.riurik = {};
+            riurik.on = function(){ $(riurik).on.apply( $( riurik ), $.makeArray(arguments) ); };
+            riurik.trigger = function(event){ $(riurik).trigger.apply( $(riurik), [event, $.makeArray(arguments).slice(1)] );};
+
+        }
 	</script>
     <link rel="shortcut icon" href="/static/img/{{ favicon }}">
     <link rel="stylesheet" type="text/css" href="/static/jquery-ui/css/start/jquery-ui.custom.css" />
 	<script type="text/javascript" src="/static/js/jquery.min.js"></script>
+    <script type="text/javascript">
+        $(function(){riurik.trigger('riurik.initing-editor');});
+    </script>
   	<script type="text/javascript" src="/static/js/jquery.json.min.js"></script>
 	<script type="text/javascript" src="/static/jquery-ui/js/jquery-ui.custom.min.js"></script>
+    <script type="text/javascript" src="/static/js/consoles.js"></script>
     
     <link rel="stylesheet" href="/static/css/base.css" type="text/css">
+    <link rel="stylesheet" href="/static/css/loader.css" type="text/css">
     
     <link rel="stylesheet" href="/static/css/contextMenu.css" type="text/css">
     <script type="text/javascript" src="/static/js/jquery.contextMenu.js"></script>
