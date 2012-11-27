@@ -16,40 +16,20 @@
     <script type="text/javascript" src="/static/js/jquery.cookie.js"></script>
     <script type="text/javascript">
          $(document).ready(function() {
-          try { var last_context = $.cookie('last_context');
-              if ( typeof last_context == 'string' ) 
-                $('select[name=context]').val(last_context);
-          } catch (e) { console.log(e); }
-          {% if not is_stubbed %}    
-              var source_value = draft_value = $('#code').val();
-              coffeeScriptSyntaxChecker = function(code, el) { 
-                try { 
-                    CoffeeScript.compile(code); 
-                    $(el).text('syntax OK'); 
-                } catch (e) { 
-                    $(el).text(e.message); 
-                } 
-            };  /*
-              var mode = ( /\.coffee\?/.test(window.location.href) ) ? "coffeescript" : "javascript";
-                var editor = CodeMirror.fromTextArea(document.getElementById("code"), {
-                mode: mode,
-                    content: source_value,
-                lineWrapping: true,
-                    autoMatchParens: true,
-                    lineNumbers: true,
-                matchBrackets: true,
-                extraKeys: {
-                    "Ctrl-S": function(){ $('#save').trigger('click'); },
-                    "Ctrl-R": function(){ $('#run').trigger('click'); }
-                },
-                onChange: function(editor, options) {
-                    if ( mode == 'coffeescript' ) {
-                        coffeeScriptSyntaxChecker(editor.getValue(), '#syntax');
-                    }
-                }
-            });
-            window.editor = editor;
-                */
+              try { var last_context = $.cookie('last_context');
+                  if ( typeof last_context == 'string' ) 
+                    $('select[name=context]').val(last_context);
+              } catch (e) { console.log(e); }
+              {% if not is_stubbed %}    
+                window.coffeeScriptSyntaxChecker = function(code, el) { 
+                    try { 
+                        CoffeeScript.compile(code); 
+                        $(el).text('syntax OK'); 
+                    } catch (e) { 
+                        $(el).text(e.message); 
+                    } 
+                };
+                var source_value = editor.getValue();
                 var ConfirmDiscardchanges = function(){
                         var new_value = editor.getValue();
                         if ( new_value == source_value ) {
@@ -60,16 +40,16 @@
                         }
                         return true;
                 };
-                    $(document).unload(ConfirmDiscardchanges);
-                    $('a').click(function(e){
+                $(document).unload(ConfirmDiscardchanges);
+                $('a').click(function(e){
                         e.stopPropagation();
                         if ($(this).attr('id') != 'save' && $(this).attr('id') != 'run' && $(this).attr('id') != 'discard' && $(this).attr('id') != 'close') {
                             return ConfirmDiscardchanges();
                         }
                 });
-                    $('#discard').click(function(){ if ( ConfirmDiscardchanges() ) document.location=document.location;});
-                    $('#close').click(function(){ if ( ConfirmDiscardchanges() ) document.location='{{ request.path|above }}';});
-          {% endif %}
+                $('#discard').click(function(){ if ( ConfirmDiscardchanges() ) document.location=document.location;});
+                $('#close').click(function(){ if ( ConfirmDiscardchanges() ) document.location='{{ request.path|above }}';});
+             {% endif %}
     
           $('#run').click(function(){ 
             var context = $('select[name=context]').val();
@@ -99,7 +79,6 @@
             });
          {% endif %}
 
-                 //$.ctrl('R', function(){ $('#run').trigger('click'); });
          $('#unstub').click(function(){
             console.log('get control')
             $.get(
