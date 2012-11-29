@@ -119,30 +119,20 @@ riurik.reporter.getHtmlTestResults = function () {
 
 riurik.reporter.send = function (data, callback) {
 	$(document).unbind('ajaxError');
-	riurik.log('report: ' + data.event);
-	
-	var complete = function(complete_msg) {
-		$(document).bind('ajaxError', riurik.ajaxError);
-		if(complete_msg == 'error') {
-			riurik.log(callback.toString());
-		}
-		if(typeof callback != 'undefined') {
-			callback(complete_msg);
-		}	
-	};
+	//console.log('send');
+	//console.log(data);
 
-	try {
-		$.ajax({
-			'url': riurik.reporter.url,
-			'data': data,
-			'dataType': 'jsonp',
-			'complete': function() { complete(data.event) }
-		});
-	}catch(e) {
-		riurik.log(e.toString());
-		riurik.log('try to complete...');
-		complete('error');
-	};
+	$.ajax({
+		'url': riurik.reporter.url,
+		'data': data,
+		'dataType': 'jsonp',
+		'complete': function(){
+			$(document).bind('ajaxError', riurik.ajaxError);
+			if(typeof callback != 'undefined') {
+				callback(data.event);
+			}	
+		}
+	});
 };
 
 riurik.reporter.getTestDuration = function () {
@@ -166,30 +156,20 @@ riurik.reporter.consignor = function () {
 				if( event == 'done') {
 					riurik.reporter.state = 'done';
 				}
-				
-				if( event == 'timeout') {
-					riurik.log('!!! reporter timeout !!!');
-					riurik.log('reporter length is ' + riurik.reporter.queue.length);
-				}
 			};
-			
-			if ( riurik.reporter.queue.length > 0 ) {
+
+			busyTimeOut = setTimeout(next, 120 * 1000);
+			if ( riurik.reporter.queue.length > 0 ){
 				data = riurik.reporter.queue.shift();
 				data['date'] = riurik.reporter.date;
 				data['context'] = context.__name__;
 				data['path'] = riurik.reporter.target_tests_path;
 				
 				busy = true;
-				clearTimeout( busyTimeOut );
-				busyTimeOut = setTimeout(function() { next('timeout'); }, 100 * 1000);
-				
 				riurik.reporter.send( data, next );
 			}
 		};
-		
-		if(riurik.reporter.state != 'done') {
-			setTimeout(f, 100);
-		}
+		setTimeout(f, 100);
 	})();
 };
 
