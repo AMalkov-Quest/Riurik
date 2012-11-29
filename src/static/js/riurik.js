@@ -102,8 +102,7 @@ riurik.load_tests = function(){
 		console.log('tests load time:');
 		console.log((new Date() - riurikldr.start)/1000);
 
-		riurik.trigger( "riurik.tests.loaded" );
-		//riurik.engine.run_tests();
+		riurik.engine.run_tests();
 	});
 }
 
@@ -384,4 +383,4 @@ riurik.log = function(){
 		args.push(o);
 	});
 	riurik.__log_storage.push(args);
-}
+};
