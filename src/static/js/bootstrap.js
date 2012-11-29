@@ -28,9 +28,9 @@ riurikldr.LoadScript = function(scriptName, callback, target){
 	}else{
 		script.onload = onload;
 	}
+
 	//target.head.appendChild( script );
 	target.body.appendChild( script );
-	//$('head').append( $(script) );
 };
 
 riurikldr.loader = function() {

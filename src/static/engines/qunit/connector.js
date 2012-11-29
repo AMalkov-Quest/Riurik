@@ -9,14 +9,16 @@ riurik.engine.init = function( next ){
 
 	next();
 };
-console.log('wait for riurik.tests.loaded event')
+
 riurik.on("riurik.tests.loaded", function(){
+//riurik.engine.run_tests = function() {
 	console.log('start QUnit tests...');
 
 	QUnit.config.autorun = false;
 	QUnit.config.autostart = true;
 	
 	QUnit.load();
+//};
 });
 
 //QUnit test matchers
