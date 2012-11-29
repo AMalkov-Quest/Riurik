@@ -69,8 +69,9 @@ TEMPLATE_LOADERS = (
     'django.template.loaders.app_directories.Loader',
 #     'django.template.loaders.eggs.load_template_source',
 )
-#SESSION_ENGINE = 'django.contrib.sessions.backends.file'
-SESSION_ENGINE = "django.contrib.sessions.backends.cache"
+SESSION_ENGINE = 'django.contrib.sessions.backends.file'
+SESSION_FILE_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'sessions'))
+#SESSION_ENGINE = "django.contrib.sessions.backends.cache"
 CACHE_BACKEND = 'locmem://'
 CACHE_MIDDLEWARE_ANONYMOUS_ONLY = False
 CACHE_MIDDLEWARE_SECONDS = 600
@@ -128,6 +129,7 @@ TEST_CONTEXT_JS_FILE_NAME = '.context.js'
 JS_FILE_EXT = '.js'
 INI_FILE_EXT = '.ini'
 COFFEE_FILE_EXT = '.coffee'
+CUCUMBER_FILE_EXT = '.feature'
 TEST_SWAP_FILE_NAME = '.%s.swp'
 LIB_KEY_NAME = 'libraries'
 LIB_DEFAULT_NAME = 'library.js'

@@ -4,6 +4,7 @@ body {
 }
 #developer-consoles {
     position:fixed;
+    z-index: 99999999999;
     bottom:0;
     left: 0;
     background: #CCC;
@@ -98,6 +99,24 @@ body {
     position: absolute;
     top: 2px;
     left: 10px;
+}
+
+#git-console #git-add {
+    position: absolute;
+    top: 2px;
+    left: 55px;
+}
+
+#git-console #git-commit {
+    position: absolute;
+    top: 2px;
+    left: 103px;
+}
+
+#git-console #git-push {
+    position: absolute;
+    top: 2px;
+    left: 160px;
 }
 
 

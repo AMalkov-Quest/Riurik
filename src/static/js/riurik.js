@@ -103,6 +103,7 @@ riurik.load_tests = function(){
 		console.log((new Date() - riurikldr.start)/1000);
 
 		riurik.trigger( "riurik.tests.loaded" );
+		//riurik.engine.run_tests();
 	});
 }
 
@@ -384,7 +385,3 @@ riurik.log = function(){
 	});
 	riurik.__log_storage.push(args);
 }
-
-riurik.log('Riurik console: initialized');
-
-

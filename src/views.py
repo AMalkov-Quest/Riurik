@@ -14,7 +14,7 @@ import mimetypes, datetime
 import urllib, urllib2
 import codecs, time
 import distributor
-import coffeescript
+import coffeescript, cucumber
 import inuse, serving
 from serving import add_request_handler
 
@@ -183,7 +183,7 @@ def runSuite(request, RequestHandler):
 	saveLocalContext(fullpath, contextjs)
 
 	engine = 'qunit'
-	if cucumber(ctx):
+	if cucumber.cucumber(path, ctx):
 		engine = 'cucumber'
 
 	url = "http://%s/%s?server=%s&engine=%s&path=/%s" % ( target, settings.EXEC_TESTS_CMD, server, engine, path )
@@ -226,8 +226,10 @@ def runTest(request, RequestHandler):
 		path = coffeescript.compile2js(test_content, path, fullpath)
 
 	engine = 'qunit'
-	if cucumber(ctx):
+	if cucumber.cucumber(path, ctx):
 		engine = 'cucumber'
+		if path.endswith(settings.CUCUMBER_FILE_EXT):
+			path = cucumber.compile2js(path, fullpath)
 
 	url = "http://%s/%s?server=%s&engine=%s&path=/%s" % (target, settings.EXEC_TESTS_CMD, server, engine, path)
 	log.info("redirect to run test %s" % url)
@@ -235,9 +237,6 @@ def runTest(request, RequestHandler):
 
 def coffee(path):
 	return path.endswith('.coffee')
-
-def cucumber(ctx):
-	return ctx.get('cucumber', None) != None
 
 def saveLocalContext(fullpath, contextjs):
 	if os.path.isdir(fullpath):
