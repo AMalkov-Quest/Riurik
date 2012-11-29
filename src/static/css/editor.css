@@ -9,16 +9,6 @@ a.disabled {
 	color: grey;
 }
 
-.CodeMirror {
-	width: 100%;
-}
-
-.CodeMirror-scroll {
-	height: auto;
-	width: 100%;
-	overflow: visible;
-}
-
 #code {
     width: 90%;
     min-height: 70%;
