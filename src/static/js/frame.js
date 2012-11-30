@@ -74,9 +74,12 @@
 			function jQueryIsLoaded() {
 				return typeof _frame.window.jQuery != 'undefined';
 			}
-
-			$.waitFor.condition( jQueryIsLoaded, 1000 )
+	
+			//too short timeout here might cause twice jQuery loading
+			//this implicates unstable tests loading and running insight the frame
+			$.waitFor.condition( jQueryIsLoaded, 6000 )
 			.then(done, function() {
+				console.log('load jQuery into frame');
 				riurikldr.LoadScript( riurik.src.jquery, done, _frame.document );				
 			});
 		},
