@@ -104,8 +104,8 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'src',
     'src.plugins.search',
-    #'src.plugins.git',
-    #'src.plugins.github',
+    'src.plugins.git',
+    'src.plugins.github',
 )
 
 def appInstalled(app_name):

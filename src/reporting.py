@@ -1,4 +1,4 @@
-import os, json, re
+import os, json, re, time
 import threading
 import shutil
 from logger import log
@@ -101,9 +101,13 @@ def getSuiteHistoryResults(path, context):
 		if re.search('[\-\d]+\.json$', fileName):
 			yield load(fileName)
 
+def formatDate(date):
+	epoch_sec = float(date)
+	return time.strftime("%Y-%m-%d-%H-%M-%S", time.localtime(epoch_sec)) 
+
 def getFileName(path, context, date, ext):
 	testDir = getTestResultDir(path, context)
-	return os.path.join(testDir, '%s.%s' % (date, ext))
+	return os.path.join(testDir, '%s.%s' % (formatDate(date), ext))
 
 def getBeginFile(path, context, date):
 	return getFileName(path, context, date, 'begin')

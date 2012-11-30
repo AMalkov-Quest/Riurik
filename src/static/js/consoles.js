@@ -58,8 +58,6 @@ riurik.on("riurik.initing", function(){
     status = initEl(status, consoles);
     statusText = initEl(statusText, status);
     consoleLabels = initEl(consoleLabels, status, 'ul')
-    //gitConsole = initConsole( 'git-console', 'Git' );
-    //initGitConsole( gitConsole );
     toolsConsole = initConsole( 'powershell-console', 'Tools' );
     logConsole = initConsole( 'riurik-console', 'Logs' );
 });

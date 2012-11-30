@@ -1,6 +1,6 @@
 from django import template
 import time, datetime
-#from django.utils.safestring import mark_safe
+import reporting
 
 register = template.Library()
 
@@ -13,6 +13,4 @@ def aggregate_results(listitems, attr):
 
 @register.filter
 def date_from_str(string):
-	return datetime.datetime.fromtimestamp(time.mktime( time.strptime(string, '%Y-%m-%d-%H-%M-%S') ))
-
-
+	return datetime.datetime.fromtimestamp(time.mktime(time.localtime(float(string))))
