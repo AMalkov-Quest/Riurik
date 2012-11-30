@@ -36,12 +36,14 @@ def stub(path, request):
         return cache_request_control
     if cache.add(path, (session_key, cache_request_control), 60):
         request.session[path] = session_key
+    
     return cache_request_control
 
 def getControl(request):
     path = request.GET['path']
     cache_value = cache.get(path)
     session_key = request.session.get('stub_key') or None
+    
     if cache_value:
         try:
             cache_session_key = cache_value[0]
@@ -49,6 +51,7 @@ def getControl(request):
         except:
             cache_session_key = None
             cache_request_control = False
+
         if cache_session_key != session_key:
             cache.set(path, (cache_session_key, True), 30)
         if 'cancel' in request.GET:
@@ -59,6 +62,7 @@ def getControl(request):
                 cache.delete(path)
     else:
         return HttpResponse('true')
+    
     return HttpResponse(str(not cache_request_control).lower())
 
 def getOpenedFiles(request, clean=False):
