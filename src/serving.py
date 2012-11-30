@@ -41,7 +41,7 @@ def getGitHub(request, path, time):
 def factory(request, path):
 	log.debug('serving: select handler')
 
-	start_time = request.REQUEST.get('time', None)
+	start_time = request.REQUEST.get('date', None)
 
 	gHandler = getGitHub(request, path, start_time)
 	if gHandler:

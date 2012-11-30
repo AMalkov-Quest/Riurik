@@ -405,7 +405,8 @@ def tests_status(request):
 		import reporting
 		path = request.GET.get('path')
 		context = request.GET.get('context')
-		status = reporting.status(path, context)
+		date = request.GET.get('date', None)
+		status = reporting.status(path, context, date)
 		return HttpResponse(status)
 	except Exception, e:
 		log.exception(e)

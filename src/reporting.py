@@ -1,6 +1,7 @@
 import os, json, re, time
 import threading
 import shutil
+import fnmatch
 from logger import log
 import contrib
 
@@ -233,13 +234,32 @@ def done(data):
 			debug(done.path, done.context, done.date, 'suite is done')
 		else:
 			debug(done.path, done.context, done.date, 'suite is already done')
+
+def mkstatus(status, date):
+	return json.dumps({
+		'status': status,
+		'date': date
+	})
+
+def status(path, context, date):
+	if date:
+		return status_bydate(path, context, date)
+	else:
+		return status_nodate(path, context)
+
+def status_bydate(path, context, date):
+	cwd = getTestResultDir(path, context)
+	for root, dirs, files in os.walk(cwd):
+		for file_ in files:
+			if fnmatch.fnmatch(file_, '%s.*' % formatDate(date) ):
+				root, ext = os.path.splitext(file_)
+				if ext == '.begin' or ext == '.progress' or ext == '.done':
+					status = ext.strip('.')
+					return mkstatus(status, date)
+
+	return mkstatus('undefined', '')	
 		
-def status(path, context):
-	def mkstatus(status, date):
-		return json.dumps({
-			'status': status,
-			'date': date
-		})
+def status_nodate(path, context):
 	cwd = getTestResultDir(path, context)
 	with mutex:
 		for root, dirs, files in os.walk(cwd):
