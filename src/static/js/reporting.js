@@ -1,7 +1,8 @@
 riurik.reporter = {}
 
 riurik.reporter.url = riurik.BuildHttpUri('/report_callback/');
-riurik.reporter.date = formatDate(new Date(), 'yyyy-MM-dd-HH-mm-ss');
+//riurik.reporter.date = formatDate(new Date(), 'yyyy-MM-dd-HH-mm-ss');
+riurik.reporter.date = context.test_start_time; 
 riurik.reporter.target_tests_path = riurik.args.path;
 riurik.reporter.state = 'begin';
 riurik.reporter.testNum = 0;
@@ -119,20 +120,29 @@ riurik.reporter.getHtmlTestResults = function () {
 
 riurik.reporter.send = function (data, callback) {
 	$(document).unbind('ajaxError');
-	//console.log('send');
-	//console.log(data);
-
-	$.ajax({
-		'url': riurik.reporter.url,
-		'data': data,
-		'dataType': 'jsonp',
-		'complete': function(){
-			$(document).bind('ajaxError', riurik.ajaxError);
-			if(typeof callback != 'undefined') {
-				callback(data.event);
-			}	
+	riurik.log('report: ' + data.event);
+	
+	var complete = function(complete_msg) {
+		$(document).bind('ajaxError', riurik.ajaxError);
+		if(complete_msg == 'error') {
+			riurik.log(callback.toString());
 		}
-	});
+		if(typeof callback != 'undefined') {
+			callback(complete_msg);
+		}	
+	};
+
+	try {
+		$.ajax({
+			'url': riurik.reporter.url,
+			'data': data,
+			'dataType': 'jsonp',
+			'complete': function() { complete(data.event) }
+		});
+	}catch(e) {
+		riurik.log(data.event + ' status reporting error: ' + e.toString());
+		complete('error');
+	};
 };
 
 riurik.reporter.getTestDuration = function () {
@@ -156,20 +166,30 @@ riurik.reporter.consignor = function () {
 				if( event == 'done') {
 					riurik.reporter.state = 'done';
 				}
+				
+				if( event == 'timeout') {
+					riurik.log('!!! reporter timeout !!!');
+					riurik.log('reporter length is ' + riurik.reporter.queue.length);
+				}
 			};
-
-			busyTimeOut = setTimeout(next, 120 * 1000);
-			if ( riurik.reporter.queue.length > 0 ){
+			
+			if ( riurik.reporter.queue.length > 0 ) {
 				data = riurik.reporter.queue.shift();
 				data['date'] = riurik.reporter.date;
 				data['context'] = context.__name__;
 				data['path'] = riurik.reporter.target_tests_path;
 				
 				busy = true;
+				clearTimeout( busyTimeOut );
+				busyTimeOut = setTimeout(function() { next('timeout'); }, 60 * 1000);
+				
 				riurik.reporter.send( data, next );
 			}
 		};
-		setTimeout(f, 100);
+		
+		if(riurik.reporter.state != 'done') {
+			setTimeout(f, 100);
+		}
 	})();
 };
 

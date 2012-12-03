@@ -3,7 +3,7 @@
 		go: function(path, cache) {
 			var dfd = $.Deferred();
 			var url = path;
-			var regex = new RegExp('^http://[a-zA-Z0-9]');
+			var regex = new RegExp('^http[s]?://[a-zA-Z0-9]');
 			if(!regex.test(url)) {
 				url = 'http://' + context.host + ':' + context.port + '/' + path;
 			}
@@ -74,9 +74,12 @@
 			function jQueryIsLoaded() {
 				return typeof _frame.window.jQuery != 'undefined';
 			}
-
-			$.waitFor.condition( jQueryIsLoaded, 1000 )
+	
+			//too short timeout here might cause twice jQuery loading
+			//this implicates unstable tests loading and running insight the frame
+			$.waitFor.condition( jQueryIsLoaded, 6000 )
 			.then(done, function() {
+				console.log('load jQuery into frame');
 				riurikldr.LoadScript( riurik.src.jquery, done, _frame.document );				
 			});
 		},
@@ -90,15 +93,13 @@
 
 		console_complete: function(){
 			frame.__console_timeout = setTimeout(function(){
-				$('#tabs-2-loading').hide();
+				$('#status-text').removeClass('in-progress');
 			}, 500);
-			$('#tabs-2').parent().attr('title', '');
 		},
 
 		console_working: function(title){
 			if ( frame.__console_timeout ) { clearTimeout(frame.__console_timeout) }
-			$('#tabs-2').parent().attr('title', title);
-			$('#tabs-2-loading').show();
+			$('#status-text').addClass('in-progress');
 		},
 
 		jQuery: function() {

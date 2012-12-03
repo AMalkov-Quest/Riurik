@@ -12,9 +12,9 @@ riurik.engine.init = function( next ){
 
 riurik.cucumber = {}
 
-riurik.on("riurik.tests.loaded", function(){
+riurik.engine.run_tests = function() {
 	RunCucumber();
-});
+};
 
 riurik.CucumberHTMLListener = function($root) {
 	var CucumberHTML = require('cucumber-html');

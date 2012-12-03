@@ -1,4 +1,4 @@
-import os, os.path
+import os
 from django.shortcuts import render_to_response as _render_to_response
 from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.template import loader, RequestContext, Context, Template, TemplateDoesNotExist
@@ -31,22 +31,25 @@ def add_request_handler(fn):
 		return fn(request)
 	return patch
 
-def getGitHub(request, path):
+def getGitHub(request, path, time):
 	try:
 		from plugins.github.views import plugin
-		return plugin(request, path)
+		return plugin(request, path, time)
 	except ImportError, e:
 		log.exception(e)
 
 def factory(request, path):
 	log.debug('serving: select handler')
-	gHandler = getGitHub(request, path) 
+
+	start_time = request.REQUEST.get('date', None)
+
+	gHandler = getGitHub(request, path, start_time)
 	if gHandler:
 		log.debug('github handler is selected')
 		return gHandler
 	else:
 		log.debug('default handler is selected')
-		return DefaultHandler(request, path)
+		return DefaultHandler(request, path, start_time)
 
 def response(request, path):
 	handler = factory(request, path)
@@ -54,9 +57,10 @@ def response(request, path):
 
 class BaseHandler(object):
 
-	def __init__(self, request, path):
+	def __init__(self, request, path, time):
 		self.path = path
-		self.user = ''
+		self.user = None
+		self.time = time if time else contrib.getNowTime()
 
 	def get_path(self):
 		return self.path
@@ -81,7 +85,7 @@ class BaseHandler(object):
 		log.debug('serve full path %s' % fullpath)
 		if os.path.isdir(fullpath):
 			if 'history' in request.REQUEST:
-				return get_history(request, self.path)
+				return self.get_history(request)
 
 			if request.path and request.path[-1:] != '/':
 				return HttpResponseRedirect(request.path + '/')
@@ -128,7 +132,8 @@ class BaseHandler(object):
 	def is_document_root(self, fullpath):
 		document_root = self.get_document_root()
 		if document_root:
-			return os.path.samefile(fullpath, document_root)
+			#return os.path.samefile(fullpath, document_root)
+			return os.path.normpath(fullpath) == os.path.normpath(document_root)
 		else:
 			return False
 
@@ -187,6 +192,30 @@ class BaseHandler(object):
 			'login'     : self.user
 		})
 
+	def get_history(self, request):
+		import reporting
+		context = request.REQUEST.get('context')
+		date = request.REQUEST.get('history', None)
+		asxml = request.REQUEST.get('xml', None)
+		asjson = request.REQUEST.get('json', None)
+		if not date:
+			results = reporting.getSuiteHistoryResults(self.path, context)
+			pathtype = self.get_type(self.get_full_path())
+			return  _render_to_response('history_list.html', locals())
+
+		if asxml:
+			tests_list = reporting.getResultsAsXml(self.path, context, date, request)
+			return HttpResponse(tests_list)
+
+		tests_list = reporting.getResults(self.path, context, date)
+
+		if asjson:
+			url = reporting.getTestResultsUrl(self.path, context, date, request)
+			result = { 'url': url, 'data': tests_list }
+			return HttpResponse(json.dumps(result))
+
+		return _render_to_response('history_qunit.html', locals())
+
 class DefaultHandler(BaseHandler):
 	
 	def get_document_root(self):
@@ -199,29 +228,6 @@ class DefaultHandler(BaseHandler):
 
 	def get_virtual_root(self):
 		return contrib.get_virtual_root(self.path)
-
-def get_history(request, path):
-	import reporting
-	context = request.REQUEST.get('context')
-	date = request.REQUEST.get('history', None)
-	asxml = request.REQUEST.get('xml', None)
-	asjson = request.REQUEST.get('json', None)
-	if not date:
-		results = reporting.getSuiteHistoryResults(path, context)
-		return  _render_to_response('history_list.html', locals())
-
-	if asxml:
-		tests_list = reporting.getResultsAsXml(path, context, date, request)
-		return HttpResponse(tests_list)
-
-	tests_list = reporting.getResults(path, context, date)
-
-	if asjson:
-		url = reporting.getTestResultsUrl(path, context, date, request)
-		result = { 'url': url, 'data': tests_list }
-		return HttpResponse(json.dumps(result))
-
-	return _render_to_response('history.html', locals())
 
 def get_spec(target, path):
 	spec_url = spec.get_url(path)

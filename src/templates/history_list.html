@@ -12,7 +12,7 @@
 {% block controls %}
 {% endblock controls %}
 
-{% block title %}<p class="breadcrumbs">{{ request.path|breadcrumbs }}</p>{% endblock title %}
+{% block title %}<p class="breadcrumbs">{{ request.path|breadcrumbs:pathtype }}</p>{% endblock title %}
 
 {% block content %}
 	{% for suite_runs in results %}

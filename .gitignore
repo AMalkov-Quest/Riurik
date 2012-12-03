@@ -9,3 +9,5 @@ local_settings.py
 tags
 virtual_paths.py
 testsResult
+node_modules
+env

@@ -14,7 +14,7 @@ import mimetypes, datetime
 import urllib, urllib2
 import codecs, time
 import distributor
-import coffeescript
+import coffeescript, cucumber
 import inuse, serving
 from serving import add_request_handler
 
@@ -39,46 +39,6 @@ def error_handler(fn):
 
 		return response
 	return _f
-
-@add_request_handler
-def enumerate_suites(request, RequestHandler):
-	"""
-	Return a list of suite names.
-	Arguments:
-		ctx	(optional)	- filter suites containing supplied ctx name
-		json 	(optional)	- return result in JSON format
-	"""
-	ctx_name = request.REQUEST.get('context')
-	as_json = request.REQUEST.get('json', False)
-	path = request.REQUEST.get('path', '/')
-	
-	root = RequestHandler.get_document_root()
-	fullpath = RequestHandler.get_full_path()
-	log.debug('enum suites in %s' % root)
-	contextini = settings.TEST_CONTEXT_FILE_NAME
-	suites = []
-	for dirpath, dirnames, filenames in os.walk(fullpath, followlinks=True):
-		if contextini in filenames:
-			relpath = os.path.relpath(dirpath, root)
-			ctx = context.get(RequestHandler, relpath )
-			ctx_sections = ctx.sections()
-			if not ctx_name in ctx_sections:
-				continue
-
-			if path in relpath:
-				suite_name = os.path.relpath(relpath, path)
-			else:
-				suite_name = relpath
-				
-			suites += [ suite_name ]
-
-	if as_json:
-		reply = json.dumps(suites)
-	else:
-		reply = ','.join(suites)
-
-	#return HttpResponse(str(suites).replace('[','').replace(']','').rstrip(',').replace('\'',''))
-	return HttpResponse( reply )
 
 def log_errors(fn):
 	""" Catch errors and write it into logs then raise it up.
@@ -223,7 +183,7 @@ def runSuite(request, RequestHandler):
 	saveLocalContext(fullpath, contextjs)
 
 	engine = 'qunit'
-	if cucumber(ctx):
+	if cucumber.cucumber(path, ctx):
 		engine = 'cucumber'
 
 	url = "http://%s/%s?server=%s&engine=%s&path=/%s" % ( target, settings.EXEC_TESTS_CMD, server, engine, path )
@@ -266,8 +226,10 @@ def runTest(request, RequestHandler):
 		path = coffeescript.compile2js(test_content, path, fullpath)
 
 	engine = 'qunit'
-	if cucumber(ctx):
+	if cucumber.cucumber(path, ctx):
 		engine = 'cucumber'
+		if path.endswith(settings.CUCUMBER_FILE_EXT):
+			path = cucumber.compile2js(path, fullpath)
 
 	url = "http://%s/%s?server=%s&engine=%s&path=/%s" % (target, settings.EXEC_TESTS_CMD, server, engine, path)
 	log.info("redirect to run test %s" % url)
@@ -275,9 +237,6 @@ def runTest(request, RequestHandler):
 
 def coffee(path):
 	return path.endswith('.coffee')
-
-def cucumber(ctx):
-	return ctx.get('cucumber', None) != None
 
 def saveLocalContext(fullpath, contextjs):
 	if os.path.isdir(fullpath):
@@ -446,7 +405,8 @@ def tests_status(request):
 		import reporting
 		path = request.GET.get('path')
 		context = request.GET.get('context')
-		status = reporting.status(path, context)
+		date = request.GET.get('date', None)
+		status = reporting.status(path, context, date)
 		return HttpResponse(status)
 	except Exception, e:
 		log.exception(e)

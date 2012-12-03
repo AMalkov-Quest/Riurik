@@ -56,36 +56,16 @@
 		</div>
 		<div id="engine">
 		</div>
-		<div style="display:none" id="tabs">
-			<ul>
-				<li><a href="#tabs-1">Frame</a></li>
-				<li>
-					<a href="#tabs-2">Tools</a>
-					<div style="width:16px; height: 16px; float: left; padding: .5em 0;">
-						<div id="tabs-2-loading"></div>
-					</div>
-					</li>
-				<li><a href="#tabs-3">Console</a></li>
-			</ul>
-			<div id="tabs-1">
-				<div id="frame-url"></div>
-				<iframe id="frame" name="frame">
-					<html>
-						<head>
-						</head>
-						<body>
-						</body>
-					</html>
-				</iframe>
-			</div>
-			<div id="tabs-2">
-				<div id="powershell-console">
-				</div>
-			</div>
-			<div id="tabs-3">
-				<div id="riurik-console">
-				</div>
-			</div>
+		<div id="frame-container" style="display:none;">
+			<div id="frame-url"></div>
+			<iframe id="frame" name="frame">
+				<html>
+					<head>
+					</head>
+					<body>
+					</body>
+				</html>
+			</iframe>
 		</div>
 	</body>
 </html>

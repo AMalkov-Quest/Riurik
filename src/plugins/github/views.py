@@ -55,16 +55,16 @@ def login(req):
 def oAuth(request):
 	return request.session.get('token', None)
 
-def plugin(request, path):
+def plugin(request, path, time):
 	if settings.appInstalled('src.plugins.github'):
 		if oAuth(request):
-			handler = GitHandler(request, path)
+			handler = GitHandler(request, path, time)
 			if handler.repo:
 				return handler
 			else:
-				return GitInitHandler(request, path)
+				return GitInitHandler(request, path, time)
 		else:
-			return GitFronPageHandler(request, path)
+			return GitFronPageHandler(request, path, time)
 
 def mkrepo(request):
 	token = oAuth(request)
@@ -83,8 +83,8 @@ def mkrepo(request):
 
 class GitHandler(serving.BaseHandler):
 
-	def __init__(self, request, path):
-		self.path = path
+	def __init__(self, request, path, time):
+		super(GitHandler, self).__init__(request, path, time)
 		token, login, repoid = get_auth(request)
 		self.user = login if login else gitware.get_user_by_token(token).login
 		self.repo = repoid if repoid else gitware.get_riurik_repo(self.user).id
@@ -101,7 +101,7 @@ class GitHandler(serving.BaseHandler):
 
 class GitFronPageHandler(GitHandler):
 
-	def __init__(self, request, path):
+	def __init__(self, request, path, time):
 		pass
 
 	def serve(self, request):

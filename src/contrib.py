@@ -1,9 +1,12 @@
 # coding: utf-8
-import os, re, config
+import os, re, config, time
 import settings
 from logger import log
 import socket
 import fnmatch
+
+def getNowTime():
+	return time.mktime( time.localtime( time.time() ) ) 
 
 def ishidden(filename):
 	return filename.startswith('.') and filename != settings.TEST_CONTEXT_FILE_NAME

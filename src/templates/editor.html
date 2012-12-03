@@ -1,202 +1,204 @@
 {% extends 'directory-index.html' %}
 {% load i18n dir_index_tags %}
 {% block styles %}
-	{{ block.super }}
-	<link rel="stylesheet" type="text/css" href="/static/codemirroreditor/lib/codemirror.css" />
-	<link rel="stylesheet" type="text/css" href="/static/css/editor.css" />	
+    {{ block.super }}
+    <link rel="stylesheet" type="text/css" href="/static/codemirroreditor/lib/codemirror.css" />
+    <link rel="stylesheet" type="text/css" href="/static/css/editor.css" />    
 {% endblock styles %}
 
 {% block javascripts %}
-	{{ block.super }}
-	<script type="text/javascript" src="/static/js/coffeescript-compiler.js"></script>
-	{% if not is_stubbed %}
-		<script type="text/javascript" src="/static/codemirroreditor/lib/codemirror.js"></script>
-		<script type="text/javascript" src="/static/codemirroreditor/mode/javascript/javascript.js"></script>
-		<script type="text/javascript" src="/static/codemirroreditor/mode/coffeescript/coffeescript.js"></script>
-	{% endif %}
-	<script type="text/javascript" src="/static/js/jquery.cookie.js"></script>
-	<script type="text/javascript">
-   	  $(document).ready(function() {
-		  try { var last_context = $.cookie('last_context');
-			  if ( typeof last_context == 'string' ) 
-				$('select[name=context]').val(last_context);
-		  } catch (e) { console.log(e); }
-		  {% if not is_stubbed %}	
-		  	var source_value = draft_value = $('#code').val();
-		  	coffeeScriptSyntaxChecker = function(code, el) { 
-				try { 
-					CoffeeScript.compile(code); 
-					$(el).text('syntax OK'); 
-				} catch (e) { 
-					$(el).text(e.message); 
-				} 
-			};
-		  	var mode = ( /\.coffee\?/.test(window.location.href) ) ? "coffeescript" : "javascript";
-  		  	var editor = CodeMirror.fromTextArea(document.getElementById("code"), {
-				mode: mode,
-		    		content: source_value,
-				lineWrapping: true,
-		    		autoMatchParens: true,
-		    		lineNumbers: true,
-				matchBrackets: true,
-				extraKeys: {
-					"Ctrl-S": function(){ $('#save').trigger('click'); },
-					"Ctrl-R": function(){ $('#run').trigger('click'); }
-				},
-				onChange: function(editor, options) {
-					if ( mode == 'coffeescript' ) {
-						coffeeScriptSyntaxChecker(editor.getValue(), '#syntax');
-					}
-				}
-			});
-			window.editor = editor;
-		        var ConfirmDiscardchanges = function(){
-	        	        var new_value = editor.getValue();
-		                if ( new_value == source_value ) {
-        		            return true
-                		}
-		                if ( confirm('{% trans "Are you sure to close this file and discard all changes?" %}') == false ) {
-        		            return false;
-                		}
-	                	return true;
-	    		};
-            		$(document).unload(ConfirmDiscardchanges);
-            		$('a').click(function(e){
-		                e.stopPropagation();
-                		if ($(this).attr('id') != 'save' && $(this).attr('id') != 'run' && $(this).attr('id') != 'discard' && $(this).attr('id') != 'close') {
-		                    return ConfirmDiscardchanges();
-                		}
-	    		});
-            		$('#discard').click(function(){ if ( ConfirmDiscardchanges() ) document.location=document.location;});
-            		$('#close').click(function(){ if ( ConfirmDiscardchanges() ) document.location='{{ request.path|above }}';});
-		  {% endif %}
+    {{ block.super }}
+    <script type="text/javascript" src="/static/js/coffeescript-compiler.js"></script>
+    <script type="text/javascript" src="/static/ace-editor/ace.js"></script>
+    <script type="text/javascript" src="/static/ace-editor/mode-coffee.js"></script>
+    <script type="text/javascript" src="/static/ace-editor/mode-javascript.js"></script>
+    <script type="text/javascript" src="/static/ace-editor/mode-gherkin.js"></script>
+    <script type="text/javascript" src="/static/js/editor-connector.js"></script>
+    <script type="text/javascript" src="/static/js/jquery.cookie.js"></script>
+    <script type="text/javascript">
+         $(document).ready(function() {
+              try { var last_context = $.cookie('last_context');
+                  if ( typeof last_context == 'string' ) 
+                    $('select[name=context]').val(last_context);
+              } catch (e) { console.log(e); }
+              {% if not is_stubbed %}    
+                window.coffeeScriptSyntaxChecker = function(code, el) { 
+                    try { 
+                        CoffeeScript.compile(code); 
+                        $(el).text('syntax OK'); 
+                    } catch (e) { 
+                        $(el).text(e.message); 
+                    } 
+                };
+                var source_value = editor.getValue();
+                var ConfirmDiscardchanges = function(){
+                        var new_value = editor.getValue();
+                        if ( new_value == source_value ) {
+                            return true
+                        }
+                        if ( confirm('{% trans "Are you sure to close this file and discard all changes?" %}') == false ) {
+                            return false;
+                        }
+                        return true;
+                };
+                $(document).unload(ConfirmDiscardchanges);
+                $('a').click(function(e){
+                        e.stopPropagation();
+                        if ($(this).attr('id') != 'save' && $(this).attr('id') != 'run' && $(this).attr('id') != 'discard' && $(this).attr('id') != 'close') {
+                            return ConfirmDiscardchanges();
+                        }
+                });
+                $('#discard').click(function(){ if ( ConfirmDiscardchanges() ) document.location=document.location;});
+                $('#close').click(function(){ if ( ConfirmDiscardchanges() ) document.location='{{ request.path|above }}';});
+             {% endif %}
     
-		  $('#run').click(function(){ 
-			var context = $('select[name=context]').val();
-			try {
-				$.cookie('last_context', context);
-			} catch (e) { console.log(e); }
-			$('#apply-test input[name=context]')
-				.val(context); 
-			$('#apply-test')
-				.attr('action', '/actions/test/submit/')
-				.attr('target', context + '{{ request.path|current }}');
-			$('#apply-test').submit();
-	 	  });
+          $('#run').click(function(){ 
+            var context = $('select[name=context]').val();
+            try {
+                $.cookie('last_context', context);
+            } catch (e) { console.log(e); }
+            $('#apply-test textarea[name=content]').val(editor.getValue()); 
+            $('#apply-test input[name=context]')
+                .val(context); 
+            $('#apply-test')
+                .attr('action', '/actions/test/submit/')
+                .attr('target', context + '{{ request.path|current }}');
+            $('#apply-test').submit();
+           });
 
-		 {% if not is_stubbed %}
-			$('#save').click(function(){ 
-				var context = $('select[name=context]').val();
-				try { $.cookie('last_context', context); } catch (e) { console.log(e); }
-				if ( $('#apply-test input[name=url]').val().indexOf('/settings') == 0 ) {
-					$('#apply-test').attr('action', '/settings/save/').removeAttr('target');
-				} else {
-				    $('#apply-test').attr('action', '/actions/test/save/').removeAttr('target');
-				}
-				$('#apply-test').submit(); 
-			});
-		 {% endif %}
+         {% if not is_stubbed %}
+            $('#save').click(function(){ 
+                $('#apply-test textarea[name=content]').val(editor.getValue()); 
+                var context = $('select[name=context]').val();
+                try { $.cookie('last_context', context); } catch (e) { console.log(e); }
+                if ( $('#apply-test input[name=url]').val().indexOf('/settings') == 0 ) {
+                    $('#apply-test').attr('action', '/settings/save/').removeAttr('target');
+                } else {
+                    $('#apply-test').attr('action', '/actions/test/save/').removeAttr('target');
+                }
+                $('#apply-test').submit(); 
+            });
+         {% endif %}
 
-            	 //$.ctrl('R', function(){ $('#run').trigger('click'); });
-		 $('#unstub').click(function(){
-			console.log('get control')
-			$.get(
-				'/actions/test/control/',
-				{ 'path': '{{ relative_file_path }}' },
-				function(data){
-					console.log('result', data)
-				}
-			);
-		});
+         $('#unstub').click(function(){
+            console.log('get control')
+            $.get(
+                '/actions/test/control/',
+                { 'path': '{{ relative_file_path }}' },
+                function(data){
+                    $('#operationControlWait').dialog({
+                        resizable: false
+                    });
+                    var waitingControl = function(){
+                        $.getJSON(
+                            '/actions/test/control/', 
+                            {'path': '{{ relative_file_path }}'},
+                            function(success){
+                                if (success) {
+                                    window.location = window.location;
+                                }
+                                setTimeout(waitingControl, 1000);
+                            }
+                        );
+                    };
+                    setTimeout(waitingControl, 1000);
+                }
+            );
+        });
 
-	      {% if not is_stubbed %}
- 	         setInterval(function(){
-        	     $.get(
-				'/actions/test/stub/', 
-				{ path: '{{ relative_file_path }}', '_':  Math.random().toString() },
-				function(request_control){
-					console.log('request control', request_control)
-					if ( request_control == 'False' ) { return; }
-					if ( request_control == 'True' ) {
-						var req_t = setTimeout(function(){
-							window.location = '{{ request.path|above }}';
-						}, 30 * 1000 );
-						$('#operationControl').dialog({
-							resizable: false,
-							buttons: [
-								{
-									id: 'cancel-access-request',
-									click: function() {
-										clearTimeout(req_t);
-										$(this).dialog('close');
-										$.get('/actions/test/control/', { 'path': '{{ relative_file_path }}', 'cancel': true, '_': Math.random().toString() });
-									},
-									text: 'cancel'
-								},
-								{
-									id: 'accept-access-request',
-									click: function(){
-										$(this).dialog('close');
-										$('#close').trigger('click');
-									},
-									text: 'accept'
-								}
-							]
-						});
-					}
-				}
-			);
-          	}, 30 * 1000);
-	   {% endif %}
-	});
-	</script>
+          {% if not is_stubbed %}
+              setInterval(function(){
+                 $.get(
+                '/actions/test/stub/', 
+                { path: '{{ relative_file_path }}', '_':  Math.random().toString() },
+                function(request_control){
+                    console.log('request control', request_control)
+                    if ( request_control == 'False' ) { return; }
+                    if ( request_control == 'True' ) {
+                        var req_t = setTimeout(function(){
+                            $.get('/actions/test/control/', { 'path': '{{ relative_file_path }}', 'cancel': 'accepted', '_': Math.random().toString() }, function(){
+                                window.location = '{{ request.path|above }}';
+                            });
+                        }, 10 * 1000 );
+                        $('#operationControl').dialog({
+                            resizable: false,
+                            buttons: [
+                                {
+                                    id: 'cancel-access-request',
+                                    click: function() {
+                                        clearTimeout(req_t);
+                                        $(this).dialog('close');
+                                        $.get('/actions/test/control/', { 'path': '{{ relative_file_path }}', 'cancel': 'cancelled', '_': Math.random().toString() });
+                                    },
+                                    text: 'cancel'
+                                },
+                                {
+                                    id: 'accept-access-request',
+                                    click: function(){
+                                        $.get('/actions/test/control/', { 'path': '{{ relative_file_path }}', 'cancel': 'accepted', '_': Math.random().toString() }, function(){
+                                            $(this).dialog('close');
+                                            $('#close').trigger('click');
+                                        });
+                                    },
+                                    text: 'accept'
+                                }
+                            ]
+                        });
+                    }
+                }
+            );
+              }, 10 * 1000);
+       {% endif %}
+    });
+    </script>
 {% endblock %}
 
 {% block controls %}
-	{% if not is_stubbed %}
-	<ul class="horizontal-menu">
-		{% ifequal filetype 'test'  %}
-			{% block context-controls %}
-			{% if contexts %}
-				<li><a id="run" href="javascript:void(0);">{% trans "Run" %}</a><select name="context">{% for item in contexts %}<option value='{{item}}'{% if forloop.first %} selected="selected"{% endif %}>{{item}}</option>{% endfor %}</select></li>
-		
-				{% block context-btn %}
-				<li><a id="context-preview-ctrl" href=".context.ini" rel='context-preview'>{% trans "Context" %}</a></li>
-				{% endblock context-btn %}
-			{% endif %}
-			{% if not contexts %}
-			<li>
-				<a id="create-context" title="{% trans "To execute the test you have to define cotext" %}" href=".context.ini?editor" >{% trans "Create context" %}</a>
-			</li>
-			{% endif %}
-			{% endblock context-controls %}
-			<li><a id="spec-link" href="{{ spec }}" target="_blank" >{% trans "Spec" %}</a></li>
-		{% endifequal %}
-		
-		<li><a id="save" href="javascript:void(0);">{% trans "Save" %}</a></li>
-		<li><a id="close" href="javascript: void(0);">{% trans "Close" %}</a></li>
-	</ul>
-	{% else %}
-	<ul class="horizontal-menu">
-		{% if contexts %}
-		<li><a id="run" href="javascript:void(0);">{% trans "Run" %}</a>
-		at <select name="context">{% for item in contexts %}<option value='{{item}}'{% if forloop.first %} selected="selected"{% endif %}>{{item}}</option>{% endfor %}</select></li>
-		{% endif %}
-		<li><a id="unstub" href="javascript:void(0);">{% trans "Get control" %}</a></li>
-	</ul>
-	{% endif %}
+    {% if not is_stubbed %}
+    <ul class="horizontal-menu">
+        {% ifequal filetype 'test'  %}
+            {% block context-controls %}
+            {% if contexts %}
+                <li><a id="run" href="javascript:void(0);">{% trans "Run" %}</a><select name="context">{% for item in contexts %}<option value='{{item}}'{% if forloop.first %} selected="selected"{% endif %}>{{item}}</option>{% endfor %}</select></li>
+        
+                {% block context-btn %}
+                <li><a id="context-preview-ctrl" href=".context.ini" rel='context-preview'>{% trans "Context" %}</a></li>
+                {% endblock context-btn %}
+            {% endif %}
+            {% if not contexts %}
+            <li>
+                <a id="create-context" title="{% trans "To execute the test you have to define cotext" %}" href=".context.ini?editor" >{% trans "Create context" %}</a>
+            </li>
+            {% endif %}
+            {% endblock context-controls %}
+            <li><a id="spec-link" href="{{ spec }}" target="_blank" >{% trans "Spec" %}</a></li>
+        {% endifequal %}
+        
+        <li><a id="save" href="javascript:void(0);">{% trans "Save" %}</a></li>
+        <li><a id="close" href="javascript: void(0);">{% trans "Close" %}</a></li>
+    </ul>
+    {% else %}
+    <ul class="horizontal-menu">
+        {% if contexts %}
+        <li><a id="run" href="javascript:void(0);">{% trans "Run" %}</a>
+        at <select name="context">{% for item in contexts %}<option value='{{item}}'{% if forloop.first %} selected="selected"{% endif %}>{{item}}</option>{% endfor %}</select></li>
+        {% endif %}
+        <li><a id="unstub" href="javascript:void(0);">{% trans "Get control" %}</a></li>
+    </ul>
+    {% endif %}
 {% endblock controls %}
 
 {% block title %}<p class="breadcrumbs">{{ request.path|breadcrumbs:filetype }}</p>{% endblock title %}
 
 {% block content %}
-		<form id='apply-test' method='POST'{% if is_stubbed %} style="display:none;"{% endif %} >
-		<input type="hidden" name="path" value="{{ relative_file_path }}" />
-		<input type="hidden" name="url" value="{{ request.path }}" />
-		<input type="hidden" name="context" value="default" />
-		<textarea id='code' name='content'>{{ content|default:"" }}</textarea>
-		</form>
-	{% if is_stubbed %}
-		<pre>{{ content }}</pre>
-	{% endif %}
+        <form id='apply-test' method='POST'{% if is_stubbed %} style="display:none;"{% endif %} >
+        <input type="hidden" name="path" value="{{ relative_file_path }}" />
+        <input type="hidden" name="url" value="{{ request.path }}" />
+        <input type="hidden" name="context" value="default" />
+        <textarea name="content" style="display:none;"></textarea>
+        <div id='code'>{{ content|safe|default:"" }}</div>
+        </form>
+    {% if is_stubbed %}
+        <pre>{{ content }}</pre>
+    {% endif %}
 {% endblock content %}

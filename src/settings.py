@@ -6,11 +6,11 @@ working_dir = os.path.dirname(os.path.abspath(__file__))
 root = os.path.normpath(os.path.dirname(working_dir))
 
 try:
-	import virtual_paths
-	virtual_paths_py = 'virtual_paths.py'
+    import virtual_paths
+    virtual_paths_py = 'virtual_paths.py'
 except Exception:
-	import virtual_paths_default as virtual_paths
-	virtual_paths_py = 'virtual_paths_default.py'
+    import virtual_paths_default as virtual_paths
+    virtual_paths_py = 'virtual_paths_default.py'
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
@@ -70,13 +70,14 @@ TEMPLATE_LOADERS = (
 #     'django.template.loaders.eggs.load_template_source',
 )
 SESSION_ENGINE = 'django.contrib.sessions.backends.file'
+SESSION_FILE_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'sessions'))
 #SESSION_ENGINE = "django.contrib.sessions.backends.cache"
 CACHE_BACKEND = 'locmem://'
 CACHE_MIDDLEWARE_ANONYMOUS_ONLY = False
 CACHE_MIDDLEWARE_SECONDS = 600
 
 MIDDLEWARE_CLASSES = (
-	'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
 )
 
 ROOT_URLCONF = 'urls'
@@ -84,40 +85,40 @@ ROOT_URLCONF = 'urls'
 TEMPLATE_DIRS = (
 
     os.path.join(os.path.dirname( __file__ ), 'templates'),
-	os.path.join(os.path.dirname( __file__ ), 'plugins', 'search', 'templates'),
+    os.path.join(os.path.dirname( __file__ ), 'plugins', 'search', 'templates'),
     os.path.join(os.path.dirname( __file__ ), 'plugins', 'github', 'templates'),
 )
 
 TEMPLATE_CONTEXT_PROCESSORS = (
-	"django.core.context_processors.i18n",
-	"django.core.context_processors.media",
-	"django.core.context_processors.request",
-	"django.contrib.messages.context_processors.messages",
+    "django.core.context_processors.i18n",
+    "django.core.context_processors.media",
+    "django.core.context_processors.request",
+    "django.contrib.messages.context_processors.messages",
 )
 
 INSTALLED_APPS = (
-	'django.contrib.auth',
+    'django.contrib.auth',
     'django.contrib.contenttypes',
-	'django.contrib.sessions',
-	'django.contrib.sites',
-	'django.contrib.messages',
-	'src',
-	'src.plugins.search',
-	'src.plugins.git',
-	'src.plugins.github',
+    'django.contrib.sessions',
+    'django.contrib.sites',
+    'django.contrib.messages',
+    'src',
+    'src.plugins.search',
+    'src.plugins.git',
+    'src.plugins.github',
 )
 
 def appInstalled(app_name):
-	return app_name in INSTALLED_APPS
+    return app_name in INSTALLED_APPS
 
 if platform.system() == 'Windows':
-	nodejs = os.path.join(os.environ['ProgramFiles'], 'nodejs', 'node.exe')
-	coffee = os.path.join(r'C:\CoffeeScript', 'bin', 'coffee')
-	COFFEESCRIPT_EXECUTABLE = '"%s" "%s"' % (nodejs, coffee)
+    nodejs = os.path.join(os.environ['ProgramFiles'], 'nodejs', 'node.exe')
+    coffee = os.path.join(r'C:\CoffeeScript', 'bin', 'coffee')
+    COFFEESCRIPT_EXECUTABLE = '"%s" "%s"' % (nodejs, coffee)
 elif platform.system() == 'Linux':
-	COFFEESCRIPT_EXECUTABLE = 'coffee'
+    COFFEESCRIPT_EXECUTABLE = 'coffee'
 else:
-	COFFEESCRIPT_EXECUTABLE = None
+    COFFEESCRIPT_EXECUTABLE = None
 
 EXEC_TESTS_CMD='static/testLoader.html'
 SUITE_SETUP_FILE_NAME = 'suite-setup.js'
@@ -128,6 +129,7 @@ TEST_CONTEXT_JS_FILE_NAME = '.context.js'
 JS_FILE_EXT = '.js'
 INI_FILE_EXT = '.ini'
 COFFEE_FILE_EXT = '.coffee'
+CUCUMBER_FILE_EXT = '.feature'
 TEST_SWAP_FILE_NAME = '.%s.swp'
 LIB_KEY_NAME = 'libraries'
 LIB_DEFAULT_NAME = 'library.js'
@@ -143,45 +145,45 @@ STATIC_MANAGEMENT_ASSET_PATHS = []
 STATIC_MANAGEMENT_HOSTNAMES = ['http://www.riurik.com']
 STATIC_MANAGEMENT_VERSIONER = 'plugins.static_management.versioners.SHA1Sum'
 STATIC_MANAGEMENT = {
-	'js': {
-		'qunit.testLoader.js': [
-			'js/jquery.min.js',
-			'js/jquery.json.min.js',
-			'jquery-ui/js/jquery-ui.custom.min.js',
-			'js/dates.js',
-			'js/tools.js',
-			'js/riurik.js',
-			'js/reporting.js',
-			'js/frame.js',
-			'js/errors.js',
-			'engines/qunit/connector.js',
-			'engines/qunit/qunit.html.js',
-			'engines/qunit/qunit.js',
-			'engines/qunit/qunit.extentions.js'
-		]
-	},
-	'css': {
-		
-	}
+    'js': {
+        'qunit.testLoader.js': [
+            'js/jquery.min.js',
+            'js/jquery.json.min.js',
+            'js/dates.js',
+            'js/tools.js',
+            'js/riurik.js',
+            'js/consoles.js',
+            'js/reporting.js',
+            'js/frame.js',
+            'js/errors.js',
+            'engines/qunit/connector.js',
+            'engines/qunit/qunit.html.js',
+            'engines/qunit/qunit.js',
+            'engines/qunit/qunit.extentions.js'
+        ]
+    },
+    'css': {
+        
+    }
 }
 
 CUC_STATIC_MANAGEMENT = {
-	'js': {
-		'cucumber.testLoader.js': [
-			'js/jquery.min.js',
-			'js/jquery.json.min.js',
-			'jquery-ui/js/jquery-ui.custom.min.js',
-			'js/dates.js',
-			'js/tools.js',
-			'js/riurik.js',
-			'js/reporting.js',
-			'js/frame.js',
-			'js/errors.js',
-			'engines/cucumber/connector.js',
-			'engines/cucumber/cucumber.js',
-		]
-	},
-	'css': {
-		
-	}
+    'js': {
+        'cucumber.testLoader.js': [
+            'js/jquery.min.js',
+            'js/jquery.json.min.js',
+            'js/dates.js',
+            'js/tools.js',
+            'js/riurik.js',
+            'js/consoles.js',
+            'js/reporting.js',
+            'js/frame.js',
+            'js/errors.js',
+            'engines/cucumber/connector.js',
+            'engines/cucumber/cucumber.js',
+        ]
+    },
+    'css': {
+        
+    }
 }

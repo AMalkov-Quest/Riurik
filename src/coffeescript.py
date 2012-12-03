@@ -14,7 +14,7 @@ def coffee2js(path):
 	file_name = os.path.basename(path)
 	return (file_name, '.%s' % file_name.replace(settings.COFFEE_FILE_EXT, settings.JS_FILE_EXT))
 
-def execute(source, full_path):
+def execute(source):
 	if not settings.COFFEESCRIPT_EXECUTABLE:
 		raise Exception("Unsupported platform: %s. Can't compile CoffeeScript" % platform.system())
 
@@ -38,14 +38,16 @@ def save(full_path, path, out):
 	return path.replace(coffee_name, js_name) if path else None
 
 def compile(source, full_path):
-	log.info('compile %s' % full_path)
+	log.info('coffeescript compile %s' % full_path)
 	if not source:
 		source = dir_index_tools.gettest(full_path)
 	else:
 		source = source.encode("utf-8")
 
-	out, errors = execute(source, full_path)
+	out, errors = execute(source)
 	if not out:
+		if errors:
+			log.exception(errors)
 		raise Exception('CoffeeScript compilation error ...')
 
 	return out

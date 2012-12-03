@@ -59,10 +59,8 @@ def patch_libraries(RequestHandler, ctximpl, ctx):
 	if libraries != None:
 		ctximpl.replace(settings.LIB_KEY_NAME, json.dumps(libraries).replace('\'','\"'))
 
-def add_start_time(ctximpl):
-	import time
-	now = time.localtime(time.time())
-	ctximpl.add('test_start_time', time.mktime(now))
+def add_start_time(ctximpl, start_time):
+	ctximpl.add('test_start_time', start_time)
 
 def add_name(ctximpl, name):
 	if name:
@@ -112,7 +110,7 @@ def patch(RequestHandler, ctx, riurik_url, ctxname=None):
 	ctximpl = contrib.context_impl(ctx.items())
 	include_tests(path, ctx, ctximpl)
 	patch_libraries(RequestHandler, ctximpl, ctx)
-	add_start_time(ctximpl)
+	add_start_time(ctximpl, RequestHandler.time)
 	add_name(ctximpl, ctxname)
 	add_virtual_root(ctximpl, path)
 	contrib.patch_host_port(ctximpl, riurik_url)
