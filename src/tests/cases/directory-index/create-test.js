@@ -29,7 +29,7 @@ asyncTest('check created', function() {
       equal(_$('#create-dir-index-dialog').is(":visible"), true, 'dialog is visible');      
       equal(_$('.ui-dialog-title').text(), _$('a#new-test').text(), 'dialog has right title');
       _$('#object-name').val(context.test_name.concat('.js'));
-      _$('button :contains(create)').click()
+      _$('button :contains(OK)').click()
        
       $.when( frame.load() ).then(function(_$) {
         equal(_$('#create-dir-index-dialog').is(":visible"), false, 'dialog is invisible');
