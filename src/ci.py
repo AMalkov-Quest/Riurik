@@ -50,7 +50,8 @@ def get_suites(root, path, fullpath, ctx_name, RequestHandler):
 	... f tests/suite-2/sub-suite/.context.ini [context]
 	... ''')
 	>>> settings.virtual_paths.VIRTUAL_PATHS['root'] = os.getcwd()
-	>>> get_suites(os.getcwd(), 'root/tests', os.getcwd()+'/tests', 'context', DefaultHandler({}, 'root/tests'))
+	>>> df = DefaultHandler({}, 'root/tests', None)
+	>>> get_suites(os.getcwd(), 'root/tests', os.getcwd()+'/tests', 'context', df)
 	['tests/suite-1', 'tests/suite-2/sub-suite']
 	"""
 	contextini = settings.TEST_CONTEXT_FILE_NAME

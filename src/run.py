@@ -20,9 +20,8 @@ def test(request, RequestHandler):
 	contextjs = context.render(RequestHandler, ctx, server, context_name)
 	log.debug('contextJS: '+ contextjs)
 
-	clean_path = contrib.get_relative_clean_path(path)
 	target = contrib.get_runner_url(ctx, server)
-	log.info('target of test %s is %s' % (clean_path, target))
+	log.info('target of test %s is %s' % (path, target))
 
 	dir_index_tools.savetest(request.REQUEST.get('content', None), fullpath)
 	test_content = request.REQUEST.get("content", open(fullpath, 'r').read())
@@ -54,19 +53,29 @@ def suite(request, RequestHandler):
 	compileSuiteCoffee(path, fullpath)
 	contextjs = context.render(RequestHandler, ctx, server, context_name)
 
-	clean_path = contrib.get_relative_clean_path(path)
 	target = contrib.get_runner_url(ctx, server)
-	log.info('target of suite %s is %s' % (clean_path, target))
+	log.info('target of suite %s is %s' % (path, target))
 
 	saveLocalContext(fullpath, contextjs)
 
 	engine = 'qunit'
 	if cucumber.cucumber(path, ctx):
 		engine = 'cucumber'
+		compileSuiteCucumber(path, fullpath)
 
 	url = "http://%s/%s?server=%s&engine=%s&path=/%s" % ( target, settings.EXEC_TESTS_CMD, server, engine, path )
 	log.info("redirect to run suite %s" % url)
 	return HttpResponseRedirect( url )
+
+def compileSuiteCucumber(path, suite_path):
+	features = contrib.enum_files_in_folders(
+			suite_path,
+			lambda file_: not file_.endswith(settings.CUCUMBER_FILE_EXT)
+	)
+	for feature in features:
+		fullpath = testFullPath(suite_path, feature)
+		log.debug('compile %s' % fullpath)
+		cucumber.compile2js(path, fullpath)
 
 def compileSuiteCoffee(path, suite_path):
 	contrib.cleandir(suite_path, '.*.js')
@@ -75,9 +84,11 @@ def compileSuiteCoffee(path, suite_path):
 			lambda file_: not file_.endswith(settings.COFFEE_FILE_EXT)
 	)
 	for test in tests:
-		fullpath = os.path.join(suite_path, test)
-		path = coffeescript.compile2js(None, None, fullpath)
-		log.info(path)
+		fullpath = testFullPath(suite_path, test)
+		coffeescript.compile2js(None, None, fullpath)
+
+def testFullPath(suite_path, test):
+	return os.path.join(suite_path, test)
 
 def coffee(path):
 	return path.endswith('.coffee')

@@ -1,6 +1,7 @@
 import urllib, urllib2
 from django.http import HttpResponse
 from django.template.loader import render_to_string
+from logger import log
 
 def handler(fn):
 	def _f(*args, **kwargs):
@@ -21,7 +22,7 @@ def handler(fn):
 		return response
 	return _f
 
-def log(fn):
+def catch_and_log(fn):
 	""" Catch errors and write it into logs then raise it up.
 		Normal result returned if no errors.
 
@@ -29,11 +30,11 @@ def log(fn):
 		...	 	return k
 		>>> def testExc(k):
 		...	 	raise Exception(k)
-		>>> f = log(testF)
+		>>> f = catch_and_log(testF)
 		>>> f(10)
 		10
 
-		>>> f = log(testExc)
+		>>> f = catch_and_log(testExc)
 		>>> f(10)
 		Traceback (most recent call last):
 			...

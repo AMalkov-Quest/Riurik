@@ -17,18 +17,10 @@ def compile(full_path):
 	#return coffeescript.compile("Spec'''%s'''" % source, full_path)
 	return "Spec('%s');" % removeEOL(source)
 
-def cucumber2js(path):
-	"""
-	>>> cucumber2js('test.feature')
-	('test.feature', '.test.js')
-	"""
-	file_name = os.path.basename(path)
-	return (file_name, '.%s' % file_name.replace(settings.CUCUMBER_FILE_EXT, settings.JS_FILE_EXT))
-
 def cucumber2coffee(path):
 	"""
 	>>> cucumber2coffee('test.feature')
-	('test.feature', '.test.coffee')
+	('test.feature', 'test.coffee')
 	"""
 	file_name = os.path.basename(path)
 	return (file_name, '%s' % file_name.replace(settings.CUCUMBER_FILE_EXT, settings.COFFEE_FILE_EXT))
