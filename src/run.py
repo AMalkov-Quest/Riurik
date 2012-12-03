@@ -36,7 +36,8 @@ def test(request, RequestHandler):
 		if path.endswith(settings.CUCUMBER_FILE_EXT):
 			path = cucumber.compile2js(path, fullpath)
 
-	url = "http://%s/%s?server=%s&engine=%s&path=/%s" % (target, settings.EXEC_TESTS_CMD, server, engine, path)
+	testLoaderUrl = ctx.get('test_loader_url', settings.EXEC_TESTS_CMD)
+	url = "http://%s/%s?server=%s&engine=%s&path=/%s" % (target, testLoaderUrl, server, engine, path)
 	log.info("redirect to run test %s" % url)
 	return HttpResponseRedirect(url)
 
@@ -63,7 +64,8 @@ def suite(request, RequestHandler):
 		engine = 'cucumber'
 		compileSuiteCucumber(path, fullpath)
 
-	url = "http://%s/%s?server=%s&engine=%s&path=/%s" % ( target, settings.EXEC_TESTS_CMD, server, engine, path )
+	testLoaderUrl = ctx.get('test_loader_url', settings.EXEC_TESTS_CMD)
+	url = "http://%s/%s?server=%s&engine=%s&path=/%s" % ( target, testLoaderUrl, server, engine, path )
 	log.info("redirect to run suite %s" % url)
 	return HttpResponseRedirect( url )
 
