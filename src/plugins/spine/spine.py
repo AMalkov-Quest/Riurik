@@ -22,14 +22,14 @@ def run_hem_server(ctx, path, fullpath, server):
 		hem.terminate()
 		hem = None
 
-		port = ctx.get('port', 80)
-		host = ctx.get('host', server)
-		hem_path = os.path.join(fullpath, "../node_modules/hem/bin/hem")
-		hem = subprocess.Popen(
-			(hem_path, "server", "--port=%s" % port),
-			cwd = fullpath,
-			stdout = open( '/dev/null', 'w' ), stderr = subprocess.STDOUT
-		)
+	port = ctx.get('port', 80)
+	host = ctx.get('host', server)
+	hem_path = os.path.join(fullpath, "../node_modules/hem/bin/hem")
+	hem = subprocess.Popen(
+		(hem_path, "server", "--port=%s" % port),
+		cwd = fullpath,
+		stdout = open( '/dev/null', 'w' ), stderr = subprocess.STDOUT
+	)
 
-		wait_hem( host, port )
-		return "http://%s:%s/test" % (host, port)
+	wait_hem( host, port )
+	return "http://%s:%s/test" % (host, port)
