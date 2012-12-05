@@ -32,4 +32,4 @@ def run_hem_server(ctx, path, fullpath, server):
 	)
 
 	wait_hem( host, port )
-	return "http://%s:%s/test?_=%d" % ( host, port, random.random() )
+	return "http://%s:%s/test?_=%s" % ( host, port, random.random() )
