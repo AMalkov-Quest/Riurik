@@ -52,22 +52,23 @@ def suite(request, RequestHandler):
 
 	log.info('run suite %s with context %s' % (path, context_name))
 	server = request.get_host();
-	compileSuiteCoffee(path, fullpath)
-	contextjs = context.render(RequestHandler, ctx, server, context_name)
-
-	target = contrib.get_runner_url(ctx, server)
-	log.info('target of suite %s is %s' % (path, target))
-
-	saveLocalContext(fullpath, contextjs)
-
-	engine = 'qunit'
-	if cucumber.cucumber(path, ctx):
-		engine = 'cucumber'
-		compileSuiteCucumber(path, fullpath)
-
 	if spine.spine(ctx):
 		url = spine.run_hem_server(ctx, path, fullpath, server)
 	else:
+		compileSuiteCoffee(path, fullpath)
+		contextjs = context.render(RequestHandler, ctx, server, context_name)
+
+		target = contrib.get_runner_url(ctx, server)
+		log.info('target of suite %s is %s' % (path, target))
+
+		saveLocalContext(fullpath, contextjs)
+
+		engine = 'qunit'
+		if cucumber.cucumber(path, ctx):
+			engine = 'cucumber'
+			compileSuiteCucumber(path, fullpath)
+
+	
 		testLoaderUrl = ctx.get('test_loader_url', settings.EXEC_TESTS_CMD)
 		url = "http://%s/%s?server=%s&engine=%s&path=/%s" % ( target, testLoaderUrl, server, engine, path )
 
