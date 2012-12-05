@@ -6,6 +6,7 @@ import context, settings, contrib
 import coffeescript, cucumber
 import dir_index_tools
 from logger import log
+from plugins.spine import spine
 
 @add_request_handler
 @error_handler
@@ -64,8 +65,12 @@ def suite(request, RequestHandler):
 		engine = 'cucumber'
 		compileSuiteCucumber(path, fullpath)
 
-	testLoaderUrl = ctx.get('test_loader_url', settings.EXEC_TESTS_CMD)
-	url = "http://%s/%s?server=%s&engine=%s&path=/%s" % ( target, testLoaderUrl, server, engine, path )
+	if spine.spine(ctx):
+		url = spine.run_hem_server(ctx, path, fullpath, server)
+	else:
+		testLoaderUrl = ctx.get('test_loader_url', settings.EXEC_TESTS_CMD)
+		url = "http://%s/%s?server=%s&engine=%s&path=/%s" % ( target, testLoaderUrl, server, engine, path )
+
 	log.info("redirect to run suite %s" % url)
 	return HttpResponseRedirect( url )
 
