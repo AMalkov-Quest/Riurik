@@ -11,62 +11,13 @@ import settings
 from logger import log
 import context, config, contrib
 import mimetypes, datetime
-import urllib, urllib2
 import codecs, time
 import distributor
-import coffeescript, cucumber
 import inuse, serving
 from serving import add_request_handler
 
 def serve(request, path, show_indexes=False):
 	return serving.response(request, path)
-
-def error_handler(fn):
-	def _f(*args, **kwargs):
-		try:
-			response = fn(*args, **kwargs)
-		except urllib2.HTTPError, ex:
-			response = HttpResponse(ex.read(), status=500)
-		except urllib2.URLError, ex:
-			response = HttpResponse(status=500)
-			response.write(render_to_string('error.html', {
-				'type': ex.__class__.__name__,
-				'msg': ex,
-				'stacktrace': '',
-				'issue':  ex.issue if hasattr(ex, 'issue') else '',
-				'request': args[0].REQUEST
-			}))
-
-		return response
-	return _f
-
-def log_errors(fn):
-	""" Catch errors and write it into logs then raise it up.
-		Normal result returned if no errors.
-
-		>>> def testF(k):
-		...	 	return k
-		>>> def testExc(k):
-		...	 	raise Exception(k)
-		>>> f = log_errors(testF)
-		>>> f(10)
-		10
-
-		>>> f = log_errors(testExc)
-		>>> f(10)
-		Traceback (most recent call last):
-			...
-		Exception: 10
-
-	"""
-	def log_it(*args, **kwargs):
-		try:
-			result = fn(*args, **kwargs)
-		except Exception, ex:
-			log.error("%s", ex)
-			raise
-		return result
-	return log_it
 
 def show_context(request, path):
 	RequestHandler = serving.factory(request, path)
@@ -162,95 +113,6 @@ def submitTest(request):
 
 def submitSuite(request):
 	return _render_to_response( "runsuite.html", request.POST )
-
-@add_request_handler
-@error_handler
-def runSuite(request, RequestHandler):
-	fullpath = RequestHandler.get_full_path()
-	path = contrib.normpath(request.REQUEST["path"])
-	context_name = request.REQUEST["context"]
-	ctx = context.get(RequestHandler, section=context_name)
-
-	log.info('run suite %s with context %s' % (path, context_name))
-	server = request.get_host();
-	compileSuiteCoffee(path, fullpath)
-	contextjs = context.render(RequestHandler, ctx, server, context_name)
-
-	clean_path = contrib.get_relative_clean_path(path)
-	target = contrib.get_runner_url(ctx, server)
-	log.info('target of suite %s is %s' % (clean_path, target))
-
-	saveLocalContext(fullpath, contextjs)
-
-	engine = 'qunit'
-	if cucumber.cucumber(path, ctx):
-		engine = 'cucumber'
-
-	url = "http://%s/%s?server=%s&engine=%s&path=/%s" % ( target, settings.EXEC_TESTS_CMD, server, engine, path )
-	log.info("redirect to run suite %s" % url)
-	return HttpResponseRedirect( url )
-
-def compileSuiteCoffee(path, suite_path):
-	contrib.cleandir(suite_path, '.*.js')
-	tests = contrib.enum_files_in_folders(
-			suite_path,
-			lambda file_: not file_.endswith(settings.COFFEE_FILE_EXT)
-	)
-	for test in tests:
-		fullpath = os.path.join(suite_path, test)
-		path = coffeescript.compile2js(None, None, fullpath)
-		log.info(path)
-
-@add_request_handler
-@error_handler
-def runTest(request, RequestHandler):
-	fullpath = RequestHandler.get_full_path()
-	path = contrib.normpath(request.REQUEST["path"])
-	context_name = request.REQUEST.get("context", None)
-	ctx = context.get(RequestHandler, section=context_name)
-
-	log.info('run test %s with context %s' % (path, context_name))
-	server = request.get_host()
-	contextjs = context.render(RequestHandler, ctx, server, context_name)
-	log.debug('contextJS: '+ contextjs)
-
-	clean_path = contrib.get_relative_clean_path(path)
-	target = contrib.get_runner_url(ctx, server)
-	log.info('target of test %s is %s' % (clean_path, target))
-
-	tools.savetest(request.REQUEST.get('content', None), fullpath)
-	test_content = request.REQUEST.get("content", open(fullpath, 'r').read())
-	
-	saveLocalContext(fullpath, contextjs)
-	if coffee(path):
-		path = coffeescript.compile2js(test_content, path, fullpath)
-
-	engine = 'qunit'
-	if cucumber.cucumber(path, ctx):
-		engine = 'cucumber'
-		if path.endswith(settings.CUCUMBER_FILE_EXT):
-			path = cucumber.compile2js(path, fullpath)
-
-	url = "http://%s/%s?server=%s&engine=%s&path=/%s" % (target, settings.EXEC_TESTS_CMD, server, engine, path)
-	log.info("redirect to run test %s" % url)
-	return HttpResponseRedirect(url)
-
-def coffee(path):
-	return path.endswith('.coffee')
-
-def saveLocalContext(fullpath, contextjs):
-	if os.path.isdir(fullpath):
-		contextjs_path = os.path.join(fullpath, settings.TEST_CONTEXT_JS_FILE_NAME)
-	else:
-		contextjs_path = os.path.join(os.path.dirname(fullpath), settings.TEST_CONTEXT_JS_FILE_NAME)
-	f = open(contextjs_path, 'wt')
-	f.write(contextjs)
-	f.close()
-
-def saveRemoteContext(path, content, url, ctx):
-	contextjs_path = os.path.join(path, settings.TEST_CONTEXT_JS_FILE_NAME)
-	log.info('save %s context' % path)
-	distributor.sendContentToRemote(contextjs_path, content, url, ctx)
 
 def recvLogRecords(request):
 	from logger import FILENAME, timeFormat
