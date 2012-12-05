@@ -1,4 +1,4 @@
-import os, subprocess, socket, time
+import os, subprocess, socket, time, random
 
 hem = None
 
@@ -26,10 +26,10 @@ def run_hem_server(ctx, path, fullpath, server):
 	host = ctx.get('host', server)
 	hem_path = os.path.join(fullpath, "../node_modules/hem/bin/hem")
 	hem = subprocess.Popen(
-		(hem_path, "server", "--port=%s" % port),
+		(os.path.normpath(hem_path), "server", "--port=%s" % port),
 		cwd = fullpath,
 		stdout = open( '/dev/null', 'w' ), stderr = subprocess.STDOUT
 	)
 
 	wait_hem( host, port )
-	return "http://%s:%s/test" % (host, port)
+	return "http://%s:%s/test?_=%d" % ( host, port, random.random() )
