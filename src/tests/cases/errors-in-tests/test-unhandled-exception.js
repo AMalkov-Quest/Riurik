@@ -16,7 +16,7 @@ test('should not hang a suite', function() {
   ok( riurik.matchers.fail.calledOnce, 'the fail method should be called' );
   $.substring(
     riurik.matchers.fail.args[0].toString(),
-    "Uncaught TypeError: Object [object Object] has no method 'nonfunction'",
+    "Script error",
     'argument should be'
   );
   

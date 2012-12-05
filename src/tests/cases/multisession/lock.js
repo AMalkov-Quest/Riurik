@@ -1,14 +1,12 @@
 module('multisession locks');
 
 QUnit.setup(function() {
-  with(context) {
-    context.test_name = 'example.js';
-    context.suite_name = 'multisession';
-    context.suite_path = root.concat('/', suite_name);
-    context.test_path = suite_path.concat('/',  test_name);
-    context.URL = contexter.URL(context, context.test_path + '?editor');
-    create_test( test_name, suite_path );
-  }
+  context.test_name = 'example.js';
+  context.suite_name = 'multisession';
+  context.suite_path = context.root.concat('/', context.suite_name);
+  context.test_path = context.suite_path.concat('/',  context.test_name);
+  context.URL = contexter.URL(context, context.test_path + '?editor');
+  create_test( context.test_name, context.suite_path );
 });
 
 function emulateAnotherSession(_$) {
@@ -24,7 +22,7 @@ function restorePreviousSession(_$) {
 asyncTest('open file first time ', function(){
   $.when( frame.go( context.URL ) ).then(function(_$){
     $.waitFor.condition( function(){ return typeof _$.cookie != 'undefined'; } ).then(function(){
-      ok(_$('.CodeMirror-lines').length === 1, 'CodeMirror frame editor exists');
+      ok( _$('#code').length === 1, 'editor exists' );
       context._$ = _$;
       start();
     });
@@ -34,7 +32,7 @@ asyncTest('open file first time ', function(){
 asyncTest('open file second time ', function() {
   emulateAnotherSession(context._$);
   $.when( frame.go( context.URL ) ).then(function(_$) {
-    ok(_$('.CodeMirror-wrapping').length === 0, 'CodeMirror frame editor not exists');
+    ok( _$('#code').length === 0, 'editor is not exists');
     restorePreviousSession(_$);
 
     start();

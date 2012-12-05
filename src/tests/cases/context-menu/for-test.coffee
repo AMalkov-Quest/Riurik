@@ -20,13 +20,13 @@ test 'should have appropriate actions', ->
 asyncTest 'Edit context should open context for editing', ->
   $.when( frame.go( context.suite_path ) ).then ->
     checkActionSucceeded 'Context', ->
-      QUnit.substring _$('.CodeMirror-lines').text(), "[#{context.cws}]", 'editor content OK'
+      QUnit.substring _$('#code').text(), "[#{context.cws}]", 'editor content OK'
       start()
 
 asyncTest 'Edit spec should open spec urls for editing', ->
   $.when( frame.go( context.suite_path ) ).then ->
     checkActionSucceeded 'Specification', ->
-      editorContent = _$('.CodeMirror-lines').text()
+      editorContent = _$('#code').text()
       QUnit.substring editorContent, "[DEFAULT]"
       QUnit.substring editorContent, "url="
       QUnit.substring editorContent, "title="
