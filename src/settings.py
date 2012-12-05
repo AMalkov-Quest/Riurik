@@ -1,15 +1,16 @@
 #######################################################################################
 # Django settings for web_reports project.
 import os, platform
+from local_settings import *
 
 working_dir = os.path.dirname(os.path.abspath(__file__))
 root = os.path.normpath(os.path.dirname(working_dir))
 
 try:
-    import virtual_paths
+    from local_settings import VIRTUAL_PATHS
     virtual_paths_py = 'virtual_paths.py'
-except Exception:
-    import virtual_paths_default as virtual_paths
+except ImportError:
+    from virtual_paths_default import VIRTUAL_PATHS
     virtual_paths_py = 'virtual_paths_default.py'
 
 DEBUG = True

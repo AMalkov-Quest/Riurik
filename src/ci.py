@@ -49,7 +49,7 @@ def get_suites(root, path, fullpath, ctx_name, RequestHandler):
 	... d tests/suite-2/sub-suite
 	... f tests/suite-2/sub-suite/.context.ini [context]
 	... ''')
-	>>> settings.virtual_paths.VIRTUAL_PATHS['root'] = os.getcwd()
+	>>> settings.VIRTUAL_PATHS['root'] = os.getcwd()
 	>>> get_suites(os.getcwd(), 'root/tests', os.getcwd()+'/tests', 'context', DefaultHandler({}, 'root/tests'))
 	['tests/suite-1', 'tests/suite-2/sub-suite']
 	"""

@@ -43,10 +43,9 @@ def factory(request, path):
 
 	start_time = request.REQUEST.get('date', None)
 
-	gHandler = getGitHub(request, path, start_time)
-	if gHandler:
+	if hasattr(settings, 'use_github'):
 		log.debug('github handler is selected')
-		return gHandler
+		return getGitHub(request, path, start_time)
 	else:
 		log.debug('default handler is selected')
 		return DefaultHandler(request, path, start_time)
