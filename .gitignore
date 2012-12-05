@@ -4,10 +4,8 @@
 *.log
 *.swp
 .context.js
-local_settings.py
 .ropeproject
 tags
-virtual_paths.py
 testsResult
 node_modules
 env
