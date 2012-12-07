@@ -5,6 +5,9 @@ from logger import log
 import socket
 import fnmatch
 
+def testFullPath(suite_path, test):
+	return os.path.join(suite_path, test)
+
 def getNowTime():
 	return time.mktime( time.localtime( time.time() ) ) 
 
