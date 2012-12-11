@@ -189,7 +189,7 @@ CUC_STATIC_MANAGEMENT = {
     }
 }
 
-STATIC_MANAGEMENT = {
+MOCHA_STATIC_MANAGEMENT = {
     'js': {
         'mocha.testLoader.js': [
             'js/jquery.min.js',
@@ -205,6 +205,28 @@ STATIC_MANAGEMENT = {
             'engines/mocha/mocha.html.js',
             'engines/mocha/mocha.js',
             'engines/mocha/expect.js',
+        ]
+    },
+    'css': {
+        
+    }
+}
+
+STATIC_MANAGEMENT = {
+    'js': {
+        'jasmine.testLoader.js': [
+            'js/jquery.min.js',
+            'js/jquery.json.min.js',
+            'js/dates.js',
+            'js/tools.js',
+            'js/riurik.js',
+            'js/consoles.js',
+            'js/reporting.js',
+            'js/frame.js',
+            'js/errors.js',
+            'engines/jasmine/connector.js',
+            'engines/jasmine/jasmine.js',
+            'engines/jasmine/jasmine-html.js',
         ]
     },
     'css': {

@@ -1,7 +1,8 @@
 riurik.onErrorHandler = function(msg, url, line) {
 	riurik.log("error(" + url + ": " +  line + "): " + msg);
 	riurik.trigger( "riurik.error", msg, url, line );
-	return true;
+	// return false here to see error message in the console
+	return false;
 };
 
 riurik.ajaxError = function(event, jqXHR, ajaxSettings, exception) { 

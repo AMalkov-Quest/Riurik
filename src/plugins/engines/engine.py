@@ -11,6 +11,9 @@ def engage4test(path, fullpath, ctx):
 	if is_mocha(ctx):
 		engine = 'mocha'
 
+	if is_jasmine(ctx):
+		engine = 'jasmine'
+
 	return engine
 
 def engage4suite(path, fullpath, ctx):
@@ -26,3 +29,6 @@ def is_cucumber(path, ctx):
 
 def is_mocha(ctx):
 	return ctx.get('mocha', None) != None
+
+def is_jasmine(ctx):
+	return ctx.get('jasmine', None) != None
