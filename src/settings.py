@@ -70,9 +70,9 @@ TEMPLATE_LOADERS = (
     'django.template.loaders.app_directories.Loader',
 #     'django.template.loaders.eggs.load_template_source',
 )
-SESSION_ENGINE = 'django.contrib.sessions.backends.file'
-SESSION_FILE_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'sessions'))
-#SESSION_ENGINE = "django.contrib.sessions.backends.cache"
+#SESSION_ENGINE = 'django.contrib.sessions.backends.file'
+#SESSION_FILE_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'sessions'))
+SESSION_ENGINE = "django.contrib.sessions.backends.cache"
 CACHE_BACKEND = 'locmem://'
 CACHE_MIDDLEWARE_ANONYMOUS_ONLY = False
 CACHE_MIDDLEWARE_SECONDS = 600
@@ -189,7 +189,7 @@ CUC_STATIC_MANAGEMENT = {
     }
 }
 
-MOCHA_STATIC_MANAGEMENT = {
+STATIC_MANAGEMENT = {
     'js': {
         'mocha.testLoader.js': [
             'js/jquery.min.js',
@@ -212,7 +212,7 @@ MOCHA_STATIC_MANAGEMENT = {
     }
 }
 
-STATIC_MANAGEMENT = {
+JA_STATIC_MANAGEMENT = {
     'js': {
         'jasmine.testLoader.js': [
             'js/jquery.min.js',

@@ -2,7 +2,8 @@ riurik.engine = {}
 
 riurik.engine.init = function( next ){
 	riurik.trigger( "riurik.engine.initing" );
-			
+
+	$('#frame-container').remove();			
 	riurik.engine.config();
 	riurik.trigger( "riurik.engine.inited" );
 	next();
@@ -18,5 +19,15 @@ riurik.engine.run_tests = function() {
 riurik.engine.config = function() {
     mocha.setup('bdd');
 };
+
+riurik.matchers.pass = function(message) {
+	
+};
+
+riurik.matchers.fail = function(message) {
+	
+};
+
+$.extend(riurik.exports, riurik.matchers);
 
 $.extend(riurik.exports);

@@ -2,7 +2,8 @@ riurik.engine = {}
 
 riurik.engine.init = function( next ){
 	riurik.trigger( "riurik.engine.initing" );
-			
+	
+	$('#frame-container').remove();
 	riurik.engine.config();
 	riurik.trigger( "riurik.engine.inited" );
 	next();
@@ -19,10 +20,11 @@ riurik.engine.config = function() {
     riurik.engine.jasmineEnv = jasmine.getEnv();
 	riurik.engine.jasmineEnv.updateInterval = 1000;
 
-	var trivialReporter = new jasmine.TrivialReporter();
-	riurik.engine.jasmineEnv.addReporter(trivialReporter);
+	//var reporter = new jasmine.TrivialReporter();
+	var reporter = new jasmine.HtmlReporter();
+	riurik.engine.jasmineEnv.addReporter(reporter);
 	riurik.engine.jasmineEnv.specFilter = function(spec) {
-		return trivialReporter.specFilter(spec);
+		return reporter.specFilter(spec);
 	};
 };
 
@@ -33,5 +35,7 @@ riurik.matchers.pass = function(message) {
 riurik.matchers.fail = function(message) {
 	expect(true).toBeFalsy();
 };
+
+$.extend(riurik.exports, riurik.matchers);
 
 $.extend(riurik.exports);
