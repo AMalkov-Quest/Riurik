@@ -2,7 +2,7 @@
 =======
 Riurik is a wiki web server that allows to make, organize, and run selenium free, pure javascript acceptance test scripts. It aims to simplify the process of UI, functional and integration testing web applications. A web browser - the only thing that you need for this. Riurik is written in Javascript and Python using jQuery, Qunit, Django, heavily influenced by, and borrows the best parts of Fitnesse.
 
-Riurik is a tool designed to make writing automated acceptance and regression tests easier. It provides features that make it easier to organize and structure your acceptance tests, associating them with the user stories or features that they test. 
+Riurik is a tool designed to make writing automated acceptance and regression tests for web applications easier. It provides features that make it easier to organize and structure your acceptance tests, associating them with the user stories or features that they test. 
 
 Documentation:
 --------------
