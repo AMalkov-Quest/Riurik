@@ -27,7 +27,11 @@ Documentation:
 
 * Download ZIP and unpack
 * Download python http://www.python.org/ftp/python/2.7.3/python-2.7.3.msi and setup
-* 
+* Download last python setup tools http://pypi.python.org/pypi/setuptools and install
+* Download Django zipped archive https://www.djangoproject.com/download
+* Unpack it and run the C:\Python27\python.exe setup.py install inside this unpacked folder
+* Download nodejs http://nodejs.org/download and install it
+* run.bat
 
 Authors
 ------
