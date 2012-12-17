@@ -25,7 +25,9 @@ Documentation:
  
 ### Quick start
 
-
+* Download ZIP and unpack
+* Download python http://www.python.org/ftp/python/2.7.3/python-2.7.3.msi and setup
+* 
 
 Authors
 ------
