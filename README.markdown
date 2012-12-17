@@ -9,7 +9,9 @@ Riurik is a tool designed to make writing automated acceptance and regression te
 * QUnit, jasmine, mocha, cucumberjs can be used to write specs
 * Allows to run any script language to execute server-side code
 * CI integration: xml, json, html result reporting, execution progress
-* Tests execution history
+* Tests execution history 
+
+<a name="demo">[Demo]http://www.youtube.com/watch?v=W13HB3FEkdo</a>
 
 Documentation:
 --------------
@@ -23,54 +25,7 @@ Documentation:
  
 ### Quick start
 
-Being a Django web application, Riurik requires Python and Django. It works with Python version 2.6 and 2.7. Get Python at [http://www.python.org][6]. If you’re running Linux, you probably already have it installed. To install the Django framework follow [this installation guid][5]. Now download and unpack the [latest Riurik packaged release from Github][4]. In the src folder execute
 
-        sh run.sh
-
-for Linux. For Windows use
-
-        run.bat
-
-but first you have to [add the python path to Windows PATH][AddingPythonToWindowsPath] or just modify the run.bat script by adding full path to python.exe command.
-
-Start up a web browser and go to http://localhost:8000. The main Riurik screen should come up.
-
-To make you django application ready to work with Riurik download [Riurik Django bindings][DjangoBindings]. Unpack it into your django web application tests folder. It should be a package directory, i.e. contain \_\_init\_\_.py. Also create your test suites folder there. For example
-
-       django web app
-       | tests
-       | | cases
-       | | riurik
-       | | __init__.py
-       
-In your urls.py add urlpatterns to include('tests.riurik.urls')
-
-    urlpatterns += patterns('',
-      (r'^testsrc', include('tests.riurik.urls')),
-    )
-       
-That's it. You're ready to start using Riurik.
-
-### Example
-
-    asyncTest('create suite button', function() {
-      $.when(frame.go('riurik-inner-tests')).then(function() {
-        equal(_$('#new-suite').text(), 'Create Suite');
-        _$('#new-suite').click();
-        equal(_$('.ui-dialog-title').text(), 'Create Suite');
-        equal(_$('#fsobject-tip').text(), 'Specify a suite name here');
-        equal(_$('#create-folder-btn').text(), 'create');
-        
-        _$('#object-name').val('second-suite');
-        _$('#create-folder-btn').click();
-        
-        $.when(frame.load()).then(function() {
-          ok(_$('li#second-suite.folder').length > 0, 'new suite is created successfully');
-          
-          start();
-        });
-      });
-    });
 
 Authors
 ------
