@@ -4,8 +4,12 @@ Riurik is a tool designed to make writing automated acceptance and regression te
 
 * Short learning curve
 * Selenium free
-* To abstract over browser differences the JQuery library is used
-* CoffeeScript is used to write specs
+* The JQuery library is used to abstract over browser differences
+* Using CoffeeScript to write specs makes them more readable
+* QUnit, jasmine, mocha, cucumberjs can be used to write specs
+* Allows to run any script language to execute server-side code
+* CI integration: xml, json, html result reporting, execution progress
+* Tests execution history
 
 Documentation:
 --------------
