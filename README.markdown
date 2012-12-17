@@ -11,8 +11,8 @@ Riurik is a tool designed to make writing automated acceptance and regression te
 * CI integration: xml, json, html result reporting, execution progress
 * Tests execution history 
 
-<a name="demo">[Demo]http://www.youtube.com/watch?v=W13HB3FEkdo</a>
-=======
+<a name="DEMO">[Demo](http://www.youtube.com/watch?v=W13HB3FEkdo)</a>
+
 Documentation:
 --------------
 
