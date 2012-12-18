@@ -9,7 +9,21 @@ Riurik is a tool designed to make writing automated acceptance and regression te
 * QUnit, jasmine, mocha, cucumberjs can be used to write specs
 * Allows to run any script language to execute server-side code
 * CI integration: xml, json, html result reporting, execution progress
-* Tests execution history 
+* Tests execution history
+* It provides Web based UI with handy code editor(http://ace.ajax.org)
+* You can use PowerShell, python, batch(cmd) scripts to create test fixtures
+  * this list can be easily extended
+  * these fixtures are for setup and examine your test environment before and after tests
+  * you can create, edit and execute this scripts right in browser
+* Browser is a single place to manage, review, execute and check results of your tests
+* It does not require to use particular DSL and framework to write specs
+  * javascript, that is one of the language of web developers, is used to write specs
+  * you can use any javascript libraries or framework to write and execute you specs
+  * cucumber, qUnit, jasmine, mocha (this list can be extended easily)
+  * using real programming language(javascript) eliminates any code duplication issues
+  * using real programming language makes the developers life easier
+  * it is possible to use coffescript to make the specs more readable and write less code
+  * it is possible to use cucumber to make the specs event more readable(especially for business users)
 
 <a name="DEMO">[Demo](http://www.youtube.com/watch?v=W13HB3FEkdo)</a>
 
