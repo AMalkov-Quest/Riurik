@@ -1,9 +1,9 @@
 #!/bin/bash
-sudo pip install ropemode
-
 sudo apt-get install python-setuptools tmux
-sudo easy_install django pygithub
 
+sudo easy_install django pygithub nose pip
+
+sudo pip install ropemode
 sudo pip install minimock
 sudo pip install tl.testing
 sudo pip install PyGithub
