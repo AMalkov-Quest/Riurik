@@ -1,4 +1,4 @@
-var gitLoginDialogID = '#git-login-dialog';
+var gitLoginDialogID = '#github-dialogs';
 var OSX = {
 	container: null,
 	modal: function () {

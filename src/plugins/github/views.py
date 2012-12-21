@@ -31,9 +31,11 @@ def authorize(code, host):
 def store_auth(request, token):
 	request.session['token'] = token
 	user = gitware.get_user_by_token(token)
-	request.session['login'] = user.login
-	repo = gitware.get_riurik_repo(user)
-	request.session['repoid'] = repo.id
+	if user:
+		repo = gitware.get_riurik_repo(user)
+		if repo:
+			request.session['login'] = user.login
+			request.session['repoid'] = repo.id
 
 def get_auth(request):
 	return (
@@ -68,16 +70,17 @@ def plugin(request, path, time):
 
 def mkrepo(request):
 	token = oAuth(request)
+	store_auth(request, token)
 	user = gitware.get_user_by_token(token)
 	repo = gitware.mkrepo_for_riurik(user)
 	gitware.init_repo(user, repo)
-	gitware.init_gitignore(user, repo)
+	gitware.init_gitignore(user.login, repo.id)
 
-	gitssh.command(token, "git config user.name '%s'" % user.login)
-	gitssh.command(token, "git config user.email %s" % user.email)
-	gitssh.command(token, "git add .")
-	gitssh.command(token, "git commit -a -m 'initial commit'")
-	gitssh.command(token, "git push -u origin master")
+	gitssh.command(user.login, repo.id, "git config user.name '%s'" % user.login)
+	gitssh.command(user.login, repo.id, "git config user.email %s" % user.email)
+	gitssh.command(user.login, repo.id, "git add .")
+	gitssh.command(user.login, repo.id, "git commit -a -m 'initial commit'")
+	gitssh.command(user.login, repo.id, "git push -u origin master")
 
 	return HttpResponseRedirect('/')
 
@@ -86,8 +89,15 @@ class GitHandler(serving.BaseHandler):
 	def __init__(self, request, path, time):
 		super(GitHandler, self).__init__(request, path, time)
 		token, login, repoid = get_auth(request)
-		self.user = login if login else gitware.get_user_by_token(token).login
-		self.repo = repoid if repoid else gitware.get_riurik_repo(self.user).id
+		self.user = login
+		self.repo = repoid
+		if not self.user:
+			user = gitware.get_user_by_token(token)
+			if user:
+				self.user = user.login
+				repo = gitware.get_riurik_repo(user)
+				if repo:
+					self.repo = repo.id
 
 	def get_document_root(self):
 		return gitware.get_document_root(self.user, self.repo)
@@ -121,7 +131,7 @@ class GitFronPageHandler(GitHandler):
 class GitInitHandler(GitHandler):
 
 	def serve(self, request):
-		log.debug('initialize git repo fo %s' % (self.user.login))
+		log.debug('initialize git repo fo %s' % (self.user))
 
 		repo_name = gitware.gen_repo_name(self.user)
 		descriptor = Context({

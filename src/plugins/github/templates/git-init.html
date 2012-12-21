@@ -5,7 +5,7 @@
 
 	<script type="text/javascript">
 	jQuery(function ($) {
-		OSX.modal();		
+		OSX.modal();
 	});
 	</script>
 
@@ -13,7 +13,7 @@
 
 {% block body %}
 {{ block.super }}
-<div id="git-console" align="left">
+<div id="github-dialogs" align="left">
 	<p>Hello <b>{{ login }}</b>! And Welcome!</p>
 	<p>You've successfully authorized the Riurik framework on GitHub. Now we are ready to create new repository over your account. It's name is going to be <b>{{ repo_name }}</b>. Additionaly in order to commit to this repository via the git command line we are going to create a <a href="https://help.github.com/articles/managing-deploy-keys">deploy key</a> there.</p>
 	<div align="right">

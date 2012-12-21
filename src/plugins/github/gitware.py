@@ -134,22 +134,16 @@ def get_repos(user):
 def ensure_riurik_repo(user):
 	repo_name = gen_repo_name(user)
 	repo = get_repo_by_name(user, repo_name)
-	#if not repo:
-	#	repo = create_repo(user, repo_name)
-		
+
 	return repo
 
 def get_riurik_repo(user):
 	repos = get_repos(user)
 	if not repos:
-		#repo = ensure_riurik_repo(user)
-		#ensure_deploy_key(user, repo)
-		repo = None
+		return None
 	else:
 		repo = repos[0]
 	
-	#init_repo(user, repo)
-
 	return repo
 
 def init_gitignore(user, repo):
@@ -159,7 +153,7 @@ def init_gitignore(user, repo):
 	f.close()
 
 def mkrepo_for_riurik(user):
-	repo_name = gen_repo_name(user)
+	repo_name = gen_repo_name(user.login)
 	log.debug("create the '%s' repo for the '%s' user" % (repo_name, user.login))
 	repo = create_repo(user, repo_name)
 	
