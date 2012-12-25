@@ -68,7 +68,7 @@ def get_user_dir(login, repo_id):
 	return '%s-%s' % (login, repo_id)
 
 def gen_repo_name(user):
-	return 'for-riurik'
+	return 'riurik-tests'
 
 def init_repo(user, repo):
 	from plugins.git import gitssh
@@ -155,14 +155,17 @@ def init_gitignore(user, repo):
 	f.write('.*.js')
 	f.close()
 
-def try_to_create_repo(token):
+def try_to_create_riurik_repo(token):
 	from plugins.git import gitssh
 	try:
 		user = gitware.get_user_by_token(token)
 		repo = mkrepo_for_riurik(user)
+		init_riurik_repo(user, repo)
+		return repo
 	except Exception, e:
 		return None
 
+def init_riurik_repo(user, repo):
 	init_repo(user, repo)
 	init_gitignore(user.login, repo.id)
 
@@ -171,8 +174,6 @@ def try_to_create_repo(token):
 	gitssh.command(user.login, repo.id, "git add .")
 	gitssh.command(user.login, repo.id, "git commit -a -m 'initial commit'")
 	gitssh.command(user.login, repo.id, "git push -u origin master")
-	
-	return repo
 
 def mkrepo_for_riurik(user):
 	repo_name = gen_repo_name(user.login)

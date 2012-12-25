@@ -95,10 +95,10 @@ def plugin(request, path, time):
 		else:
 			return GitFronPageHandler(request, path, time)
 
-def mkrepo(request):
+def initrepo(request):
 	token = get_token(request)
-	store_auth_by_token(request, token)
-	repo = gitware.try_to_create_repo(token)
+	#store_auth_by_token(request, token)
+	#repo = gitware.try_to_create_repo(token)
 
 	return HttpResponseRedirect('/')
 
@@ -153,16 +153,33 @@ class GitInitHandler(GitHandler):
 
 		repo_name = gitware.gen_repo_name(self.user)
 		token = get_token(request)
-		repo = gitware.try_to_create_repo(token)
+		repo = gitware.try_to_create_riurik_repo(token)
 		if repo:
-			return self.repo_is_created()
+			return self.repo_is_created(repo_name)
 		else:
-			return self.have_to_create_repo(repo_name)
+			if not token:
+				password = request.session.get('password', None)
+				user = gitware.get_user_by_password(self.user, password)
+			else:
+				user = gitware.get_user_by_token(token)
+			return self.have_to_create_repo(user)
 
-	def repo_is_created(self):
-		return HttpResponseRedirect('/')
+	def have_to_create_repo(self, user):
+		repos_list = gitware.get_repos(user)
+		descriptor = Context({
+			'directory' : '/',
+			'type'		: 'virtual',
+			'file_list' : [],
+			'dir_list'  : [],
+			'contexts'  : [],
+			'favicon'   : None,
+			'spec'      : None,
+			'login'     : self.user,
+			'repos_list' : repos_list,
+		})
+		return _render_to_response('select-repo.html', descriptor)
 
-	def have_to_create_repo(self, repo_name):
+	def repo_is_created(self, repo_name):
 
 		descriptor = Context({
 			'directory' : '/',

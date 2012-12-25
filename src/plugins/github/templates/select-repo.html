@@ -1,0 +1,24 @@
+{% extends 'git-base.html' %}
+{% load i18n %}
+{% block javascripts %}
+	{{ block.super }}
+
+	<script type="text/javascript">
+	jQuery(function ($) {
+		OSX.modal();
+	});
+	</script>
+
+{% endblock %}
+
+{% block body %}
+{{ block.super }}
+<div id="github-dialogs" align="left">
+	<p>Hello <b>{{ login }}</b>! And Welcome!</p>
+	<p>You've successfully authorized the Riurik framework on GitHub. 
+	<div align="right">
+		<input type=button class="agree" onClick="window.location='/github/initrepo'" value="OK">
+	</div>
+</div>
+
+{% endblock %}
