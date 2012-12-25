@@ -98,8 +98,7 @@ def plugin(request, path, time):
 def mkrepo(request):
 	token = get_token(request)
 	store_auth_by_token(request, token)
-	user = gitware.get_user_by_token(token)
-	repo = gitware.try_to_create_repo(user)
+	repo = gitware.try_to_create_repo(token)
 
 	return HttpResponseRedirect('/')
 
@@ -154,13 +153,7 @@ class GitInitHandler(GitHandler):
 
 		repo_name = gitware.gen_repo_name(self.user)
 		token = get_token(request)
-		if not token:
-			password = request.session.get('password', None)
-			user = gitware.get_user_by_password(self.user, password)
-		else:
-			user = gitware.get_user_by_token(token)
-
-		repo = gitware.try_to_create_repo(user)
+		repo = gitware.try_to_create_repo(token)
 		if repo:
 			return self.repo_is_created()
 		else:

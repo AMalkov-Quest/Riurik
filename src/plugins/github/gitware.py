@@ -155,9 +155,10 @@ def init_gitignore(user, repo):
 	f.write('.*.js')
 	f.close()
 
-def try_to_create_repo(user):
+def try_to_create_repo(token):
 	from plugins.git import gitssh
 	try:
+		user = gitware.get_user_by_token(token)
 		repo = mkrepo_for_riurik(user)
 	except Exception, e:
 		return None
