@@ -10,12 +10,14 @@ import serving
 import gitware
 from plugins.git import gitssh
 
-def signin(req):
+def _signin_(req):
 	variables = { 'RIURIK_URL': 'http://'+req.META['HTTP_HOST']+'/login' }
 	variables.update(globals())
 	return _render_to_response("signin.html", variables)
 
 def authorize(code, host):
+	log.debug( 'authorize on github' )
+
 	params = urllib.urlencode({
 		'code': code.encode('utf-8'),
 		'client_id': gitware.client_id[host],
@@ -26,16 +28,25 @@ def authorize(code, host):
 	conn.request('POST', gitware.github_access_url, params, { 'Accept': 'application/json' })
 	resp = conn.getresponse()
 	token = json.loads(resp.read())
+
+	log.debug( 'authorization is done, token %s' % token )
 	return token['access_token']
 
-def store_auth(request, token):
-	request.session['token'] = token
-	user = gitware.get_user_by_token(token)
+def store_auth(request, user):
 	if user:
+		request.session['login'] = user.login
 		repo = gitware.get_riurik_repo(user)
 		if repo:
-			request.session['login'] = user.login
 			request.session['repoid'] = repo.id
+
+def store_auth_by_token(request, token):
+	request.session['token'] = token
+	user = gitware.get_user_by_token(token)
+	store_auth(request, user)
+
+def store_auth_by_password(request, login, password):
+	user = gitware.get_user_by_password(login, password)
+	store_auth(request, user)
 
 def get_auth(request):
 	return (
@@ -44,33 +55,49 @@ def get_auth(request):
 		request.session.get('repoid', None)
 	)
 
-def login(req):
-	code = req.GET.get('code')
-	state = req.GET.get('state')
-	host = req.META['HTTP_HOST']
-	
-	token = authorize(code, host)
-	store_auth(req, token)
+def signin(request):
+	login = request.GET.get('login')
+	password = request.GET.get('password')
+	log.debug('sign in: %s %s' % (login, password))
+	store_auth_by_password(request, login, password)
 
 	return HttpResponseRedirect('/')
 
-def oAuth(request):
-	return request.session.get('token', None)
+def login(request):
+	code = request.GET.get('code')
+	state = request.GET.get('state')
+	host = request.META['HTTP_HOST']
+	
+	token = authorize(code, host)
+	store_auth_by_token(request, token)
+
+	return HttpResponseRedirect('/')
+
+def authorized(request):
+	token, login, repoid = get_auth(request)
+	return login
+
+def reporized(request):
+	token, login, repoid = get_auth(request)
+	return repoid
+
+def get_token(request):
+	token, login, repoid = get_auth(request)
+	return token
 
 def plugin(request, path, time):
 	if settings.appInstalled('src.plugins.github'):
-		if oAuth(request):
-			handler = GitHandler(request, path, time)
-			if handler.repo:
-				return handler
+		if authorized(request):
+			if reporized(request):
+				return GitHandler(request, path, time)
 			else:
 				return GitInitHandler(request, path, time)
 		else:
 			return GitFronPageHandler(request, path, time)
 
 def mkrepo(request):
-	token = oAuth(request)
-	store_auth(request, token)
+	token = get_token(request)
+	store_auth_by_token(request, token)
 	user = gitware.get_user_by_token(token)
 	repo = gitware.mkrepo_for_riurik(user)
 	gitware.init_repo(user, repo)

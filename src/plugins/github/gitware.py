@@ -61,6 +61,9 @@ def download_deploy_key(user, repo):
 def get_user_by_token(token):
 	return Github(token).get_user()
 
+def get_user_by_password(login, password):
+	return Github(login, password).get_user()
+
 def get_user_dir(login, repo_id):
 	return '%s-%s' % (login, repo_id)
 
