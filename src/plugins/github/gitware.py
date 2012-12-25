@@ -68,13 +68,13 @@ def get_user_dir(login, repo_id):
 	return '%s-%s' % (login, repo_id)
 
 def gen_repo_name(user):
-	return 'riurik-for-%s' % user
+	return 'for-riurik'
 
 def init_repo(user, repo):
-	from plugins.git.gitssh import GitSSH
+	from plugins.git import gitssh
 	user_dir = get_user_dir(user.login, repo.id)
 	if not os.path.exists( get_abspath(user_dir) ):
-		with GitSSH(get_abspath(), get_rsa_path(user.login), get_rsa_pub_path(user.login)) as call:
+		with gitssh.GitSSH(get_abspath(), get_rsa_path(user.login), get_rsa_pub_path(user.login)) as call:
 			cmd = 'git clone %s %s' % (repo.ssh_url, user_dir)
 			out, error, code = call(cmd)
 
@@ -154,6 +154,24 @@ def init_gitignore(user, repo):
 	f = open(git_ignore_path, 'w')
 	f.write('.*.js')
 	f.close()
+
+def try_to_create_repo(user):
+	from plugins.git import gitssh
+	try:
+		repo = mkrepo_for_riurik(user)
+	except Exception, e:
+		return None
+
+	init_repo(user, repo)
+	init_gitignore(user.login, repo.id)
+
+	gitssh.command(user.login, repo.id, "git config user.name '%s'" % user.login)
+	gitssh.command(user.login, repo.id, "git config user.email %s" % user.email)
+	gitssh.command(user.login, repo.id, "git add .")
+	gitssh.command(user.login, repo.id, "git commit -a -m 'initial commit'")
+	gitssh.command(user.login, repo.id, "git push -u origin master")
+	
+	return repo
 
 def mkrepo_for_riurik(user):
 	repo_name = gen_repo_name(user.login)

@@ -8,7 +8,6 @@ import httplib, urllib, json
 from logger import log
 import serving
 import gitware
-from plugins.git import gitssh
 
 def _signin_(req):
 	variables = { 'RIURIK_URL': 'http://'+req.META['HTTP_HOST']+'/login' }
@@ -45,6 +44,7 @@ def store_auth_by_token(request, token):
 	store_auth(request, user)
 
 def store_auth_by_password(request, login, password):
+	request.session['password'] = password
 	user = gitware.get_user_by_password(login, password)
 	store_auth(request, user)
 
@@ -99,15 +99,7 @@ def mkrepo(request):
 	token = get_token(request)
 	store_auth_by_token(request, token)
 	user = gitware.get_user_by_token(token)
-	repo = gitware.mkrepo_for_riurik(user)
-	gitware.init_repo(user, repo)
-	gitware.init_gitignore(user.login, repo.id)
-
-	gitssh.command(user.login, repo.id, "git config user.name '%s'" % user.login)
-	gitssh.command(user.login, repo.id, "git config user.email %s" % user.email)
-	gitssh.command(user.login, repo.id, "git add .")
-	gitssh.command(user.login, repo.id, "git commit -a -m 'initial commit'")
-	gitssh.command(user.login, repo.id, "git push -u origin master")
+	repo = gitware.try_to_create_repo(user)
 
 	return HttpResponseRedirect('/')
 
@@ -161,6 +153,24 @@ class GitInitHandler(GitHandler):
 		log.debug('initialize git repo fo %s' % (self.user))
 
 		repo_name = gitware.gen_repo_name(self.user)
+		token = get_token(request)
+		if not token:
+			password = request.session.get('password', None)
+			user = gitware.get_user_by_password(self.user, password)
+		else:
+			user = gitware.get_user_by_token(token)
+
+		repo = gitware.try_to_create_repo(user)
+		if repo:
+			return self.repo_is_created()
+		else:
+			return self.have_to_create_repo(repo_name)
+
+	def repo_is_created(self):
+		return HttpResponseRedirect('/')
+
+	def have_to_create_repo(self, repo_name):
+
 		descriptor = Context({
 			'directory' : '/',
 			'type'		: 'virtual',
