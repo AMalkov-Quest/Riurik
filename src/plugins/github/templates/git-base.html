@@ -4,13 +4,12 @@
 
 {% block styles %}
 	{{ block.super }}
-	<link type='text/css' href='/static/css/git-console.css' rel='stylesheet' media='screen' />
+    <link rel="stylesheet" type="text/css" href="/static/bootstrap/css/bootstrap.min.css" media="screen"/>
 {% endblock styles %}
 
 {% block javascripts %}
 	{{ block.super }}
-	<script type='text/javascript' src='/static/js/jquery.simplemodal.js'></script>
-	<script type='text/javascript' src='/static/js/git-console.js'></script>
+    <script src="/static/bootstrap/js/bootstrap.min.js"></script>
 {% endblock %}
 
 {% endblock %}
