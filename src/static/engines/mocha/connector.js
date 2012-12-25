@@ -2,8 +2,7 @@ riurik.engine = {}
 
 riurik.engine.init = function( next ){
 	riurik.trigger( "riurik.engine.initing" );
-
-	$('#frame-container').remove();			
+			
 	riurik.engine.config();
 	riurik.trigger( "riurik.engine.inited" );
 	next();
