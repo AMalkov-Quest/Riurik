@@ -4,6 +4,10 @@
 {% load dir_index_tags %}
 
 <head>
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+    <meta http-equiv="Content-Language" content="en-us" />
+	<meta http-equiv="Cache-Control" content="No-Cache" />
+    <meta name="robots" content="NONE,NOARCHIVE" />
 	<script type="text/javascript">
 		// Define a cross-browser window.console.log method.
 		// For IE and FF without Firebug, fallback to using an alert.
@@ -18,34 +22,30 @@
         }
 	</script>
     <link rel="shortcut icon" href="/static/img/{{ favicon }}">
-    <link rel="stylesheet" type="text/css" href="/static/jquery-ui/css/start/jquery-ui.custom.css" />
-	<script type="text/javascript" src="/static/js/jquery.min.js"></script>
-    <script type="text/javascript">
+	{% block head %}
+        <script type="text/javascript" src="/static/js/jquery.min.js"></script>
+	    <script type="text/javascript">
         $(function(){riurik.trigger('riurik.initing-editor');});
-    </script>
-  	<script type="text/javascript" src="/static/js/jquery.json.min.js"></script>
-	<script type="text/javascript" src="/static/jquery-ui/js/jquery-ui.custom.min.js"></script>
-    <script type="text/javascript" src="/static/js/consoles.js"></script>
+	    </script>
+      	<script type="text/javascript" src="/static/js/jquery.json.min.js"></script>
+		<script type="text/javascript" src="/static/jquery-ui/js/jquery-ui.custom.min.js"></script>
+	    <script type="text/javascript" src="/static/js/consoles.js"></script>
     
-    <link rel="stylesheet" href="/static/css/base.css" type="text/css">
-    <link rel="stylesheet" href="/static/css/loader.css" type="text/css">
-    
-    <link rel="stylesheet" href="/static/css/contextMenu.css" type="text/css">
-    <script type="text/javascript" src="/static/js/jquery.contextMenu.js"></script>
-    <script type="text/javascript" src="/static/js/dir-index-ctxmenu.js"></script>
-    <script type="text/javascript" src="/static/js/dir-index-tools.js"></script>
-	    
-    <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
-    <meta http-equiv="Content-Language" content="en-us" />
-	<meta http-equiv="Cache-Control" content="No-Cache" />
-    <meta name="robots" content="NONE,NOARCHIVE" />
-    <title>{{ directory|current }}</title>
-    {% block head %}
-        {% block styles %}
-	{% endblock styles %}
-	{% block javascripts %}
-	{% endblock javascripts %}
+		 {% block styles %}
+		<link rel="stylesheet" href="/static/css/base.css" type="text/css">
+    	 <link rel="stylesheet" type="text/css" href="/static/jquery-ui/css/start/jquery-ui.custom.css" />
+		<link rel="stylesheet" href="/static/css/loader.css" type="text/css">
+	    <link rel="stylesheet" href="/static/css/contextMenu.css" type="text/css">
+		{% endblock styles %}
+
+        <script type="text/javascript" src="/static/js/jquery.contextMenu.js"></script>
+	    <script type="text/javascript" src="/static/js/dir-index-ctxmenu.js"></script>
+	    <script type="text/javascript" src="/static/js/dir-index-tools.js"></script>
+		{% block javascripts %}
+		{% endblock javascripts %}
     {% endblock head %}
+	    
+    <title>{{ directory|current }}</title>
 </head>
 
 {% include "dir-index-tools.html" %}
@@ -56,6 +56,8 @@
 	<div class="header">
 		<a href="#" title="Riurik Web Based Acceptance Testing Framework"></a>
 		<div class="title-riurik">Riurik Web Based Acceptance Testing Framework</div>
+		{% block search %}{% include 'search/include/search.html' %}{% endblock search %}
+
 	</div>
 	<div class="content">
 		{% block title %}
@@ -106,7 +108,6 @@
 			</ul>
 			</form>
 			{% endblock controls %}
-			{% block search %}{% include 'search/include/search.html' %}{% endblock search %}
 			{% block user %}{% include 'github-user.html' %}{% endblock user %}
 		</div>
 		<div style="clear:both;"></div>

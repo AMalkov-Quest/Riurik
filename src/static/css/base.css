@@ -1,7 +1,17 @@
+form {
+margin: 0 0 0 0;
+}
 .header {
 	background: url(/static/img/head_bg.png);
 	height: 30px;
 	width: 100%;
+	position: absolute;
+	top: 10px;
+}
+
+.content {
+	position: relative;
+	margin-top: 40px;
 }
 
 .horizontal-menu li {
