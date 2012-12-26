@@ -127,12 +127,7 @@ def get_repo_by_name(user, name):
 		return None
 
 def get_repos(user):
-	repos = []
-	for repo in user.get_repos():
-		if get_deploy_key(repo):
-			repos.append(repo)
-
-	return repos
+	return user.get_repos()
 
 def ensure_riurik_repo(user):
 	repo_name = gen_repo_name(user)
@@ -141,13 +136,11 @@ def ensure_riurik_repo(user):
 	return repo
 
 def get_riurik_repo(user):
-	repos = get_repos(user)
-	if not repos:
-		return None
-	else:
-		repo = repos[0]
+	for repo in get_repos(user):
+		if get_deploy_key(repo):
+			return repo
 	
-	return repo
+	return None
 
 def init_gitignore(user, repo):
 	git_ignore_path = get_full_path(user, repo, gitignore)
@@ -159,13 +152,12 @@ def try_to_create_riurik_repo(token):
 	from plugins.git import gitssh
 	try:
 		user = gitware.get_user_by_token(token)
-		repo = mkrepo_for_riurik(user)
-		init_riurik_repo(user, repo)
-		return repo
+		return mkrepo_for_riurik(user)
 	except Exception, e:
 		return None
 
 def init_riurik_repo(user, repo):
+	from plugins.git import gitssh
 	init_repo(user, repo)
 	init_gitignore(user.login, repo.id)
 
@@ -179,12 +171,13 @@ def mkrepo_for_riurik(user):
 	repo_name = gen_repo_name(user.login)
 	log.debug("create the '%s' repo for the '%s' user" % (repo_name, user.login))
 	repo = create_repo(user, repo_name)
-	
-	key = ssh_key_gen(user)
-	log.debug('create a deploy key in the %s repo' % repo_name)
-	repo.create_key(key_title, key)
-
+	create_deploy_key(user, repo)
 	return repo
+	
+def create_deploy_key(user, repo):
+	key = ssh_key_gen(user)
+	log.debug('create a deploy key in the %s repo' % repo.name)
+	repo.create_key(key_title, key)
 
 def get_abspath(path=None):
 	home = get_repos_root()

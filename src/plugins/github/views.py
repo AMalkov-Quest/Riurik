@@ -2,7 +2,7 @@
 
 from django.shortcuts import render_to_response as _render_to_response
 from django.template import Context
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 import settings
 import httplib, urllib, json
 from logger import log
@@ -96,11 +96,35 @@ def plugin(request, path, time):
 			return GitFronPageHandler(request, path, time)
 
 def initrepo(request):
-	token = get_token(request)
-	#store_auth_by_token(request, token)
-	#repo = gitware.try_to_create_repo(token)
-
+	title = request.GET.get('title', '')
+	user = get_user(request)
+	repo = gitware.get_repo_by_name(user, title)
+	gitware.create_deploy_key(user, repo)
+	gitware.init_riurik_repo(user, repo)
+	request.session['repoid'] = repo.id	
 	return HttpResponseRedirect('/')
+
+def mkrepo(request):
+	title = request.GET.get('title', '')
+	user = get_user(request)
+	gitware.create_repo(user, title)
+	return HttpResponse()
+
+def delrepo(request):
+	title = request.GET.get('title', '')
+	user = get_user(request)
+	repo = gitware.get_repo_by_name(user, title)
+	repo.delete()
+	return HttpResponse()
+
+def get_user(request):
+	token = get_token(request)
+	if not token:
+		login = request.session.get('login', None)
+		password = request.session.get('password', None)
+		return gitware.get_user_by_password(login, password)
+	else:
+		return gitware.get_user_by_token(token)
 
 class GitHandler(serving.BaseHandler):
 
@@ -157,15 +181,12 @@ class GitInitHandler(GitHandler):
 		if repo:
 			return self.repo_is_created(repo_name)
 		else:
-			if not token:
-				password = request.session.get('password', None)
-				user = gitware.get_user_by_password(self.user, password)
-			else:
-				user = gitware.get_user_by_token(token)
+			user = get_user(request)
 			return self.have_to_create_repo(user)
 
 	def have_to_create_repo(self, user):
 		repos_list = gitware.get_repos(user)
+		log.debug(repos_list)
 		descriptor = Context({
 			'directory' : '/',
 			'type'		: 'virtual',
@@ -175,7 +196,7 @@ class GitInitHandler(GitHandler):
 			'favicon'   : None,
 			'spec'      : None,
 			'login'     : self.user,
-			'repos_list' : repos_list,
+			'repos_list' : [repo.name for repo in repos_list],
 		})
 		return _render_to_response('select-repo.html', descriptor)
 

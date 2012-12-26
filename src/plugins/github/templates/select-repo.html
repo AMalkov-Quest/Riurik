@@ -7,6 +7,10 @@
 	jQuery(function ($) {
 		OSX.modal();
 	});
+
+	function InitRepo() {
+		window.location='/github/initrepo?title=' + $('#repos').val();
+	};
 	</script>
 
 {% endblock %}
@@ -15,10 +19,18 @@
 {{ block.super }}
 <div id="github-dialogs" align="left">
 	<p>Hello <b>{{ login }}</b>! And Welcome!</p>
-	<p>You've successfully authorized the Riurik framework on GitHub. 
+	<p>You've successfully authorized the Riurik framework on GitHub. Please create public repositry there, refresh this page and select this repository.  
+	{% if repos_list %}
 	<div align="right">
-		<input type=button class="agree" onClick="window.location='/github/initrepo'" value="OK">
+		<select id="repos">
+			<option value="" selected>Select repository</option>
+			{% for repo in repos_list %}
+			<option value="{{ repo }}">{{ repo }}</option>
+			{% endfor %}
+		</select>
+		<input type=button class="agree" onClick="javascript:InitRepo()" value="OK">
 	</div>
+	{% endif %}
 </div>
 
 {% endblock %}
