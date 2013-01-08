@@ -1,0 +1,36 @@
+{% extends 'git-base.html' %}
+{% load i18n %}
+{% block javascripts %}
+	{{ block.super }}
+
+	<script type="text/javascript">
+	jQuery(function ($) {
+		OSX.modal();
+	});
+
+	function InitRepo() {
+		window.location='/github/initrepo?title=' + $('#repos').val();
+	};
+	</script>
+
+{% endblock %}
+
+{% block body %}
+{{ block.super }}
+<div id="github-dialogs" align="left">
+	<p>Hello <b>{{ login }}</b>! And Welcome!</p>
+	<p>You've successfully authorized the Riurik framework on GitHub. Please create public repositry there, refresh this page and select this repository.  
+	{% if repos_list %}
+	<div align="right">
+		<select id="repos">
+			<option value="" selected>Select repository</option>
+			{% for repo in repos_list %}
+			<option value="{{ repo }}">{{ repo }}</option>
+			{% endfor %}
+		</select>
+		<input type=button class="agree" onClick="javascript:InitRepo()" value="OK">
+	</div>
+	{% endif %}
+</div>
+
+{% endblock %}

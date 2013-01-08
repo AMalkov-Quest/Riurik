@@ -61,17 +61,20 @@ def download_deploy_key(user, repo):
 def get_user_by_token(token):
 	return Github(token).get_user()
 
+def get_user_by_password(login, password):
+	return Github(login, password).get_user()
+
 def get_user_dir(login, repo_id):
 	return '%s-%s' % (login, repo_id)
 
 def gen_repo_name(user):
-	return 'riurik-for-%s' % user
+	return 'riurik-tests'
 
 def init_repo(user, repo):
-	from plugins.git.gitssh import GitSSH
+	from plugins.git import gitssh
 	user_dir = get_user_dir(user.login, repo.id)
 	if not os.path.exists( get_abspath(user_dir) ):
-		with GitSSH(get_abspath(), get_rsa_path(user.login), get_rsa_pub_path(user.login)) as call:
+		with gitssh.GitSSH(get_abspath(), get_rsa_path(user.login), get_rsa_pub_path(user.login)) as call:
 			cmd = 'git clone %s %s' % (repo.ssh_url, user_dir)
 			out, error, code = call(cmd)
 
@@ -124,12 +127,7 @@ def get_repo_by_name(user, name):
 		return None
 
 def get_repos(user):
-	repos = []
-	for repo in user.get_repos():
-		if get_deploy_key(repo):
-			repos.append(repo)
-
-	return repos
+	return user.get_repos()
 
 def ensure_riurik_repo(user):
 	repo_name = gen_repo_name(user)
@@ -138,13 +136,11 @@ def ensure_riurik_repo(user):
 	return repo
 
 def get_riurik_repo(user):
-	repos = get_repos(user)
-	if not repos:
-		return None
-	else:
-		repo = repos[0]
+	for repo in get_repos(user):
+		if get_deploy_key(repo):
+			return repo
 	
-	return repo
+	return None
 
 def init_gitignore(user, repo):
 	git_ignore_path = get_full_path(user, repo, gitignore)
@@ -152,16 +148,36 @@ def init_gitignore(user, repo):
 	f.write('.*.js')
 	f.close()
 
+def try_to_create_riurik_repo(token):
+	from plugins.git import gitssh
+	try:
+		user = gitware.get_user_by_token(token)
+		return mkrepo_for_riurik(user)
+	except Exception, e:
+		return None
+
+def init_riurik_repo(user, repo):
+	from plugins.git import gitssh
+	init_repo(user, repo)
+	init_gitignore(user.login, repo.id)
+
+	gitssh.command(user.login, repo.id, "git config user.name '%s'" % user.login)
+	gitssh.command(user.login, repo.id, "git config user.email %s" % user.email)
+	gitssh.command(user.login, repo.id, "git add .")
+	gitssh.command(user.login, repo.id, "git commit -a -m 'initial commit'")
+	gitssh.command(user.login, repo.id, "git push -u origin master")
+
 def mkrepo_for_riurik(user):
 	repo_name = gen_repo_name(user.login)
 	log.debug("create the '%s' repo for the '%s' user" % (repo_name, user.login))
 	repo = create_repo(user, repo_name)
-	
-	key = ssh_key_gen(user)
-	log.debug('create a deploy key in the %s repo' % repo_name)
-	repo.create_key(key_title, key)
-
+	create_deploy_key(user, repo)
 	return repo
+	
+def create_deploy_key(user, repo):
+	key = ssh_key_gen(user)
+	log.debug('create a deploy key in the %s repo' % repo.name)
+	repo.create_key(key_title, key)
 
 def get_abspath(path=None):
 	home = get_repos_root()
