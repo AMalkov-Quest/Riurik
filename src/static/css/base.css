@@ -1,6 +1,11 @@
-form {
-margin: 0 0 0 0;
+.agree {
+	margin-bottom: 0px; 
 }
+
+form {
+	margin: 0 0 0 0;
+}
+
 .header {
 	background: url(/static/img/head_bg.png);
 	height: 30px;

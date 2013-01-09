@@ -5,7 +5,7 @@
 
 	<script type="text/javascript">
 	jQuery(function ($) {
-		OSX.modal();
+		$('#github-dialogs').modal();
 	});
 
 	function InitRepo() {
@@ -17,18 +17,23 @@
 
 {% block body %}
 {{ block.super }}
-<div id="github-dialogs" align="left">
-	<p>Hello <b>{{ login }}</b>! And Welcome!</p>
-	<p>You've successfully authorized the Riurik framework on GitHub. Please create public repositry there, refresh this page and select this repository.  
+<div id="github-dialogs" align="left" class="modal hide fade" tabindex="-1" role="dialog" aria-hidden="true">
+	<div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h3>Hello {{ login }}</h3>
+    </div>
+	<div class="modal-body">
+		<p>You've successfully authorized the Riurik framework on GitHub. Please create public repositry there, refresh this page and select this repository.</p>
+	</div>	
 	{% if repos_list %}
-	<div align="right">
-		<select id="repos">
+	<div class="modal-footer">
+		<select id="repos" style="width: auto">
 			<option value="" selected>Select repository</option>
 			{% for repo in repos_list %}
 			<option value="{{ repo }}">{{ repo }}</option>
 			{% endfor %}
 		</select>
-		<input type=button class="agree" onClick="javascript:InitRepo()" value="OK">
+		<input id="init_repo" type=button class="btn btn-primary" onClick="javascript:InitRepo()" value="OK">
 	</div>
 	{% endif %}
 </div>
