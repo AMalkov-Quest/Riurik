@@ -14,7 +14,8 @@
 	function LogInWithGithub(scope) {
 		var githref = '{{ githref }}';
 		window.location=githref + scope;
-	};
+        //window.location=githref + $('#scope').val();
+ 	};
 	</script>
 
 {% endblock %}
@@ -22,32 +23,30 @@
 {% block body %}
 {{ block.super }}
 
-<div id="github-dialogs" align="left" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="accessLevelsLabel" aria-hidden="true">
+<div id="github-dialogs" align="left" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="log-in-with-github" aria-hidden="true">
     <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-        <h3 id="accessLevelsLabel">Github access levels</h3>
+        <h3 id="log-in-with-github">Log in with Github</h3>
     </div>
     <div class="modal-body">
     	<p>{% trans "The Riurik framework does not provide any storage service. But it uses GitHub for it. Any artifacts those are going to be created here will be stored in your GitHub repository. So to start using Riurik it is necessary to login with your existing GitHub account. GitHub requires to specify level of access that you are agree to grant to Riurik over your account. We recommend to allow Riurik updating your public repository in order to automate creating and configuring it. But of course you can select another read-only option and do all the required actions manually." %}</p>
     </div>
 	<div class="modal-footer">
-        <!--
-		<select id="scope">
-			<option value="repo" selected>Update your public and private repositories</option>
-			<option value="public_repo">Update your public repositories</option>
-			<option value="">Read your public information</option>	
-		</select>
-        -->
         <div class="dropdown">
             <a class="dropdown-toggle" data-toggle="scope-dropdown" href="#">Select access level</a>
             <b class="caret"></b>
             <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
-                <li><a href="javascript:LogInWithGithub('repo')">Update your public and private repositories</a></li>
-                <li><a href="javascript:LogInWithGithub('public_repo')">Update your public repositories</a></li>
-                <li><a href="javascript:LogInWithGithub('')">Read your public information</a></li>
+                <li><a href="javascript:LogInWithGithub('')">I already have the repository created and configured</a></li>
+                <li><a href="javascript:LogInWithGithub('public_repo')">I would like to create new repository myself</a></li>
+                <li><a href="javascript:LogInWithGithub('repo')">Create new repository on my behalf</a></li>
             </ul>
         </div>
-        <!--<button class="btn btn-primary agree" onClick="javascript:LogInWithGithub()">OK</button>-->
+		<!--<select id="scope" style="width: auto">
+			<option value="" selected>I already have the repository created and configured</option>
+			<option value="public_repo">I would like to create new repository myself</option>
+			<option value="repo">Create new repository on my behalf</option>
+		</select>
+        <button id="agree" class="btn btn-primary" onClick="javascript:LogInWithGithub()">OK</button>-->
 	</div>
 </div>
 
