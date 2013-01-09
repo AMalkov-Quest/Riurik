@@ -1,5 +1,5 @@
 import os
-from github import Github
+from github import Github, GithubException
 import shlex
 from subprocess import Popen, PIPE
 from logger import log
@@ -30,16 +30,24 @@ def get_oauth_href(request):
 
 def get_keys(obj):
 	try:
+		log.debug('get keys of the %s repo' % obj.name)
 		keys = obj.get_keys()
-	except Exception, e:
+	except GithubException, e:
+		log.exception(e)
 		return []
 
 	return keys
 
 def get_deploy_key(repo):
-	for key in get_keys(repo):
-		if key_title == key.title and repo.description == repo_title:
-			return key
+	try:
+		for key in get_keys(repo):
+			if key_title == key.title:
+				return key
+
+	except GithubException, e:
+		log.exception(e)
+
+	log.debug('deploy key has not been found')
 
 def create_repo(user, name):
 	return user.create_repo(name, repo_title)	
