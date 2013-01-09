@@ -11,9 +11,9 @@
 		});		
 	});
 
-	function LogInWithGithub() {
+	function LogInWithGithub(scope) {
 		var githref = '{{ githref }}';
-		window.location=githref + $('#scope').val();
+		window.location=githref + scope;
 	};
 	</script>
 
@@ -31,12 +31,23 @@
     	<p>{% trans "The Riurik framework does not provide any storage service. But it uses GitHub for it. Any artifacts those are going to be created here will be stored in your GitHub repository. So to start using Riurik it is necessary to login with your existing GitHub account. GitHub requires to specify level of access that you are agree to grant to Riurik over your account. We recommend to allow Riurik updating your public repository in order to automate creating and configuring it. But of course you can select another read-only option and do all the required actions manually." %}</p>
     </div>
 	<div class="modal-footer">
+        <!--
 		<select id="scope">
 			<option value="repo" selected>Update your public and private repositories</option>
 			<option value="public_repo">Update your public repositories</option>
 			<option value="">Read your public information</option>	
 		</select>
-        <button class="btn btn-primary agree" onClick="javascript:LogInWithGithub()">OK</button>
+        -->
+        <div class="dropdown">
+            <a class="dropdown-toggle" data-toggle="scope-dropdown" href="#">Select access level</a>
+            <b class="caret"></b>
+            <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+                <li><a href="javascript:LogInWithGithub('repo')">Update your public and private repositories</a></li>
+                <li><a href="javascript:LogInWithGithub('public_repo')">Update your public repositories</a></li>
+                <li><a href="javascript:LogInWithGithub('')">Read your public information</a></li>
+            </ul>
+        </div>
+        <!--<button class="btn btn-primary agree" onClick="javascript:LogInWithGithub()">OK</button>-->
 	</div>
 </div>
 
