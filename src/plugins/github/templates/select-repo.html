@@ -6,11 +6,9 @@
 	<script type="text/javascript">
 	jQuery(function ($) {
 		$('#github-dialogs').modal();
+		$('.dropdown-toggle').dropdown();
 	});
 
-	function InitRepo() {
-		window.location='/github/initrepo?title=' + $('#repos').val();
-	};
 	</script>
 
 {% endblock %}
@@ -23,17 +21,17 @@
         <h3>Hello {{ login }}</h3>
     </div>
 	<div class="modal-body">
-		<p>You've successfully authorized the Riurik framework on GitHub. Please create public repositry there, refresh this page and select this repository.</p>
+		<p>You've successfully authorized the Riurik framework on GitHub. Please create public repository there, refresh this page and select this repository.</p>
 	</div>	
 	{% if repos_list %}
 	<div class="modal-footer">
-		<select id="repos" style="width: auto">
-			<option value="" selected>Select repository</option>
-			{% for repo in repos_list %}
-			<option value="{{ repo }}">{{ repo }}</option>
-			{% endfor %}
-		</select>
-		<input id="init_repo" type=button class="btn btn-primary" onClick="javascript:InitRepo()" value="OK">
+        <div class="dropdown" id="repos" style="text-align:left;">
+			<a class="dropdown-toggle" data-toggle="scope-dropdown" href="#">Select repository <b class="caret"></b></a>
+		    <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">														{% for repo in repos_list %}
+		          <li><a href="/github/initrepo?title={{ repo }}">{{ repo }}</a></li>
+		          {% endfor %}   
+		    </ul>              
+		</div>
 	</div>
 	{% endif %}
 </div>
