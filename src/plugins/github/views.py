@@ -73,6 +73,10 @@ def login(request):
 
 	return HttpResponseRedirect('/')
 
+def logout(request):
+	request.session.flush()
+	return HttpResponseRedirect('/')
+
 def authorized(request):
 	token, login, repoid = get_auth(request)
 	return login
