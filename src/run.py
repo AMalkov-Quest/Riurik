@@ -6,6 +6,7 @@ import context, settings, contrib
 import coffeescript, cucumber
 import dir_index_tools
 from logger import log
+import plugins.engines.engine as engine
 
 @add_request_handler
 @error_handler
@@ -30,14 +31,9 @@ def test(request, RequestHandler):
 	if coffee(path):
 		path = coffeescript.compile2js(test_content, path, fullpath)
 
-	engine = 'qunit'
-	if cucumber.cucumber(path, ctx):
-		engine = 'cucumber'
-		if path.endswith(settings.CUCUMBER_FILE_EXT):
-			path = cucumber.compile2js(path, fullpath)
-
+	engine_type = engine.engage4test(path, fullpath, ctx)
 	testLoaderUrl = ctx.get('test_loader_url', settings.EXEC_TESTS_CMD)
-	url = "http://%s/%s?server=%s&engine=%s&path=/%s" % (target, testLoaderUrl, server, engine, path)
+	url = "http://%s/%s?server=%s&engine=%s&path=/%s" % (target, testLoaderUrl, server, engine_type, path)
 	log.info("redirect to run test %s" % url)
 	return HttpResponseRedirect(url)
 
@@ -59,25 +55,11 @@ def suite(request, RequestHandler):
 
 	saveLocalContext(fullpath, contextjs)
 
-	engine = 'qunit'
-	if cucumber.cucumber(path, ctx):
-		engine = 'cucumber'
-		compileSuiteCucumber(path, fullpath)
-
+	engine_type = engine.engage4suite(path, fullpath, ctx)
 	testLoaderUrl = ctx.get('test_loader_url', settings.EXEC_TESTS_CMD)
-	url = "http://%s/%s?server=%s&engine=%s&path=/%s" % ( target, testLoaderUrl, server, engine, path )
+	url = "http://%s/%s?server=%s&engine=%s&path=/%s" % ( target, testLoaderUrl, server, engine_type, path )
 	log.info("redirect to run suite %s" % url)
 	return HttpResponseRedirect( url )
-
-def compileSuiteCucumber(path, suite_path):
-	features = contrib.enum_files_in_folders(
-			suite_path,
-			lambda file_: not file_.endswith(settings.CUCUMBER_FILE_EXT)
-	)
-	for feature in features:
-		fullpath = testFullPath(suite_path, feature)
-		log.debug('compile %s' % fullpath)
-		cucumber.compile2js(path, fullpath)
 
 def compileSuiteCoffee(path, suite_path):
 	contrib.cleandir(suite_path, '.*.js')
@@ -86,11 +68,8 @@ def compileSuiteCoffee(path, suite_path):
 			lambda file_: not file_.endswith(settings.COFFEE_FILE_EXT)
 	)
 	for test in tests:
-		fullpath = testFullPath(suite_path, test)
+		fullpath = contrib.testFullPath(suite_path, test)
 		coffeescript.compile2js(None, None, fullpath)
-
-def testFullPath(suite_path, test):
-	return os.path.join(suite_path, test)
 
 def coffee(path):
 	return path.endswith('.coffee')

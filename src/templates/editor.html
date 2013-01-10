@@ -31,7 +31,7 @@
                     } 
                 };
                 var source_value = editor.getValue();
-                var ConfirmDiscardchanges = function(){
+				var ConfirmDiscardchanges = function(){
                         var new_value = editor.getValue();
                         if ( new_value == source_value ) {
                             return true
@@ -196,7 +196,7 @@
         <input type="hidden" name="url" value="{{ request.path }}" />
         <input type="hidden" name="context" value="default" />
         <textarea name="content" style="display:none;"></textarea>
-        <div id='code'>{{ content|safe|default:"" }}</div>
+        <div id='code'>{{ content|default:"" }}</div>
         </form>
     {% if is_stubbed %}
         <pre>{{ content }}</pre>

@@ -70,9 +70,9 @@ TEMPLATE_LOADERS = (
     'django.template.loaders.app_directories.Loader',
 #     'django.template.loaders.eggs.load_template_source',
 )
-SESSION_ENGINE = 'django.contrib.sessions.backends.file'
-SESSION_FILE_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'sessions'))
-#SESSION_ENGINE = "django.contrib.sessions.backends.cache"
+#SESSION_ENGINE = 'django.contrib.sessions.backends.file'
+#SESSION_FILE_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'sessions'))
+SESSION_ENGINE = "django.contrib.sessions.backends.cache"
 CACHE_BACKEND = 'locmem://'
 CACHE_MIDDLEWARE_ANONYMOUS_ONLY = False
 CACHE_MIDDLEWARE_SECONDS = 600
@@ -145,7 +145,7 @@ PRODUCT_CODE_ALIAS = 'product_code_alias'
 STATIC_MANAGEMENT_ASSET_PATHS = []
 STATIC_MANAGEMENT_HOSTNAMES = ['http://www.riurik.com']
 STATIC_MANAGEMENT_VERSIONER = 'plugins.static_management.versioners.SHA1Sum'
-STATIC_MANAGEMENT = {
+QUNIT_STATIC_MANAGEMENT = {
     'js': {
         'qunit.testLoader.js': [
             'js/jquery.min.js',
@@ -182,6 +182,51 @@ CUC_STATIC_MANAGEMENT = {
             'js/errors.js',
             'engines/cucumber/connector.js',
             'engines/cucumber/cucumber.js',
+        ]
+    },
+    'css': {
+        
+    }
+}
+
+STATIC_MANAGEMENT = {
+    'js': {
+        'mocha.testLoader.js': [
+            'js/jquery.min.js',
+            'js/jquery.json.min.js',
+            'js/dates.js',
+            'js/tools.js',
+            'js/riurik.js',
+            'js/consoles.js',
+            'js/reporting.js',
+            'js/frame.js',
+            'js/errors.js',
+            'engines/mocha/connector.js',
+            'engines/mocha/mocha.html.js',
+            'engines/mocha/mocha.js',
+            'engines/mocha/expect.js',
+        ]
+    },
+    'css': {
+        
+    }
+}
+
+JA_STATIC_MANAGEMENT = {
+    'js': {
+        'jasmine.testLoader.js': [
+            'js/jquery.min.js',
+            'js/jquery.json.min.js',
+            'js/dates.js',
+            'js/tools.js',
+            'js/riurik.js',
+            'js/consoles.js',
+            'js/reporting.js',
+            'js/frame.js',
+            'js/errors.js',
+            'engines/jasmine/connector.js',
+            'engines/jasmine/jasmine.js',
+            'engines/jasmine/jasmine-html.js',
         ]
     },
     'css': {
