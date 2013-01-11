@@ -9,6 +9,10 @@ a.disabled {
 	color: grey;
 }
 
+.content {
+	position: inherit;
+}
+
 #code {
     width: 90%;
     min-height: 70%;
