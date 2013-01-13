@@ -51,7 +51,8 @@
                 $('#discard').click(function(){ if ( ConfirmDiscardchanges() ) document.location=document.location;});
                 $('#close').click(function(){ if ( ConfirmDiscardchanges() ) document.location='{{ request.path|above }}';});
 			{% else %}
-				window.editor.setReadOnly(true)	
+				window.editor.setReadOnly(true);	
+				$('#close').click(function(){ document.location='{{ request.path|above }}';});
             {% endif %}
     
           $('#run').click(function(){ 
@@ -156,8 +157,12 @@
 {% endblock %}
 
 {% block controls %}
+	<ul class="horizontal-menu">
+        {% if contexts %}
+        <li><a id="run" href="javascript:void(0);">{% trans "Run" %}</a>
+        at <select name="context">{% for item in contexts %}<option value='{{item}}'{% if forloop.first %} selected="selected"{% endif %}>{{item}}</option>{% endfor %}</select></li>
+        {% endif %}
     {% if not read_only %}
-    <ul class="horizontal-menu">
         {% ifequal filetype 'test'  %}
             {% block context-controls %}
             {% if contexts %}
@@ -177,18 +182,13 @@
         {% endifequal %}
         
         <li><a id="save" href="javascript:void(0);">{% trans "Save" %}</a></li>
-        <li><a id="close" href="javascript: void(0);">{% trans "Close" %}</a></li>
     </ul>
     {% endif %}
 	{% if stubbed %}
-    <ul class="horizontal-menu">
-        {% if contexts %}
-        <li><a id="run" href="javascript:void(0);">{% trans "Run" %}</a>
-        at <select name="context">{% for item in contexts %}<option value='{{item}}'{% if forloop.first %} selected="selected"{% endif %}>{{item}}</option>{% endfor %}</select></li>
-        {% endif %}
         <li><a id="unstub" href="javascript:void(0);">{% trans "Get control" %}</a></li>
-    </ul>
     {% endif %}
+	<li><a id="close" href="javascript: void(0);">{% trans "Close" %}</a></li>
+	</ul>
 {% endblock controls %}
 
 {% block title %}<p class="breadcrumbs">{{ request.path|breadcrumbs:filetype }}</p>{% endblock title %}
