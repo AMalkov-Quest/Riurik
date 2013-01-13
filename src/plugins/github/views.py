@@ -173,6 +173,11 @@ class GitFronPageHandler(serving.DefaultHandler):
 		descriptor['githref'] = gitware.get_oauth_href(request)
 		return descriptor
 
+	def get_file_content_to_edit(self, fullpath, stubbed):
+		descriptor = super(GitFronPageHandler, self).get_file_content_to_edit(fullpath, stubbed)
+		descriptor['read_only'] = True
+		return descriptor
+
 class GitInitHandler(GitHandler):
 
 	def serve(self, request):
