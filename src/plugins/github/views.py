@@ -1,8 +1,8 @@
 # coding: utf-8
 
 from django.shortcuts import render_to_response as _render_to_response
-from django.template import Context
 from django.http import HttpResponseRedirect, HttpResponse
+from django.template import loader, RequestContext, Context, Template, TemplateDoesNotExist
 import settings
 import httplib, urllib, json
 from logger import log
@@ -155,24 +155,23 @@ class GitHandler(serving.BaseHandler):
 	def get_virtual_root(self):
 		return '' 
 
-class GitFronPageHandler(GitHandler):
+class GitFronPageHandler(serving.DefaultHandler):
 
-	def __init__(self, request, path, time):
-		pass
+	def load_index_template(self):
+		try:
+			t = loader.select_template(['git-front-page.html'])
+		except TemplateDoesNotExist:
+			t = Template(
+				django.views.static.DEFAULT_DIRECTORY_INDEX_TEMPLATE,
+				name='Default directory index template')
 
-	def serve(self, request):
-		log.debug('show git front page')
-		descriptor = Context({
-			'directory' : '/',
-			'type'		: 'front-page',
-			'file_list' : [],
-			'dir_list'  : [],
-			'contexts'  : [],
-			'favicon'   : None,
-			'spec'      : None,
-			'githref'   : gitware.get_oauth_href(request),
-		})
-		return _render_to_response('git-front-page.html', descriptor)
+		return t
+
+	def get_dir_index(self, document_root, fullpath, request):
+		descriptor = super(GitFronPageHandler, self).get_dir_index(document_root, fullpath, request)
+		descriptor['type'] = 'front-page'
+		descriptor['githref'] = gitware.get_oauth_href(request)
+		return descriptor
 
 class GitInitHandler(GitHandler):
 

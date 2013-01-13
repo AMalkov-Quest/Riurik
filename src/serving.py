@@ -89,7 +89,7 @@ class BaseHandler(object):
 			if request.path and request.path[-1:] != '/':
 				return HttpResponseRedirect(request.path + '/')
 
-			template = load_index_template()
+			template = self.load_index_template()
 			descriptor = self.get_dir_index(document_root, fullpath, request)
 			return HttpResponse(template.render(descriptor))
 	
@@ -106,6 +106,16 @@ class BaseHandler(object):
 			return _render_to_response('editor.html', descriptor, context_instance=RequestContext(request))
 
 		return get_file_content(fullpath)
+
+	def load_index_template(self):
+		try:
+			t = loader.select_template(['directory-index.html', 'directory-index'])
+		except TemplateDoesNotExist:
+			t = Template(
+				django.views.static.DEFAULT_DIRECTORY_INDEX_TEMPLATE,
+				name='Default directory index template')
+
+		return t
 
 	def get_file_content_to_edit(self, fullpath, stubbed):
 		try:
@@ -249,13 +259,3 @@ def get_file_content(fullpath):
 		response["Content-Encoding"] = encoding
 
 	return response
-
-def load_index_template():
-	try:
-		t = loader.select_template(['directory-index.html', 'directory-index'])
-	except TemplateDoesNotExist:
-		t = Template(
-				django.views.static.DEFAULT_DIRECTORY_INDEX_TEMPLATE,
-				name='Default directory index template')
-
-	return t
