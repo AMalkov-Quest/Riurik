@@ -5,7 +5,7 @@
 			var url = path;
 			var regex = new RegExp('^http[s]?://[a-zA-Z0-9]');
 			if(!regex.test(url)) {
-				url = 'http://' + context.host + ':' + context.port + '/' + path;
+				url = 'http://' + riurik.context.host + ':' + riurik.context.port + '/' + path;
 			}
 			window.frame.location = url;
 
@@ -80,7 +80,7 @@
 			$.waitFor.condition( jQueryIsLoaded, 6000 )
 			.then(done, function() {
 				console.log('load jQuery into frame');
-				riurikldr.LoadScript( riurik.src.jquery, done, _frame.document );				
+				riurik.LoadScript( riurik.src.jquery, done, _frame.document );				
 			});
 		},
 
