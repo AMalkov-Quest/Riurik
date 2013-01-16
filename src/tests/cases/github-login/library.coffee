@@ -1,5 +1,5 @@
 mkrepo = (title)->
-    $.ajax $.URI(context, 'github/mkrepo'),
+    $.ajax $.URI( $R.context, 'github/mkrepo' ),
         type: 'GET'
         async: false
         data: { 'title': title }
@@ -7,7 +7,7 @@ mkrepo = (title)->
             riurik.log "repository '#{title}' is created"
             
 delrepo = (title)->
-    $.ajax $.URI(context, 'github/delrepo'),
+    $.ajax $.URI( $R.context, 'github/delrepo' ),
         type: 'GET'
         async: false
         data: { 'title': title }
@@ -15,7 +15,7 @@ delrepo = (title)->
             riurik.log "repository '#{title}' is deleted"
             
 logout = ->
-    $.ajax $.URI(context, 'github/logout'),
+    $.ajax $.URI( $R.context, 'github/logout' ),
         type: 'GET'
         async: false
         success: (data)=>
