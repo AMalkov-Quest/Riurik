@@ -104,6 +104,7 @@ String.prototype.strip = function(c) {
    should be defined in testsLoader.html
 */
 //var riurik = {}
+window.$R = riurik;
 
 /* Namespace for exposing api in the jQuery namespace */
 riurik.exports = {}
@@ -935,7 +936,12 @@ riurik.engine.run_tests = function() {
 };
 
 riurik.engine.config = function() {
-    mocha.setup('bdd');
+    //mocha.setup('bdd');
+	mocha.setup({
+		ui: 'bdd',
+		globals: ['hasCert'],	// switch off the global leak detection mechanism
+		timeout: 10000			// the test-case timeout
+	});
 };
 
 riurik.matchers.pass = function(message) {

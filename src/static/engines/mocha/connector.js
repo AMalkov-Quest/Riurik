@@ -16,7 +16,12 @@ riurik.engine.run_tests = function() {
 };
 
 riurik.engine.config = function() {
-    mocha.setup('bdd');
+    //mocha.setup('bdd');
+	mocha.setup({
+		ui: 'bdd',
+		globals: ['hasCert'],	// switch off the global leak detection mechanism
+		timeout: 10000			// the test-case timeout
+	});
 };
 
 riurik.matchers.pass = function(message) {
