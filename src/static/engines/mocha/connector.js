@@ -22,6 +22,14 @@ riurik.engine.config = function() {
 		globals: ['hasCert'],	// switch off the global leak detection mechanism
 		timeout: 10000			// the test-case timeout
 	});
+	
+	// extend expect.js with custome asserts
+	expect.Assertion.prototype.visible = function () {
+		this.assert(
+		this.obj.is(':visible')
+		, function(){ return 'expected ' + expect.i(this.obj) + ' to be visible' }
+		, function(){ return 'expected ' + expect.i(this.obj) + ' to be invisible' });
+	};
 };
 
 riurik.matchers.pass = function(message) {

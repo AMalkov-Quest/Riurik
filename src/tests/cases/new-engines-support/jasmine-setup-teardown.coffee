@@ -1,6 +1,9 @@
 describe "A spec (with setup and tear-down)", ->
   foo = null
 
+  beforeAll ->
+    foo = 0
+  
   beforeEach ->
     foo = 0
     foo += 1

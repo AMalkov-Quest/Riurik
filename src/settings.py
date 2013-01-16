@@ -189,7 +189,7 @@ cucumberSTATIC_MANAGEMENT = {
     }
 }
 
-mochaSTATIC_MANAGEMENT = {
+STATIC_MANAGEMENT = {
     'js': {
         'mocha.testLoader.js': [
             'js/jquery.min.js',
