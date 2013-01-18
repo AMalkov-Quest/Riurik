@@ -104,6 +104,7 @@ String.prototype.strip = function(c) {
    should be defined in testsLoader.html
 */
 //var riurik = {}
+window.$R = riurik;
 
 /* Namespace for exposing api in the jQuery namespace */
 riurik.exports = {}

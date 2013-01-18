@@ -32,7 +32,17 @@ asyncTest('open file first time ', function(){
 asyncTest('open file second time ', function() {
   emulateAnotherSession(context._$);
   $.when( frame.go( context.URL ) ).then(function(_$) {
-    ok( _$('#code').length === 0, 'editor is not exists');
+    ok( frame.window().editor.getReadOnly() );
+      
+    ok( _$('#code').length === 1, 'editor should exists');
+    ok( _$('#run').length === 1, 'the Run button should be' );
+    ok( _$('#unstub').length === 1, 'the Get Control button should be' );
+    ok( _$('#close').length === 1, 'the Close button should be' );
+    
+    ok( _$('#context-preview-ctrl').length === 0, 'the Context button should not be shown' );
+    ok( _$('#spec-link').length === 0, 'the Spec button should not be shown' );
+    ok( _$('#save').length === 0, 'the Save button should not be shown' );
+    
     restorePreviousSession(_$);
 
     start();

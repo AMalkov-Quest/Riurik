@@ -5,7 +5,7 @@ QUnit.setup(function() {
   QUnit.log(context.URL);
   var content = '[' + context.suite + ']';
   context.suites_list = '';
-  
+
   $.each(context.suites, function(i, value) {
     create_suite(value, context.root, content);
   });
