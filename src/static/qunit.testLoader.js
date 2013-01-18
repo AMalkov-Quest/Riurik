@@ -995,6 +995,7 @@ riurik.engine.config = function() {
 	}
 
 	QUnit.moduleStart = function(module) {
+		window.context = clone(riurik.context);
 		riurik.trigger("riurik.tests.suite.start", module.name);
 	}
 
