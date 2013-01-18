@@ -1,7 +1,6 @@
 module 'first login'
 
 asyncTest 'setup', ->
-    context.login_url = "https://github.com/login/oauth/authorize?client_id=cea1f31118f8468d79d8&redirect_url=http://www.riurik.com/github/login&scope="
     $.when( frame.go( 'github/logout' ) ).then ->
         $.when( frame.go( '' ) ).then ->
             $.waitFor.condition( -> _$('div#github-dialogs' ).is(':visible') ).then ->
@@ -24,7 +23,7 @@ asyncTest 'should show github authorization dialog', ->
     _$('a.dropdown-toggle').click()
     
 asyncTest 'should propose to create repository', ->
-    $.when( frame.go( 'github/signin?login=a-ceceron&password=MurES@sab53' ) ).then ->
+    $.when( frame.go( context.signin_url ) ).then ->
         $.waitFor.condition( -> _$('div#github-dialogs' ).is(':visible') ).then ->
             ok not _$('a.dropdown-toggle').is(':visible')
             start()
@@ -32,7 +31,7 @@ asyncTest 'should propose to create repository', ->
 asyncTest 'should show created repository in the list', ->
     repo_title = 'riurik-tests'
     mkrepo repo_title
-    $.when( frame.go( 'github/signin?login=a-ceceron&password=MurES@sab53' ) ).then ->
+    $.when( frame.go( context.signin_url ) ).then ->
         $.waitFor.condition( -> _$('div#github-dialogs' ).is(':visible') ).then ->
             _$('a.dropdown-toggle').click()
             

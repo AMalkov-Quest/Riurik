@@ -100,13 +100,13 @@ String.prototype.strip = function(c) {
 };
 
 /* Begin: riurik.js */
-/* Top level namespace for Riurik */
-var riurik = {}
+/* Top level namespace for Riurik
+   should be defined in testsLoader.html
+*/
+//var riurik = {}
 
 /* Namespace for exposing api in the jQuery namespace */
 riurik.exports = {}
-
-jQuery.extend(true, riurik, riurikldr);
 
 riurik.trigger = function(event){
 	var args = $.makeArray( arguments ).slice(1);
@@ -128,10 +128,7 @@ riurik.on( "riurik.engine.loaded", function(){
 
 riurik.init = function() {
 	riurik.trigger( "riurik.initing" );
-
-	riurik.context = clone(context);
 	riurik.onerror();
-
 	riurik.trigger( "riurik.inited" );
 }
 
@@ -153,7 +150,6 @@ riurik.on("riurik.tests.end", function(){
 });
 
 riurik.on("riurik.tests.suite.start", function(e, suite){
-	context = clone(riurik.context)
 	riurik.log("Suite '"+suite+"' started");
 });
 
@@ -172,37 +168,37 @@ riurik.on("riurik.tests.test.done", function(e, test){
 riurik.load_tests = function(){
 	riurik.trigger( "riurik.tests.loading" );
 	console.log( "riurik.tests.loading" );
-	if ( typeof window.context == 'undefined' ) {
-		alert('context should be preliminary loaded');
+	if ( typeof riurik.context == 'undefined' ) {
+		alert('Riurik context should be preliminary loaded');
 		return;
 	}
 
-	var l = riurikldr.loader();
-	$.each(context.libraries || [],function(i,url){
+	var l = riurik.loader();
+	$.each( riurik.context.libraries || [], function(i,url){
 		l.queue( '/' + url, function(){ 
 			riurik.trigger("riurik.tests.library.loaded", '/'+url);
 		});
  	});
 	
-	if ( /\.js$/.test(riurikldr.args.path) ) {
-		l.queue(riurikldr.args.path, function(){ 
-			riurik.trigger("riurik.tests.test.loaded", riurikldr.args.path);
+	if ( /\.js$/.test(riurik.args.path) ) {
+		l.queue(riurik.args.path, function(){ 
+			riurik.trigger("riurik.tests.test.loaded", riurik.args.path);
 		});
 	} else {
-		if(typeof context.suite_setup != 'undefined'){
-			l.queue( riurikldr.args.cwd + '/' + context.suite_setup, function(){ 
-				riurik.trigger("riurik.tests.suite_setup.loaded", riurikldr.args.cwd+'/'+context.suite_setup);
+		if(typeof riurik.context.suite_setup != 'undefined'){
+			l.queue( riurik.args.cwd + '/' + riurik.context.suite_setup, function(){ 
+				riurik.trigger("riurik.tests.suite_setup.loaded", riurik.args.cwd+'/'+riurik.context.suite_setup);
 			});
 		}
-		$.each(context.include || [],function(i,url){
-			l.queue( riurikldr.args.cwd + '/' + url, function(){
-				riurik.trigger("riurik.tests.include.loaded", riurikldr.args.cwd+'/'+url);
+		$.each(riurik.context.include || [],function(i,url){
+			l.queue( riurik.args.cwd + '/' + url, function(){
+				riurik.trigger("riurik.tests.include.loaded", riurik.args.cwd+'/'+url);
 			});
 		});
 	};
 	l.then(function(){
 		console.log('tests load time:');
-		console.log((new Date() - riurikldr.start)/1000);
+		console.log((new Date() - riurik.start)/1000);
 
 		riurik.engine.run_tests();
 	});
@@ -444,7 +440,7 @@ riurik.Waits.prototype.fail = function(callback) {
  * The context.timeout value is used in order to provide generic way to
  * manage timeouts in tests.
  * */
-riurik.exports.waitFor = new riurik.Waits(context.timeout, context.check_every);
+riurik.exports.waitFor = new riurik.Waits(riurik.context.timeout, riurik.context.check_every);
 
 //this should be done in appropriate engine
 //$.extend(riurik.exports);
@@ -567,7 +563,7 @@ riurik.reporter = {}
 
 riurik.reporter.url = riurik.BuildHttpUri('/report_callback/');
 //riurik.reporter.date = formatDate(new Date(), 'yyyy-MM-dd-HH-mm-ss');
-riurik.reporter.date = context.test_start_time; 
+riurik.reporter.date = riurik.context.test_start_time; 
 riurik.reporter.target_tests_path = riurik.args.path;
 riurik.reporter.state = 'begin';
 riurik.reporter.testNum = 0;
@@ -774,7 +770,7 @@ riurik.on("riurik.tests.test.done", riurik.reporter.testDone);
 			var url = path;
 			var regex = new RegExp('^http[s]?://[a-zA-Z0-9]');
 			if(!regex.test(url)) {
-				url = 'http://' + context.host + ':' + context.port + '/' + path;
+				url = 'http://' + riurik.context.host + ':' + riurik.context.port + '/' + path;
 			}
 			window.frame.location = url;
 
@@ -849,7 +845,7 @@ riurik.on("riurik.tests.test.done", riurik.reporter.testDone);
 			$.waitFor.condition( jQueryIsLoaded, 6000 )
 			.then(done, function() {
 				console.log('load jQuery into frame');
-				riurikldr.LoadScript( riurik.src.jquery, done, _frame.document );				
+				riurik.LoadScript( riurik.src.jquery, done, _frame.document );				
 			});
 		},
 
@@ -891,7 +887,8 @@ riurik.on("riurik.tests.test.done", riurik.reporter.testDone);
 riurik.onErrorHandler = function(msg, url, line) {
 	riurik.log("error(" + url + ": " +  line + "): " + msg);
 	riurik.trigger( "riurik.error", msg, url, line );
-	return true;
+	// return false here to see error message in the console
+	return false;
 };
 
 riurik.ajaxError = function(event, jqXHR, ajaxSettings, exception) { 
@@ -924,7 +921,7 @@ riurik.engine = {}
 
 riurik.engine.init = function( next ){
 	riurik.trigger( "riurik.engine.initing" );
-	
+	window.context = clone(riurik.context);
 	riurik.engine.config();
 	riurik.trigger( "riurik.engine.inited" );
 	load_remote_style('/static/engines/qunit/qunit.css');
@@ -998,6 +995,7 @@ riurik.engine.config = function() {
 	}
 
 	QUnit.moduleStart = function(module) {
+		window.context = clone(riurik.context);
 		riurik.trigger("riurik.tests.suite.start", module.name);
 	}
 

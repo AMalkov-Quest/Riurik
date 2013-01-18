@@ -2,7 +2,7 @@ riurik.reporter = {}
 
 riurik.reporter.url = riurik.BuildHttpUri('/report_callback/');
 //riurik.reporter.date = formatDate(new Date(), 'yyyy-MM-dd-HH-mm-ss');
-riurik.reporter.date = context.test_start_time; 
+riurik.reporter.date = riurik.context.test_start_time; 
 riurik.reporter.target_tests_path = riurik.args.path;
 riurik.reporter.state = 'begin';
 riurik.reporter.testNum = 0;

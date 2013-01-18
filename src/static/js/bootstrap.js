@@ -2,11 +2,11 @@ if ( typeof console == 'undefined' || typeof console.log == 'undefined' ) {
 	var console = { log: function(){} };
 }
 
-riurikldr.LoadScript = function(scriptName, callback, target){
+riurik.LoadScript = function(scriptName, callback, target) {
 	if( typeof target == 'undefined') {
 		target = document;
 	}
-	var url = riurikldr.BuildHttpUri( scriptName );
+	var url = riurik.BuildHttpUri( scriptName );
 	var script = target.createElement( 'script' );
 	script.type = 'text/javascript';
 	script.src = url + '?_=' + Math.random().toString();
@@ -33,7 +33,7 @@ riurikldr.LoadScript = function(scriptName, callback, target){
 	target.body.appendChild( script );
 };
 
-riurikldr.loader = function() {
+riurik.loader = function() {
 	var queue = [];
 	var callbacks = [];
 	var running = false;
@@ -41,7 +41,7 @@ riurikldr.loader = function() {
 		running = true;
 		if ( queue.length > 0 ) {
 			var task = queue.shift();
-			riurikldr.LoadScript( 
+			riurik.LoadScript( 
 				task.url, 
 				function(){
 					if ( typeof task.callback == 'function' ) 
@@ -78,16 +78,16 @@ var load_remote_style = function(url){
 	var style = document.createElement( 'link' );
 	style.type = 'text/css';
 	style.rel = 'stylesheet';
-	style.href = riurikldr.BuildHttpUri(url)+'?_='+Math.random().toString();
+	style.href = riurik.BuildHttpUri(url)+'?_='+Math.random().toString();
 	document.body.appendChild( style );
 };
 
-riurikldr.loader().queue(riurikldr.args.cwd + '/.context.js', function(){
-	riurikldr.start = new Date();
-	document.title = /\/([^\/]*)\/*$/.exec(riurikldr.args.path)[1];
-	var engine = riurikldr.TryGetArgument('engine') || 'qunit';
+riurik.loader().queue(riurik.args.cwd + '/.context.js', function(){
+	riurik.start = new Date();
+	document.title = /\/([^\/]*)\/*$/.exec(riurik.args.path)[1];
+	var engine = riurik.TryGetArgument('engine') || 'qunit';
 
-	riurikldr.loader()
+	riurik.loader()
 	.queue('/static/'+engine+'.testLoader.js')
 	.then(function() {
 		riurik.engine.init(function(){
@@ -96,7 +96,7 @@ riurikldr.loader().queue(riurikldr.args.cwd + '/.context.js', function(){
 			$('#gif-loader').hide();
 
 			console.log('riurik load time:');
-			console.log((new Date() - riurikldr.start)/1000);
+			console.log((new Date() - riurik.start)/1000);
 		});
 	});
 

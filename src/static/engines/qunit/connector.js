@@ -2,7 +2,7 @@ riurik.engine = {}
 
 riurik.engine.init = function( next ){
 	riurik.trigger( "riurik.engine.initing" );
-	
+	window.context = clone(riurik.context);
 	riurik.engine.config();
 	riurik.trigger( "riurik.engine.inited" );
 	load_remote_style('/static/engines/qunit/qunit.css');
@@ -76,6 +76,7 @@ riurik.engine.config = function() {
 	}
 
 	QUnit.moduleStart = function(module) {
+		window.context = clone(riurik.context);
 		riurik.trigger("riurik.tests.suite.start", module.name);
 	}
 

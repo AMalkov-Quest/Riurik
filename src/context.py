@@ -28,7 +28,7 @@ def get_URL(instance, resolve=False):
 def render(RequestHandler, ctx, riurik_url, ctxname):
 	ctxitems = patch(RequestHandler, ctx, riurik_url, ctxname)
 	t = Template("""{% load json_tags %}
-		var context = {
+		riurik.context = {
 			{% for option in options %}
 				{{ option.0 }}: {{ option.1|tojson }}{% if not forloop.last %},{% endif %}
 			{% endfor %}
