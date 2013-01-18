@@ -114,8 +114,8 @@
 		<div class="line">
 			{% block content %}
 			<div id="dir-index-id" class="dir-index" style="width:500px;">
+				<br>
 	        	<ul>
-	        		<li></li>
 	        		{% for f in dir_list %}
 	        		<li id="{{ f.title|strip:'/' }}" class="{{ f.type }}" title="{{ f.title|strip:'/' }}">
 						<a href="{{ f.title }}">{{ f.title|strip:'/' }}</a>
