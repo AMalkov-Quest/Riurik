@@ -166,8 +166,6 @@
         {% ifequal filetype 'test'  %}
             {% block context-controls %}
             {% if contexts %}
-                <li><a id="run" href="javascript:void(0);">{% trans "Run" %}</a><select name="context">{% for item in contexts %}<option value='{{item}}'{% if forloop.first %} selected="selected"{% endif %}>{{item}}</option>{% endfor %}</select></li>
-        
                 {% block context-btn %}
                 <li><a id="context-preview-ctrl" href=".context.ini" rel='context-preview'>{% trans "Context" %}</a></li>
                 {% endblock context-btn %}
@@ -182,7 +180,6 @@
         {% endifequal %}
         
         <li><a id="save" href="javascript:void(0);">{% trans "Save" %}</a></li>
-    </ul>
     {% endif %}
 	{% if stubbed %}
         <li><a id="unstub" href="javascript:void(0);">{% trans "Get control" %}</a></li>
