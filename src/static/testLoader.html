@@ -4,30 +4,30 @@
 		<title></title>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 		<script type="text/javascript">
-			//Bootstrap namespace for Riurik
-			var riurikldr = {};
+			/* Top level namespace for Riurik */
+			var riurik = {};
 
-			riurikldr.src = {};
-			riurikldr.src.jquery = '/static/js/jquery.min.js';
-			riurikldr.src.bootstrap = '/static/js/bootstrap.js';
+			riurik.src = {};
+			riurik.src.jquery = '/static/js/jquery.min.js';
+			riurik.src.bootstrap = '/static/js/bootstrap.js';
 
-			riurikldr.TryGetArgument = function( name ) {
+			riurik.TryGetArgument = function( name ) {
 				var arg = (new RegExp( name + '=([^&$]+)' )).exec(window.location.href);
 				if ( arg ) return arg[1];
 				return null;
 			};
 
-			riurikldr.GetArgument = function( name ) {
-				var arg = riurikldr.TryGetArgument(name);
+			riurik.GetArgument = function( name ) {
+				var arg = riurik.TryGetArgument(name);
 				if ( arg ) return arg;
 				else alert('Can not find argument ' + name);
 			};
 
-			riurikldr.BuildHttpUri = function(url) {
-				return 'http://'.concat(riurikldr.args.server, url);
+			riurik.BuildHttpUri = function(url) {
+				return 'http://'.concat(riurik.args.server, url);
 			};
 
-			riurikldr.GetCwd = function(path) {
+			riurik.GetCwd = function(path) {
 				if ( ! /\.js$/.test(path) ) {
 					//current target is suite, just return it
 					return path;
@@ -36,13 +36,13 @@
 				return /(.*?)\/[^\/]*$/.exec(path)[1];
 			};
 			
-			riurikldr.args = {};
-			riurikldr.args.server = riurikldr.GetArgument('server');
-			riurikldr.args.path = riurikldr.GetArgument('path');
-			riurikldr.args.cwd = riurikldr.GetCwd(riurikldr.args.path);
+			riurik.args = {};
+			riurik.args.server = riurik.GetArgument('server');
+			riurik.args.path = riurik.GetArgument('path');
+			riurik.args.cwd = riurik.GetCwd(riurik.args.path);
 
 			window.onload = function(){
-				var url = riurikldr.BuildHttpUri( riurikldr.src.bootstrap );
+				var url = riurik.BuildHttpUri( riurik.src.bootstrap );
 				var script = document.createElement( 'script' );
 				script.type = 'text/javascript';
 				script.src = url + '?_=' + Math.random().toString();
