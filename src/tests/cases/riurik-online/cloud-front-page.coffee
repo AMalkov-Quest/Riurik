@@ -22,13 +22,14 @@ describe 'cloud front page', ->
             expect( list.length ).to.above(0)
             
             context.subfolder = list.first().text().trim()
-            $.when( frame.go( context.folder_root + '/' + context.subfolder ) ).then ->
+            $.when( frame.go( "#{context.folder_root}/#{context.subfolder}" ) ).then ->
             
                 done()
         
-it 'shold show read only test scripts content', (done)->
+    it 'shold show read only test scripts content', (done)->
 
-    $.when( frame.go( context.folder_root + '/' + context.subfolder + '/' + _$( 'div#dir-index-id ul li' ).first().text().trim() + '?editor' ) ).then ->
+        test_script = _$( 'div#dir-index-id ul li' ).first().text().trim()
+        $.when( frame.go( "#{context.folder_root}/#{context.subfolder}/#{test_script}?editor" ) ).then ->
 
             done()
             
