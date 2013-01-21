@@ -30,3 +30,13 @@ jQuery.cookie = function (key, value, options) {
     var result, decode = options.raw ? function (s) { return s; } : decodeURIComponent;
     return (result = new RegExp('(?:^|; )' + encodeURIComponent(key) + '=([^;]*)').exec(document.cookie)) ? decode(result[1]) : null;
 };
+
+function emulateAnotherSession(_$) {
+  //emulate that the test is open in another browser window
+  context.sessionid = _$.cookie('sessionid');
+  _$.cookie('sessionid', '', { 'path': '/' });
+}
+
+function restorePreviousSession(_$) {
+  _$.cookie('sessionid', context.sessionid, { 'path': '/' });
+}
