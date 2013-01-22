@@ -1,5 +1,14 @@
 {% if login %}
-<div id="github-user" class="title-riurik" style="position: absolute; top: 10px; right: 400px;">
+<style>
+	.github-user {
+		position: absolute;
+		right: 70px;
+		top: 10px;
+		float: left;
+		font-size: 16px;
+	}
+</style>
+<div id="github-user" class="github-user">
 	{{ login }}
 </div>
 {% endif %}

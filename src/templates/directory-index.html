@@ -54,10 +54,9 @@
 <body>
 	{% block body %}
 	<div class="header">
-		<a href="#" title="Riurik Web Based Acceptance Testing Framework"></a>
-		<div class="title-riurik">Riurik Web Based Acceptance Testing Framework</div>
+		<div title="Riurik" class="title-riurik">Riurik</div>
 		{% block search %}{% include 'search/include/search.html' %}{% endblock search %}
-
+		{% block user %}{% include 'github-user.html' %}{% endblock user %}
 	</div>
 	<div class="content">
 		{% block title %}
@@ -108,7 +107,6 @@
 			</ul>
 			</form>
 			{% endblock controls %}
-			{% block user %}{% include 'github-user.html' %}{% endblock user %}
 		</div>
 		<div style="clear:both;"></div>
 		<div class="line">
