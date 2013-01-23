@@ -159,9 +159,11 @@
 {% block controls %}
 	<ul class="horizontal-menu">
         {% if contexts %}
+		{% ifequal filetype 'test'  %}	
         <li><a id="run" href="javascript:void(0);">{% trans "Run" %}</a>
         <select name="context">{% for item in contexts %}<option value='{{item}}'{% if forloop.first %} selected="selected"{% endif %}>{{item}}</option>{% endfor %}</select></li>
-        {% endif %}
+        {% endifequal %}
+		{% endif %}
     {% if not read_only %}
         {% ifequal filetype 'test'  %}
             {% block context-controls %}
