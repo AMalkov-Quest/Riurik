@@ -121,6 +121,7 @@ elif platform.system() == 'Linux':
 else:
     COFFEESCRIPT_EXECUTABLE = None
 
+DEFAULT = 'DEFAULT'
 EXEC_TESTS_CMD='static/testLoader.html'
 SUITE_SETUP_FILE_NAME = 'suite-setup.js'
 SPEC_URL_FILE_NAME = '.specification.ini'

@@ -120,7 +120,7 @@ def patch(RequestHandler, ctx, riurik_url, ctxname=None):
 class global_settings(object):
 	comment = 'from global settings'
 
-	def __init__(self, RequestHandler, section='DEFAULT'):
+	def __init__(self, RequestHandler, section=settings.DEFAULT):
 		self.inifile = RequestHandler.get_global_context_path()
 		self.section = section
 		log.debug('read global settings from %s, section:%s' % (self.inifile, section))
@@ -148,7 +148,7 @@ class global_settings(object):
 
 	def sections(self):
 		log.debug('reading sections: %s' % config.sections(self.inifile))
-		return config.sections(self.inifile)
+		return config.sections(self.inifile) or [settings.DEFAULT]
 
 	def get_folder(self):
 		return os.path.dirname(self.inifile)
@@ -156,9 +156,11 @@ class global_settings(object):
 class context(global_settings):
 	comment = 'context.ini'
 
-	def __init__(self, RequestHandler, path, section='DEFAULT'):
+	def __init__(self, RequestHandler, path, section=settings.DEFAULT):
 		self.requestHandler = RequestHandler
 		self.inifile = RequestHandler.get_context_path(path)
+		if not os.path.exists(self.inifile):
+			raise Exception('Context has not been created yet')
 		self.section = section
 		log.debug('context: %s, section: %s' % (self.inifile, self.section))
 

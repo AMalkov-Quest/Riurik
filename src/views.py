@@ -26,7 +26,8 @@ def show_context(request, path):
 
 	result = ""
 
-	sections = config.sections(context.get(RequestHandler).inifile)
+	#sections = config.sections(context.get(RequestHandler).inifile)
+	sections = context.get( RequestHandler ).sections()
 	for section_name in sections:
 		ctx = context.get(RequestHandler, section=section_name)
 		context_ini = context.render_ini(RequestHandler, ctx, request.get_host(), section_name)
