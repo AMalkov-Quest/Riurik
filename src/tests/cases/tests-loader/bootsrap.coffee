@@ -42,15 +42,15 @@ test 'it should be checked if QUnit is loaded', ->
   window.QUnit = QUnit
 
 test 'it should be checked if context is loaded', ->
-  Context = window.context
-  window.context = context.not
+  Context = riurik.context
+  riurik.context = window.undefined
+  
   sinon.stub window, "alert"
+  riurik.load_tests()
   
-  riurik.trigger( "riurik.inited" )
-  
-  ok window.alert.withArgs("context should be preliminary loaded").calledOnce, 'warning alert is called'
+  ok window.alert.withArgs("Riurik context should be preliminary loaded").calledOnce, 'warning alert is called'
   window.alert.restore()
-  window.context = Context
+  riurik.context = Context
   
 test 'the Waits object should be exported with context.timeout', ->
   ok riurik.exports.waitFor?, 'object is created'
