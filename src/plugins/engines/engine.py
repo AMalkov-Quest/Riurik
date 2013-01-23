@@ -21,6 +21,12 @@ def engage4suite(path, fullpath, ctx):
 	if is_cucumber(path, ctx):
 		engine = 'cucumber'
 		cucumber.compileSuite(path, fullpath)
+		
+	if is_mocha(ctx):
+		engine = 'mocha'
+
+	if is_jasmine(ctx):
+		engine = 'jasmine'
 
 	return engine
 
