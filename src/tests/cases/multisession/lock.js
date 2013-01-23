@@ -30,7 +30,7 @@ asyncTest('open file first time ', function(){
 });
 
 asyncTest('open file second time ', function() {
-  emulateAnotherSession(context._$);
+  //emulateAnotherSession(context._$);
   $.when( frame.go( context.URL ) ).then(function(_$) {
     ok( frame.window().editor.getReadOnly() );
       
@@ -43,7 +43,7 @@ asyncTest('open file second time ', function() {
     ok( _$('#spec-link').length === 0, 'the Spec button should not be shown' );
     ok( _$('#save').length === 0, 'the Save button should not be shown' );
     
-    restorePreviousSession(_$);
+    //restorePreviousSession(_$);
 
     start();
   });
