@@ -218,6 +218,7 @@ class BaseHandler(object):
 			return HttpResponse(tests_list)
 
 		tests_list = reporting.getResults(self.path, context, date)
+		path = self.path
 
 		if asjson:
 			url = reporting.getTestResultsUrl(self.path, context, date, request)
