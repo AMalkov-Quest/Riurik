@@ -17,7 +17,7 @@ asyncTest 'should propose to create new specification', ->
     equal _$('a#spec-link').attr('href'), "#{context.spec_ini}?editor", 'url to create new specification config file'
     equal _$('a#spec-link').attr('target'), "_blank", 'should be opend in new tab or window'
     start()
-###    
+    
 asyncTest 'should create new specification config file', ->
   _$('a#spec-link').removeAttr('target')
   simulateClick 'spec-link', 'click'
@@ -37,4 +37,3 @@ asyncTest 'should provide link to the specification', ->
     
 QUnit.teardown ->
   delete_folder context.suite_path
-###
