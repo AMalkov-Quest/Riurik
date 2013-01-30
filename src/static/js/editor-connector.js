@@ -1,6 +1,6 @@
 $(function initAceEditor(){
     window.editor = ace.edit("code");
-    editor.setTheme("ace/theme/chrome");
+    editor.setTheme("ace/theme/riurik");
     var modeprob = function(ext, name) {
         console.log("\\."+ext+"\\?", (new RegExp("\."+ext+"\?")).test(window.location.href))
         return ((new RegExp("\\."+ext+"\\?")).test(window.location.href))? name : null ;

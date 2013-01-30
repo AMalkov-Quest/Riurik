@@ -9,7 +9,7 @@ form {
 body {
     background: none repeat scroll 0% 0% rgb(231, 238, 242);
 	margin: 0;
-	padding: 0;
+	padding: 40px 0px 0px 0px;
 	font-family: 'OpenSans', sans-serif;
 	font-size: 12px;
 	color: #57676E;
@@ -43,7 +43,18 @@ a:hover,a:active {
 
 .content {
 	position: relative;
-	margin-top: 40px;
+}
+
+#horizontal-menu {
+	position: absolute;
+	right: 5%;
+	margin: 0;
+	padding: 0;
+}
+
+.horizontal-menu {
+	margin: 0;
+	padding: 0;
 }
 
 .horizontal-menu li {
@@ -54,7 +65,7 @@ a:hover,a:active {
 
 .horizontal-menu a {
 	font-family: Calibri, cursive;
-	font-size:10pt;
+	font-size: 13px;
 	text-decoration: none;	
 }
 
@@ -81,7 +92,7 @@ a.logo {
 }
 
 .content {
-	margin: 30px 63px 0px;
+	margin: 0px 63px;
 }
 
 .line {
@@ -91,8 +102,9 @@ a.logo {
 }
 
 .dir-index {
-	float: left;
-	width: 24%;
+	top: 25px;
+	position: relative;
+	background: url(/static/img/border-dotted.gif) repeat-x 100% 0%;
 }
 
 .dir-index a {
@@ -104,6 +116,11 @@ li img {
 	padding-right: 7px;
 }
 
+.content ul {
+	margin: 0;
+	padding: 0;
+}
+
 .content li {
 	list-style: none;
 	margin-bottom: 5px;
@@ -113,13 +130,16 @@ li img {
 	display: none;
 }
 
-.breadcrumbs {
-    color: navy;
-    font-weight: normal;
+#breadcrumbs {
+	position: absolute;
+	width: 100%;
+	margin-right: 200px;
+	font-size: 13px;
 }
 
-.breadcrumbs a {
+#breadcrumbs a {
     text-decoration: none;
+	font-size: inherit;
 }
 
 .dir-index li {

@@ -77,8 +77,8 @@ body {
     width: 100%;
     position: absolute;
     top: 30px;
-    background: #FFF;
-    color: #000;
+    background: #F5F5F0;
+    color: #57676E;
     overflow-x: hidden;
     overflow-y: scroll;
 }

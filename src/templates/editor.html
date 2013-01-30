@@ -190,7 +190,7 @@
 	</ul>
 {% endblock controls %}
 
-{% block title %}<p class="breadcrumbs">{{ request.path|breadcrumbs:filetype }}</p>{% endblock title %}
+{% block title %}<div id="breadcrumbs" class="breadcrumbs">{{ request.path|breadcrumbs:filetype }}</div>{% endblock title %}
 
 {% block content %}
         <form id='apply-test' method='POST'{% if is_stubbed %} style="display:none;"{% endif %} >
