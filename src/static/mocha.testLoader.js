@@ -129,6 +129,8 @@ riurik.on( "riurik.engine.loaded", function(){
 
 riurik.init = function() {
 	riurik.trigger( "riurik.initing" );
+	//to simplify the context access from tests
+	window.$context = clone(riurik.context);
 	riurik.onerror();
 	riurik.trigger( "riurik.inited" );
 }
@@ -931,7 +933,7 @@ riurik.engine.init = function( next ){
 };
 
 riurik.engine.run_tests = function() {
-	console.log('start mocha tests...');
+	console.log('start mocha tests ...');
 	mocha.run();
 };
 
@@ -940,6 +942,7 @@ riurik.engine.config = function() {
 	mocha.setup({
 		ui: 'bdd',
 		globals: ['hasCert'],	// switch off the global leak detection mechanism
+		ignoreLeaks: true,
 		timeout: 10000			// the test-case timeout
 	});
 	
