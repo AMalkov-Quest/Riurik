@@ -11,7 +11,7 @@ riurik.engine.init = function( next ){
 };
 
 riurik.engine.run_tests = function() {
-	console.log('start mocha tests...');
+	console.log('start mocha tests ...');
 	mocha.run();
 };
 
@@ -20,6 +20,7 @@ riurik.engine.config = function() {
 	mocha.setup({
 		ui: 'bdd',
 		globals: ['hasCert'],	// switch off the global leak detection mechanism
+		ignoreLeaks: true,
 		timeout: 10000			// the test-case timeout
 	});
 	
