@@ -27,6 +27,8 @@ riurik.on( "riurik.engine.loaded", function(){
 
 riurik.init = function() {
 	riurik.trigger( "riurik.initing" );
+	//to simplify the context access from tests
+	window.$context = clone(riurik.context);
 	riurik.onerror();
 	riurik.trigger( "riurik.inited" );
 }

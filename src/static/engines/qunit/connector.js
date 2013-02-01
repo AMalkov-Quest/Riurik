@@ -76,6 +76,9 @@ riurik.engine.config = function() {
 	}
 
 	QUnit.moduleStart = function(module) {
+		//to provide clean context for every module
+		window.$context = clone(riurik.context);
+		//for compatibility with old tests
 		window.context = clone(riurik.context);
 		riurik.trigger("riurik.tests.suite.start", module.name);
 	}
