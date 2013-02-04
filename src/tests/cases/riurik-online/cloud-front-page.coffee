@@ -7,7 +7,7 @@ describe 'cloud front page', ->
     it 'should show login with github link', (done)->
         
         $.when( frame.go( '' ) ).then ->
-            expect( _$('a#github') ).to.be.visible()
+            expect( _$('a#github') ).to.be.visible
             $.waitFor.condition( -> _$('div#github-dialogs' ).is(':visible') ).then ->
                 _$('select#scope option[value="public_repo"]').attr('selected', 'selected')
                 done()
@@ -18,15 +18,15 @@ describe 'cloud front page', ->
         $.waitFor.condition( -> _$('div#github-dialogs' ).is(':visible') ).then ->
             options = _$('ul.dropdown-menu li')
             
-            expect( options.length ).to.be( 3 )
-            expect( _$('a', options[0]).attr('href') ).to.be( $R.context.login_url )
-            expect( _$('a', options[1]).attr('href') ).to.be( $R.context.login_url + 'public_repo' )
-            expect( _$('a', options[2]).attr('href') ).to.be( $R.context.login_url + 'repo' )
+            expect( options ).to.have.length( 3 )
+            expect( _$('a', options[0]) ).to.have.attr( 'href', $context.login_url )
+            expect( _$('a', options[1]) ).to.have.attr( 'href', $context.login_url + 'public_repo' )
+            expect( _$('a', options[2]) ).to.have.attr( 'href', $context.login_url + 'repo' )
             
             done()
     
         _$('a.dropdown-toggle').click()
-        
+###        
     it 'should show riurik inner tests', (done)->
         
         list = _$( 'div#dir-index-id ul li' )
@@ -70,8 +70,9 @@ describe 'cloud front page', ->
             
     it 'should not support mutual exclusion mechanism', (done)->
         
-        emulateAnotherSession(_$)
+        emulateAnotherSession _$
         $.when( frame.go( context.test_script_fullpath ) ).then ->
             expect( _$('#unstub') ).to.be.empty()
-            
+            restorePreviousSession _$
             done()
+###

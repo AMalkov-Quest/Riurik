@@ -145,6 +145,12 @@ PRODUCT_CODE_ALIAS = 'product_code_alias'
 STATIC_MANAGEMENT_ASSET_PATHS = []
 STATIC_MANAGEMENT_HOSTNAMES = ['http://www.riurik.com']
 STATIC_MANAGEMENT_VERSIONER = 'plugins.static_management.versioners.SHA1Sum'
+
+chaiPack = [
+	'chai/chai.js',
+	'chai/chai-jquery.js'
+]
+
 qunitSTATIC_MANAGEMENT = {
     'js': {
         'qunit.testLoader.js': [
@@ -204,8 +210,7 @@ STATIC_MANAGEMENT = {
             'engines/mocha/connector.js',
             'engines/mocha/mocha.html.js',
             'engines/mocha/mocha.js',
-            'engines/mocha/expect.js',
-        ]
+        ] + chaiPack
     },
     'css': {
         

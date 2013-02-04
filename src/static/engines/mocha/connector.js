@@ -18,19 +18,11 @@ riurik.engine.run_tests = function() {
 riurik.engine.config = function() {
     //mocha.setup('bdd');
 	mocha.setup({
-		ui: 'bdd',
+		ui: 'tdd',
 		globals: ['hasCert'],	// switch off the global leak detection mechanism
 		ignoreLeaks: true,
 		timeout: 10000			// the test-case timeout
 	});
-	
-	// extend expect.js with custome asserts
-	expect.Assertion.prototype.visible = function () {
-		this.assert(
-		this.obj.is(':visible')
-		, function(){ return 'expected ' + expect.i(this.obj) + ' to be visible' }
-		, function(){ return 'expected ' + expect.i(this.obj) + ' to be invisible' });
-	};
 };
 
 riurik.matchers.pass = function(message) {
