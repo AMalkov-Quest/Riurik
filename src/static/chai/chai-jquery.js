@@ -18,7 +18,10 @@
   }
 }(function (chai, utils, $) {
   var inspect = utils.inspect,
-      flag = utils.flag;
+      flag = utils.flag,
+      instanceOfJQuery = function(obj) {
+        return obj.jquery;    
+      };
   $ = $ || jQuery;
 
   $.fn.inspect = function (depth) {
@@ -131,7 +134,7 @@
   chai.Assertion.overwriteProperty('exist', function (_super) {
     return function () {
       var obj = flag(this, 'object');
-      if (obj instanceof $) {
+      if ( instanceOfJQuery(obj) ) {
         this.assert(
             obj.length > 0
           , 'expected ' + inspect(obj.selector) + ' to exist'
@@ -145,7 +148,7 @@
   chai.Assertion.overwriteProperty('empty', function (_super) {
     return function () {
       var obj = flag(this, 'object');
-      if (obj instanceof $) {
+      if ( instanceOfJQuery(obj) ) {
         this.assert(
           obj.is(':empty')
           , 'expected #{this} to be empty'
@@ -160,7 +163,7 @@
     return function () {
       var be = function (selector) {
         var obj = flag(this, 'object');
-        if (obj instanceof $) {
+        if ( instanceOfJQuery(obj) ) {
           this.assert(
               obj.is(selector)
             , 'expected #{this} to be #{exp}'
@@ -179,7 +182,7 @@
   chai.Assertion.overwriteMethod('match', function (_super) {
     return function (selector) {
       var obj = flag(this, 'object');
-      if (obj instanceof $) {
+      if ( instanceOfJQuery(obj) ) {
         this.assert(
             obj.is(selector)
           , 'expected #{this} to match #{exp}'
@@ -197,7 +200,7 @@
       _super.call(this);
       var contain = function (text) {
         var obj = flag(this, 'object');
-        if (obj instanceof $) {
+        if ( instanceOfJQuery(obj) ) {
           this.assert(
               obj.is(':contains(\'' + text + '\')')
             , 'expected #{this} to contain #{exp}'
@@ -216,7 +219,7 @@
   chai.Assertion.overwriteProperty('have', function (_super) {
     return function () {
       var obj = flag(this, 'object');
-      if (obj instanceof $) {
+      if ( instanceOfJQuery(obj) ) {
         var have = function (selector) {
           this.assert(
               // Using find() rather than has() to work around a jQuery bug:

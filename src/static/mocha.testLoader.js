@@ -131,6 +131,7 @@ riurik.init = function() {
 	riurik.trigger( "riurik.initing" );
 	//using chai
 	window.expect = chai.expect
+	chai.should()
 	
 	//to simplify the context access from tests
 	window.$context = clone(riurik.context);
@@ -967,10 +968,6 @@ $(function(){
 	console.log('mocha div');
 	$('<div id="mocha"></div>').appendTo('#engine');
 });
-
-function assert(expr, msg) {
-	if (!expr) throw new Error(msg || 'failed');
-}
 
 /* Begin: mocha.js */
 ;(function(){
@@ -10004,7 +10001,10 @@ process.on = function(e, fn){
   }
 }(function (chai, utils, $) {
   var inspect = utils.inspect,
-      flag = utils.flag;
+      flag = utils.flag,
+      instanceOfJQuery = function(obj) {
+        return obj.jquery;    
+      };
   $ = $ || jQuery;
 
   $.fn.inspect = function (depth) {
@@ -10117,7 +10117,7 @@ process.on = function(e, fn){
   chai.Assertion.overwriteProperty('exist', function (_super) {
     return function () {
       var obj = flag(this, 'object');
-      if (obj instanceof $) {
+      if ( instanceOfJQuery(obj) ) {
         this.assert(
             obj.length > 0
           , 'expected ' + inspect(obj.selector) + ' to exist'
@@ -10131,7 +10131,7 @@ process.on = function(e, fn){
   chai.Assertion.overwriteProperty('empty', function (_super) {
     return function () {
       var obj = flag(this, 'object');
-      if (obj instanceof $) {
+      if ( instanceOfJQuery(obj) ) {
         this.assert(
           obj.is(':empty')
           , 'expected #{this} to be empty'
@@ -10146,7 +10146,7 @@ process.on = function(e, fn){
     return function () {
       var be = function (selector) {
         var obj = flag(this, 'object');
-        if (obj instanceof $) {
+        if ( instanceOfJQuery(obj) ) {
           this.assert(
               obj.is(selector)
             , 'expected #{this} to be #{exp}'
@@ -10165,7 +10165,7 @@ process.on = function(e, fn){
   chai.Assertion.overwriteMethod('match', function (_super) {
     return function (selector) {
       var obj = flag(this, 'object');
-      if (obj instanceof $) {
+      if ( instanceOfJQuery(obj) ) {
         this.assert(
             obj.is(selector)
           , 'expected #{this} to match #{exp}'
@@ -10183,7 +10183,7 @@ process.on = function(e, fn){
       _super.call(this);
       var contain = function (text) {
         var obj = flag(this, 'object');
-        if (obj instanceof $) {
+        if ( instanceOfJQuery(obj) ) {
           this.assert(
               obj.is(':contains(\'' + text + '\')')
             , 'expected #{this} to contain #{exp}'
@@ -10202,7 +10202,7 @@ process.on = function(e, fn){
   chai.Assertion.overwriteProperty('have', function (_super) {
     return function () {
       var obj = flag(this, 'object');
-      if (obj instanceof $) {
+      if ( instanceOfJQuery(obj) ) {
         var have = function (selector) {
           this.assert(
               // Using find() rather than has() to work around a jQuery bug:
