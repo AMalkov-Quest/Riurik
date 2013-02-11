@@ -159,9 +159,11 @@
 {% block controls %}
 	<ul class="horizontal-menu">
         {% if contexts %}
+		{% ifequal filetype 'test'  %}	
         <li><a id="run" href="javascript:void(0);">{% trans "Run" %}</a>
         <select name="context">{% for item in contexts %}<option value='{{item}}'{% if forloop.first %} selected="selected"{% endif %}>{{item}}</option>{% endfor %}</select></li>
-        {% endif %}
+        {% endifequal %}
+		{% endif %}
     {% if not read_only %}
         {% ifequal filetype 'test'  %}
             {% block context-controls %}
@@ -180,15 +182,15 @@
         {% endifequal %}
         
         <li><a id="save" href="javascript:void(0);">{% trans "Save" %}</a></li>
-    {% endif %}
-	{% if stubbed %}
+		{% if stubbed %}
         <li><a id="unstub" href="javascript:void(0);">{% trans "Get control" %}</a></li>
-    {% endif %}
-	<li><a id="close" href="javascript: void(0);">{% trans "Close" %}</a></li>
+		{% endif %}
+	{% endif %}
+		<li><a id="close" href="javascript: void(0);">{% trans "Close" %}</a></li>
 	</ul>
 {% endblock controls %}
 
-{% block title %}<p class="breadcrumbs">{{ request.path|breadcrumbs:filetype }}</p>{% endblock title %}
+{% block title %}<div id="breadcrumbs" class="breadcrumbs">{{ request.path|breadcrumbs:filetype }}</div>{% endblock title %}
 
 {% block content %}
         <form id='apply-test' method='POST'{% if is_stubbed %} style="display:none;"{% endif %} >

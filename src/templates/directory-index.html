@@ -54,17 +54,16 @@
 <body>
 	{% block body %}
 	<div class="header">
-		<a href="#" title="Riurik Web Based Acceptance Testing Framework"></a>
-		<div class="title-riurik">Riurik Web Based Acceptance Testing Framework</div>
+		<div title="Riurik" class="title-riurik">Riurik</div>
 		{% block search %}{% include 'search/include/search.html' %}{% endblock search %}
-
+		{% block user %}{% include 'github-user.html' %}{% endblock user %}
 	</div>
 	<div class="content">
 		{% block title %}
-		<p class="breadcrumbs {{ type }}">{{ directory|breadcrumbs:type }}</p>
+		<div id="breadcrumbs" class="breadcrumbs {{ type }}">{{ directory|breadcrumbs:type }}</div>
 		{% endblock title %}
-		<div id="syntax" style="float:left;padding:15px 0 0 20px;"></div>
-		<div style="float:right;">
+		<!--<div id="syntax" style="float:left;padding:15px 0 0 20px;"></div>-->
+		<div id="horizontal-menu">
 			{% block controls %}
 			<form id="run-suite" method="POST" action="/actions/suite/submit/" target="{{ directory }}">
 			<input type="hidden" name="path" value="{{ directory }}">
@@ -108,30 +107,26 @@
 			</ul>
 			</form>
 			{% endblock controls %}
-			{% block user %}{% include 'github-user.html' %}{% endblock user %}
 		</div>
 		<div style="clear:both;"></div>
-		<div class="line">
-			{% block content %}
-			<div id="dir-index-id" class="dir-index" style="width:500px;">
-				<br>
-	        	<ul>
-	        		{% for f in dir_list %}
-	        		<li id="{{ f.title|strip:'/' }}" class="{{ f.type }}" title="{{ f.title|strip:'/' }}">
-						<a href="{{ f.title }}">{{ f.title|strip:'/' }}</a>
-	    			</li>
-	    			{% endfor %}
+		{% block content %}
+		<div id="dir-index-id" class="dir-index">
+			<br>
+			<ul>
+				{% for f in dir_list %}
+				<li id="{{ f.title|strip:'/' }}" class="{{ f.type }}" title="{{ f.title|strip:'/' }}">
+					<a href="{{ f.title }}">{{ f.title|strip:'/' }}</a>
+				</li>
+				{% endfor %}
 
-	        		{% for f in file_list %}
-	        		<li class="{{ f.type }}" title="{{ f.title|strip:'/' }}">
-						<a id="{{ f.title|strip:'/' }}" href="{{ f.title }}?editor">{{ f.title|strip:'/' }}</a>
-	    			</li>
-	    			{% endfor %}
-	    		</ul>
-	    	</div>
-			{% endblock %}
-		
-    	</div>
+				{% for f in file_list %}
+				<li class="{{ f.type }}" title="{{ f.title|strip:'/' }}">
+					<a id="{{ f.title|strip:'/' }}" href="{{ f.title }}?editor">{{ f.title|strip:'/' }}</a>
+				</li>
+				{% endfor %}
+			</ul>
+		</div>
+		{% endblock %}
     </div>
     {% endblock %}
 </body>

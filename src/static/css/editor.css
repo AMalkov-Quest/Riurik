@@ -1,3 +1,7 @@
+#apply-test {
+	top: 40px;
+}
+
 .content textarea {
 	width: 99%;
 }

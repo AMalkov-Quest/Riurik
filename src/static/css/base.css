@@ -6,33 +6,71 @@ form {
 	margin: 0 0 0 0;
 }
 
+body {
+    background: none repeat scroll 0% 0% rgb(231, 238, 242);
+	margin: 0;
+	padding: 40px 0px 0px 0px;
+	font-family: 'OpenSans', sans-serif;
+	font-size: 12px;
+	color: #57676E;
+}
+
+a {
+	color: #57676E;
+}
+
+a:hover,a:active {
+  color: #2E3335;
+}
+
 .header {
-	background: url(/static/img/head_bg.png);
-	height: 30px;
+	background: none repeat scroll 0% 0% rgb(224, 231, 235);
+	border-bottom: 1px solid rgb(195, 204, 208);
+	box-shadow: 0px 1px 0px rgba(255, 255, 255, 0), 0px 0px 3px rgba(0, 0, 0, 0.1);
+	height: 40px;
 	width: 100%;
 	position: absolute;
+	top: 0px;
+}
+
+.title-riurik {
+	position: absolute;
+	left: 76px;
 	top: 10px;
+	float: left;
+	font-size: 16px;
 }
 
 .content {
 	position: relative;
-	margin-top: 40px;
+}
+
+#horizontal-menu {
+	position: absolute;
+	right: 5%;
+	margin: 0;
+	padding: 0;
+}
+
+.horizontal-menu {
+	margin: 0;
+	padding: 0;
 }
 
 .horizontal-menu li {
 	display: inline;
 	padding: 0 10px 0 5px;
-	border-right: solid 1px #000;	
+	border-right: solid 1px #57676E;	
 }
 
 .horizontal-menu a {
 	font-family: Calibri, cursive;
-	font-size:10pt;
+	font-size: 13px;
 	text-decoration: none;	
 }
 
 .horizontal-menu li a:hover {
-  color: #33CC00;
+  color: #2E3335;
 }
 
 .horizontal-menu li:last-child {
@@ -40,14 +78,7 @@ form {
 }
 
 .horizontal-menu li.disabled a {
-	color: #AAA;
 	cursor: default;
-}
-
-body {
-	color: #666;
-	font-family: Tahoma, Arial, Helvetica, Tahoma, serif;
-	font-size: 12px;
 }
 
 a.logo {
@@ -60,17 +91,8 @@ a.logo {
 	height: 74px;
 }
 
-.title-riurik {
-	color: white;
-	cursor: default;
-	float: left;
-	font-family: arial, serif, bold;
-	font-size: 16px;
-	padding: 6px 0px 0px 10px;
-}
-
 .content {
-	margin: 30px 63px 0px;
+	margin: 0px 63px;
 }
 
 .line {
@@ -80,20 +102,23 @@ a.logo {
 }
 
 .dir-index {
-	float: left;
-	width: 24%;
+	top: 25px;
+	position: relative;
+	background: url(/static/img/border-dotted.gif) repeat-x 100% 0%;
 }
 
 .dir-index a {
-	color: #058CB6;
-	font-family: Tahoma, Arial, Helvetica, serif;
-	font-size: 12px;
 	text-decoration: none;
 }
 
 li img {
 	margin-bottom: -5px;
 	padding-right: 7px;
+}
+
+.content ul {
+	margin: 0;
+	padding: 0;
 }
 
 .content li {
@@ -105,13 +130,16 @@ li img {
 	display: none;
 }
 
-.breadcrumbs {
-    color: navy;
-    font-weight: normal;
+#breadcrumbs {
+	position: absolute;
+	width: 100%;
+	margin-right: 200px;
+	font-size: 13px;
 }
 
-.breadcrumbs a {
+#breadcrumbs a {
     text-decoration: none;
+	font-size: inherit;
 }
 
 .dir-index li {
