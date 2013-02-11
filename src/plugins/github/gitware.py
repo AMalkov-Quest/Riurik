@@ -6,6 +6,7 @@ from logger import log
 
 repo_title = 'Repo added through Riurik Framework'
 key_title = 'Key added through Riurik Framework'
+read_me = 'This is the Riurik tests repository'
 #git = Github('Riurik', 'riurik862879')
 gitignore = '.gitignore'
 
@@ -156,6 +157,12 @@ def init_gitignore(user, repo):
 	f.write('.*.js')
 	f.close()
 
+def init_readme(user, repo):
+	readme_path = get_full_path(user, repo, 'README')
+	f = open(readme_path, 'w')
+	f.write(read_me)
+	f.close()
+
 def try_to_create_riurik_repo(token):
 	from plugins.git import gitssh
 	try:
@@ -168,6 +175,7 @@ def init_riurik_repo(user, repo):
 	from plugins.git import gitssh
 	init_repo(user, repo)
 	init_gitignore(user.login, repo.id)
+	init_readme(user.login, repo.id)
 
 	gitssh.command(user.login, repo.id, "git config user.name '%s'" % user.login)
 	gitssh.command(user.login, repo.id, "git config user.email %s" % user.email)

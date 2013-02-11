@@ -20,6 +20,7 @@ a.disabled {
 #code {
     width: 90%;
     min-height: 70%;
+	top: 90px;
 }
 
 body {
