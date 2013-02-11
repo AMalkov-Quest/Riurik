@@ -7,6 +7,9 @@
 	jQuery(function ($) {
 		$('#github-dialogs').modal();
 		$('.dropdown-toggle').dropdown();
+		$('a#new-suite').attr('onclick', 'return false');
+		$('a#new-test').attr('onclick', 'return false');
+		$('input[name="search_pattern"]').attr('disabled', true)
 	});
 
 	</script>
@@ -21,7 +24,7 @@
         <h3>Hello {{ login }}</h3>
     </div>
 	<div class="modal-body">
-		<p>You've successfully authorized the Riurik framework on GitHub. Please create public repository there, refresh this page and select this repository.</p>
+		<p>{% trans "You've successfully authorized the Riurik framework on GitHub. Now we are ready to prepare your repository for work. Just <a href='https://github.com/repositories/new' style='color: #2E3335;' target='blank'>create new public one</a>, refresh this page and select it to proceed." %}</p>
 	</div>	
 	{% if repos_list %}
 	<div class="modal-footer">

@@ -25,15 +25,15 @@
         <h3 id="log-in-with-github">Log in with Github</h3>
     </div>
     <div class="modal-body">
-    	<p>{% trans "The Riurik framework does not provide any storage service. But it uses GitHub for it. Any artifacts those are going to be created here will be stored in your GitHub repository. So to start using Riurik it is necessary to login with your existing GitHub account. GitHub requires to specify level of access that you are agree to grant to Riurik over your account. We recommend to allow Riurik updating your public repository in order to automate creating and configuring it. But of course you can select another read-only option and do all the required actions manually." %}</p>
+    	<p>{% trans "The Riurik framework does not provide any storage service, GitHub is used instead. Any scripts those are going to be created here will be stored in your GitHub repository. So to start using Riurik it is necessary to login with your existing GitHub account." %}</p>
     </div>
 	<div class="modal-footer">
         <div class="dropdown" id="scope" style="text-align:left;">
             <a class="dropdown-toggle" data-toggle="scope-dropdown" href="#">Select to proceed <b class="caret"></b></a>
             <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
-				<li><a href="{{ githref }}">I already have the repository created and configured</a></li>
-				<li><a href="{{ githref }}public_repo">I would like to create new repository myself</a></li>
-				<li><a href="{{ githref }}repo">Create new repository on my behalf</a></li>
+				<li><a href="{{ githref }}">I already have the Riurik repository</a></li>
+				<li><a href="{{ githref }}public_repo">I am new user ...</a></li>
+				<!-- <li><a href="{{ githref }}repo">Create new repository on my behalf</a></li>-->
             </ul>
         </div>
 	</div>

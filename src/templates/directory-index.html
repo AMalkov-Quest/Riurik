@@ -62,7 +62,6 @@
 		{% block title %}
 		<div id="breadcrumbs" class="breadcrumbs {{ type }}">{{ directory|breadcrumbs:type }}</div>
 		{% endblock title %}
-		<!--<div id="syntax" style="float:left;padding:15px 0 0 20px;"></div>-->
 		<div id="horizontal-menu">
 			{% block controls %}
 			<form id="run-suite" method="POST" action="/actions/suite/submit/" target="{{ directory }}">
