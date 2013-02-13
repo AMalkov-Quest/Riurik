@@ -1,16 +1,16 @@
 {% load dir_index_tags %}
 {% ifnotequal type 'front-page' %}
 <style>
-	#search {
+	.header #search {
 		position: absolute;
 		top: 7px;
 		left: 150px;
 	}
-	#search form {
+	.header #search form {
 		position: relative;
 		margin: 0;
 	}
-	#search input {
+	.header #search input {
 		width: 170px;
 		height: 20px;
 		background-color: white;
@@ -18,10 +18,10 @@
 		border: 1px solid #CCC;
 		border-radius: 3px;
 	}
-	#search input.default {
+	.header #search input.default {
 		color: #ccc;
 	}
-	#search .button {
+	.header #search .button {
 		position: absolute;
 		left: 175px;
 		top: 1px;
