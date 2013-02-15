@@ -1,4 +1,8 @@
 $(function initAceEditor(){
+    var resizer = function(){
+        $('#code').height( $(window).height()-140 );
+    }
+    $(window).resize(resizer).resize();
     window.editor = ace.edit("code");
     editor.setTheme("ace/theme/riurik");
     var modeprob = function(ext, name) {

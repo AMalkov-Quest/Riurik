@@ -63,7 +63,7 @@
 		{% block search %}{% include 'search/include/search.html' %}{% endblock search %}
 		{% block user %}{% include 'github-user.html' %}{% endblock user %}
 	</div>
-	<div class="content">
+	<div class="content"><div class="inner">
 		{% block title %}
 		<div id="breadcrumbs" class="breadcrumbs {{ type }}">{{ directory|breadcrumbs:type }}</div>
 		{% endblock title %}
@@ -131,7 +131,7 @@
 			</ul>
 		</div>
 		{% endblock %}
-    </div>
+    </div></div>
     {% endblock %}
 </body>
 </html>
