@@ -1,0 +1,36 @@
+select option {
+    background: #F5F5F0;
+    color: #57676E;
+    font-size: 11.5px;
+}
+
+span.customSelect { 
+	font-size:11.5px;
+	color:#7c7c7c;
+	padding:3px 7px;
+	border:1px solid #ccc; 
+	-moz-border-radius: 3px; 
+	-webkit-border-radius: 3px;
+	border-radius: 3px; 
+	background: none repeat scroll 0% 0% rgb(231, 238, 242);
+}
+
+span.customSelect.changed {
+	background-color: #f0dea4;
+}
+
+.customSelect.customSelectHover {
+/* Styles for when the select box is hovered */
+}
+
+.customSelect.customSelectOpen {
+	/* Styles for when the select box is open */
+}
+
+.customSelect.customSelectFocus {
+/* Styles for when the select box is in focus */
+}
+
+.customSelectInner {
+	background: url(/static/img/canvas-list-nav-item-arrow.gif) no-repeat center right;
+}

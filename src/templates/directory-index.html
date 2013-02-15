@@ -25,7 +25,10 @@
 	{% block head %}
         <script type="text/javascript" src="/static/js/jquery.min.js"></script>
 	    <script type="text/javascript">
-        $(function(){riurik.trigger('riurik.initing-editor');});
+        $(function(){
+			riurik.trigger('riurik.initing-editor');
+			$('select#context').customSelect();
+		});
 	    </script>
       	<script type="text/javascript" src="/static/js/jquery.json.min.js"></script>
 		<script type="text/javascript" src="/static/jquery-ui/js/jquery-ui.custom.min.js"></script>
@@ -33,14 +36,16 @@
     
 		 {% block styles %}
 		<link rel="stylesheet" href="/static/css/base.css" type="text/css">
-    	 <link rel="stylesheet" type="text/css" href="/static/jquery-ui/css/start/jquery-ui.custom.css" />
+    	<link rel="stylesheet" type="text/css" href="/static/jquery-ui/css/start/jquery-ui.custom.css" />
 		<link rel="stylesheet" href="/static/css/loader.css" type="text/css">
 	    <link rel="stylesheet" href="/static/css/contextMenu.css" type="text/css">
+		<link rel="stylesheet" href="/static/css/select.css" type="text/css">
 		{% endblock styles %}
 
         <script type="text/javascript" src="/static/js/jquery.contextMenu.js"></script>
 	    <script type="text/javascript" src="/static/js/dir-index-ctxmenu.js"></script>
 	    <script type="text/javascript" src="/static/js/dir-index-tools.js"></script>
+		<script type="text/javascript" src="/static/js/select.js"></script>
 		{% block javascripts %}
 		{% endblock javascripts %}
     {% endblock head %}

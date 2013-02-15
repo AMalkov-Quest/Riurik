@@ -47,7 +47,7 @@ a:hover,a:active {
 
 #horizontal-menu {
 	position: absolute;
-	right: 5%;
+	right: 0;
 	margin: 0;
 	padding: 0;
 }
@@ -92,7 +92,7 @@ a.logo {
 }
 
 .content {
-	margin: 0px 63px;
+	margin: 10px 63px;
 }
 
 .line {
