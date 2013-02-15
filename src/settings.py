@@ -152,7 +152,7 @@ chaiPack = [
 	'chai/chai-jquery.js'
 ]
 
-qunitSTATIC_MANAGEMENT = {
+STATIC_MANAGEMENT = {
     'js': {
         'qunit.testLoader.js': [
             'js/jquery.min.js',
@@ -196,7 +196,7 @@ cucumberSTATIC_MANAGEMENT = {
     }
 }
 
-STATIC_MANAGEMENT = {
+mochaSTATIC_MANAGEMENT = {
     'js': {
         'mocha.testLoader.js': [
             'js/jquery.min.js',

@@ -2,10 +2,10 @@
 	window.frame = {
 		go: function(path, cache) {
 			var dfd = $.Deferred();
-			var url = path;
+			var url = path.replace(/^\/+/,'');
 			var regex = new RegExp('^http[s]?://[a-zA-Z0-9]');
 			if(!regex.test(url)) {
-				url = 'http://' + riurik.context.host + ':' + riurik.context.port + '/' + path;
+				url = 'http://' + riurik.context.host + ':' + riurik.context.port + '/' + url;
 			}
 			window.frame.location = url;
 

@@ -153,7 +153,7 @@ class GitHandler(serving.BaseHandler):
 		return gitware.get_full_path(self.user, self.repo, path)
 
 	def get_virtual_root(self):
-		return '' 
+		return '/' 
 
 class GitFronPageHandler(serving.DefaultHandler):
 

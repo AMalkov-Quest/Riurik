@@ -16,7 +16,10 @@ riurik.engine.run_tests = function() {
 };
 
 riurik.engine.config = function() {
-    //mocha.setup('bdd');
+	//using chai
+	window.expect = chai.expect
+	chai.should()
+
 	mocha.setup({
 		ui: 'tdd',
 		globals: ['hasCert'],	// switch off the global leak detection mechanism
