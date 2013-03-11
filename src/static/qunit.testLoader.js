@@ -129,6 +129,9 @@ riurik.on( "riurik.engine.loaded", function(){
 
 riurik.init = function() {
 	riurik.trigger( "riurik.initing" );
+
+	//to simplify the context access from tests
+	window.$context = clone(riurik.context);
 	riurik.onerror();
 	riurik.trigger( "riurik.inited" );
 }
@@ -768,10 +771,10 @@ riurik.on("riurik.tests.test.done", riurik.reporter.testDone);
 	window.frame = {
 		go: function(path, cache) {
 			var dfd = $.Deferred();
-			var url = path;
+			var url = path.replace(/^\/+/,'');
 			var regex = new RegExp('^http[s]?://[a-zA-Z0-9]');
 			if(!regex.test(url)) {
-				url = 'http://' + riurik.context.host + ':' + riurik.context.port + '/' + path;
+				url = 'http://' + riurik.context.host + ':' + riurik.context.port + '/' + url;
 			}
 			window.frame.location = url;
 
@@ -996,6 +999,9 @@ riurik.engine.config = function() {
 	}
 
 	QUnit.moduleStart = function(module) {
+		//to provide clean context for every module
+		window.$context = clone(riurik.context);
+		//for compatibility with old tests
 		window.context = clone(riurik.context);
 		riurik.trigger("riurik.tests.suite.start", module.name);
 	}

@@ -66,10 +66,9 @@ def add_name(ctximpl, name):
 	if name:
 		ctximpl.add('__name__', name)
 
-def add_virtual_root(ctximpl, path):
-	vroot = contrib.get_virtual_root(path)
-	if vroot:
-		ctximpl.add('__virtual_root__', vroot)
+def add_virtual_root(RequestHandler, ctximpl):
+	root = RequestHandler.get_virtual_root()
+	ctximpl.add('_root_', root.strip('//') + '/')
 
 def include_tests(path, ctx, ctximpl):
 
@@ -112,7 +111,7 @@ def patch(RequestHandler, ctx, riurik_url, ctxname=None):
 	patch_libraries(RequestHandler, ctximpl, ctx)
 	add_start_time(ctximpl, RequestHandler.time)
 	add_name(ctximpl, ctxname)
-	add_virtual_root(ctximpl, path)
+	add_virtual_root(RequestHandler, ctximpl)
 	contrib.patch_host_port(ctximpl, riurik_url)
 
 	return ctximpl.as_tuple()
