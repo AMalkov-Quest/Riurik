@@ -104,6 +104,7 @@ String.prototype.strip = function(c) {
    should be defined in testsLoader.html
 */
 //var riurik = {}
+window.$R = riurik;
 
 /* Namespace for exposing api in the jQuery namespace */
 riurik.exports = {}
@@ -128,6 +129,12 @@ riurik.on( "riurik.engine.loaded", function(){
 
 riurik.init = function() {
 	riurik.trigger( "riurik.initing" );
+	//using chai
+	//window.expect = chai.expect
+	//chai.should()
+	
+	//to simplify the context access from tests
+	window.$context = clone(riurik.context);
 	riurik.onerror();
 	riurik.trigger( "riurik.inited" );
 }
@@ -921,7 +928,7 @@ riurik.engine = {}
 
 riurik.engine.init = function( next ){
 		riurik.trigger( "riurik.engine.initing" );
-				
+		window.context = clone(riurik.context);		
 		riurik.engine.config();
 		riurik.trigger( "riurik.engine.inited" );
 		next();

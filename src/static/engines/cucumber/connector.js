@@ -2,7 +2,7 @@ riurik.engine = {}
 
 riurik.engine.init = function( next ){
 		riurik.trigger( "riurik.engine.initing" );
-				
+		window.context = clone(riurik.context);		
 		riurik.engine.config();
 		riurik.trigger( "riurik.engine.inited" );
 		next();

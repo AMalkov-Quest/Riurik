@@ -129,9 +129,6 @@ riurik.on( "riurik.engine.loaded", function(){
 
 riurik.init = function() {
 	riurik.trigger( "riurik.initing" );
-	//using chai
-	window.expect = chai.expect
-	chai.should()
 	
 	//to simplify the context access from tests
 	window.$context = clone(riurik.context);
@@ -942,7 +939,10 @@ riurik.engine.run_tests = function() {
 };
 
 riurik.engine.config = function() {
-    //mocha.setup('bdd');
+    //using chai
+	window.expect = chai.expect
+	chai.should()
+	
 	mocha.setup({
 		ui: 'tdd',
 		globals: ['hasCert'],	// switch off the global leak detection mechanism

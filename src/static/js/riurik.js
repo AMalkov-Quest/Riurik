@@ -27,9 +27,6 @@ riurik.on( "riurik.engine.loaded", function(){
 
 riurik.init = function() {
 	riurik.trigger( "riurik.initing" );
-	//using chai
-	window.expect = chai.expect
-	chai.should()
 	
 	//to simplify the context access from tests
 	window.$context = clone(riurik.context);
