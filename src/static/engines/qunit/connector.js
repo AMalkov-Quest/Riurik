@@ -80,22 +80,37 @@ riurik.engine.config = function() {
 		window.$context = clone(riurik.context);
 		//for compatibility with old tests
 		window.context = clone(riurik.context);
-		riurik.trigger("riurik.tests.suite.start", module.name);
+		
+		//riurik.trigger("riurik.tests.suite.start", module.name);
+		riurik.reporter.suite = module.name;
+		riurik.reporter.suiteStarted = new Date();
 	}
 
 	QUnit.moduleDone = function(module) {
-		riurik.trigger("riurik.tests.suite.done", module.name);
+		//riurik.trigger("riurik.tests.suite.done", module.name);
 	}
 
 	QUnit.testStart = function(test) {
-		riurik.trigger("riurik.tests.test.start", test.name);
+		//riurik.trigger("riurik.tests.test.start", test.name);
+		riurik.reporter.test = test.name;
+		riurik.reporter.testStarted = new Date();
 	}
 
 	QUnit.testDone = function(test) {
-		riurik.trigger("riurik.tests.test.done", test.name, test.passed, test.failed, test.total);
+		name = riurik.reporter.suite + ': ' + test.name;
+		riurik.trigger("riurik.tests.test.done", name, test.passed, test.failed, test.total);
 	}
 
 	QUnit.log = riurik.log;
+	
+	riurik.reporter.getTestDuration = function () {
+		var duration = (new Date() - riurik.reporter.testStarted)/1000;
+		if(isNaN(duration)) {
+			duration = 0;
+		}
+
+		return duration;
+	};
 
 	riurik.reporter.getHtmlTestResults = function () {
 		var moduleName = riurik.reporter.suite,

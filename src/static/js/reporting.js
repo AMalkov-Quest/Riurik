@@ -47,7 +47,7 @@ riurik.reporter.done = function () {
 	});
 };
 
-riurik.reporter.suiteStart = function(e, suite) {
+/*riurik.reporter.suiteStart = function(e, suite) {
 	riurik.reporter.suite = suite;
 	riurik.reporter.suiteStarted = new Date();
 };
@@ -60,16 +60,15 @@ riurik.reporter.suiteDone = function(e, module) {
 riurik.reporter.testStart = function(e, test) {
 	riurik.reporter.test = test;
 	riurik.reporter.testStarted = new Date();
-};
+};*/
 
 riurik.reporter.testDone = function(e, name, passed, failed, total) {
 	console.log('the "' + name + '" test is done', arguments);
-	var module = riurik.reporter.suite;
 	riurik.reporter.testNum  = riurik.reporter.testNum + 1;
 	riurik.reporter.queue.push({ 
 		'event': 'testDone',
 		'id': riurik.reporter.testNum,
-		'name': module + ': ' + name,
+		'name': name,
 		'failed': failed,
 		'passed': passed,
 		'total': total,
@@ -145,15 +144,6 @@ riurik.reporter.send = function (data, callback) {
 	};
 };
 
-riurik.reporter.getTestDuration = function () {
-	var duration = (new Date() - riurik.reporter.testStarted)/1000;
-	if(isNaN(duration)) {
-		duration = 0;
-	}
-
-	return duration;
-};
-
 riurik.reporter.consignor = function () {
 	var busy = false;
 	var busyTimeOut;
@@ -176,7 +166,7 @@ riurik.reporter.consignor = function () {
 			if ( riurik.reporter.queue.length > 0 ) {
 				data = riurik.reporter.queue.shift();
 				data['date'] = riurik.reporter.date;
-				data['context'] = context.__name__;
+				data['context'] = riurik.context.__name__;
 				data['path'] = riurik.reporter.target_tests_path;
 				
 				busy = true;
@@ -195,8 +185,8 @@ riurik.reporter.consignor = function () {
 
 riurik.on("riurik.tests.begin", riurik.reporter.begin);
 riurik.on("riurik.tests.end", riurik.reporter.done);
-riurik.on("riurik.tests.suite.start", riurik.reporter.suiteStart);
-riurik.on("riurik.tests.suite.done", riurik.reporter.suiteDone);
-riurik.on("riurik.tests.test.start", riurik.reporter.testStart);
+//riurik.on("riurik.tests.suite.start", riurik.reporter.suiteStart);
+//riurik.on("riurik.tests.suite.done", riurik.reporter.suiteDone);
+//riurik.on("riurik.tests.test.start", riurik.reporter.testStart);
 riurik.on("riurik.tests.test.done", riurik.reporter.testDone);
 
