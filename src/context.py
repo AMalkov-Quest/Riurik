@@ -68,7 +68,7 @@ def add_name(ctximpl, name):
 
 def add_virtual_root(RequestHandler, ctximpl):
 	root = RequestHandler.get_virtual_root()
-	ctximpl.add('_root_', root.strip('//') + '/')
+	ctximpl.add( '_root_', root.strip('//') )
 
 def include_tests(path, ctx, ctximpl):
 
