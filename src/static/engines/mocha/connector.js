@@ -12,6 +12,7 @@ riurik.engine.init = function( next ){
 
 riurik.engine.run_tests = function() {
 	console.log('start mocha tests ...');
+	riurik.trigger("riurik.tests.begin");
 	runner = mocha.run();
 	riurik.reporter.mocha(runner);
 };
@@ -29,6 +30,8 @@ riurik.engine.config = function() {
 	});
 
 };
+
+riurik.reporter.engine = 'mocha';
 
 riurik.reporter.mocha = function(runner) {
 
@@ -49,6 +52,16 @@ riurik.reporter.mocha = function(runner) {
 	runner.on('test end', function(test) {
 		console.log('Mocha test END:');
 		console.log(test);
+		if(test.state == 'passed') {
+			test.passed = 1;
+			test.failed = 0;
+			test.total = 1;
+		}else{
+			test.passed = 0;
+			test.failed = 1;
+			test.total = 1;
+		}
+		riurik.trigger("riurik.tests.test.done", test.title, test.passed, test.failed, test.total);
 	});
 
 	runner.on('suite end', function(suite) {
@@ -58,9 +71,18 @@ riurik.reporter.mocha = function(runner) {
 
 	runner.on('end', function() {
 		console.log('Mocha END');
+		riurik.trigger("riurik.tests.end");
 	});
 
 }
+
+riurik.reporter.getTestDuration = function () {
+	return 0;
+};
+
+riurik.reporter.getHtmlTestResults = function () {
+	return '';
+};
 
 riurik.matchers.pass = function(message) {
 	
