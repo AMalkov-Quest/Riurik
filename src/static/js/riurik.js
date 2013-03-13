@@ -119,6 +119,10 @@ riurik.util.strip = function(s, c) {
 riurik.util.URI = function(env, path) {
 	return 'http://' + env.host + ':' + env.port + '/' + path;
 }
+
+riurik.util.FULL_URL = function(path) {
+	return 'http://' + riurik.context.host + ':' + riurik.context.port + '/' + path;
+}
 	
 riurik.util.load_js = function(jsfile_src) {
 	var scr = jsfile_src;
