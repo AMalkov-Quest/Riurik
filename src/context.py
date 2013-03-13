@@ -4,6 +4,7 @@ import settings, config, contrib
 from django.template import Context, Template
 import socket
 from django.core.cache import cache
+from context_impl import context_impl
 
 def host(instance, resolve=True):
 	key = 'host'
@@ -66,10 +67,6 @@ def add_name(ctximpl, name):
 	if name:
 		ctximpl.add('__name__', name)
 
-def add_virtual_root(RequestHandler, ctximpl):
-	root = RequestHandler.get_virtual_root().strip('//')
-	ctximpl.add( '_root_', root if root else '/' )
-
 def include_tests(path, ctx, ctximpl):
 
 	def contextjs(path):
@@ -106,12 +103,12 @@ def patch_suite_setup(ctximpl, path):
 
 def patch(RequestHandler, ctx, riurik_url, ctxname=None):
 	path = RequestHandler.get_path()
-	ctximpl = contrib.context_impl(ctx.items())
+	ctximpl = context_impl(ctx.items())
 	include_tests(path, ctx, ctximpl)
 	patch_libraries(RequestHandler, ctximpl, ctx)
 	add_start_time(ctximpl, RequestHandler.time)
 	add_name(ctximpl, ctxname)
-	add_virtual_root(RequestHandler, ctximpl)
+	ctximpl.add_virtual_root(RequestHandler)
 	contrib.patch_host_port(ctximpl, riurik_url)
 
 	return ctximpl.as_tuple()
