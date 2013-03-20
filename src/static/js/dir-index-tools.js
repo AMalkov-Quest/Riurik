@@ -11,7 +11,11 @@ $(function () {
 		$('a#history').attr('href', '?history&context='+$('select[name=context]').val());
 	}).change();
 
-	$('#context-preview-ctrl').click(function(){
+	$('#context-preview-ctrl').click(function(e){
+		if( e.ctrlKey ) {
+			open('.context.ini?editor'); 
+			return false;
+		}
 		$('#context-preview').dialog({
 			width: $(document).width()*0.9,
 			height: 600,
