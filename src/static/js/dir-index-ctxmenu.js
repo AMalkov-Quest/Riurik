@@ -4,13 +4,14 @@ var ctxMenuActions = {
 		var args = action.split('#');
 		action = args.shift();
 		args = ', [' + args.map(function(i){return '"'+i+'"';}).toString() + ']';
-		var parmas = '("' + $(el).find('a').text() + '", "' + $(el).attr('class') + '"'+ args +')';
-		eval('ctxMenuActions.' + action + parmas);
+		var params = '("' + $(el).find('a').text() + '", "' + $(el).attr('class') + '"'+ args +')';
+		eval('ctxMenuActions.' + action + params);
 	},
 
 	editctx: function (target, context) {
 		var currentDir = $('#context-action > input[name=url]').val();
-		window.location = "/actions/suite/edit/?path=" + currentDir + target;
+		//window.location = "/actions/suite/edit/?path=" + currentDir + target;
+		window.location = '/' + currentDir + '.context.ini?editor';
 	},
 	
 	editspec: function (target, context) {
