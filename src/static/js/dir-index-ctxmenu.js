@@ -9,14 +9,18 @@ var ctxMenuActions = {
 	},
 
 	editctx: function (target, context) {
-		var currentDir = $('#context-action > input[name=url]').val();
-		//window.location = "/actions/suite/edit/?path=" + currentDir + target;
-		window.location = '/' + currentDir + '.context.ini?editor';
+		ctxMenuActions.editimpl(target, context, '.context.ini');
 	},
 	
 	editspec: function (target, context) {
-		var currentDir = $('#context-action > input[name=url]').val();
-		window.location = '/' + currentDir + '.specification.ini?editor';
+		ctxMenuActions.editimpl(target, context, '.specification.ini');
+	},
+
+	editimpl: function (target, context, file_name) {
+		if( context == 'test' ) {
+			target = $('#context-action > input[name=url]').val();
+		}
+		window.location = '/' + target + '/' + file_name + '?editor';
 	},
 	
 	remove: function (target, context) {
