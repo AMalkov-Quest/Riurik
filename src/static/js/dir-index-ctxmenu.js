@@ -52,7 +52,7 @@ var ctxMenuActions = {
 		var fullPath = currentDir + target;
 		var context = $('#context').val();
 		if ( typeof context == 'undefined' ) {
-			alert('No context selected');
+			alert('This action is not implemented yet. Open the suite to execute it.');
 			return;	
 		}
 		var target_type = $('#dir-index-id li[title="'+target+'"]').attr('class');
