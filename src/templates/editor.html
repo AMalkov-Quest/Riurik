@@ -182,10 +182,10 @@
         {% endifequal %}
         
         <li><a id="save" href="javascript:void(0);">{% trans "Save" %}</a></li>
+	{% endif %}
 		{% if stubbed %}
         <li><a id="unstub" href="javascript:void(0);">{% trans "Get control" %}</a></li>
 		{% endif %}
-	{% endif %}
 		<li><a id="close" href="javascript: void(0);">{% trans "Close" %}</a></li>
 	</ul>
 {% endblock controls %}
