@@ -161,11 +161,11 @@ jQuery.extend(riurik.exports, riurik.util);
 riurik.matchers = {}
 
 riurik.matchers.pass = function(message) {
-	alert('Test Engine pass is not implemented');
+	riurik.util.log(message || 'success!');
 };
 
 riurik.matchers.fail = function(message) {
-	alert('Test Engine fail is not implemented');
+	throw new Error(message || 'some failure!');
 };
 
 riurik.matchers.substring = function(actual, expected, message) {

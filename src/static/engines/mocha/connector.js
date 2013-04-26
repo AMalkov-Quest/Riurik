@@ -84,14 +84,6 @@ riurik.reporter.getHtmlTestResults = function () {
 	return '';
 };
 
-riurik.matchers.pass = function(message) {
-	
-};
-
-riurik.matchers.fail = function(message) {
-	
-};
-
 $.extend(riurik.exports, riurik.matchers);
 
 $.extend(riurik.exports);
