@@ -67,7 +67,8 @@ def get_suites(root, path, fullpath, ctx_name, RequestHandler):
 			if not ctx_name in ctx_sections:
 				continue
 
-			if path in relpath:
+			#if path in relpath:
+			if relpath.strip('\\').startswith(path):
 				suite_name = os.path.relpath(relpath, path)
 			else:
 				suite_name = relpath
