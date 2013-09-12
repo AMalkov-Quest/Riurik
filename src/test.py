@@ -1,5 +1,9 @@
 import os, inspect, minimock
 import __builtin__
+
+def Mock(name, **kw):
+	kw['tracker'] = minimock.Printer(open(os.devnull, "w"))
+	return minimock.Mock(name, **kw)
  
 def stub(name, **kw):
 	kw['tracker'] = minimock.Printer(open(os.devnull, "w"))

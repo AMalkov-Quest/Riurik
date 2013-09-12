@@ -101,7 +101,8 @@ class BaseHandler(object):
 				raise Http404('"%s" does not exist' % fullpath)
 
 		if 'editor' in request.REQUEST:
-			descriptor = self.get_file_content_to_edit(fullpath, inuse.is_stubbed(self.path, request))
+			stubbed = inuse.is_stubbed(self.path, request)
+			descriptor = self.get_file_content_to_edit(fullpath, stubbed, stubbed)
 			inuse.stub(self.path, request)
 			return _render_to_response('editor.html', descriptor, context_instance=RequestContext(request))
 
@@ -117,7 +118,7 @@ class BaseHandler(object):
 
 		return t
 
-	def get_file_content_to_edit(self, fullpath, stubbed):
+	def get_file_content_to_edit(self, fullpath, stubbed, read_only=False):
 		try:
 			contexts = context.get( self ).sections()
 		except Exception, e:
@@ -131,7 +132,7 @@ class BaseHandler(object):
 			'content': content,
 			'contexts': contexts,
 			'relative_file_path': self.path,
-			'read_only': stubbed,
+			'read_only': read_only,
 			'stubbed': stubbed,
 			'favicon'   : 'dir-index-test.gif',
 			'filetype':  self.get_type(fullpath),

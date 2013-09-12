@@ -119,6 +119,10 @@ riurik.util.strip = function(s, c) {
 riurik.util.URI = function(env, path) {
 	return 'http://' + env.host + ':' + env.port + '/' + path;
 }
+
+riurik.util.FULL_URL = function(path) {
+	return 'http://' + riurik.context.host + ':' + riurik.context.port + '/' + path;
+}
 	
 riurik.util.load_js = function(jsfile_src) {
 	var scr = jsfile_src;
@@ -157,11 +161,11 @@ jQuery.extend(riurik.exports, riurik.util);
 riurik.matchers = {}
 
 riurik.matchers.pass = function(message) {
-	alert('Test Engine pass is not implemented');
+	riurik.util.log(message || 'success!');
 };
 
 riurik.matchers.fail = function(message) {
-	alert('Test Engine fail is not implemented');
+	throw new Error(message || 'some failure!');
 };
 
 riurik.matchers.substring = function(actual, expected, message) {

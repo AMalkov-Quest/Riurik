@@ -150,3 +150,7 @@ li img {
 .dir-index .folder { background: url(/static/img/dir-index-folder.gif) no-repeat scroll top left; }
 .dir-index .suite { background: url(/static/img/dir-index-suite.gif) no-repeat scroll top left; }
 .dir-index .test { background: url(/static/img/dir-index-test.gif) no-repeat scroll top left; }
+
+#context-preview, .ui-dialog, .ui-widget, .ui-widget-content {
+	background: none repeat scroll 0% 0% rgb(231, 238, 242);
+}
