@@ -13,6 +13,7 @@
 		<script type="text/javascript" src="/static/codemirroreditor/lib/codemirror.js"></script>
 		<script type="text/javascript" src="/static/codemirroreditor/mode/javascript/javascript.js"></script>
 		<script type="text/javascript" src="/static/codemirroreditor/mode/coffeescript/coffeescript.js"></script>
+		<script type="text/javascript" src="/static/showdown/dist/showdown.js"></script>
 	{% endif %}
 	<script type="text/javascript" src="/static/js/jquery.cookie.js"></script>
 	<script type="text/javascript">
@@ -31,7 +32,12 @@
 					$(el).text(e.message); 
 				} 
 			};
+			
 		  	var mode = ( /\.coffee\?/.test(window.location.href) ) ? "coffeescript" : "javascript";
+			var markdown = ( /\.daspec\?/.test(window.location.href) )
+			if( markdown ) {
+				mode = 'markdown';
+			}
   		  	var editor = CodeMirror.fromTextArea(document.getElementById("code"), {
 				mode: mode,
 		    		content: source_value,
@@ -41,7 +47,15 @@
 				matchBrackets: true,
 				extraKeys: {
 					"Ctrl-S": function(){ $('#save').trigger('click'); },
-					"Ctrl-R": function(){ $('#run').trigger('click'); }
+					"Ctrl-R": function(){ $('#run').trigger('click'); },
+					"Ctrl-M": function(){
+						if( markdown ) {
+							var converter = new showdown.Converter({simplifiedAutoLink: true, strikethrough: true, ghCodeBlocks: true, tables: true})
+							window.alert( converter.makeHtml(editor.getValue()) );
+							var newWindow = window.open("", "newWindow", "resizable=yes");
+							newWindow.document.write(converter.makeHtml(editor.getValue()));
+						}
+					}
 				},
 				onChange: function(editor, options) {
 					if ( mode == 'coffeescript' ) {

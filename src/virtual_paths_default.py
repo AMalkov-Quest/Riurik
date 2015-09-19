@@ -5,4 +5,5 @@ VIRTUAL_PATHS = {
   'riurik-inner-tests': (root, 'tests', 'cases'),
   'other-tests': (root, 'tests-1', 'cases'),
   'django-app-tests': (root, 'tests-2', 'cases'),
+  'daspec-tests': (root, 'daspec', 'cases'),
 }
