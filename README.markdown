@@ -1,6 +1,31 @@
-<a name="README">[Riurik acceptance testing framework for web applications](https://github.com/andrew-malkov/Riurik)</a>
+<a name="README">[Riurik testing framework for web applications](https://github.com/andrew-malkov/Riurik)</a>
 =======
-Riurik is a wiki web server that allows to make, organize, and run selenium free, pure javascript acceptance test scripts. It aims to simplify the process of UI, functional and integration testing web applications. A web browser - the only thing that you need for this. Riurik is written in Javascript and Python using jQuery, Qunit, Django, heavily influenced by, and borrows the best parts of Fitnesse.
+Riurik is a tool designed to make writing automated acceptance and regression tests for web applications easier. It provides features that make it easier to organize and structure your acceptance tests, associating them with the user stories or features that they test. 
+
+* Short learning curve
+* Selenium free
+* The JQuery library is used to abstract over browser differences
+* Using CoffeeScript to write specs makes them more readable
+* QUnit, jasmine, mocha, cucumberjs can be used to write specs
+* Allows to run any script language to execute server-side code
+* CI integration: xml, json, html result reporting, execution progress
+* Tests execution history
+* It provides Web based UI with handy code editor(http://ace.ajax.org)
+* You can use PowerShell, python, batch(cmd) scripts to create test fixtures
+  * this list can be easily extended
+  * these fixtures are for setup and examine your test environment before and after tests
+  * you can create, edit and execute this scripts right in browser
+* Browser is a single place to manage, review, execute and check results of your tests
+* It does not require to use particular DSL and framework to write specs
+  * javascript, that is one of the language of web developers, is used to write specs
+  * you can use any javascript libraries or framework to write and execute you specs
+  * cucumber, qUnit, jasmine, mocha (this list can be extended easily)
+  * using real programming language(javascript) eliminates any code duplication issues
+  * using real programming language makes the developers life easier
+  * it is possible to use coffescript to make the specs more readable and write less code
+  * it is possible to use cucumber to make the specs event more readable(especially for business users)
+
+<a name="DEMO">[Demo](http://www.youtube.com/watch?v=W13HB3FEkdo)</a>
 
 Documentation:
 --------------
@@ -10,57 +35,17 @@ Documentation:
 * [Python 2][2]
 * [Django] [3]
 * [jQuery][1]
+* [nodejs][7]
  
 ### Quick start
 
-Being a Django web application, Riurik requires Python and Django. It works with Python version 2.6 and 2.7. Get Python at [http://www.python.org][6]. If you’re running Linux, you probably already have it installed. To install the Django framework follow [this installation guid][5]. Now download and unpack the [latest Riurik packaged release from Github][4]. In the src folder execute
-
-        sh run.sh
-
-for Linux. For Windows use
-
-        run.bat
-
-but first you have to [add the python path to Windows PATH][AddingPythonToWindowsPath] or just modify the run.bat script by adding full path to python.exe command.
-
-Start up a web browser and go to http://localhost:8000. The main Riurik screen should come up.
-
-To make you django application ready to work with Riurik download [Riurik Django bindings][DjangoBindings]. Unpack it into your django web application tests folder. It should be a package directory, i.e. contain \_\_init\_\_.py. Also create your test suites folder there. For example
-
-       django web app
-       | tests
-       | | cases
-       | | riurik
-       | | __init__.py
-       
-In your urls.py add urlpatterns to include('tests.riurik.urls')
-
-    urlpatterns += patterns('',
-      (r'^testsrc', include('tests.riurik.urls')),
-    )
-       
-That's it. You're ready to start using Riurik.
-
-### Example
-
-    asyncTest('create suite button', function() {
-      $.when(frame.go('riurik-inner-tests')).then(function() {
-        equal(_$('#new-suite').text(), 'Create Suite');
-        _$('#new-suite').click();
-        equal(_$('.ui-dialog-title').text(), 'Create Suite');
-        equal(_$('#fsobject-tip').text(), 'Specify a suite name here');
-        equal(_$('#create-folder-btn').text(), 'create');
-        
-        _$('#object-name').val('second-suite');
-        _$('#create-folder-btn').click();
-        
-        $.when(frame.load()).then(function() {
-          ok(_$('li#second-suite.folder').length > 0, 'new suite is created successfully');
-          
-          start();
-        });
-      });
-    });
+* Download ZIP and unpack
+* Download python http://www.python.org/ftp/python/2.7.3/python-2.7.3.msi and setup
+* Download last python setup tools http://pypi.python.org/pypi/setuptools and install
+* Download Django zipped archive https://www.djangoproject.com/download
+* Unpack it and run the C:\Python27\python.exe setup.py install inside this unpacked folder
+* Download nodejs http://nodejs.org/download and install it
+* run.bat
 
 Authors
 ------
@@ -117,6 +102,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 [4]: https://github.com/andrew-malkov/Riurik/downloads "Riurik Download"
 [5]: https://docs.djangoproject.com/en/1.3/topics/install
 [6]: http://www.python.org
+[7]: http://nodejs.org
 [DjangoBindings]: https://github.com/andrew-malkov/Riurik-Django/downloads
 [amalkov]: https://github.com/andrew-malkov
 [atimiskov]: https://github.com/AntonTimiskov
