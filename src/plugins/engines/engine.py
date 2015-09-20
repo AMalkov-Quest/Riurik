@@ -13,6 +13,9 @@ def engage4test(path, fullpath, ctx):
 
 	if is_jasmine(ctx):
 		engine = 'jasmine'
+	
+	if is_daspec(path, ctx):
+		engine = 'daspec'
 
 	return engine
 
@@ -28,7 +31,13 @@ def engage4suite(path, fullpath, ctx):
 	if is_jasmine(ctx):
 		engine = 'jasmine'
 
+	if is_daspec(path, ctx):
+		engine = 'daspec'
+
 	return engine
+
+def is_daspec(path, ctx):
+	return path.endswith(settings.DASPEC_FILE_EXT) or ctx.get('daspec', None) != None
 
 def is_cucumber(path, ctx):
 	return path.endswith(settings.CUCUMBER_FILE_EXT) or ctx.get('cucumber', None) != None
