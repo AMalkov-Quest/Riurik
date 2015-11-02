@@ -28,7 +28,7 @@
 			};
 
 			riurik.GetCwd = function(path) {
-				if ( ! /\.js$/.test(path) ) {
+				if ( ! /\.js$/.test(path) && ! /\.daspec$/.test(path) ) {
 					//current target is suite, just return it
 					return path;
 				}

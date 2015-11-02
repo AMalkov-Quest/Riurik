@@ -88,7 +88,11 @@ riurik.loader().queue(riurik.args.cwd + '/.context.js', function(){
 	var engine = riurik.TryGetArgument('engine') || 'qunit';
 
 	riurik.loader()
-	.queue('/static/'+engine+'.testLoader.js')
+	.queue('/static/js/jquery.min.js')
+	.queue('/static/js/tools.js')
+	.queue('/static/js/errors.js')
+	.queue('/static/js/riurik.js')
+	.queue('/static/engines/'+engine+'/connector.js')
 	.then(function() {
 		riurik.engine.init(function(){
 			riurik.trigger( "riurik.engine.loaded" );
