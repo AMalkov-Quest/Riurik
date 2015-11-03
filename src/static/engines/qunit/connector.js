@@ -3,11 +3,25 @@ riurik.engine = {}
 riurik.engine.init = function( next ){
 	riurik.trigger( "riurik.engine.initing" );
 	window.context = clone(riurik.context);
-	riurik.engine.config();
-	riurik.trigger( "riurik.engine.inited" );
-	load_remote_style('/static/engines/qunit/qunit.css');
+	
+	riurik.loader()
+	.queue('/static/js/jquery.json.min.js')
+	.queue('/static/js/dates.js')
+	.queue('/static/js/consoles.js')
+	.queue('/static/js/reporting.js')
+	.queue('/static/js/frame.js')
+	.queue('/static/engines/qunit/qunit.html.js')
+	.queue('/static/engines/qunit/qunit.js')
+	.queue('/static/engines/qunit/qunit.extentions.js')
+	.then(function() {
+		riurik.reporter.engine = 'qunit';
+		riurik.engine.config();
+		
+		riurik.trigger( "riurik.engine.inited" );
+		load_remote_style('/static/engines/qunit/qunit.css');
 
-	next();
+		next();
+	});
 };
 
 riurik.engine.run_tests = function() {
@@ -44,8 +58,6 @@ riurik.matchers.substring = function(actual, expected, message) {
 };
 
 jQuery.extend(riurik.exports, riurik.matchers);
-
-riurik.reporter.engine = 'qunit';
 
 riurik.engine.config = function() {
 	if ( typeof window.QUnit == 'undefined' ) {
