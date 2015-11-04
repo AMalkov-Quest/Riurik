@@ -1,16 +1,6 @@
-# End-of-year bonus allocation
+# This is a heading so it's ignored
 
-> Managers get 20% of their salary, capped at 50K; Lab rats get 10%.
+> this is a block quote so it's ignored as well
+> but the line below is normal text so it will be executed
 
-A manager with a 50000 salary should get 10000 as the end of year bonus. 
-A lab rat with a 50000 salary should get 5000 as the end of year bonus.
-A drone with a 50000 salary should get no bonus.
-
-> you can also use bullet lists - each item is an independent example
-
-* A manager with a 50000 salary should get 10000 as the end of year bonus
-* A manager with a 250000 salary should get 50000 as the end of year bonus
-* A manager with a 250001 salary should get 50000 as the end of year bonus
-* A manager with a 400000 salary should get 50000 as the end of year bonus
-* A lab rat with a 30000 salary should get 3000 as the end of year bonus
-* A drone with a 20000 salary should get no bonus
+The right way to greet the World is "Hello, World!"
