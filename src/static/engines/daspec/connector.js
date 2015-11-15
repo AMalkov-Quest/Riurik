@@ -33,9 +33,9 @@ riurik.engine.run_tests = function() {
 				var runner = new DaSpec.Runner(riurik.engine.steps_definition),
 					resultFormatter = new DaSpec.MarkdownResultFormatter(runner);
 			
-				runner.execute(markdown);
-				
-				$('#outputArea').html(resultFormatter.formattedResults()); 
+				runner.execute(markdown).then(function () {
+					$('#outputArea').html(resultFormatter.formattedResults());
+				}); 
 			});
 		}, 
 		dataType: 'text'
