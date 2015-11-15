@@ -6,11 +6,13 @@ riurik.engine.init = function( next ){
 	$('#frame-container').remove();
 	
 	riurik.loader()
+	.queue('/static/showdown/bin/showdown.js')
 	.queue('/static/engines/daspec/daspec-web.js')
 	.queue('/static/engines/daspec/daspec.html.js')
 	.then(function() {
 		$.extend(riurik.exports);
 		riurik.engine.config();
+		load_remote_style('/static/engines/daspec/bootstrap.css');
 		load_remote_style('/static/engines/daspec/daspec.css');
 		riurik.trigger( "riurik.engine.inited" );
 		next();
@@ -34,7 +36,9 @@ riurik.engine.run_tests = function() {
 					resultFormatter = new DaSpec.MarkdownResultFormatter(runner);
 			
 				runner.execute(markdown).then(function () {
-					$('#outputArea').html(resultFormatter.formattedResults());
+					var converter = new showdown.Converter({simplifiedAutoLink: true, strikethrough: true, ghCodeBlocks: true, tables: true})
+					$('#outputArea').html(converter.makeHtml(resultFormatter.formattedResults()));
+					//$('#outputArea').html(resultFormatter.formattedResults());
 				}); 
 			});
 		}, 
