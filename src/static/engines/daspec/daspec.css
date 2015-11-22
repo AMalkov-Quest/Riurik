@@ -1,6 +1,7 @@
 body {
   padding-bottom: 40px;
-  color: #5a5a5a; }
+  color: #5a5a5a;
+  }
 
 .marketing {
   padding-left: 15px;
@@ -77,7 +78,8 @@ body {
 
 #page-content table {
   margin-top: 10px;
-  margin-bottom: 10px; }
+  margin-bottom: 10px;
+  }
 
 #page-content table td, #page-content table th {
   border: 1px solid silver;

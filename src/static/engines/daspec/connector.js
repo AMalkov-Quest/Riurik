@@ -13,9 +13,8 @@ riurik.engine.init = function( next ){
 	.then(function() {
 		$.extend(riurik.exports);
 		riurik.engine.config();
-		//load_remote_style('/static/engines/daspec/bootstrap.css');
-		load_remote_style('/static/bootstrap/css/bootstrap.css');
 		load_remote_style('/static/engines/daspec/daspec.css');
+		load_remote_style('/static/bootstrap/css/bootstrap.css');
 		riurik.trigger( "riurik.engine.inited" );
 		next();
 	});
