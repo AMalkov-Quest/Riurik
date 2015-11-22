@@ -6,13 +6,15 @@ riurik.engine.init = function( next ){
 	$('#frame-container').remove();
 	
 	riurik.loader()
-	.queue('/static/showdown/bin/showdown.js')
+	.queue('/static/bootstrap/js/bootstrap.js')
+	.queue('/static/showdown/dist/showdown.js')
 	.queue('/static/engines/daspec/daspec-web.js')
 	.queue('/static/engines/daspec/daspec.html.js')
 	.then(function() {
 		$.extend(riurik.exports);
 		riurik.engine.config();
-		load_remote_style('/static/engines/daspec/bootstrap.css');
+		//load_remote_style('/static/engines/daspec/bootstrap.css');
+		load_remote_style('/static/bootstrap/css/bootstrap.css');
 		load_remote_style('/static/engines/daspec/daspec.css');
 		riurik.trigger( "riurik.engine.inited" );
 		next();
