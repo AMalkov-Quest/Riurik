@@ -1,4 +1,3 @@
-riurik.engine.steps_definition = function() {
 var VATCalculator = function () {
     'use strict';
 	var euCodes =
@@ -56,4 +55,3 @@ defineStep(/Use EU VAT\?\s*\|\s*Expected EU VAT Country/, function (ipAddress, b
 	expect(usingVAT).toEqual(shouldUseVAT);
 	expect(designated).toEqual(expectedCountry);
 });
-};

@@ -1,4 +1,3 @@
-riurik.engine.steps_definition = function() {
 /* This is the system under test - the business object, production code being tested */
 var InventoryService = function () {
     	'use strict';
@@ -55,4 +54,3 @@ defineStep(/The following items will be (.*):/, function (status, tableOfItems) 
 	// .toEqualUnorderedTable compares whole tables
 	expect(actualTable).toEqualUnorderedTable(tableOfItems);
 });
-};

@@ -1,5 +1,3 @@
-riurik.engine.steps_definition = function() {
-    
 var FeedService = function () {
     'use strict';
 	var self = this,
@@ -62,5 +60,3 @@ defineStep(/appear in the feeds for/, function (expectedFeedsList) {
 	'use strict';
 	expect(feedService.getFeedsForMessageId(lastMessageId)).toEqualSet(expectedFeedsList);
 });
-
-};
