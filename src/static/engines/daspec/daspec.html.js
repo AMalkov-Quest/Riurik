@@ -1,6 +1,6 @@
 $(function(){
 	$('\
-		<div id="outputArea" class="examples">\
+		<div id="page-content" class="examples">\
 		</div>\
 	').appendTo('#engine');
 });

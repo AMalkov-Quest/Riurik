@@ -49,7 +49,7 @@ riurik.engine.run_tests = function(defineSteps) {
 		
 			runner.execute(markdown).then(function () {
 				var converter = new showdown.Converter({simplifiedAutoLink: true, strikethrough: true, ghCodeBlocks: true, tables: true})
-				$('#outputArea').html(converter.makeHtml(resultFormatter.formattedResults()));
+				$('#page-content').html(converter.makeHtml(resultFormatter.formattedResults()));
 				//$('#outputArea').html(resultFormatter.formattedResults());
 			});
 		}, 
