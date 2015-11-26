@@ -332,7 +332,7 @@ module.exports = function ExampleBlock() {
 			};
 		};
 	self.addLine = function (lineText) {
-		lines.unshift(lineText);
+		lines.unshift(lineText.replace(/\n|\r/g, ""));
 	};
 	self.getAttachment = function () {
 		var attachmentLines = self.getAttachmentLines().filter(regexUtil.assertionLine);
