@@ -332,7 +332,7 @@ module.exports = function ExampleBlock() {
 			};
 		};
 	self.addLine = function (lineText) {
-		lines.unshift(lineText.replace(/\n|\r/g, ""));
+		lines.unshift(lineText);
 	};
 	self.getAttachment = function () {
 		var attachmentLines = self.getAttachmentLines().filter(regexUtil.assertionLine);
@@ -431,7 +431,7 @@ module.exports = function ExampleBlocks(inputText) {
 	var self = this,
 		ExampleBlock = require('./example-block');
 	self.getBlocks = function () {
-		var lines = inputText && inputText.split('\n').reverse(),
+		var lines = inputText && inputText.split(/\r?\n/).reverse(),
 			current = new ExampleBlock(),
 			blocks = [current];
 		lines.forEach(function (line) {
