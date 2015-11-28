@@ -22,27 +22,34 @@ riurik.engine.init = function( next ){
 
 riurik.load_tests = function(){
 	console.log('load daspec test ' + riurik.args.path);
-	'use strict';
-	//riurik.loader().queue(riurik.args.path.replace(/daspec$/, 'js')).then(function() {
-	//	riurik.engine.run_tests();
-	//});
 	$.ajax({ 
-		url: riurik.args.path.replace(/daspec$/, 'js'), 
-		success: function(jscode){
-			var defineSteps = function() {
-				eval(jscode);
-			};
-			riurik.engine.run_tests(defineSteps);
+		url: riurik.args.path, 
+		success: function(markdown){
+			if(riurik.context.server_side){
+			    riurik.engine.run_tests_server_side(markdown);
+			}else{
+		        riurik.engine.run_tests(markdown);
+			} 
 		}, 
 		dataType: 'text'
 	});
 };
 
-riurik.engine.run_tests = function(defineSteps) {
-	console.log('start daspec tests...');
+riurik.engine.run_tests_server_side = function(markdown) {
+    console.log('start daspec tests server side ...');
+    var converter = new showdown.Converter({simplifiedAutoLink: true, strikethrough: true, ghCodeBlocks: true, tables: true})
+    $('#page-content').html(converter.makeHtml(markdown));
+    
+};
+
+riurik.engine.run_tests = function(markdown) {
+	console.log('start daspec tests in browser ...');
 	$.ajax({ 
-		url: riurik.args.path, 
-		success: function(markdown){
+		url: riurik.args.path.replace(/daspec$/, 'js'), 
+		success: function(steps){
+            var defineSteps = function() {
+                eval(steps);
+            };
 			var runner = new DaSpec.Runner(defineSteps);
 			var counter = new DaSpec.CountingResultListener(runner);
 			var resultFormatter = new DaSpec.MarkdownResultFormatter(runner);
