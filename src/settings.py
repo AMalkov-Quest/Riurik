@@ -116,6 +116,7 @@ if platform.system() == 'Windows':
     nodejs = os.path.join(os.environ['ProgramFiles'], 'nodejs', 'node.exe')
     coffee = os.path.join(r'C:\CoffeeScript', 'bin', 'coffee')
     COFFEESCRIPT_EXECUTABLE = '"%s" "%s"' % (nodejs, coffee)
+    DASPEC_EXECUTABLE = 'daspec'
 elif platform.system() == 'Linux':
     COFFEESCRIPT_EXECUTABLE = 'coffee'
 else:

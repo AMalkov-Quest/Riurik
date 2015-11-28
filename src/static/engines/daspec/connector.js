@@ -45,7 +45,7 @@ riurik.engine.run_tests_server_side = function(markdown) {
         { specs: riurik.args.path, steps: riurik.args.path.replace(/daspec$/, 'js') }, 
         function(data){
             markdownResult = data['result'];
-            console.log(markdownResult);  
+            $('#page-content').html(converter.makeHtml(markdownResult));  
         },
         "json"
     );
