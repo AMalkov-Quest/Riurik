@@ -1,5 +1,5 @@
 from django.conf.urls.defaults import *
-
+from django.views.generic import RedirectView
 from django.views.static import serve
 import os
 import settings
@@ -7,7 +7,7 @@ import views, ci
 from logger import log
 
 urlpatterns = patterns('',
-	(r'^favicon\.ico$', 'django.views.generic.simple.redirect_to', {'url': '/static/img/favicon.gif'}),
+	(r'^favicon\.ico$', RedirectView.as_view(url="/static/img/favicon.gif")),
 	(r'^actions/folder/create/$', 'views.createFolder'),
 	(r'^actions/suite/create/$', 'views.createSuite'),
 	(r'^actions/suite/edit/$', 'views.editSuite'),
