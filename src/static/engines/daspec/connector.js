@@ -40,6 +40,16 @@ riurik.engine.run_tests_server_side = function(markdown) {
     var converter = new showdown.Converter({simplifiedAutoLink: true, strikethrough: true, ghCodeBlocks: true, tables: true})
     $('#page-content').html(converter.makeHtml(markdown));
     
+    $.post(
+        '/actions/nodejs/run/', 
+        { specs: riurik.args.path, steps: riurik.args.path.replace(/daspec$/, 'js') }, 
+        function(data){
+            markdownResult = data['result'];
+            console.log(markdownResult);  
+        },
+        "json"
+    );
+    
 };
 
 riurik.engine.run_tests = function(markdown) {
@@ -57,7 +67,6 @@ riurik.engine.run_tests = function(markdown) {
 			runner.execute(markdown).then(function () {
 				var converter = new showdown.Converter({simplifiedAutoLink: true, strikethrough: true, ghCodeBlocks: true, tables: true})
 				$('#page-content').html(converter.makeHtml(resultFormatter.formattedResults()));
-				//$('#outputArea').html(resultFormatter.formattedResults());
 			});
 		}, 
 		dataType: 'text'
