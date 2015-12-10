@@ -9,3 +9,5 @@ tags
 testsResult
 node_modules
 env
+build
+dist
