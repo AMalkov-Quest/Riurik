@@ -3,11 +3,11 @@
 *.pyc
 *.log
 *.swp
+*.spec
 .context.js
 .ropeproject
 tags
 testsResult
 node_modules
 env
-build
 dist
