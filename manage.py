@@ -1,4 +1,8 @@
 import os, sys
+#for pyinstaller
+import src.plugins.search
+import src.plugins.git
+import src.plugins.github
 
 if __name__ == "__main__":
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "src.settings")
