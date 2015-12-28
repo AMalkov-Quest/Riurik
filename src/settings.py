@@ -93,6 +93,9 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
 )
 
+if not os.path.exists(SESSION_FILE_PATH):
+    os.makedirs(SESSION_FILE_PATH)
+
 ROOT_URLCONF = 'urls'
 
 TEMPLATE_DIRS = (

@@ -4,6 +4,7 @@ import src.plugins.search
 import src.plugins.git
 import src.plugins.github
 from django.core.cache.backends.locmem import LocMemCache
+from django.contrib.sessions import middleware, serializers
 
 if __name__ == "__main__":
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "src.settings")
