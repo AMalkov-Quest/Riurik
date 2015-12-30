@@ -8,7 +8,7 @@ import json, mimetypes, stat
 import src.settings
 from src.logger import log
 import src.dir_index_tools as tools
-import context, contrib, inuse, spec
+import context, src.contrib, inuse, spec
 
 def get_path(request):
 	if request.POST and 'path' in request.POST:
@@ -59,7 +59,7 @@ class BaseHandler(object):
 	def __init__(self, request, path, time):
 		self.path = path
 		self.user = None
-		self.time = time if time else contrib.getNowTime()
+		self.time = time if time else src.contrib.getNowTime()
 
 	def get_path(self):
 		return self.path
@@ -165,7 +165,7 @@ class BaseHandler(object):
 
 		if not document_root:
 			pagetype = 'front-page'
-			for key in contrib.get_virtual_paths():
+			for key in src.contrib.get_virtual_paths():
 				dir_descriptor = get_descriptor(key)
 				dirs.append(dir_descriptor)
 		else:
@@ -230,15 +230,15 @@ class BaseHandler(object):
 class DefaultHandler(BaseHandler):
 	
 	def get_document_root(self):
-		return contrib.get_document_root(self.path)
+		return src.contrib.get_document_root(self.path)
 
 	def get_full_path(self, path=None):
-		document_root = contrib.get_document_root(self.path)
+		document_root = src.contrib.get_document_root(self.path)
 		path = self.path if not path else path
-		return contrib.get_full_path(document_root, path)
+		return src.contrib.get_full_path(document_root, path)
 
 	def get_virtual_root(self):
-		return contrib.get_virtual_root(self.path)
+		return src.contrib.get_virtual_root(self.path)
 
 def get_spec(target, path):
 	spec_url = spec.get_url(path)

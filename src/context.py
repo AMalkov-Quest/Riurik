@@ -1,6 +1,6 @@
 import os, re, json
 from src.logger import log
-import src.settings, config, contrib
+import src.settings, config, src.contrib
 from django.template import Context, Template
 import socket
 from django.core.cache import cache
@@ -9,7 +9,7 @@ from context_impl import context_impl
 def host(instance, resolve=True):
 	key = 'host'
 	if resolve:
-		return contrib.resolveRemoteAddr(instance.get(key), cache)
+		return src.contrib.resolveRemoteAddr(instance.get(key), cache)
 	return instance.get(key)
 
 def get(RequestHandler, path=None, section='default'):
@@ -22,7 +22,7 @@ def get_URL(instance, resolve=False):
 		if host == 'localhost':
 			host = socket.gethostname()
 		if resolve:
-			host = contrib.resolveRemoteAddr(host, cache)
+			host = src.contrib.resolveRemoteAddr(host, cache)
 		url =  'http://%s:%s' % (host, instance.get('port'))
 	return url
 
@@ -55,7 +55,7 @@ def render_ini(RequestHandler, ctx, riurik_url, section_name='default'):
 	return t.render(c)
 
 def patch_libraries(RequestHandler, ctximpl, ctx):
-	libraries = contrib.get_libraries_impl(RequestHandler, ctximpl.as_list(), ctx)
+	libraries = src.contrib.get_libraries_impl(RequestHandler, ctximpl.as_list(), ctx)
 	log.info('libs are %s' % libraries)
 	if libraries != None:
 		ctximpl.replace(src.settings.LIB_KEY_NAME, json.dumps(libraries).replace('\'','\"'))
@@ -78,7 +78,7 @@ def include_tests(path, ctx, ctximpl):
 	if not ctximpl.has(src.settings.INCLUDE_KEY):
 		exclude = []
 		if ctximpl.has(src.settings.EXCLUDE_KEY):
-			exclude = contrib.loadListFromString(ctx.get( option=src.settings.EXCLUDE_KEY ))
+			exclude = src.contrib.loadListFromString(ctx.get( option=src.settings.EXCLUDE_KEY ))
 		include = []
 		for root, dirs, files in os.walk(ctx.get_folder()):
 			for file_ in files:
@@ -94,7 +94,7 @@ def include_tests(path, ctx, ctximpl):
 
 					include += [ str(file_relpath) ]
 	else:
-		include = contrib.loadListFromString(ctx.get( option=src.settings.INCLUDE_KEY ))
+		include = src.contrib.loadListFromString(ctx.get( option=src.settings.INCLUDE_KEY ))
 
 	ctximpl.replace(src.settings.INCLUDE_KEY, str(include).replace('\'','\"'))
 
@@ -109,7 +109,7 @@ def patch(RequestHandler, ctx, riurik_url, ctxname=None):
 	add_start_time(ctximpl, RequestHandler.time)
 	add_name(ctximpl, ctxname)
 	ctximpl.add_virtual_root(RequestHandler)
-	contrib.patch_host_port(ctximpl, riurik_url)
+	src.contrib.patch_host_port(ctximpl, riurik_url)
 
 	return ctximpl.as_tuple()
 

@@ -2,7 +2,7 @@ import os, re
 from django import template
 from django.utils.safestring import mark_safe
 import src.settings
-import contrib
+import src.contrib
 from src.logger import log
 import json
 register = template.Library()

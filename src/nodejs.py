@@ -2,16 +2,16 @@ from django.http import Http404, HttpResponse, HttpResponseRedirect, HttpRequest
 import os, shlex, subprocess, platform
 import json
 from src.logger import log
-import src.settings, contrib
+import src.settings, src.contrib
 
 def run(request):
     specs = request.POST["specs"]
     steps = request.POST["steps"]
     log.debug('nodejs run %s' %  specs)
     
-    document_root = contrib.get_document_root(specs)
-    fullSpecsPath = contrib.get_full_path(document_root, specs)
-    fullStepsPath = contrib.get_full_path(document_root, steps)
+    document_root = src.contrib.get_document_root(specs)
+    fullSpecsPath = src.contrib.get_full_path(document_root, specs)
+    fullStepsPath = src.contrib.get_full_path(document_root, steps)
     testsResults = src.settings.root + "\\testsResult"
     result = execute(fullSpecsPath, fullStepsPath, testsResults)
     result = get_results(fullSpecsPath, testsResults)

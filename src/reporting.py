@@ -3,7 +3,7 @@ import threading
 import shutil
 import fnmatch
 from src.logger import log
-import contrib
+import src.contrib
 
 mutex = threading.RLock()
 
@@ -207,9 +207,9 @@ def start(data):
 	start = TestInfo(data)
 	
 	cwd = getTestResultDir(start.path, start.context)
-	contrib.cleandir(cwd, '*.begin')
-	contrib.cleandir(cwd, '*.progress')
-	contrib.cleandir(cwd, '*.done')
+	src.contrib.cleandir(cwd, '*.begin')
+	src.contrib.cleandir(cwd, '*.progress')
+	src.contrib.cleandir(cwd, '*.done')
 	
 	fileName = getBeginFile(start.path, start.context, start.date)
 	dump(fileName, [])
@@ -290,7 +290,7 @@ def progress(date, path, context):
 	return progress
 
 def getTestResultsUrl(path, context, date, request):
-	host = contrib.resolveURI(request.get_host())
+	host = src.contrib.resolveURI(request.get_host())
 	return '%s/%s?history=%s&context=%s' % (host, path, date, context)
 
 def getResultsAsXml(path, context, date, request):

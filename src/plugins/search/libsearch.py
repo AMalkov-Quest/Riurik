@@ -1,13 +1,13 @@
 # coding: utf-8
 
 import re, os
-import contrib
+import src.contrib
 from src.logger import log
 
 def listfiles(folder):
 	for root, dirs, files in os.walk(folder):
 		for fname in files:
-			if not contrib.ishidden(fname):
+			if not src.contrib.ishidden(fname):
 				yield os.path.join(root, fname)
 
 def search(root, path, search_pattern):

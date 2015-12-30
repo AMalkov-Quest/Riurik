@@ -1,5 +1,5 @@
 import os, shutil
-import src.settings, resources, contrib
+import src.settings, resources, src.contrib
 from src.logger import log
 
 def get_type(path):

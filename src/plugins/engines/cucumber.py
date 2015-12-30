@@ -1,19 +1,19 @@
 import os, shlex, subprocess, platform
 import src.settings, src.dir_index_tools
 from src.logger import log
-import src.coffeescript, contrib
+import src.coffeescript, src.contrib
 
 def removeEOL(text):
 	lines = text.splitlines()
 	return "\\n".join(lines)
 
 def compileSuite(path, suite_path):
-	features = contrib.enum_files_in_folders(
+	features = src.contrib.enum_files_in_folders(
 			suite_path,
 			lambda file_: not file_.endswith(src.settings.CUCUMBER_FILE_EXT)
 	)
 	for feature in features:
-		fullpath = contrib.testFullPath(suite_path, feature)
+		fullpath = src.contrib.testFullPath(suite_path, feature)
 		log.debug('compile %s' % fullpath)
 		compile2js(path, fullpath)
 

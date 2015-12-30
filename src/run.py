@@ -2,7 +2,7 @@ import os
 from django.http import Http404, HttpResponse, HttpResponseRedirect
 from error import handler as error_handler
 from serving import add_request_handler
-import context, src.settings, contrib
+import context, src.settings, src.contrib
 import src.coffeescript, cucumber
 import src.dir_index_tools
 from src.logger import log
@@ -12,7 +12,7 @@ import plugins.engines.engine as engine
 @error_handler
 def test(request, RequestHandler):
 	fullpath = RequestHandler.get_full_path()
-	path = contrib.normpath(request.REQUEST["path"])
+	path = src.contrib.normpath(request.REQUEST["path"])
 	context_name = request.REQUEST.get("context", None)
 	ctx = context.get(RequestHandler, section=context_name)
 
@@ -21,7 +21,7 @@ def test(request, RequestHandler):
 	contextjs = context.render(RequestHandler, ctx, server, context_name)
 	log.debug('contextJS: '+ contextjs)
 
-	target = contrib.get_runner_url(ctx, server)
+	target = src.contrib.get_runner_url(ctx, server)
 	log.info('target of test %s is %s' % (path, target))
 
 	src.dir_index_tools.savetest(request.REQUEST.get('content', None), fullpath)
@@ -41,7 +41,7 @@ def test(request, RequestHandler):
 @error_handler
 def suite(request, RequestHandler):
 	fullpath = RequestHandler.get_full_path()
-	path = contrib.normpath(request.REQUEST["path"])
+	path = src.contrib.normpath(request.REQUEST["path"])
 	context_name = request.REQUEST["context"]
 	ctx = context.get(RequestHandler, section=context_name)
 
@@ -50,7 +50,7 @@ def suite(request, RequestHandler):
 	compileSuiteCoffee(path, fullpath)
 	contextjs = context.render(RequestHandler, ctx, server, context_name)
 
-	target = contrib.get_runner_url(ctx, server)
+	target = src.contrib.get_runner_url(ctx, server)
 	log.info('target of suite %s is %s' % (path, target))
 
 	saveLocalContext(fullpath, contextjs)
@@ -62,13 +62,13 @@ def suite(request, RequestHandler):
 	return HttpResponseRedirect( url )
 
 def compileSuiteCoffee(path, suite_path):
-	contrib.cleandir(suite_path, '.*.js')
-	tests = contrib.enum_files_in_folders(
+	src.contrib.cleandir(suite_path, '.*.js')
+	tests = src.contrib.enum_files_in_folders(
 			suite_path,
 			lambda file_: not file_.endswith(src.settings.COFFEE_FILE_EXT)
 	)
 	for test in tests:
-		fullpath = contrib.testFullPath(suite_path, test)
+		fullpath = src.contrib.testFullPath(suite_path, test)
 		coffeescript.compile2js(None, None, fullpath)
 
 def coffee(path):

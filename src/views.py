@@ -9,7 +9,7 @@ import json
 import django.conf
 import src.settings
 from src.logger import log
-import context, config, contrib
+import context, config, src.contrib
 import mimetypes, datetime
 import codecs, time
 import distributor
