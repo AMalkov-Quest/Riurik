@@ -7,7 +7,7 @@ import os, re
 import dir_index_tools as tools
 import json
 import django.conf
-import settings
+import src.settings
 from logger import log
 import context, config, contrib
 import mimetypes, datetime
@@ -81,9 +81,9 @@ def createSuite(request, RequestHandler):
 def editSuite(request, RequestHandler):
 	fullpath = RequestHandler.get_full_path()
 	log.debug('edit context %s' % fullpath)
-	if not os.path.exists(os.path.join(fullpath, settings.TEST_CONTEXT_FILE_NAME)):
-		tools.mkconfig(fullpath, settings.TEST_CONTEXT_FILE_NAME)
-	redirect = '/' + request.GET['path'] + '/' + settings.TEST_CONTEXT_FILE_NAME + '?editor'
+	if not os.path.exists(os.path.join(fullpath, src.settings.TEST_CONTEXT_FILE_NAME)):
+		tools.mkconfig(fullpath, src.settings.TEST_CONTEXT_FILE_NAME)
+	redirect = '/' + request.GET['path'] + '/' + src.settings.TEST_CONTEXT_FILE_NAME + '?editor'
 	return HttpResponseRedirect(redirect)
 
 @add_request_handler
@@ -180,7 +180,7 @@ def live_settings_view(request):
 
 def get_virtual_paths_path():
 	root = os.path.dirname(os.path.abspath(__file__))
-	return os.path.join(root, settings.virtual_paths_py)
+	return os.path.join(root, src.settings.virtual_paths_py)
 
 def stubFile(request):
 	request_control = inuse.stub(request.GET['path'], request)

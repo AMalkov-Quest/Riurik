@@ -1,5 +1,5 @@
 import os
-import settings
+import src.settings
 import config
 
 def get_opt(path):
@@ -22,7 +22,7 @@ def get_opt(path):
 
 def get_url(path):
 	path, section = get_opt(path)
-	fullpath = os.path.join(path, settings.SPEC_URL_FILE_NAME)
+	fullpath = os.path.join(path, src.settings.SPEC_URL_FILE_NAME)
 
 	if len(config.sections(fullpath)) > 1:
 		urls = []

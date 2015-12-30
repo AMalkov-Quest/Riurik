@@ -1,11 +1,11 @@
-import settings
+import src.settings
 import cucumber
 
 def engage4test(path, fullpath, ctx):
 	engine = 'qunit'
 	if is_cucumber(path, ctx):
 		engine = 'cucumber'
-		if path.endswith(settings.CUCUMBER_FILE_EXT):
+		if path.endswith(src.settings.CUCUMBER_FILE_EXT):
 			path = cucumber.compile2js(path, fullpath)
 
 	if is_mocha(ctx):
@@ -37,10 +37,10 @@ def engage4suite(path, fullpath, ctx):
 	return engine
 
 def is_daspec(path, ctx):
-	return path.endswith(settings.DASPEC_FILE_EXT) or ctx.get('daspec', None) != None
+	return path.endswith(src.settings.DASPEC_FILE_EXT) or ctx.get('daspec', None) != None
 
 def is_cucumber(path, ctx):
-	return path.endswith(settings.CUCUMBER_FILE_EXT) or ctx.get('cucumber', None) != None
+	return path.endswith(src.settings.CUCUMBER_FILE_EXT) or ctx.get('cucumber', None) != None
 
 def is_mocha(ctx):
 	return ctx.get('mocha', None) != None

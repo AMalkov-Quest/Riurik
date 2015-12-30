@@ -69,7 +69,7 @@ def static_combine(end_file, to_combine, delimiter="\n/* Begin: %s */\n", compre
         combo_file.close()
         if compress:
             try:
-                command =  settings.STATIC_MANAGEMENT_COMPRESS_CMD % end_file
+                command =  src.settings.STATIC_MANAGEMENT_COMPRESS_CMD % end_file
             except AttributeError, error:
                 raise CommandError("STATIC_MANAGEMENT_COMPRESS_CMD not set")
             except TypeError, error:

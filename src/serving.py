@@ -5,7 +5,7 @@ from django.template import loader, RequestContext, Context, Template, TemplateD
 from django.utils.http import http_date
 import django.views.static
 import json, mimetypes, stat
-import settings
+import src.settings
 from logger import log
 import dir_index_tools as tools
 import context, contrib, inuse, spec
@@ -43,7 +43,7 @@ def factory(request, path):
 
 	start_time = request.REQUEST.get('date', None)
 
-	if hasattr(settings, 'use_github'):
+	if hasattr(src.settings, 'use_github'):
 		log.debug('github handler is selected')
 		return getGitHub(request, path, start_time)
 	else:
@@ -67,15 +67,15 @@ class BaseHandler(object):
 	def get_context_path(self, path):
 		fullpath = self.get_full_path(path)
 		if os.path.isdir(fullpath):
-			return os.path.join(fullpath, settings.TEST_CONTEXT_FILE_NAME)
+			return os.path.join(fullpath, src.settings.TEST_CONTEXT_FILE_NAME)
 		else:
 			dirname = os.path.dirname(fullpath)
-			return os.path.join(dirname, settings.TEST_CONTEXT_FILE_NAME)
+			return os.path.join(dirname, src.settings.TEST_CONTEXT_FILE_NAME)
 
 	def get_global_context_path(self):
 		return os.path.join(
 				self.get_document_root(),
-				settings.GLOBAL_CONTEXT_FILE_NAME
+				src.settings.GLOBAL_CONTEXT_FILE_NAME
 				)		
 
 	def serve(self, request):
@@ -181,7 +181,7 @@ class BaseHandler(object):
 
 		try:
 			if self.get_type(fullpath) == 'virtual':
-				contexts = context.global_settings(self).sections()
+				contexts = context.global_src.settings(self).sections()
 			else:
 				contexts = context.get(self).sections()
 			log.debug(contexts)
@@ -246,7 +246,7 @@ def get_spec(target, path):
 	if spec_url:
 		return spec_url
 	else:
-		return '%s?editor' % settings.SPEC_URL_FILE_NAME
+		return '%s?editor' % src.settings.SPEC_URL_FILE_NAME
 
 def get_file_content(fullpath):
 	log.debug('get content of %s' % fullpath)

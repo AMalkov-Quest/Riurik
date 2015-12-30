@@ -2,11 +2,11 @@ from django.http import HttpResponse
 import codecs
 import os.path
 import markdown
-import settings
+import src.settings
 
 def readme(request):
 	doc_name = request.REQUEST.get('doc', 'README.markdown')	
-	path = os.path.join(settings.root, doc_name)
+	path = os.path.join(src.settings.root, doc_name)
 	html = markdown2html(path) 
 	return HttpResponse(html)
 

@@ -1,6 +1,6 @@
 import os, re, json
 from logger import log
-import settings, config, contrib
+import src.settings, config, contrib
 from django.template import Context, Template
 import socket
 from django.core.cache import cache
@@ -58,7 +58,7 @@ def patch_libraries(RequestHandler, ctximpl, ctx):
 	libraries = contrib.get_libraries_impl(RequestHandler, ctximpl.as_list(), ctx)
 	log.info('libs are %s' % libraries)
 	if libraries != None:
-		ctximpl.replace(settings.LIB_KEY_NAME, json.dumps(libraries).replace('\'','\"'))
+		ctximpl.replace(src.settings.LIB_KEY_NAME, json.dumps(libraries).replace('\'','\"'))
 
 def add_start_time(ctximpl, start_time):
 	ctximpl.add('test_start_time', start_time)
@@ -70,15 +70,15 @@ def add_name(ctximpl, name):
 def include_tests(path, ctx, ctximpl):
 
 	def contextjs(path):
-		return settings.TEST_CONTEXT_JS_FILE_NAME in path
+		return src.settings.TEST_CONTEXT_JS_FILE_NAME in path
 
 	def suite_setup(path):
-		return settings.SUITE_SETUP_FILE_NAME in path
+		return src.settings.SUITE_SETUP_FILE_NAME in path
 
-	if not ctximpl.has(settings.INCLUDE_KEY):
+	if not ctximpl.has(src.settings.INCLUDE_KEY):
 		exclude = []
-		if ctximpl.has(settings.EXCLUDE_KEY):
-			exclude = contrib.loadListFromString(ctx.get( option=settings.EXCLUDE_KEY ))
+		if ctximpl.has(src.settings.EXCLUDE_KEY):
+			exclude = contrib.loadListFromString(ctx.get( option=src.settings.EXCLUDE_KEY ))
 		include = []
 		for root, dirs, files in os.walk(ctx.get_folder()):
 			for file_ in files:
@@ -94,12 +94,12 @@ def include_tests(path, ctx, ctximpl):
 
 					include += [ str(file_relpath) ]
 	else:
-		include = contrib.loadListFromString(ctx.get( option=settings.INCLUDE_KEY ))
+		include = contrib.loadListFromString(ctx.get( option=src.settings.INCLUDE_KEY ))
 
-	ctximpl.replace(settings.INCLUDE_KEY, str(include).replace('\'','\"'))
+	ctximpl.replace(src.settings.INCLUDE_KEY, str(include).replace('\'','\"'))
 
 def patch_suite_setup(ctximpl, path):
-	ctximpl.add(settings.SUITE_SETUP, path)
+	ctximpl.add(src.settings.SUITE_SETUP, path)
 
 def patch(RequestHandler, ctx, riurik_url, ctxname=None):
 	path = RequestHandler.get_path()
@@ -116,7 +116,7 @@ def patch(RequestHandler, ctx, riurik_url, ctxname=None):
 class global_settings(object):
 	comment = 'from global settings'
 
-	def __init__(self, RequestHandler, section=settings.DEFAULT):
+	def __init__(self, RequestHandler, section=src.settings.DEFAULT):
 		self.inifile = RequestHandler.get_global_context_path()
 		self.section = section
 		log.debug('read global settings from %s, section:%s' % (self.inifile, section))
@@ -144,7 +144,7 @@ class global_settings(object):
 
 	def sections(self):
 		log.debug('reading sections: %s' % config.sections(self.inifile))
-		return config.sections(self.inifile) or [settings.DEFAULT]
+		return config.sections(self.inifile) or [src.settings.DEFAULT]
 
 	def get_folder(self):
 		return os.path.dirname(self.inifile)
@@ -152,7 +152,7 @@ class global_settings(object):
 class context(global_settings):
 	comment = 'context.ini'
 
-	def __init__(self, RequestHandler, path, section=settings.DEFAULT):
+	def __init__(self, RequestHandler, path, section=src.settings.DEFAULT):
 		self.requestHandler = RequestHandler
 		self.inifile = RequestHandler.get_context_path(path)
 		if not os.path.exists(self.inifile):
@@ -171,13 +171,13 @@ class context(global_settings):
 		return value
 
 	def libraries(self, values):
-		gs = global_settings(self.requestHandler).items() or {}
+		gs = global_src.settings(self.requestHandler).items() or {}
 		for item in gs:
-			if item[0] == settings.LIB_KEY_NAME:
+			if item[0] == src.settings.LIB_KEY_NAME:
 				glibs = item[1]
-				llibs = values[settings.LIB_KEY_NAME]
+				llibs = values[src.settings.LIB_KEY_NAME]
 				if glibs != llibs:
-					libs = { settings.LIB_KEY_NAME: ','.join([glibs, llibs]) }
+					libs = { src.settings.LIB_KEY_NAME: ','.join([glibs, llibs]) }
 					values.update(libs)
 
 	def items(self):

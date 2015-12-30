@@ -1,5 +1,5 @@
 import os, shutil
-import settings, resources, contrib
+import src.settings, resources, contrib
 from logger import log
 
 def get_type(path):
@@ -10,7 +10,7 @@ def get_type(path):
 	'folder'
 	>>> get_type(__file__)
 	'test'
-	>>> name = os.path.join(os.path.dirname(__file__), settings.TEST_CONTEXT_FILE_NAME)
+	>>> name = os.path.join(os.path.dirname(__file__), src.settings.TEST_CONTEXT_FILE_NAME)
 	>>> f = open(name, 'w')
 	>>> f.close()
 	>>> get_type(os.path.dirname(__file__))
@@ -19,7 +19,7 @@ def get_type(path):
 	"""
 	if os.path.exists(path):
 		if os.path.isdir(path):
-			if os.path.exists( os.path.join(path, settings.TEST_CONTEXT_FILE_NAME) ):
+			if os.path.exists( os.path.join(path, src.settings.TEST_CONTEXT_FILE_NAME) ):
 				return 'suite'
 			
 			return 'folder'
@@ -27,7 +27,7 @@ def get_type(path):
 		if '.ini' in path:
 			return 'configfile'
 
-		if settings.SPEC_URL_FILE_NAME in path:
+		if src.settings.SPEC_URL_FILE_NAME in path:
 			return 'specification'
 
 		return 'test'
@@ -59,13 +59,13 @@ def mksuite(path, name):
 	try:
 		fullpath = os.path.join(path, name)
 		os.mkdir(fullpath)
-		filename = os.path.join(fullpath, settings.TEST_CONTEXT_FILE_NAME)
+		filename = os.path.join(fullpath, src.settings.TEST_CONTEXT_FILE_NAME)
 		f = open(filename, 'w')
 		f.close()
 	except Exception, e:
 		return (False, str(e))
 	
-	return (True, os.path.join(name, settings.TEST_CONTEXT_FILE_NAME))
+	return (True, os.path.join(name, src.settings.TEST_CONTEXT_FILE_NAME))
 
 def template(name):
 	content = ''
@@ -81,25 +81,25 @@ def template(name):
 
 def make(fullpath):
 	path, name = os.path.split(fullpath)
-	if name.endswith(settings.INI_FILE_EXT):
+	if name.endswith(src.settings.INI_FILE_EXT):
 		return mkconfig(path, name)
 	else:
 		return mktest(path, name)
 
 def mktest(path, name):
 	template_name = None
-	if name.endswith(settings.JS_FILE_EXT):
+	if name.endswith(src.settings.JS_FILE_EXT):
 		template_name = 'js_test.tmpl'
-	elif name.endswith(settings.COFFEE_FILE_EXT):
+	elif name.endswith(src.settings.COFFEE_FILE_EXT):
 		template_name = 'coffee_test.tmpl'
 	
 	return mkscript(path, name, template_name)
 
 def mkconfig(path, name):
 	template_name = None
-	if name == settings.TEST_CONTEXT_FILE_NAME:
+	if name == src.settings.TEST_CONTEXT_FILE_NAME:
 		template_name = 'context.tmpl'
-	elif name == settings.SPEC_URL_FILE_NAME:
+	elif name == src.settings.SPEC_URL_FILE_NAME:
 		template_name = 'spec.tmpl'
 
 	return mkscript(path, name, template_name)
@@ -135,7 +135,7 @@ def savetmptest(content, fullpath):
 			os.makedirs(os.path.dirname(fullpath))
 
 		dir, file_name = os.path.split(fullpath)
-		swp_file_name = settings.TEST_SWAP_FILE_NAME % file_name 
+		swp_file_name = src.settings.TEST_SWAP_FILE_NAME % file_name 
 		swpname = os.path.join(dir, swp_file_name) 
 
 		f = open(swpname, 'w')

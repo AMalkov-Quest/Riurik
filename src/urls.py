@@ -2,36 +2,36 @@ from django.conf.urls.defaults import *
 from django.views.generic import RedirectView
 from django.views.static import serve
 import os
-import settings
-import views, ci
+import src.settings
+import src.views, src.ci, src.run
 from logger import log
 
 urlpatterns = patterns('',
 	(r'^favicon\.ico$', RedirectView.as_view(url="/static/img/favicon.gif")),
-	(r'^actions/folder/create/$', 'views.createFolder'),
-	(r'^actions/suite/create/$', 'views.createSuite'),
-	(r'^actions/suite/edit/$', 'views.editSuite'),
-	(r'^actions/suite/submit/$', 'views.submitSuite'),
-	(r'^actions/suite/run/$', 'run.suite'),
-	(r'^actions/test/create/$', 'views.createTest'),
-	(r'^actions/test/save/$', 'views.saveTest'),
-	(r'^actions/test/save/draft/$', 'views.saveDraftTest'),
-	url(r'^actions/test/run/$', 'run.test', name='run-test'),
-	(r'^actions/nodejs/run/$', 'nodejs.run'),
-	(r'^actions/test/stub/$', 'views.stubFile'),
-	(r'^actions/test/submit/$', 'views.submitTest'),
+	(r'^actions/folder/create/$', 'src.views.createFolder'),
+	(r'^actions/suite/create/$', 'src.views.createSuite'),
+	(r'^actions/suite/edit/$', 'src.views.editSuite'),
+	(r'^actions/suite/submit/$', 'src.views.submitSuite'),
+	(r'^actions/suite/run/$', 'src.run.suite'),
+	(r'^actions/test/create/$', 'src.views.createTest'),
+	(r'^actions/test/save/$', 'src.views.saveTest'),
+	(r'^actions/test/save/draft/$', 'src.views.saveDraftTest'),
+	url(r'^actions/test/run/$', 'src.run.test', name='run-test'),
+	(r'^actions/nodejs/run/$', 'src.nodejs.run'),
+	(r'^actions/test/stub/$', 'src.views.stubFile'),
+	(r'^actions/test/submit/$', 'src.views.submitTest'),
 	(r'^actions/test/control/$', 'inuse.getControl'),
-	(r'^logger/records/recv/$', 'views.recvLogRecords'),
-	(r'^actions/remove/$', 'views.removeObject'),
-	(r'^actions/rename/$', 'views.renameObject'),
+	(r'^logger/records/recv/$', 'src.views.recvLogRecords'),
+	(r'^actions/remove/$', 'src.views.removeObject'),
+	(r'^actions/rename/$', 'src.views.renameObject'),
 	(r'^actions/suite/enumerate/$', 'ci.enumerate_suites'),
-	(r'^(?P<path>.*)/show_context[/]?$', 'views.show_context'),
-	(r'^settings[/]?$', 'views.live_settings_view'),
-	(r'^settings/save[/]?$', 'views.live_settings_save'),
-	(r'^report_callback/$', 'views.report_callback'),
-	(r'^report/status$', 'views.tests_status'),
-	(r'^report/progress$', 'views.tests_progress'),
-	(r'^report/purge$', 'views.reporting_purge'),
+	(r'^(?P<path>.*)/show_context[/]?$', 'src.views.show_context'),
+	(r'^src.settings[/]?$', 'src.views.live_src.settings_view'),
+	(r'^src.settings/save[/]?$', 'src.views.live_src.settings_save'),
+	(r'^report_callback/$', 'src.views.report_callback'),
+	(r'^report/status$', 'src.views.tests_status'),
+	(r'^report/progress$', 'src.views.tests_progress'),
+	(r'^report/purge$', 'src.views.reporting_purge'),
 
 )
 
@@ -45,11 +45,11 @@ urlpatterns += patterns('',
 urlpatterns += patterns('',
 	(r'^static/(?P<path>.*)$', 'django.views.static.serve',
 		{
-		'document_root': settings.MEDIA_ROOT,
+		'document_root': src.src.settings.MEDIA_ROOT,
 		'show_indexes': True
 		}
 	),
-	(r'^(?P<path>.*)$', 'views.serve',
+	(r'^(?P<path>.*)$', 'src.views.serve',
 		{
 			'show_indexes': True
 		}

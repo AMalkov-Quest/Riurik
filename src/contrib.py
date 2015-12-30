@@ -1,6 +1,6 @@
 # coding: utf-8
 import os, re, config, time
-import settings
+import src.settings
 from logger import log
 import socket
 import fnmatch
@@ -13,7 +13,7 @@ def getNowTime():
 	return time.mktime( time.localtime( time.time() ) ) 
 
 def ishidden(filename):
-	return filename.startswith('.') and filename != settings.TEST_CONTEXT_FILE_NAME
+	return filename.startswith('.') and filename != src.settings.TEST_CONTEXT_FILE_NAME
 
 def cleandir(path, pattern):
 	n = 0
@@ -94,25 +94,25 @@ def getVirtualPathConfig(config_path):
 	return dict( items )
 
 def extend_virtual_paths(root, path, alias, virtual_paths):
-	config_path = os.path.join(path, settings.GLOBAL_CONTEXT_FILE_NAME)
+	config_path = os.path.join(path, src.settings.GLOBAL_CONTEXT_FILE_NAME)
 	if not os.path.exists(config_path): return
 
 	config_items = getVirtualPathConfig(config_path)
 
-	product_code_path = config_items.get(settings.PRODUCT_CODE_PATH)
-	product_code_alias = config_items.get(settings.PRODUCT_CODE_ALIAS)
+	product_code_path = config_items.get(src.settings.PRODUCT_CODE_PATH)
+	product_code_alias = config_items.get(src.settings.PRODUCT_CODE_ALIAS)
 	if product_code_path and product_code_alias:
 		product_code_alias = '%s-%s' % (alias, product_code_alias)
 		virtual_paths[product_code_alias] = os.path.join(root, product_code_path)
 
 def get_virtual_paths():
 	"""
-	>>> settings.VIRTUAL_PATHS = {'key': 'value'}
+	>>> src.settings.VIRTUAL_PATHS = {'key': 'value'}
 	>>> get_virtual_paths()
 	{'key': 'value'}
 	"""
 	result = {}
-	for alias, path in settings.VIRTUAL_PATHS.iteritems():
+	for alias, path in src.settings.VIRTUAL_PATHS.iteritems():
 		if isinstance(path, tuple):
 			root = path[0]
 			realpath = os.path.join(*path)
@@ -185,7 +185,7 @@ def get_libraries_raw(ctxitems):
 	['lib1', 'lib2']
 	"""
 	for item in ctxitems:
-		if item[0] == settings.LIB_KEY_NAME:
+		if item[0] == src.settings.LIB_KEY_NAME:
 			if not '[]' in item[1]:
 				return [lib.strip() for lib in item[1].split(',')]
 			else:
@@ -204,7 +204,7 @@ def libraries_default(RequestHandler, ctx):
 			lib_relpath = lib_path.replace(root, virtual_root).lstrip('/')
 			libraries.append(str(lib_relpath))
 
-	lib_relpath = get_local_lib_path(RequestHandler, settings.LIB_DEFAULT_NAME, ctx)
+	lib_relpath = get_local_lib_path(RequestHandler, src.settings.LIB_DEFAULT_NAME, ctx)
 	if lib_relpath:
 		libraries.append(lib_relpath)
 
@@ -310,7 +310,7 @@ def get_full_path(document_root, path):
 	"""
 	>>> import test
 	>>> test.stub('get_virtual_paths', returns={'tests-1': 'C:\\dir-1'})
-	>>> settings.VIRTUAL_PATHS['tests-1'] = 'C:\\dir-1'
+	>>> src.settings.VIRTUAL_PATHS['tests-1'] = 'C:\\dir-1'
 	>>> get_full_path('/dir/dir-1', '')
 	'/dir/dir-1'
 	>>> get_full_path('/dir/dir-1', '/')

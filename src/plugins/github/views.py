@@ -3,7 +3,7 @@
 from django.shortcuts import render_to_response as _render_to_response
 from django.http import HttpResponseRedirect, HttpResponse
 from django.template import loader, RequestContext, Context, Template, TemplateDoesNotExist
-import settings
+import src.settings
 import httplib, urllib, json
 from logger import log
 import serving
@@ -90,7 +90,7 @@ def get_token(request):
 	return token
 
 def plugin(request, path, time):
-	if settings.appInstalled('src.plugins.github'):
+	if src.settings.appInstalled('src.plugins.github'):
 		if authorized(request):
 			if reporized(request):
 				return GitHandler(request, path, time)

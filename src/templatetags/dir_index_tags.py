@@ -1,10 +1,10 @@
 import os, re
 from django import template
 from django.utils.safestring import mark_safe
-import settings
-import contrib
-from logger import log
-import dir_index_tools
+import src.settings
+import src.contrib
+from src.logger import log
+import src.dir_index_tools
 
 register = template.Library()
 

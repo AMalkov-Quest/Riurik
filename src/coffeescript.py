@@ -1,10 +1,10 @@
 import os, shlex, subprocess, platform
-import settings, dir_index_tools
+import src.settings, dir_index_tools
 from logger import log
 
 def coffee(path):
 	file_name = os.path.basename(path)
-	return file_name.endswith(settings.COFFEE_FILE_EXT)
+	return file_name.endswith(src.settings.COFFEE_FILE_EXT)
 
 def coffee2js(path):
 	"""
@@ -12,19 +12,19 @@ def coffee2js(path):
 	('test.coffee', '.test.js')
 	"""
 	file_name = os.path.basename(path)
-	return (file_name, '.%s' % file_name.replace(settings.COFFEE_FILE_EXT, settings.JS_FILE_EXT))
+	return (file_name, '.%s' % file_name.replace(src.settings.COFFEE_FILE_EXT, src.settings.JS_FILE_EXT))
 
 def execute(source):
-	if not settings.COFFEESCRIPT_EXECUTABLE:
+	if not src.settings.COFFEESCRIPT_EXECUTABLE:
 		raise Exception("Unsupported platform: %s. Can't compile CoffeeScript" % platform.system())
 
 	try:
-		args = shlex.split("%s -c -b -s -p" % settings.COFFEESCRIPT_EXECUTABLE)
+		args = shlex.split("%s -c -b -s -p" % src.settings.COFFEESCRIPT_EXECUTABLE)
 		p = subprocess.Popen(args, stdin=subprocess.PIPE, stdout=subprocess.PIPE)
 		return p.communicate(source)
 	except Exception, e:
 		log.exception(e)
-		raise Exception("Can't execute CoffeeScript compiler: %s" % settings.COFFEESCRIPT_EXECUTABLE)
+		raise Exception("Can't execute CoffeeScript compiler: %s" % src.settings.COFFEESCRIPT_EXECUTABLE)
         
 def save(full_path, path, out):
 	coffee_name, js_name = coffee2js(full_path)

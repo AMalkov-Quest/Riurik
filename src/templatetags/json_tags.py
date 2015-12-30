@@ -1,7 +1,7 @@
 import os, re
 from django import template
 from django.utils.safestring import mark_safe
-import settings
+import src.settings
 import contrib
 from logger import log
 import json

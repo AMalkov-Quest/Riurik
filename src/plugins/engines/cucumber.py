@@ -1,5 +1,5 @@
 import os, shlex, subprocess, platform
-import settings, dir_index_tools
+import src.settings, dir_index_tools
 from logger import log
 import coffeescript, contrib
 
@@ -10,7 +10,7 @@ def removeEOL(text):
 def compileSuite(path, suite_path):
 	features = contrib.enum_files_in_folders(
 			suite_path,
-			lambda file_: not file_.endswith(settings.CUCUMBER_FILE_EXT)
+			lambda file_: not file_.endswith(src.settings.CUCUMBER_FILE_EXT)
 	)
 	for feature in features:
 		fullpath = contrib.testFullPath(suite_path, feature)
@@ -30,7 +30,7 @@ def cucumber2coffee(path):
 	('test.feature', 'test.coffee')
 	"""
 	file_name = os.path.basename(path)
-	return (file_name, '%s' % file_name.replace(settings.CUCUMBER_FILE_EXT, settings.COFFEE_FILE_EXT))
+	return (file_name, '%s' % file_name.replace(src.settings.CUCUMBER_FILE_EXT, src.settings.COFFEE_FILE_EXT))
 
 def save(full_path, path, cucumber_source):
 	cucumber_name, coffee_name = cucumber2coffee(full_path)

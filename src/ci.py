@@ -2,7 +2,7 @@ import os, json
 from django.http import HttpResponse
 from serving import add_request_handler
 from logger import log
-import settings, context
+import src.settings, context
 
 @add_request_handler
 def enumerate_suites(request, RequestHandler):
@@ -49,7 +49,7 @@ def get_suites(root, path, fullpath, ctx_name, RequestHandler):
 	... d tests/suite-2/sub-suite
 	... f tests/suite-2/sub-suite/.context.ini [context]
 	... ''')
-	>>> settings.VIRTUAL_PATHS['root'] = os.getcwd()
+	>>> src.settings.VIRTUAL_PATHS['root'] = os.getcwd()
 	>>> dfh = DefaultHandler({}, 'root/tests', None)
 	>>> suites = get_suites(os.getcwd(), 'root/tests', os.getcwd()+'/tests', 'context', dfh)
 	>>> 'tests/suite-2/sub-suite' in suites
@@ -57,7 +57,7 @@ def get_suites(root, path, fullpath, ctx_name, RequestHandler):
 	>>> 'tests/suite-1' in suites
 	True
 	"""
-	contextini = settings.TEST_CONTEXT_FILE_NAME
+	contextini = src.settings.TEST_CONTEXT_FILE_NAME
 	suites = []
 	for dirpath, dirnames, filenames in os.walk(fullpath, followlinks=True):
 		if contextini in filenames:

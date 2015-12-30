@@ -2,7 +2,7 @@ import os
 from django.http import Http404, HttpResponse, HttpResponseRedirect
 from error import handler as error_handler
 from serving import add_request_handler
-import context, settings, contrib
+import context, src.settings, contrib
 import coffeescript, cucumber
 import dir_index_tools
 from logger import log
@@ -32,7 +32,7 @@ def test(request, RequestHandler):
 		path = coffeescript.compile2js(test_content, path, fullpath)
 
 	engine_type = engine.engage4test(path, fullpath, ctx)
-	testLoaderUrl = ctx.get('test_loader_url', settings.EXEC_TESTS_CMD)
+	testLoaderUrl = ctx.get('test_loader_url', src.settings.EXEC_TESTS_CMD)
 	url = "http://%s/%s?server=%s&engine=%s&path=/%s" % (target, testLoaderUrl, server, engine_type, path)
 	log.info("redirect to run test %s" % url)
 	return HttpResponseRedirect(url)
@@ -56,7 +56,7 @@ def suite(request, RequestHandler):
 	saveLocalContext(fullpath, contextjs)
 
 	engine_type = engine.engage4suite(path, fullpath, ctx)
-	testLoaderUrl = ctx.get('test_loader_url', settings.EXEC_TESTS_CMD)
+	testLoaderUrl = ctx.get('test_loader_url', src.settings.EXEC_TESTS_CMD)
 	url = "http://%s/%s?server=%s&engine=%s&path=/%s" % ( target, testLoaderUrl, server, engine_type, path )
 	log.info("redirect to run suite %s" % url)
 	return HttpResponseRedirect( url )
@@ -65,7 +65,7 @@ def compileSuiteCoffee(path, suite_path):
 	contrib.cleandir(suite_path, '.*.js')
 	tests = contrib.enum_files_in_folders(
 			suite_path,
-			lambda file_: not file_.endswith(settings.COFFEE_FILE_EXT)
+			lambda file_: not file_.endswith(src.settings.COFFEE_FILE_EXT)
 	)
 	for test in tests:
 		fullpath = contrib.testFullPath(suite_path, test)
@@ -76,9 +76,9 @@ def coffee(path):
 
 def saveLocalContext(fullpath, contextjs):
 	if os.path.isdir(fullpath):
-		contextjs_path = os.path.join(fullpath, settings.TEST_CONTEXT_JS_FILE_NAME)
+		contextjs_path = os.path.join(fullpath, src.settings.TEST_CONTEXT_JS_FILE_NAME)
 	else:
-		contextjs_path = os.path.join(os.path.dirname(fullpath), settings.TEST_CONTEXT_JS_FILE_NAME)
+		contextjs_path = os.path.join(os.path.dirname(fullpath), src.settings.TEST_CONTEXT_JS_FILE_NAME)
 	f = open(contextjs_path, 'wt')
 	f.write(contextjs)
 	f.close()

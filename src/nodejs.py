@@ -2,7 +2,7 @@ from django.http import Http404, HttpResponse, HttpResponseRedirect, HttpRequest
 import os, shlex, subprocess, platform
 import json
 from logger import log
-import settings, contrib
+import src.settings, contrib
 
 def run(request):
     specs = request.POST["specs"]
@@ -12,7 +12,7 @@ def run(request):
     document_root = contrib.get_document_root(specs)
     fullSpecsPath = contrib.get_full_path(document_root, specs)
     fullStepsPath = contrib.get_full_path(document_root, steps)
-    testsResults = settings.root + "\\testsResult"
+    testsResults = src.settings.root + "\\testsResult"
     result = execute(fullSpecsPath, fullStepsPath, testsResults)
     result = get_results(fullSpecsPath, testsResults)
     
@@ -25,14 +25,14 @@ def run(request):
 
 def execute(specs, steps, testsResults):
     try:
-        args = "%s --specs %s --steps  %s --output-dir %s" % (settings.DASPEC_EXECUTABLE, specs, steps, testsResults)
+        args = "%s --specs %s --steps  %s --output-dir %s" % (src.settings.DASPEC_EXECUTABLE, specs, steps, testsResults)
         log.debug('run %s' %  args)
         p = subprocess.Popen(args, shell=True)
         result = p.communicate()
         
     except Exception, e:
         log.exception(e)
-        raise Exception("Can't execute daspec: %s" % settings.DASPEC_EXECUTABLE)
+        raise Exception("Can't execute daspec: %s" % src.settings.DASPEC_EXECUTABLE)
     
 def get_results(spec, testsResults):
     resultPath = spec.replace("C:", testsResults)
