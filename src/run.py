@@ -3,7 +3,7 @@ from django.http import Http404, HttpResponse, HttpResponseRedirect
 from error import handler as error_handler
 from serving import add_request_handler
 import context, src.settings, contrib
-import coffeescript, cucumber
+import src.coffeescript, cucumber
 import src.dir_index_tools
 from src.logger import log
 import plugins.engines.engine as engine
@@ -29,7 +29,7 @@ def test(request, RequestHandler):
 	
 	saveLocalContext(fullpath, contextjs)
 	if coffee(path):
-		path = coffeescript.compile2js(test_content, path, fullpath)
+		path = src.coffeescript.compile2js(test_content, path, fullpath)
 
 	engine_type = engine.engage4test(path, fullpath, ctx)
 	testLoaderUrl = ctx.get('test_loader_url', src.settings.EXEC_TESTS_CMD)

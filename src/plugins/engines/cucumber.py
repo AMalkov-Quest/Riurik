@@ -1,7 +1,7 @@
 import os, shlex, subprocess, platform
 import src.settings, src.dir_index_tools
 from src.logger import log
-import coffeescript, contrib
+import src.coffeescript, contrib
 
 def removeEOL(text):
 	lines = text.splitlines()
@@ -35,7 +35,7 @@ def cucumber2coffee(path):
 def save(full_path, path, cucumber_source):
 	cucumber_name, coffee_name = cucumber2coffee(full_path)
 	coffee_full_path = full_path.replace(cucumber_name, coffee_name)
-	coffeescript.compile2js(None, None, coffee_full_path)
+	src.coffeescript.compile2js(None, None, coffee_full_path)
 	
 	coffee_name, js_name = coffeescript.coffee2js(coffee_full_path)
 	js_full_path = coffee_full_path.replace(coffee_name, js_name)

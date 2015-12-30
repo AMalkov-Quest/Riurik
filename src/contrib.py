@@ -159,7 +159,7 @@ def get_libraries_impl(RequestHandler, ctxitems, ctx):
 			log.info('there are no precofigured libs to include, try defaults ...')
 			libraries = libraries_default(RequestHandler, ctx)
 
-	import coffeescript
+	import src.coffeescript
 	def patch_coffeescript_lib(lib):
 		if re.search(r'\.coffee$', lib):
 			root = RequestHandler.get_document_root()
