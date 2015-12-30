@@ -1,7 +1,7 @@
 import os, shlex, subprocess, platform
 import src.settings, src.dir_index_tools
 from src.logger import log
-import coffeescript
+import src.coffeescript
 
 def cucumber(path, ctx):
 	return path.endswith(src.settings.CUCUMBER_FILE_EXT) or ctx.get('cucumber', None) != None

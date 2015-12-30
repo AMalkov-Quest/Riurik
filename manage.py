@@ -11,6 +11,7 @@ from src.plugins.github import urls
 from src.templatetags import dir_index_tags
 
 from django.core import context_processors
+from django.contrib.messages import context_processors
 from django.db.backends.dummy import base
 from django.core.cache.backends.locmem import LocMemCache
 from django.contrib.sessions import middleware, serializers

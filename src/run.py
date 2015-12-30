@@ -69,7 +69,7 @@ def compileSuiteCoffee(path, suite_path):
 	)
 	for test in tests:
 		fullpath = src.contrib.testFullPath(suite_path, test)
-		coffeescript.compile2js(None, None, fullpath)
+		src.coffeescript.compile2js(None, None, fullpath)
 
 def coffee(path):
 	return path.endswith('.coffee')

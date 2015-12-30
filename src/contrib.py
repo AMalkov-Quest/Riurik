@@ -164,7 +164,7 @@ def get_libraries_impl(RequestHandler, ctxitems, ctx):
 		if re.search(r'\.coffee$', lib):
 			root = RequestHandler.get_document_root()
 			fullpath = get_full_path(root, lib)
-			return coffeescript.compile2js(None, lib, fullpath)
+			return src.coffeescript.compile2js(None, lib, fullpath)
 		return lib
 	libraries = map( patch_coffeescript_lib, libraries )
 	log.debug(libraries)
