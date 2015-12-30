@@ -7,9 +7,9 @@ if getattr(sys, 'frozen', False):
     working_dir = sys._MEIPASS
 else:
     working_dir = os.path.dirname(os.path.abspath(__file__))
-print "working_dir %s" % working_dir
+    #sys.path.append(working_dir)
+    
 root = os.path.normpath(os.path.dirname(working_dir))
-sys.path.append(working_dir)
 
 try:
     from local_settings import VIRTUAL_PATHS
@@ -98,7 +98,7 @@ MIDDLEWARE_CLASSES = (
 if not os.path.exists(SESSION_FILE_PATH):
     os.makedirs(SESSION_FILE_PATH)
 
-ROOT_URLCONF = 'urls'
+ROOT_URLCONF = 'src.urls'
 
 TEMPLATE_DIRS = (
 

@@ -1,8 +1,13 @@
 import os, sys
 #for pyinstaller
+from src import urls
 import src.plugins.search
+from src.plugins.search import urls
+from src.plugins.help import urls
 import src.plugins.git
+from src.plugins.git import urls
 import src.plugins.github
+from src.plugins.github import urls
 
 from django.db.backends.dummy import base
 from django.core.cache.backends.locmem import LocMemCache

@@ -36,10 +36,10 @@ urlpatterns = patterns('',
 )
 
 urlpatterns += patterns('',
-	(r'^search', include('plugins.search.urls')),
-	(r'^readme', include('plugins.help.urls')),
-	(r'^git/(?P<cmd>.*)$', include('plugins.git.urls')),
-	(r'^github/', include('plugins.github.urls')),
+	(r'^search', include('src.plugins.search.urls')),
+	(r'^readme', include('src.plugins.help.urls')),
+	(r'^git/(?P<cmd>.*)$', include('src.plugins.git.urls')),
+	(r'^github/', include('src.plugins.github.urls')),
 )
 
 urlpatterns += patterns('',
