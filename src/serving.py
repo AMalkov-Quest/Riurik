@@ -181,7 +181,7 @@ class BaseHandler(object):
 
 		try:
 			if self.get_type(fullpath) == 'virtual':
-				contexts = context.global_src.settings(self).sections()
+				contexts = context.global_settings(self).sections()
 			else:
 				contexts = context.get(self).sections()
 			log.debug(contexts)

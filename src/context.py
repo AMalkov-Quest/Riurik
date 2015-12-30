@@ -171,7 +171,7 @@ class context(global_settings):
 		return value
 
 	def libraries(self, values):
-		gs = global_src.settings(self.requestHandler).items() or {}
+		gs = global_settings(self.requestHandler).items() or {}
 		for item in gs:
 			if item[0] == src.settings.LIB_KEY_NAME:
 				glibs = item[1]
