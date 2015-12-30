@@ -4,7 +4,7 @@ from django.utils.safestring import mark_safe
 import src.settings
 import src.contrib
 from src.logger import log
-import src.dir_index_tools
+import src.src.dir_index_tools
 
 register = template.Library()
 

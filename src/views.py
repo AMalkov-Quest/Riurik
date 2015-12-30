@@ -4,7 +4,7 @@ from django.template import loader, RequestContext, Context, Template, TemplateD
 from django.http import Http404, HttpResponse, HttpResponseRedirect, HttpRequest, HttpResponseServerError
 import django.views.static
 import os, re
-import dir_index_tools as tools
+import src.dir_index_tools as tools
 import json
 import django.conf
 import src.settings

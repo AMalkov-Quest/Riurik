@@ -7,7 +7,7 @@ import django.views.static
 import json, mimetypes, stat
 import src.settings
 from logger import log
-import dir_index_tools as tools
+import src.dir_index_tools as tools
 import context, contrib, inuse, spec
 
 def get_path(request):

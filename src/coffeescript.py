@@ -1,5 +1,5 @@
 import os, shlex, subprocess, platform
-import src.settings, dir_index_tools
+import src.settings, src.dir_index_tools
 from logger import log
 
 def coffee(path):
@@ -33,14 +33,14 @@ def save(full_path, path, out):
 		os.remove(full_path)
 
 	if out:
-		dir_index_tools.savetest(out.decode("utf-8"), full_path)
+		src.dir_index_tools.savetest(out.decode("utf-8"), full_path)
 
 	return path.replace(coffee_name, js_name) if path else None
 
 def compile(source, full_path):
 	log.info('coffeescript compile %s' % full_path)
 	if not source:
-		source = dir_index_tools.gettest(full_path)
+		source = src.dir_index_tools.gettest(full_path)
 	else:
 		source = source.encode("utf-8")
 

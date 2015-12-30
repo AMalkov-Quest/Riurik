@@ -1,7 +1,7 @@
 import os
 import contrib
 from logger import log
-import dir_index_tools as tools
+import src.dir_index_tools as tools
 import urllib, urllib2
 
 def auth(url, ctx):

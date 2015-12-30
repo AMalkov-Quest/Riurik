@@ -4,7 +4,7 @@ from error import handler as error_handler
 from serving import add_request_handler
 import context, src.settings, contrib
 import coffeescript, cucumber
-import dir_index_tools
+import src.dir_index_tools
 from logger import log
 import plugins.engines.engine as engine
 
@@ -24,7 +24,7 @@ def test(request, RequestHandler):
 	target = contrib.get_runner_url(ctx, server)
 	log.info('target of test %s is %s' % (path, target))
 
-	dir_index_tools.savetest(request.REQUEST.get('content', None), fullpath)
+	src.dir_index_tools.savetest(request.REQUEST.get('content', None), fullpath)
 	test_content = request.REQUEST.get("content", open(fullpath, 'r').read())
 	
 	saveLocalContext(fullpath, contextjs)

@@ -1,5 +1,5 @@
 import os, shlex, subprocess, platform
-import src.settings, dir_index_tools
+import src.settings, src.dir_index_tools
 from logger import log
 import coffeescript
 
@@ -12,7 +12,7 @@ def removeEOL(text):
 
 def compile(full_path):
 	log.info('cucumber compile %s' % full_path)
-	source = dir_index_tools.gettest(full_path)
+	source = src.dir_index_tools.gettest(full_path)
 	#log.info("Spec'''%s'''" % source)
 	#return coffeescript.compile("Spec'''%s'''" % source, full_path)
 	return "Spec('%s');" % removeEOL(source)
@@ -33,10 +33,10 @@ def save(full_path, path, cucumber_source):
 	coffee_name, js_name = coffeescript.coffee2js(coffee_full_path)
 	js_full_path = coffee_full_path.replace(coffee_name, js_name)
 	if os.path.exists(js_full_path):
-		js_source = dir_index_tools.gettest(js_full_path)
+		js_source = src.dir_index_tools.gettest(js_full_path)
 		os.remove(js_full_path)
 		source = cucumber_source + '\n' + js_source
-		dir_index_tools.savetest(source.decode("utf-8"), js_full_path)
+		src.dir_index_tools.savetest(source.decode("utf-8"), js_full_path)
 
 		return path.replace(cucumber_name, js_name) if path else None
 
