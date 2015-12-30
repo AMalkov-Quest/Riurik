@@ -4,6 +4,7 @@
 *.log
 *.swp
 *.spec
+*.zip
 .context.js
 .ropeproject
 tags
