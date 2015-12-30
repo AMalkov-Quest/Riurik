@@ -1,6 +1,6 @@
 import os, shutil
 import src.settings, resources, contrib
-from logger import log
+from src.logger import log
 
 def get_type(path):
 	"""

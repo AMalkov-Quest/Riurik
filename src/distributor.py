@@ -1,6 +1,6 @@
 import os
 import contrib
-from logger import log
+from src.logger import log
 import src.dir_index_tools as tools
 import urllib, urllib2
 

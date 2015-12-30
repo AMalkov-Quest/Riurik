@@ -1,7 +1,7 @@
 # coding: utf-8
 import os, re, config, time
 import src.settings
-from logger import log
+from src.logger import log
 import socket
 import fnmatch
 from context_impl import context_impl

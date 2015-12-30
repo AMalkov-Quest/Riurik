@@ -1,6 +1,6 @@
 import os, shlex, subprocess, platform
 import src.settings, src.dir_index_tools
-from logger import log
+from src.logger import log
 import coffeescript
 
 def cucumber(path, ctx):

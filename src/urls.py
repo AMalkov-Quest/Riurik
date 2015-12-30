@@ -4,7 +4,7 @@ from django.views.static import serve
 import os
 import src.settings
 import src.views, src.ci, src.run
-from logger import log
+from src.logger import log
 
 urlpatterns = patterns('',
 	(r'^favicon\.ico$', RedirectView.as_view(url="/static/img/favicon.gif")),
@@ -26,8 +26,8 @@ urlpatterns = patterns('',
 	(r'^actions/rename/$', 'src.views.renameObject'),
 	(r'^actions/suite/enumerate/$', 'ci.enumerate_suites'),
 	(r'^(?P<path>.*)/show_context[/]?$', 'src.views.show_context'),
-	(r'^src.settings[/]?$', 'src.views.live_src.settings_view'),
-	(r'^src.settings/save[/]?$', 'src.views.live_src.settings_save'),
+	(r'^settings[/]?$', 'src.views.live_src.settings_view'),
+	(r'^settings/save[/]?$', 'src.views.live_src.settings_save'),
 	(r'^report_callback/$', 'src.views.report_callback'),
 	(r'^report/status$', 'src.views.tests_status'),
 	(r'^report/progress$', 'src.views.tests_progress'),

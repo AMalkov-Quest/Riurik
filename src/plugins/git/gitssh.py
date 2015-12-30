@@ -1,6 +1,6 @@
 import subprocess, tempfile, os, shlex
 import plugins.github.gitware as gitware
-from logger import log
+from src.logger import log
 
 git_ssh_cmd = os.path.abspath( os.path.join( os.path.dirname( os.path.join( __file__ ) ), 'git-ssh.sh' ) )
 

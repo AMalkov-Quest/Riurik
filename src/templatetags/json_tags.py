@@ -3,7 +3,7 @@ from django import template
 from django.utils.safestring import mark_safe
 import src.settings
 import contrib
-from logger import log
+from src.logger import log
 import json
 register = template.Library()
 

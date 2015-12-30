@@ -3,7 +3,7 @@ from django.template import loader, RequestContext, Context, Template, TemplateD
 from django.http import Http404, HttpResponse, HttpResponseRedirect, HttpResponseNotModified, HttpRequest
 import os, json
 import libsearch
-from logger import log
+from src.logger import log
 import serving
 
 def search_view(request, path=None, search_pattern=None, as_json=False, global_search=True):

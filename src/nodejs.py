@@ -1,7 +1,7 @@
 from django.http import Http404, HttpResponse, HttpResponseRedirect, HttpRequest, HttpResponseServerError
 import os, shlex, subprocess, platform
 import json
-from logger import log
+from src.logger import log
 import src.settings, contrib
 
 def run(request):

@@ -1,5 +1,5 @@
 import os, re, json
-from logger import log
+from src.logger import log
 import src.settings, config, contrib
 from django.template import Context, Template
 import socket

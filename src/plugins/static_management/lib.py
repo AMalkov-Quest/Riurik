@@ -5,7 +5,7 @@ import subprocess
 from django.conf import settings
 from django.core import exceptions
 from django.core.management.base import CommandError
-from logger import log
+from src.logger import log
 
 def get_version(end_file, relative_filename, versioner):
     """gets the file version based on the versioner provided"""

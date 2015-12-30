@@ -2,7 +2,7 @@ import os, json, re, time
 import threading
 import shutil
 import fnmatch
-from logger import log
+from src.logger import log
 import contrib
 
 mutex = threading.RLock()

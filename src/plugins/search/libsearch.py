@@ -2,7 +2,7 @@
 
 import re, os
 import contrib
-from logger import log
+from src.logger import log
 
 def listfiles(folder):
 	for root, dirs, files in os.walk(folder):

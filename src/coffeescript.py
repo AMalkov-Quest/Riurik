@@ -1,6 +1,6 @@
 import os, shlex, subprocess, platform
 import src.settings, src.dir_index_tools
-from logger import log
+from src.logger import log
 
 def coffee(path):
 	file_name = os.path.basename(path)

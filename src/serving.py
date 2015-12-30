@@ -6,7 +6,7 @@ from django.utils.http import http_date
 import django.views.static
 import json, mimetypes, stat
 import src.settings
-from logger import log
+from src.logger import log
 import src.dir_index_tools as tools
 import context, contrib, inuse, spec
 

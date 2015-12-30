@@ -1,7 +1,7 @@
 import urllib, urllib2
 from django.http import HttpResponse
 from django.template.loader import render_to_string
-from logger import log
+from src.logger import log
 
 def handler(fn):
 	def _f(*args, **kwargs):

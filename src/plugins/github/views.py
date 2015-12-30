@@ -5,7 +5,7 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.template import loader, RequestContext, Context, Template, TemplateDoesNotExist
 import src.settings
 import httplib, urllib, json
-from logger import log
+from src.logger import log
 import serving
 import gitware
 

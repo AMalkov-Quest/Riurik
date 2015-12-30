@@ -5,7 +5,7 @@ from serving import add_request_handler
 import context, src.settings, contrib
 import coffeescript, cucumber
 import src.dir_index_tools
-from logger import log
+from src.logger import log
 import plugins.engines.engine as engine
 
 @add_request_handler

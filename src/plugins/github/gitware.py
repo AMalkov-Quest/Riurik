@@ -2,7 +2,7 @@ import os
 from github import Github, GithubException
 import shlex
 from subprocess import Popen, PIPE
-from logger import log
+from src.logger import log
 
 repo_title = 'Repo added through Riurik Framework'
 key_title = 'Key added through Riurik Framework'

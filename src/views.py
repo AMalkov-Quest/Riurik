@@ -8,7 +8,7 @@ import src.dir_index_tools as tools
 import json
 import django.conf
 import src.settings
-from logger import log
+from src.logger import log
 import context, config, contrib
 import mimetypes, datetime
 import codecs, time
@@ -116,7 +116,7 @@ def submitSuite(request):
 	return _render_to_response( "runsuite.html", request.POST )
 
 def recvLogRecords(request):
-	from logger import FILENAME, timeFormat
+	from src.logger import FILENAME, timeFormat
 	log_file = FILENAME
 	f = codecs.open(log_file, 'r', 'utf-8')
 	records = f.read()

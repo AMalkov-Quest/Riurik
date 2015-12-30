@@ -1,7 +1,7 @@
 import os, json
 from django.http import HttpResponse
 from serving import add_request_handler
-from logger import log
+from src.logger import log
 import src.settings, context
 
 @add_request_handler

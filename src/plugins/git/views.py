@@ -2,7 +2,7 @@ import os
 from django.http import HttpResponse
 import plugins.git.gitssh as gitssh
 import plugins.github.views as github
-from logger import log
+from src.logger import log
 
 def git(request, cmd):
 	token, login, repoid = github.get_auth(request)
