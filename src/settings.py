@@ -3,7 +3,11 @@
 import os, platform, sys
 from local_settings import *
 
-working_dir = os.path.dirname(os.path.abspath(__file__))
+if getattr(sys, 'frozen', False):
+    working_dir = sys._MEIPASS
+else:
+    working_dir = os.path.dirname(os.path.abspath(__file__))
+print "working_dir %s" % working_dir
 root = os.path.normpath(os.path.dirname(working_dir))
 sys.path.append(working_dir)
 
@@ -25,8 +29,6 @@ MANAGERS = ADMINS
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.dirname( __file__ ) + 'local.db',
     }
 }
 

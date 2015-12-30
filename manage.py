@@ -3,6 +3,8 @@ import os, sys
 import src.plugins.search
 import src.plugins.git
 import src.plugins.github
+
+from django.db.backends.dummy import base
 from django.core.cache.backends.locmem import LocMemCache
 from django.contrib.sessions import middleware, serializers
 
