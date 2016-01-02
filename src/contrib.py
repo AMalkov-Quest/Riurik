@@ -92,7 +92,7 @@ def config_cacher(fn):
 def getVirtualPathConfig(config_path):
 	items = config.items(config_path, 'DEFAULT')
 	return dict( items )
-
+	
 def extend_virtual_paths(root, path, alias, virtual_paths):
 	config_path = os.path.join(path, src.settings.GLOBAL_CONTEXT_FILE_NAME)
 	if not os.path.exists(config_path): return
@@ -105,7 +105,7 @@ def extend_virtual_paths(root, path, alias, virtual_paths):
 		product_code_alias = '%s-%s' % (alias, product_code_alias)
 		virtual_paths[product_code_alias] = os.path.join(root, product_code_path)
 
-def get_virtual_paths():
+def get_virtual_paths_old():
 	"""
 	>>> src.settings.VIRTUAL_PATHS = {'key': 'value'}
 	>>> get_virtual_paths()
@@ -117,10 +117,26 @@ def get_virtual_paths():
 			root = path[0]
 			realpath = os.path.join(*path)
 			result[alias] = realpath
-			extend_virtual_paths(root, realpath, alias, result)
+			#extend_virtual_paths(root, realpath, alias, result)
 		else:
 			result[alias] = path
 
+	get_real_paths(result)
+	
+	return result
+
+def get_virtual_paths():
+	result = {}
+	root = os.path.normpath(os.path.join(src.settings.working_dir, '..'))
+	print "Root %s" % root
+	
+	testsRoot = os.path.join(root, 'TestsRoot')
+	if os.path.exists(testsRoot):
+		for dir in os.listdir(testsRoot):
+			path = os.path.join(testsRoot, dir)
+			if os.path.isdir(path):
+				result[dir] = path
+		
 	return result
 
 def target_is_remote(target, host):
