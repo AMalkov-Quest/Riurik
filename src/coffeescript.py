@@ -24,7 +24,7 @@ def execute(source):
 		return p.communicate(source)
 	except Exception, e:
 		log.exception(e)
-		raise Exception("Can't execute CoffeeScript compiler: %s" % src.settings.COFFEESCRIPT_EXECUTABLE)
+		raise Exception("Can't execute CoffeeScript compiler: %s" % args[0])
         
 def save(full_path, path, out):
 	coffee_name, js_name = coffee2js(full_path)
