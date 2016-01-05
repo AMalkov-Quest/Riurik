@@ -131,8 +131,9 @@ def appInstalled(app_name):
 
 if platform.system() == 'Windows':
     nodejs = os.path.join(os.environ['ProgramFiles'], 'nodejs', 'node.exe')
-    COFFEESCRIPT_EXECUTABLE = os.path.join(r'C:\\Users\\Administrator\\AppData\\Roaming\\npm\\', 'coffee.cmd')
-    DASPEC_EXECUTABLE = 'daspec'
+    npmpath = os.path.join(os.environ['APPDATA'], 'npm')
+    COFFEESCRIPT_EXECUTABLE = os.path.join(npmpath, 'coffee.cmd')
+    DASPEC_EXECUTABLE = os.path.join(npmpath, 'daspec.cmd')
 elif platform.system() == 'Linux':
     COFFEESCRIPT_EXECUTABLE = 'coffee'
 else:

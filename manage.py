@@ -1,6 +1,6 @@
 import os, sys
 #for pyinstaller
-from src import urls
+from src import urls, nodejs
 import src.plugins.search
 from src.plugins.search import urls
 from src.plugins.help import urls
@@ -8,7 +8,7 @@ import src.plugins.git
 from src.plugins.git import urls
 import src.plugins.github
 from src.plugins.github import urls
-from src.templatetags import dir_index_tags
+from src.templatetags import dir_index_tags, json_tags
 
 from django.core import context_processors
 from django.contrib.messages import context_processors

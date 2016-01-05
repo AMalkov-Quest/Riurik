@@ -127,10 +127,12 @@ def get_virtual_paths_old():
 
 def get_virtual_paths():
 	result = {}
-	root = os.path.normpath(os.path.join(src.settings.working_dir, '..'))
-	print "Root %s" % root
 	
-	testsRoot = os.path.join(root, 'TestsRoot')
+	testsRoot = os.path.join(src.settings.working_dir, 'TestsRoot')
+	if not os.path.exists(testsRoot):	
+		root = os.path.normpath(os.path.join(src.settings.working_dir, '..'))
+		testsRoot = os.path.join(root, 'TestsRoot')
+	
 	if os.path.exists(testsRoot):
 		for dir in os.listdir(testsRoot):
 			path = os.path.join(testsRoot, dir)
