@@ -62,7 +62,7 @@ def execute_daspec(specs, steps, testsResults):
     
 def execute_edge(script, engine, testsResults):
     try:
-        args = '"%s" %s' % (src.settings.nodejs, engine)
+        args = '"%s" %s %s' % (src.settings.nodejs, engine, script)
         log.debug('run %s' %  args)
         p = subprocess.Popen(args, shell=True, stdout=subprocess.PIPE)
         for line in p.stdout:
