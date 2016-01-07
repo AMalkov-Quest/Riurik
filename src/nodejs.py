@@ -13,8 +13,10 @@ def run_daspec(request, testsResults):
     fullSpecsPath = src.contrib.get_full_path(document_root, specs)
     fullStepsPath = src.contrib.get_full_path(document_root, steps)
     
-    result = execute_daspec(fullSpecsPath, fullStepsPath, testsResults)
-    result = get_results(fullSpecsPath, testsResults)
+    execute_daspec(fullSpecsPath, fullStepsPath, testsResults)
+    
+    resultPath = fullSpecsPath.replace("C:", testsResults)
+    result = get_results(resultPath)
     
     data = {}
     data['result'] = result
@@ -30,8 +32,10 @@ def run_edgejs(request, testsResults):
     document_root = src.contrib.get_document_root(script)
     fullScriptPath = src.contrib.get_full_path(document_root, script)
     fullEdgejsPath = os.path.join(src.settings.working_dir, 'static\engines\edgejs\edge-web.js')
+    testsResults = os.path.join(testsResults, script.strip('/'))
     
-    result = execute_edge(fullScriptPath, fullEdgejsPath, testsResults)
+    execute_edge(fullScriptPath, fullEdgejsPath, testsResults)
+    result = get_results(testsResults)
     
     data = {}
     data['result'] = result
@@ -54,6 +58,7 @@ def execute_daspec(specs, steps, testsResults):
         args = "%s --specs %s --steps  %s --output-dir %s" % (src.settings.DASPEC_EXECUTABLE, specs, steps, testsResults)
         log.debug('run %s' %  args)
         p = subprocess.Popen(args, shell=True, stdout=subprocess.PIPE)
+        
         for line in p.stdout:
             log.debug(line)
     except Exception, e:
@@ -65,13 +70,17 @@ def execute_edge(script, engine, testsResults):
         args = '"%s" %s %s' % (src.settings.nodejs, engine, script)
         log.debug('run %s' %  args)
         p = subprocess.Popen(args, shell=True, stdout=subprocess.PIPE)
+        
+        if not os.path.exists(os.path.dirname(testsResults)):
+            os.makedirs(os.path.dirname(testsResults))
+        f = open(testsResults, 'w')
         for line in p.stdout:
-            log.debug(line)
+            f.write(line)
+        f.close()
     except Exception, e:
         log.exception(e)
         raise Exception("Can't execute edge: %s" % src.settings.nodejs)
     
-def get_results(spec, testsResults):
-    resultPath = spec.replace("C:", testsResults)
+def get_results(resultPath):
     log.debug("result file is %s" % resultPath)
     return open(resultPath).read()

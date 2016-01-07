@@ -37,7 +37,7 @@ riurik.engine.run_tests = function(script) {
         { engine: 'edgejs', script: riurik.args.path }, 
         function(data){
             scriptResult = data['result'];
-            $('#page-content').html();  
+            $('#page-content').html(scriptResult);  
         },
         "json"
     );
