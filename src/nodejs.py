@@ -4,7 +4,7 @@ import json
 from src.logger import log
 import src.settings, src.contrib
 
-def run_daspec(request):
+def run_daspec(request, testsResults):
     specs = request.POST["specs"]
     steps = request.POST["steps"]
     log.debug('nodejs run daspec %s' %  specs)
@@ -12,7 +12,7 @@ def run_daspec(request):
     document_root = src.contrib.get_document_root(specs)
     fullSpecsPath = src.contrib.get_full_path(document_root, specs)
     fullStepsPath = src.contrib.get_full_path(document_root, steps)
-    testsResults = src.settings.root + "\\testsResult"
+    
     result = execute_daspec(fullSpecsPath, fullStepsPath, testsResults)
     result = get_results(fullSpecsPath, testsResults)
     
@@ -23,16 +23,15 @@ def run_daspec(request):
 
     return response
 
-def run_edgejs(request):
+def run_edgejs(request, testsResults):
     script = request.POST["script"]
     log.debug('nodejs run edgejs %s' %  script)
     
     document_root = src.contrib.get_document_root(script)
     fullScriptPath = src.contrib.get_full_path(document_root, script)
-    fullEnginePath = 'C:\Riurik\src\static\engines\edgejs\edge-web.js'
-    testsResults = src.settings.root + "\\testsResult"
+    fullEdgejsPath = os.path.join(src.settings.working_dir, 'static\engines\edgejs\edge-web.js')
     
-    result = execute_edge(fullScriptPath, fullEnginePath, testsResults)
+    result = execute_edge(fullScriptPath, fullEdgejsPath, testsResults)
     
     data = {}
     data['result'] = result
@@ -42,12 +41,13 @@ def run_edgejs(request):
     return response
 
 def run(request):
+    testsResults = os.path.join(src.settings.root, "testsResult")
     engine = request.POST["engine"]
     if engine == 'daspec':
-        return run_daspec(request)
+        return run_daspec(request, testsResults)
     
     if engine == 'edgejs':
-        return run_edgejs(request)
+        return run_edgejs(request, testsResults)
 
 def execute_daspec(specs, steps, testsResults):
     try:

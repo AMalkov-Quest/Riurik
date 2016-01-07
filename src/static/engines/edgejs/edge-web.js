@@ -9,6 +9,6 @@ ${psPath}
 var runPS = edge.func('ps', psDef);
     
 runPS(process.argv[3], function (error, result) {
-    if (error) throw error;
-    console.log(result[0]);
+    if (error) console.log(error);
+    else console.log(result[0]);
 });
