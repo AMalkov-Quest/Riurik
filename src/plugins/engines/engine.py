@@ -16,6 +16,9 @@ def engage4test(path, fullpath, ctx):
 	
 	if is_daspec(path, ctx):
 		engine = 'daspec'
+		
+	if is_edgejs(path, ctx):
+		engine = 'edgejs'
 
 	return engine
 
@@ -38,6 +41,9 @@ def engage4suite(path, fullpath, ctx):
 
 def is_daspec(path, ctx):
 	return path.endswith(src.settings.DASPEC_FILE_EXT) or ctx.get('daspec', None) != None
+
+def is_edgejs(path, ctx):
+	return path.endswith(src.settings.PS_FILE_EXT) or ctx.get('edgejs', None) != None
 
 def is_cucumber(path, ctx):
 	return path.endswith(src.settings.CUCUMBER_FILE_EXT) or ctx.get('cucumber', None) != None
