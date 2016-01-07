@@ -2,7 +2,7 @@ defineStep(/The right way to greet the (.*) is "(.*)"/, function (subject, expec
     var edge = require('edge');
     
     var hello = edge.func('ps', function () {/*
-        "PowerShell welcomes $inputFromJS on $(Get-Date)"
+        "Hello, $inputFromJS on $(Get-Date)!"
     */});
     
     promise = new Promise(function (resolve, reject) {
