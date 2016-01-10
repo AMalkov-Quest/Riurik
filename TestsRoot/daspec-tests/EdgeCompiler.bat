@@ -1,0 +1,1 @@
+%windir%\Microsoft.NET\Framework64\v4.0.30319\csc.exe /out:edge-ps.dll /reference:C:\Windows\assembly\GAC_MSIL\System.Management.Automation\1.0.0.0__31bf3856ad364e35/System.Management.Automation.dll /target:library EdgeCompiler.cs
