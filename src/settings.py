@@ -6,10 +6,10 @@ from local_settings import *
 if getattr(sys, 'frozen', False):
     working_dir = sys._MEIPASS
 else:
-    working_dir = os.path.dirname(os.path.abspath(__file__))
-    #sys.path.append(working_dir)
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    working_dir = os.path.normpath(os.path.join(current_dir, '..'))
     
-root = os.path.normpath(os.path.dirname(working_dir))
+root = os.path.normpath(working_dir)
 
 try:
     from local_settings import VIRTUAL_PATHS

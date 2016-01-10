@@ -31,7 +31,7 @@ def run_edgejs(request, testsResults):
     
     document_root = src.contrib.get_document_root(script)
     fullScriptPath = src.contrib.get_full_path(document_root, script)
-    fullEdgejsPath = os.path.join(src.settings.working_dir, 'static\engines\edgejs\edge-web.js')
+    fullEdgejsPath = os.path.join(src.settings.working_dir, 'src\static\engines\edgejs\edge-web.js')
     testsResults = os.path.join(testsResults, script.strip('/'))
     
     execute_edge(fullScriptPath, fullEdgejsPath, testsResults)

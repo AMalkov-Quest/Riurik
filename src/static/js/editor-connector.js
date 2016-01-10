@@ -12,7 +12,9 @@ $(function initAceEditor(){
     var mode = modeprob('coffee', 'coffee')
             || modeprob('feature', 'gherkin')
             || modeprob('js', 'javascript')
-            || modeprob('daspec', 'markdown');
+            || modeprob('daspec', 'markdown')
+            || modeprob('ps1', 'powershell')
+            || modeprob('psm1', 'powershell');
    
     console.log(mode) 
     if (mode != null) {

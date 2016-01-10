@@ -1,0 +1,23 @@
+Assuming the following inventory:
+
+
+| Item                                   | Quantity |
+|----------------------------------------|----------|
+| Fifty Quick Ideas To Improve Your Tests|       20 |
+| Impact Mapping                         |        1 |
+| Specification by Example               |        0 |
+
+When a customer order with the following items is processed:
+
+| Item                                    | Quantity |
+|-----------------------------------------|----------|
+| Specification by Example                | 4        |
+| Impact Mapping                          | 3        |
+| Fifty Quick Ideas To Improve Your Tests | 5        | 
+
+The following items will be shipped:
+
+| Item                                    | Quantity |
+|-----------------------------------------|----------|
+| Impact Mapping                          | 1        |
+| Fifty Quick Ideas To Improve Your Tests | 5        |

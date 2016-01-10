@@ -14,5 +14,5 @@ C:\Python27\Scripts\pyinstaller.exe Riurik\manage.py -d ^
 	--specpath=%~dp0
 
 XCOPY %TESTS_ROOT% %DIST%\%NAME%\TestsRoot /S /I
-XCOPY %~dp0run-exe.bat %DIST%\%NAME% /I
+XCOPY %~dp0Riurik.bat %DIST%\%NAME% /I
 exit
