@@ -35,11 +35,11 @@ if( -not (Get-WmiObject -Class Win32_Product | where { $_.Name -match "Node.js"}
 
 		Start-Process "$npmPath" 'install coffee-script -g' -Wait
 		Start-Process "$npmPath" 'install daspec -g' -Wait
-		
-		Start-Process "$npmPath" 'install edge' -WorkingDirectory $riurikPath -Wait
-		Start-Process "$npmPath" 'install edge-ps' -WorkingDirectory $riurikPath -Wait
     }
 }
+		
+Start-Process "$npmPath" 'install edge' -WorkingDirectory $riurikPath -Wait
+Start-Process "$npmPath" 'install edge-ps' -WorkingDirectory $riurikPath -Wait
 
 if( AreYouAgree "It is necessary to start the Riurik server" ) {
 	[Environment]::SetEnvironmentVariable("DJANGO_SETTINGS_MODULE", "src.settings", "Process")
